@@ -3,16 +3,50 @@ var webpack = require("webpack");
 var autoprefixer = require("autoprefixer");
 var HtmlWebpackPlugin = require("html-webpack-plugin");
 
+function getDevtool(env) {
+    return (env === "development") ? "cheap-module-eval-source-map" : "cheap-module-source-map";
+}
+
+function getEntry(env) {
+    if (env === "development") {
+        return [
+            "webpack-dev-server/client?http://localhost:3000",
+            "webpack/hot/only-dev-server",
+            "react-hot-loader/patch",
+            "babel-polyfill",
+            "whatwg-fetch",
+            "./src/index"
+        ];
+    } else {
+        return [
+            "babel-polyfill",
+            "whatwg-fetch",
+            "./src/index"
+        ];
+    }
+}
+
+function getPlugins(env) {
+    if (env === "development") {
+        return [
+            new webpack.DefinePlugin({"process.env": {NODE_ENV: '"development"'}}),
+            new webpack.HotModuleReplacementPlugin(),
+            new HtmlWebpackPlugin({template: "index.ejs"})
+        ];
+    } else {
+        return [
+            new webpack.optimize.OccurenceOrderPlugin(),
+            new webpack.DefinePlugin({"process.env": {NODE_ENV: '"production"'}}),
+            new webpack.optimize.UglifyJsPlugin({compressor: {warnings: false}}),
+            new HtmlWebpackPlugin({template: "index.ejs"})
+        ];
+    }
+}
+
 module.exports = {
-    devtool: "eval",
-    entry: [
-        "webpack-dev-server/client?http://localhost:3000",
-        "webpack/hot/only-dev-server",
-        "react-hot-loader/patch",
-        "babel-polyfill",
-        "whatwg-fetch",
-        "./src/index"
-    ],
+    devtool: getDevtool(process.env.NODE_ENV),
+    entry: getEntry(process.env.NODE_ENV),
+    plugins: getPlugins(process.env.NODE_ENV),
     resolve: {
         modulesDirectories: ["node_modules", "src"]
     },
@@ -44,14 +78,5 @@ module.exports = {
             }
         ]
     },
-    postcss: [autoprefixer],
-    plugins: [
-        new webpack.DefinePlugin({
-            "process.env": {
-                NODE_ENV: '"development"'
-            }
-        }),
-        new webpack.HotModuleReplacementPlugin(),
-        new HtmlWebpackPlugin({template: "index.ejs"})
-    ]
+    postcss: [autoprefixer]
 };

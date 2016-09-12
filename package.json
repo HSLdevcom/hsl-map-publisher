@@ -7,7 +7,7 @@
     "clean": "rimraf dist",
     "bundle": "cross-env NODE_ENV=production webpack --config webpack.config.js",
     "build": "npm run clean && npm run bundle",
-    "start": "node server.js"
+    "start": "cross-env NODE_ENV=development node server.js"
   },
   "repository": {
     "type": "git",
