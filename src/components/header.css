@@ -1,6 +1,7 @@
+@value white, background, fontFamily from "styles/common.css";
 
 .title {
-    font-family: "Gotham Rounded SSm A", "Gotham Rounded SSm B", sans-serif;
+    font-family: fontFamily;
     font-size: 70px;
     font-weight: 700;
     white-space: nowrap;
@@ -26,7 +27,7 @@
     padding: 0 20px;
     font-size: 55px;
     text-align: center;
-    border: 5px solid hsl(0, 0%, 100%);
+    border: 5px solid white;
     border-radius: 10px;
 }
 
@@ -37,7 +38,7 @@
     font-size: 42px;
     letter-spacing: -1px;
     text-transform: uppercase;
-    color: hsl(200, 100%, 40%);
-    background: hsl(0, 0%, 100%);
+    color: background;
+    background: white;
     border-radius: 1000px;
 }

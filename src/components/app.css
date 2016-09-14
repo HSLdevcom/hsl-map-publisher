@@ -1,13 +1,14 @@
+@value white, background from "styles/common.css";
 
 .root {
     width: 2296px;
     height: 3430px;
     padding: 40px;
-    color: hsl(0, 0%, 100%);
-    background: hsl(200, 100%, 40%);
+    color: white;
+    background: background;
 }
 
 .container {
-    background: hsl(0, 0%, 100%);
+    background: white;
     border-radius: 30px;
 }
