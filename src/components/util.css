@@ -1,0 +1,30 @@
+
+.row {
+    display: flex;
+    align-items: center;
+}
+
+.justifiedRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.column {
+    display: flex;
+    flex-flow: column wrap;
+    align-items: stretch;
+    overflow: hidden;
+}
+
+.justifiedColumn {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: stretch;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.image {
+    max-width: 100%;
+}

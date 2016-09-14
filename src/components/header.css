@@ -1,0 +1,43 @@
+
+.title {
+    font-family: "Gotham Rounded SSm A", "Gotham Rounded SSm B", sans-serif;
+    font-size: 70px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.subtitle {
+    composes: title;
+    font-weight: 400;
+}
+
+.small {
+    font-size: 24px;
+}
+
+.item {
+    max-height: 160px;
+    margin: 0 15px;
+}
+
+.stop {
+    composes: title;
+    margin-top: 10px;
+    padding: 0 20px;
+    font-size: 55px;
+    text-align: center;
+    border: 5px solid hsl(0, 0%, 100%);
+    border-radius: 10px;
+}
+
+.zone {
+    composes: title;
+    margin-top: 10px;
+    padding: 13px 30px;
+    font-size: 42px;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+    color: hsl(200, 100%, 40%);
+    background: hsl(0, 0%, 100%);
+    border-radius: 1000px;
+}

@@ -3,6 +3,7 @@ import { render } from "react-dom";
 import { AppContainer } from "react-hot-loader";
 
 import App from "components/app";
+import "styles/base.css";
 
 const root = document.body.appendChild(document.createElement("div"));
 

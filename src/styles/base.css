@@ -1,0 +1,7 @@
+@import url(https://cloud.typography.com/6364294/6653152/css/fonts.css);
+
+body, body * {
+    user-select: none;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+}
