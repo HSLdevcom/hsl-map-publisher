@@ -3,16 +3,17 @@ var WebpackDevServer = require("webpack-dev-server");
 
 var config = require("./webpack.config");
 
-new WebpackDevServer(webpack(config), {
-    hot: true,
+var options = {
+    hot: process.env.NODE_ENV === "development",
     historyApiFallback: true,
     stats: {
         colors: true
     }
-}).listen(3000, "localhost", function (err) {
+};
+
+new WebpackDevServer(webpack(config), options).listen(3000, "localhost", function (err) {
     if (err) {
         console.log(err);
     }
-
     console.log("Listening at localhost:3000");
 });
