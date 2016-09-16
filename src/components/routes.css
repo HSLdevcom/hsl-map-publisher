@@ -1,0 +1,27 @@
+@value white, gray, fontFamily, fontFamilyNarrow, borderRadius from "styles/common.css";
+
+.root {
+    color: gray;
+    background: white;
+    border-radius: borderRadius;
+    padding: borderRadius;
+}
+
+.identifier {
+    font-family: fontFamilyNarrow;
+    width: 120px;
+    padding: 10px;
+    font-size: 70px;
+    font-weight: 700;
+}
+
+.title {
+    font-family: fontFamily;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.subtitle {
+    composes: title;
+    font-weight: 400;
+}

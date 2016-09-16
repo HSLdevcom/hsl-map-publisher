@@ -1,0 +1,19 @@
+@value white, background, borderRadius from "styles/common.css";
+
+.root {
+    position: relative;
+    height: 1200px;
+    background: white;
+    border-radius: borderRadius;
+}
+
+.minimap {
+    position: absolute;
+    right: 50px;
+    bottom: -50px;
+    width: 30%;
+    height: 30%;
+    background: white;
+    border: 10px solid background;
+    border-radius: borderRadius;
+}

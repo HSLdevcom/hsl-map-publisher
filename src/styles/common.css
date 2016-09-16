@@ -2,6 +2,8 @@
 @value fontFamily: "Gotham Rounded SSm A", "Gotham Rounded SSm B", sans-serif;
 @value fontFamilyNarrow: "Gotham XNarrow SSm A", "Gotham XNarrow SSm B", sans-serif;
 
+@value borderRadius: 25px;
+
 @value white: hsl(255, 100%, 100%);
 @value gray: hsl(220, 2%, 35%);
 
