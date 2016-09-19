@@ -21,10 +21,10 @@ const Title = props => (
 
 const FlexSpacer = () => <div style={{ flex: "2" }}/>;
 
-const StopPoster = () => (
+const StopPoster = props => (
     <div className={styles.root}>
         <JustifiedColumn>
-            <Header/>
+            <Header {...props}/>
 
             <div className={styles.content}>
                 <div className={styles.left}>

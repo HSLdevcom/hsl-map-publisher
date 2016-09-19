@@ -31,13 +31,13 @@ const Group = props => (
     </div>
 );
 
-const Header = () => (
+const Header = props => (
     <JustifiedRow>
         <Row>
             <Icon src={busIcon}/>
             <Group>
-                <Title>Näyttelijäntie 22</Title>
-                <Subtitle>Skådespelarvägen 22</Subtitle>
+                <Title>{props.address_fi}</Title>
+                <Subtitle>{props.address_se}</Subtitle>
             </Group>
         </Row>
 
