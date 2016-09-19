@@ -1,8 +1,13 @@
+var path = require("path");
+var fs = require("fs");
 const driver = require("node-phantom-simple");
 const slimerPath = require("slimerjs").path;
 
-// TODO: Get port from common config file
-const url = "http://localhost:3000";
+// TODO: Get config from common config file
+const config = {
+    port: 3000,
+    outputPath: "output",
+};
 
 // TODO: Fetch actual stop ids from rest api
 function fetchStopIds() {
@@ -23,7 +28,7 @@ function createPage(browser) {
 
 function open(page) {
     return new Promise((resolve, reject) => {
-        page.open(url, err => err ? reject(err) : resolve(page));
+        page.open(`http://localhost:${config.port}`, err => err ? reject(err) : resolve(page));
     });
 }
 
@@ -37,13 +42,19 @@ function generatePdf(page, stopId) {
     return new Promise((resolve) => {
         page.onCallback = () => {
             page.onCallback = null;
-            capture(page, `${stopId}.png`).then(() => resolve());
+            capture(page, path.join(config.outputPath, `${stopId}.png`)).then(() => resolve());
         };
         page.evaluate((stopId) => window.setView(stopId), stopId, () => null);
     });
 }
 
 function generatePdfs(page) {
+    try {
+        fs.mkdirSync(config.outputPath);
+    } catch(error) {
+        if(error.code != "EEXIST") throw error;
+    }
+
     page.onError = (message, stack) => {
         console.error(`Error in client: ${message}`); // eslint-disable-line no-console
         process.exit(1);
