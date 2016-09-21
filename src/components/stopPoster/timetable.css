@@ -1,0 +1,7 @@
+@value fontFamily, backgroundLight, borderRadius from "styles/common.css";
+
+.root {
+    background: backgroundLight;
+    border-radius: borderRadius;
+    height: 1000px;
+}

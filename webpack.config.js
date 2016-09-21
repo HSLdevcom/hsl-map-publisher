@@ -1,6 +1,7 @@
 var path = require("path");
 var webpack = require("webpack");
 var autoprefixer = require("autoprefixer");
+var modulesValues = require("postcss-modules-values");
 var HtmlWebpackPlugin = require("html-webpack-plugin");
 
 function getDevtool(env) {
@@ -78,5 +79,5 @@ module.exports = {
             }
         ]
     },
-    postcss: [autoprefixer]
+    postcss: [modulesValues, autoprefixer]
 };

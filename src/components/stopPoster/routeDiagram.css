@@ -1,0 +1,7 @@
+@value white, borderRadius from "styles/common.css";
+
+.root {
+    height: 800px;
+    background: white;
+    border-radius: borderRadius;
+}
