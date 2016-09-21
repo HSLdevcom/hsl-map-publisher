@@ -26,7 +26,7 @@ const stops = [
  */
 function fetchStopInfo(id) {
     return new Promise(resolve => {
-        setTimeout(resolve(stops[id % 4]), 1000);
+        setTimeout(() => resolve(stops[id % 4]), 100);
     });
 }
 
