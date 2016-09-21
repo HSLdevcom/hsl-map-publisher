@@ -25,7 +25,7 @@ const stops = [
  * @returns {Promise}
  */
 function fetchStopInfo(id) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         setTimeout(() => resolve(stops[id % 4]), 100);
     });
 }

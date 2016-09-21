@@ -23,7 +23,7 @@ window.setView = (id) => {
 
 // In development mode we'll use url hash to set view
 const params = queryString.parse(location.hash);
-if(params.id) window.setView(params.id);
+if (params.id) window.setView(params.id);
 
 class App extends Component {
     constructor() {
@@ -36,7 +36,7 @@ class App extends Component {
         window.addEventListener("app:update", this.updateView);
     }
 
-    componentDidUpdate() {
+    componentDidUpdate() { // eslint-disable-line class-methods-use-this
         // Let phantom know we're ready for a screenshot
         if (window.callPhantom) window.callPhantom();
     }
