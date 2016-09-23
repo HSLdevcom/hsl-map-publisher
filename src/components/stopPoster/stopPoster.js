@@ -9,7 +9,7 @@ import Timetable from "./timetable";
 import Info from "./info";
 
 import Map from "./map";
-import RouteDiagram from "./routeDiagram";
+import RouteDiagram from "./routeDiagram/routeDiagram";
 
 import styles from "./stopPoster.css";
 

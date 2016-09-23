@@ -1,0 +1,45 @@
+
+@value white, gray, background, fontFamily, borderRadius from "styles/common.css";
+@value leftWidth, rightWidth, lineColor, lineWidth, lineRadius from "./values.css";
+
+.root {
+    position: relative;
+    color: background;
+}
+
+.header {
+    width: leftWidth;
+    border-right: lineWidth solid lineColor;
+    height: lineRadius;
+    margin-top: calc(0px - lineWidth);
+}
+
+.headerCurved {
+    composes: header;
+    border-top: lineWidth solid lineColor;
+    border-top-right-radius: lineRadius;
+    border-top-right-radius: lineRadius;
+}
+
+.footer {
+    position: relative;
+    height: 20px;
+    margin-left: leftWidth;
+    margin-right: calc(rightWidth + lineRadius + (2 * lineWidth));
+    border-bottom: lineWidth solid lineColor;
+    border-left: lineWidth solid lineColor;
+    border-bottom-left-radius: lineRadius;
+}
+
+.footer::after {
+    content:"";
+    position: absolute;
+    top: 0;
+    bottom: calc(0px - lineWidth);
+    left: calc(0px - lineWidth);
+    border-left: lineWidth solid lineColor;
+}
+
+.subpaths {
+    display: flex;
+}
