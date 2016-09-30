@@ -7,8 +7,8 @@ import styles from "./path.css";
 const Path = props => (
     <div className={styles.root}>
         <div className={props.connectLeft ? styles.headerCurved : styles.header}/>
-        {props.stops.map((id, index) =>
-            <Stop key={id} id={id} isFirst={!index} isLast={!props.subpaths && index === props.stops.length - 1}/>
+        {props.stops && props.stops.map((stop, index) =>
+            <Stop key={index} {...stop} isFirst={!index} isLast={!props.subpaths && index === props.stops.length - 1}/>
         )}
 
         {props.subpaths &&
