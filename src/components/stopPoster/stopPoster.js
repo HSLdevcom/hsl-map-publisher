@@ -24,11 +24,11 @@ const FlexSpacer = () => <div style={{ flex: "2" }}/>;
 const StopPoster = props => (
     <div className={styles.root}>
         <JustifiedColumn>
-            <Header {...props}/>
+            <Header {...props.stop}/>
 
             <div className={styles.content}>
                 <div className={styles.left}>
-                    <Routes/>
+                    <Routes routes={props.routes}/>
                     <Title>Pysäkkiaikataulu</Title>
                     <Timetable/>
                     <Info/>
@@ -39,7 +39,7 @@ const StopPoster = props => (
                 <div className={styles.right}>
                     <Map/>
                     <Title>Linjojen reitit</Title>
-                    <RouteDiagram/>
+                    <RouteDiagram stop={props.stop} routes={props.routes}/>
                 </div>
             </div>
 
