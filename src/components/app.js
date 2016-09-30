@@ -2,20 +2,20 @@ import React, { Component } from "react";
 import queryString from "query-string";
 
 import StopPoster from "components/stopPoster/stopPoster.js";
-import { fetchStopInfo } from "util/api";
+import { fetchStop, fetchRoutes } from "util/api";
 
 /**
- * Fetches stop info and dispatches an event to set corresponding view
+ * Fetches data from API and dispatches an event to set corresponding view
  * @param {Number} id - Stop identifier
  */
 window.setView = (id) => {
-    fetchStopInfo(id)
-        .then((data) => {
-            const event = new CustomEvent("app:update", { detail: { id, data } });
+    Promise.all([fetchStop(id), fetchRoutes(id)])
+        .then(([stop, routes]) => {
+            const event = new CustomEvent("app:update", { detail: { data: { stop, routes } } });
             window.dispatchEvent(event);
-        }).catch(() => {
-            // Throw new error outside the promise chain to trigger phantom's onError callback
+        }).catch((error) => {
             setTimeout(() => {
+                // Throw new error outside the promise chain to trigger phantom's onError callback
                 throw new Error(`Failed to fetch stop info (id: ${id})`);
             });
         });
