@@ -12,20 +12,27 @@
     border-right: lineWidth solid lineColor;
     height: lineRadius;
     margin-top: calc(0px - lineWidth);
+
 }
 
-.headerCurved {
-    composes: header;
+.root ~ .root > .header {
+    width: calc(2 * leftWidth);
+    margin-left: calc(0px - leftWidth);
     border-top: lineWidth solid lineColor;
     border-top-right-radius: lineRadius;
     border-top-right-radius: lineRadius;
 }
 
+.root ~ .root ~ .root > .header {
+    width: calc(leftWidth + rightWidth + leftWidth);
+    margin-left: calc(0px - rightWidth - leftWidth);
+}
+
 .footer {
     position: relative;
+    width: rightWidth;
     height: 20px;
     margin-left: leftWidth;
-    margin-right: calc(rightWidth + lineRadius + (2 * lineWidth));
     border-bottom: lineWidth solid lineColor;
     border-left: lineWidth solid lineColor;
     border-bottom-left-radius: lineRadius;
