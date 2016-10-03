@@ -19,6 +19,17 @@ const Path = props => (
             </div>
         </div>
         }
+
+        {props.routes &&
+        <div className={styles.routes}>
+            {props.routes.map((route, index) =>
+                <div key={index} className={styles.route}>
+                    <div>{route.routeId}</div>
+                    <div>{route.destination_fi}</div>
+                </div>
+            )}
+        </div>
+        }
     </div>
 );
 

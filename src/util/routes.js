@@ -1,19 +1,30 @@
 
+/**
+ * Returns routes as a tree representing connections from given stop
+ * @param {Object} stop
+ * @param {Array} routes
+ * @returns {{subpaths: Array}}
+ */
 function routesToPaths(stop, routes) {
     const paths = [];
 
-    // TODO: Subtract duration at starting stop from each duration
     // Get stops after given stop
-    const stops = routes.map((route) => {
-        const index = route.stops.map(({stopId}) => stopId).indexOf(stop.stopId);
-        return route.stops.slice(index);
+    const stops = routes.map(({stops}) => {
+        const index = stops.map(({stopId}) => stopId).indexOf(stop.stopId);
+        return stops.slice(index).map(item => ({...item, duration: item.duration - stops[index].duration}));
     });
 
     stops.forEach(stop => addStops(paths, stop));
+    paths.forEach(path => addRoutes(path, routes));
 
     return (paths.length > 1) ? {subpaths: paths} : paths[0];
 }
 
+/**
+ * Recursively adds given stops to path and its subpaths
+ * @param {Array} paths
+ * @param {Array} stops
+ */
 const addStops = (paths, stops) => {
 
     if(!stops || !stops.length) {
@@ -53,8 +64,24 @@ const addStops = (paths, stops) => {
 };
 
 /**
+ * Recursively adds route info to paths with no subpaths
+ * @param {Object} path
+ * @param {Array} routes
+ */
+function addRoutes(path, routes) {
+    if (path.subpaths) {
+        path.subpaths.forEach(subpath => addRoutes(subpath, routes));
+    } else {
+        const lastStop = path.stops[path.stops.length - 1];
+        path.routes = routes.filter(({stops}) => stops[stops.length - 1].stopId === lastStop.stopId);
+    }
+}
+
+/**
  * Returns an index where stop list differs from path
- *
+ * @param {Object} path
+ * @param {Array} stops
+ * @returns {number} - Index
  */
 function findSplitIndex(path, stops) {
     for(let i=0;i<path.stops.length;i++) {
