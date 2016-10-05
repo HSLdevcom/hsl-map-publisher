@@ -2,6 +2,7 @@
 
 var fs = require("fs");
 var path = require("path");
+const fetch = require("node-fetch");
 const driver = require("node-phantom-simple");
 
 const slimerPath = fs.readFileSync(path.join(__dirname, "../.slimerjs")).toString();
@@ -10,11 +11,11 @@ const slimerPath = fs.readFileSync(path.join(__dirname, "../.slimerjs")).toStrin
 const config = {
     port: 3000,
     outputPath: "output",
+    api: "http://localhost:8000"
 };
 
-// TODO: Fetch actual stop ids from rest api
 function fetchStopIds() {
-    return Promise.resolve([1, 2, 3, 4, 5]);
+    return fetch(`${config.api}/stopIds`).then(response => response.json());
 }
 
 function createBrowser() {
