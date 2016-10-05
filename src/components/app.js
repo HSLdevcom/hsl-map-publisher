@@ -13,7 +13,7 @@ window.setView = (id) => {
         .then(([stop, routes]) => {
             const event = new CustomEvent("app:update", { detail: { data: { stop, routes } } });
             window.dispatchEvent(event);
-        }).catch((error) => {
+        }).catch(() => {
             setTimeout(() => {
                 // Throw new error outside the promise chain to trigger phantom's onError callback
                 throw new Error(`Failed to fetch stop info (id: ${id})`);

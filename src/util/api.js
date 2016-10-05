@@ -28,7 +28,7 @@ function trimRouteId(id) {
 function fetchStop(stopId) {
     return fetch(`${API_URL}/stops/${stopId}`)
         .then(response => response.json())
-        .then(stop => ({...stop, shortId: trimShortId(stop.shortId)}));
+        .then(stop => ({ ...stop, shortId: trimShortId(stop.shortId) }));
 }
 
 /**
@@ -44,7 +44,8 @@ function fetchRoutes(stopId) {
             Object.keys(routesById).forEach((key) => {
                 // TODO: Choose route that is currently valid
                 const route = routesById[key][0];
-                const stops = route.stops.map(stop => ({...stop, shortId: trimShortId(stop.shortId)}));
+                const stops = route.stops.map(stop =>
+                    ({ ...stop, shortId: trimShortId(stop.shortId) }));
                 const routeId = trimRouteId(key);
                 routes.push({ ...route, routeId, stops });
             });
