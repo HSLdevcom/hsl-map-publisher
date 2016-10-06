@@ -7,12 +7,11 @@
  */
 function findSplitIndex(path, stops) {
     for (let i = 0; i < path.stops.length; i++) {
-        if (i === stops.length - 1 || stops[i].stopId !== path.stops[i].stopId) {
+        if (i === stops.length || stops[i].stopId !== path.stops[i].stopId) {
             return i;
         }
     }
-    // We need each destination as a separate subpath -> split outer paths ealier
-    return path.subpaths ? path.stops.length : path.stops.length - 1;
+    return path.stops.length;
 }
 
 /**
@@ -31,20 +30,19 @@ const addStops = (paths, stops) => {
         if (index) {
             const commonStops = path.stops.slice(0, index);
             const remainingPath = path.stops.slice(index);
-
-            if (remainingPath.length) {
-                if (!path.subpaths) {
-                    path.subpaths = [{ stops: remainingPath }];
-                } else {
-                    path.subpaths = [{ stops: remainingPath, subpaths: path.subpaths }];
-                }
-                path.stops = commonStops;
-            }
-
             // Stops that don't belong to current path
             const remainingStops = stops.slice(index);
 
             if (remainingStops.length) {
+                if (remainingPath.length) {
+                    if (!path.subpaths) {
+                        path.subpaths = [{ stops: remainingPath }];
+                    } else {
+                        path.subpaths = [{ stops: remainingPath, subpaths: path.subpaths }];
+                    }
+                    path.stops = commonStops;
+                }
+
                 if (!path.subpaths) path.subpaths = [];
                 addStops(path.subpaths, remainingStops);
             }
@@ -58,20 +56,19 @@ const addStops = (paths, stops) => {
 };
 
 /**
- * Recursively adds route info to paths with no subpaths
+ * Recursively adds route info to stops where routes terminate
  * @param {Object} path
  * @param {Array} routes
  */
-function addRoutes(path, routes) {
+function addDestinations(path, routes) {
+    for (const stop of path.stops) {
+        const destinations = routes
+            .filter(({ stops }) => stops[stops.length - 1].stopId === stop.stopId)
+            .map(({ routeId, destination_fi }) => ({ id: routeId, title: destination_fi }));
+        if (destinations.length) stop.destinations = destinations;
+    }
     if (path.subpaths) {
-        path.subpaths.forEach(
-            subpath => addRoutes(subpath, routes)
-        );
-    } else {
-        const lastStop = path.stops[path.stops.length - 1];
-        path.routes = routes.filter( // eslint-disable-line no-param-reassign
-            ({ stops }) => stops[stops.length - 1].stopId === lastStop.stopId
-        );
+        path.subpaths.forEach(subpath => addDestinations(subpath, routes));
     }
 }
 
@@ -92,7 +89,7 @@ function routesToPaths(stop, routes) {
     });
 
     stopLists.forEach(stops => addStops(paths, stops));
-    paths.forEach(path => addRoutes(path, routes));
+    paths.forEach(path => addDestinations(path, routes));
 
     return (paths.length > 1) ? { subpaths: paths } : paths[0];
 }
