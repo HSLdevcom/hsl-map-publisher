@@ -53,7 +53,30 @@ function fetchRoutes(stopId) {
         });
 }
 
+function fetchMap(stop) {
+    const options = {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            center: [stop.lat, stop.lon],
+            width: 1600,
+            height: 1600,
+        }),
+    };
+
+    return fetch(`${API_URL}/generateImage`, options)
+        .then(response => response.blob())
+        .then(blob => new Promise((resolve) => {
+            const reader = new window.FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = () => resolve(reader.result);
+        }));
+}
+
 export {
     fetchStop,
     fetchRoutes,
+    fetchMap,
 };
