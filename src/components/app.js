@@ -4,20 +4,57 @@ import queryString from "query-string";
 import StopPoster from "components/stopPoster/stopPoster.js";
 import { fetchStop, fetchRoutes, fetchMap } from "util/api";
 
+function createOverlaySources(stop) {
+    return {
+        location: {
+            type: "geojson",
+            data: {
+                type: "Feature",
+                geometry: {
+                type: "Point",
+                    "coordinates": [stop.lat, stop.lon]
+                },
+                properties: {
+                    "title": stop.address_fi,
+                    "marker-symbol": "monument"
+                }
+            }
+        }
+    }
+}
+
+function createOverlayLayers(stop) {
+    return [
+        {
+            id: "location",
+            type: "circle",
+            source: "location",
+            paint: {
+                "circle-color": "rgb(219, 27, 84)",
+                "circle-radius": 40
+            }
+        }
+    ]
+}
+
 function fetchStopPosterData(id) {
     return Promise.all([fetchStop(id), fetchRoutes(id)])
         .then(([stop, routes]) => {
             const mapOptions = {
                 center: [stop.lat, stop.lon],
-                width: 1600,
-                height: 1600,
-                zoom: 17,
+                width: 1000,
+                height: 1000,
+                zoom: 15,
+                sources: createOverlaySources(stop),
+                layers: createOverlayLayers(stop),
             };
             const miniMapOptions = {
                 center: [stop.lat, stop.lon],
-                width: 500,
-                height: 500,
+                width: 300,
+                height: 300,
                 zoom: 9,
+                sources: createOverlaySources(stop),
+                layers: createOverlayLayers(stop),
             };
             return Promise.all([fetchMap(mapOptions), fetchMap(miniMapOptions)])
                 .then(([mapImage, miniMapImage]) => ({ stop, routes, mapImage, miniMapImage }));
