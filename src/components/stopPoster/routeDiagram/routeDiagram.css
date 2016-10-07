@@ -1,0 +1,32 @@
+
+@value white, gray, fontFamily, borderRadius from "styles/common.css";
+@value leftWidth, rightWidth, lineWidth from "./values.css";
+
+.root {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+    padding: 35px;
+    background: white;
+    border-radius: borderRadius;
+}
+
+.start {
+    display: flex;
+    align-items: center;
+    color: gray;
+    margin-left: leftWidth;
+    margin-bottom: lineWidth;
+}
+
+.icon {
+    width: 20px;
+    margin-left: -9px;
+    margin-right: 10px;
+}
+
+.title {
+    font-size: 18px;
+    font-weight: 700;
+    font-family: fontFamily;
+}

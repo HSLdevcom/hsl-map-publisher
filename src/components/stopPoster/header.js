@@ -45,7 +45,7 @@ const Header = props => (
             <Group>
                 <Title small>Pysäkkinumero</Title>
                 <Subtitle small>Hållplatsnummer</Subtitle>
-                <div className={styles.stop}>H1660</div>
+                <div className={styles.stop}>{props.shortId}</div>
             </Group>
             <Group>
                 <Title small>Lippuvyöhyke</Title>

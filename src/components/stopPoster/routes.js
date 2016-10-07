@@ -3,37 +3,18 @@ import { Row } from "components/util";
 
 import styles from "./routes.css";
 
-const routes = [
-    {
-        id: "31",
-        fi: "Munkkiniemi",
-        se: "Munkshöjden",
-    },
-    {
-        id: "32",
-        fi: "Munkkiniemi",
-        se: "Munkshöjden",
-    },
-    {
-        id: "40",
-        fi: "Elielinaukio",
-        se: "Elielplatsen",
-    },
-    {
-        id: "43",
-        fi: "Elielinaukio",
-        se: "Elielplatsen",
-    },
-];
-
-const Routes = () => (
+const Routes = props => (
     <div className={styles.root}>
-        {routes.map((route, index) =>
+        {props.routes.map((route, index) =>
             <Row key={index}>
-                <div className={styles.identifier}>{route.id}</div>
+                <div className={styles.identifier}>{route.routeId}</div>
                 <div>
-                    <div className={styles.title}>{route.fi}</div>
-                    <div className={styles.subtitle}>{route.se}</div>
+                    <div className={styles.title}>
+                        {route.destination_fi}
+                    </div>
+                    <div className={styles.subtitle}>
+                        {route.destination_se}
+                    </div>
                 </div>
             </Row>
         )}

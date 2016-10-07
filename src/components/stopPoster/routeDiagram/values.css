@@ -1,0 +1,8 @@
+@value background from "styles/common.css";
+
+@value leftWidth: 70px;
+@value rightWidth: 220px;
+
+@value lineColor: background;
+@value lineWidth: 2px;
+@value lineRadius: 20px;

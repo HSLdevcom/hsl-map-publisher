@@ -1,0 +1,89 @@
+@value fontFamily, fontFamilyNarrow from "styles/common.css";
+@value leftWidth, rightWidth, lineColor, lineWidth from "./values.css";
+
+.stop {
+    display: flex;
+    align-items: flex-start;
+    box-sizing: border-box;
+    font-family: fontFamily;
+    white-space: nowrap;
+}
+
+.left {
+    width: leftWidth;
+    padding-top: 8px;
+    padding-right: 15px;
+    font-size: 13px;
+    text-align: right;
+    box-sizing: border-box;
+}
+
+.right {
+    padding-top: 8px;
+    padding-left: 10px;
+    width: rightWidth;
+    box-sizing: border-box;
+}
+
+.title {
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.subtitle {
+    font-size: 12px;
+}
+
+.separator {
+    display: flex;
+    flex-flow: column;
+    align-items: flex-start;
+}
+
+.separatorTop {
+    width: lineWidth;
+    height: 10px;
+    background-color: lineColor;
+}
+
+.separatorBottom {
+    width: lineWidth;
+    height: 20px;
+    background-color: lineColor;
+}
+
+.separatorSymbol {
+    width: calc(4 * lineWidth);
+    height: calc(4 * lineWidth);
+    border: lineWidth solid lineColor;
+    border-radius: calc(4 * lineWidth);
+    margin-top: calc(lineWidth / -2);
+    margin-bottom: calc(lineWidth / -2);
+    margin-left: calc(-2.5 * lineWidth);
+}
+
+.destinations {
+    margin: 10px 0;
+    font-family: fontFamilyNarrow;
+    letter-spacing: -1px;
+}
+
+.destination {
+    display: flex;
+    align-items: baseline;
+}
+
+.destination *:first-child {
+    width: calc(80px + leftWidth);
+    margin-left: -80px;
+    font-size: 40px;
+    font-weight: 700;
+    text-align: right;
+}
+
+.destination *:last-child {
+    padding-left: 5px;
+    font-size: 25px;
+    font-weight: 500;
+}
+
