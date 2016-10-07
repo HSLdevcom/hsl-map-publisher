@@ -4,25 +4,41 @@ import queryString from "query-string";
 import StopPoster from "components/stopPoster/stopPoster.js";
 import { fetchStop, fetchRoutes, fetchMap } from "util/api";
 
+function fetchStopPosterData(id) {
+    return Promise.all([fetchStop(id), fetchRoutes(id)])
+        .then(([stop, routes]) => {
+            const mapOptions = {
+                center: [stop.lat, stop.lon],
+                width: 1600,
+                height: 1600,
+                zoom: 17,
+            };
+            const miniMapOptions = {
+                center: [stop.lat, stop.lon],
+                width: 500,
+                height: 500,
+                zoom: 9,
+            };
+            return Promise.all([fetchMap(mapOptions), fetchMap(miniMapOptions)])
+                .then(([mapImage, miniMapImage]) => ({ stop, routes, mapImage, miniMapImage }));
+        });
+}
+
 /**
  * Fetches data from API and dispatches an event to set corresponding view
  * @param {Number} id - Stop identifier
  */
 window.setView = (id) => {
-    Promise.all([fetchStop(id), fetchRoutes(id)])
-        .then(([stop, routes]) => {
-            Promise.all([fetchMap(stop)]).then(([mapImage]) => {
-                const data = { stop, routes, mapImage };
-                const event = new CustomEvent("app:update", { detail: { data } });
-                window.dispatchEvent(event);
-            });
-        }).catch((error) => {
-            setTimeout(() => {
-                console.log(error); // eslint-disable-line no-console
-                // Throw new error outside the promise chain to trigger phantom's onError callback
-                throw new Error(`Failed to fetch stop info (id: ${id})`);
-            });
+    fetchStopPosterData(id).then((data) => {
+        const event = new CustomEvent("app:update", { detail: { data } });
+        window.dispatchEvent(event);
+    }).catch((error) => {
+        setTimeout(() => {
+            console.error(error); // eslint-disable-line no-console
+            // Throw new error outside the promise chain to trigger phantom's onError callback
+            throw new Error(`Failed to fetch stop info (id: ${id})`);
         });
+    });
 };
 
 // In development mode we'll use url hash to set view

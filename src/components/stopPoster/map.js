@@ -8,7 +8,9 @@ const Map = props => (
             <img src={props.mapImage} role="presentation"/>
         </div>
         <div className={styles.miniMap}>
-            <img src={props.miniMapImage} role="presentation"/>
+            <div className={styles.container}>
+                <img src={props.miniMapImage} role="presentation"/>
+            </div>
         </div>
     </div>
 );

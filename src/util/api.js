@@ -53,17 +53,16 @@ function fetchRoutes(stopId) {
         });
 }
 
-function fetchMap(stop) {
+/**
+ * Returns a map image
+ * @param {Object} mapOptions - Options used to generate image
+ * @returns {Promise} - Image as data URL
+ */
+function fetchMap(mapOptions) {
     const options = {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            center: [stop.lat, stop.lon],
-            width: 1600,
-            height: 1600,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(mapOptions),
     };
 
     return fetch(`${API_URL}/generateImage`, options)
