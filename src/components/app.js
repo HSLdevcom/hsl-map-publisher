@@ -2,23 +2,23 @@ import React, { Component } from "react";
 import queryString from "query-string";
 
 import StopPoster from "components/stopPoster/stopPoster.js";
-import { fetchStop, fetchRoutes } from "util/api";
+import { fetchStopPosterProps } from "util/stopPoster";
 
 /**
  * Fetches data from API and dispatches an event to set corresponding view
- * @param {Number} id - Stop identifier
+ * @param {Number} stopId - Stop identifier
  */
-window.setView = (id) => {
-    Promise.all([fetchStop(id), fetchRoutes(id)])
-        .then(([stop, routes]) => {
-            const event = new CustomEvent("app:update", { detail: { data: { stop, routes } } });
-            window.dispatchEvent(event);
-        }).catch(() => {
-            setTimeout(() => {
-                // Throw new error outside the promise chain to trigger phantom's onError callback
-                throw new Error(`Failed to fetch stop info (id: ${id})`);
-            });
+window.setView = (stopId) => {
+    fetchStopPosterProps(stopId).then((data) => {
+        const event = new CustomEvent("app:update", { detail: { data } });
+        window.dispatchEvent(event);
+    }).catch((error) => {
+        setTimeout(() => {
+            console.error(error); // eslint-disable-line no-console
+            // Throw new error outside the promise chain to trigger phantom's onError callback
+            throw new Error(`Failed to fetch stop info (id: ${stopId})`);
         });
+    });
 };
 
 // In development mode we'll use url hash to set view
