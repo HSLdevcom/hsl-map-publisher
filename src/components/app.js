@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import queryString from "query-string";
 
 import StopPoster from "components/stopPoster/stopPoster.js";
-import { fetchStopPosterProps } from "util/stopPoster"
+import { fetchStopPosterProps } from "util/stopPoster";
 
 /**
  * Fetches data from API and dispatches an event to set corresponding view

@@ -12,7 +12,7 @@ function fetchStopPosterProps(id) {
             const stops = routes
                 .map(route => route.stops)
                 .reduce((prev, cur) => [...prev, ...cur], [])
-                .filter(({stopId}) => stopId !== stop.stopId);
+                .filter(({ stopId }) => stopId !== stop.stopId);
             const uniqueStops = [...new Set(stops)];
 
             const mapOptions = {
@@ -20,14 +20,14 @@ function fetchStopPosterProps(id) {
                 width: 1000,
                 height: 1000,
                 zoom: 15,
-                ...createStopStyle([stop], uniqueStops)
+                ...createStopStyle([stop], uniqueStops),
             };
             const miniMapOptions = {
                 center: [stop.lat, stop.lon],
                 width: 300,
                 height: 300,
                 zoom: 9,
-                ...createStopStyle([stop])
+                ...createStopStyle([stop]),
             };
 
             return Promise.all([fetchMap(mapOptions), fetchMap(miniMapOptions)])
@@ -37,4 +37,4 @@ function fetchStopPosterProps(id) {
 
 export {
     fetchStopPosterProps, // eslint-disable-line import/prefer-default-export
-}
+};
