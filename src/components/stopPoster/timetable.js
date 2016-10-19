@@ -47,17 +47,14 @@ const DepartureRow = props => (
 
 const Table = (props) => {
     const departuresByHour = groupBy(props.departures, "hours");
+    const sortValue = value => (parseInt(value, 10) + 19) % 24;
+    const sortedHours = Object.keys(departuresByHour).sort((a, b) => sortValue(a) - sortValue(b));
+
     return (
         <div className={styles.table}>
-            {Object.keys(departuresByHour)
-                .sort((a, b) => (parseInt(a, 10) + 19) % 24 > (parseInt(b, 10) + 19) % 24)
-                .map(hours => (
-                    <DepartureRow
-                        key={hours} hours={hours}
-                        departures={departuresByHour[hours]}
-                    />
-                ))
-            }
+            {sortedHours.map(hours => (
+                <DepartureRow key={hours} hours={hours} departures={departuresByHour[hours]}/>
+            ))}
         </div>
     );
 };
