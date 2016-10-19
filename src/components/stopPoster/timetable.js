@@ -50,7 +50,7 @@ const Table = (props) => {
     return (
         <div className={styles.table}>
             {Object.keys(departuresByHour)
-                .sort()
+                .sort((a, b) => (parseInt(a, 10) + 19) % 24 > (parseInt(b, 10) + 19) % 24)
                 .map(hours => (
                     <DepartureRow
                         key={hours} hours={hours}
