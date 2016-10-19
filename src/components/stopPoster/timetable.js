@@ -61,19 +61,19 @@ const Table = (props) => {
 
 const Timetable = props => (
     <div className={styles.root}>
-        {props.weekdays &&
+        {!!props.weekdays.length &&
             <div>
                 <Header title_fi="Maanantai - Perjantai" title_se="Måndag - Fredag"/>
                 <Table departures={props.weekdays}/>
             </div>
         }
-        {props.saturdays &&
+        {!!props.saturdays.length &&
             <div>
                 <Header title_fi="Lauantai" title_se="Lördag"/>
                 <Table departures={props.saturdays}/>
             </div>
         }
-        {props.sundays &&
+        {!!props.sundays.length &&
             <div>
                 <Header title_fi="Sunnuntai" title_se="Sondag"/>
                 <Table departures={props.sundays}/>
