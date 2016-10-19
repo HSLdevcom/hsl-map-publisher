@@ -1,6 +1,6 @@
 import React from "react";
 import groupBy from "lodash/groupBy";
-import { Row, WrappingRow } from "components/util";
+import { Row, WrappingRow, Spacer } from "components/util";
 
 import styles from "./timetable.css";
 
@@ -79,6 +79,13 @@ const Timetable = props => (
                 <Table departures={props.sundays}/>
             </div>
         }
+        <Spacer height={20}/>
+        <div className={styles.footnote}>
+            e = ei matalalattia-ajoneuvo
+        </div>
+        <div className={styles.footnote}>
+            pe = vain perjantaisin
+        </div>
     </div>
 );
 
