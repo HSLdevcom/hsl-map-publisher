@@ -41,13 +41,16 @@
 }
 
 .item {
-    min-width: 30px;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    padding-left: 15px;
+    min-width: 52px;
+    padding: 4px 0;
     font-size: 12px;
     letter-spacing: -0.5px;
     line-height: 8px;
+}
+
+.itemPadded {
+    composes: item;
+    padding-left: 15px;
 }
 
 .footnote {

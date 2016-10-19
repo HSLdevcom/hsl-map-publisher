@@ -34,7 +34,7 @@ const Departure = props => (
 
 const DepartureRow = props => (
     <Row>
-        <div className={styles.item}>
+        <div className={styles.itemPadded}>
             <strong>{props.hours < 10 && "0"}{props.hours}</strong>
         </div>
         <WrappingRow>
