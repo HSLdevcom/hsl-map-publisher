@@ -30,7 +30,7 @@ const StopPoster = props => (
                 <div className={styles.left}>
                     <Routes routes={props.routes}/>
                     <Title>Pysäkkiaikataulu</Title>
-                    <Timetable/>
+                    <Timetable {...props.timetable}/>
                     <Info/>
                 </div>
 

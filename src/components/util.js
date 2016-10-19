@@ -14,6 +14,12 @@ const JustifiedRow = props => (
     </div>
 );
 
+const WrappingRow = props => (
+    <div className={styles.wrappingRow}>
+        {props.children}
+    </div>
+);
+
 const Column = props => (
     <div className={styles.column}>
         {props.children}
@@ -38,6 +44,7 @@ const Image = props => (
 export {
     Row,
     JustifiedRow,
+    WrappingRow,
     Column,
     JustifiedColumn,
     Spacer,

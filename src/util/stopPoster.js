@@ -1,4 +1,4 @@
-import { fetchStop, fetchRoutes, fetchMap } from "util/api";
+import { fetchStop, fetchTimetable, fetchRoutes, fetchMap } from "util/api";
 import { createStopStyle } from "util/map";
 
 /**
@@ -7,8 +7,8 @@ import { createStopStyle } from "util/map";
  * @returns {Promise}
  */
 function fetchStopPosterProps(id) {
-    return Promise.all([fetchStop(id), fetchRoutes(id)])
-        .then(([stop, routes]) => {
+    return Promise.all([fetchStop(id), fetchTimetable(id), fetchRoutes(id)])
+        .then(([stop, timetable, routes]) => {
             const stops = routes
                 .map(route => route.stops)
                 .reduce((prev, cur) => [...prev, ...cur], [])
@@ -31,7 +31,8 @@ function fetchStopPosterProps(id) {
             };
 
             return Promise.all([fetchMap(mapOptions), fetchMap(miniMapOptions)])
-                .then(([mapImage, miniMapImage]) => ({ stop, routes, mapImage, miniMapImage }));
+                .then(([mapImage, miniMapImage]) =>
+                    ({ stop, timetable, routes, mapImage, miniMapImage }));
         });
 }
 

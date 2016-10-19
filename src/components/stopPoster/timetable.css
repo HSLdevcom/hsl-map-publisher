@@ -1,7 +1,51 @@
-@value fontFamily, backgroundLight, borderRadius from "styles/common.css";
+@value fontFamily, fontFamilyNarrow, gray, white, background, backgroundLight, borderRadius from "styles/common.css";
 
 .root {
+    padding: 10px 20px 50px;
+    font-weight: 400;
+    font-family: fontFamilyNarrow;
+    color: gray;
     background: backgroundLight;
     border-radius: borderRadius;
-    height: 1000px;
+}
+
+.root strong {
+    font-weight: 700;
+}
+
+.header {
+    margin: 15px 0;
+    font-family: fontFamily;
+    color: background;
+}
+
+.title {
+    padding: 5px 10px;
+    font-size: 18px;
+}
+
+.subtitle {
+    display: flex;
+    padding: 0 10px;
+    font-size: 12px;
+    line-height: 13px;
+    letter-spacing: -0.5px;
+}
+
+.subtitle > *:first-child {
+    width: 50px;
+}
+
+.table > *:nth-child(odd) {
+    background-color: white;
+}
+
+.item {
+    min-width: 30px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 15px;
+    font-size: 12px;
+    letter-spacing: -0.5px;
+    line-height: 8px;
 }
