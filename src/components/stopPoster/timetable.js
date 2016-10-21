@@ -47,6 +47,7 @@ const DepartureRow = props => (
 
 const Table = (props) => {
     const departuresByHour = groupBy(props.departures, "hours");
+    // Sort hours from 5 to 4
     const sortValue = value => (parseInt(value, 10) + 19) % 24;
     const sortedHours = Object.keys(departuresByHour).sort((a, b) => sortValue(a) - sortValue(b));
 
