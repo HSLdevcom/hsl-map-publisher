@@ -32,6 +32,26 @@ function fetchStop(stopId) {
 }
 
 /**
+ * Fetches timetable for stop
+ * @param {String|Number} stopId - Stop identifier e.g. 4200210
+ * @returns {Promise} - Object containing departure list for weekdays, saturdays and sundays
+ */
+function fetchTimetable(stopId) {
+    return fetch(`${API_URL}/timetables/${stopId}`)
+        .then(response => response.json())
+        .then((timetables) => {
+            // TODO: Choose timetable that is currently valid
+            const departures = timetables[0].departures;
+            for (const key of Object.keys(departures)) {
+                for (const departure of departures[key]) {
+                    departure.routeId = trimRouteId(departure.routeId);
+                }
+            }
+            return departures;
+        });
+}
+
+/**
  * Fetch all routes that stop at given stop
  * @param {String} stopId - Stop identifier e.g. 4200210
  * @returns {Promise}
@@ -76,6 +96,7 @@ function fetchMap(mapOptions) {
 
 export {
     fetchStop,
+    fetchTimetable,
     fetchRoutes,
     fetchMap,
 };
