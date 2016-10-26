@@ -2,30 +2,39 @@
 
 .root {
     position: relative;
-    height: 1200px;
 }
 
 .miniMap {
     position: absolute;
     right: 50px;
     bottom: -50px;
-    width: 30%;
-    height: 30%;
     border: 10px solid background;
     border-radius: borderRadius;
 }
 
 .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     width: 100%;
     height: 100%;
-    overflow: hidden;
     border-radius: borderRadius;
 }
 
 .container img {
     width: 100%;
+    border-radius: borderRadius;
 }
 
+.stop {
+    position: absolute;
+    width: 34px;
+    height: 34px;
+    margin-left: -17px;
+    margin-top: -17px;
+}
+
+.location {
+    position: absolute;
+    width: 54px;
+    height: 54px;
+    margin-left: -27px;
+    margin-top: -27px;
+}
