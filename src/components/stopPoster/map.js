@@ -39,6 +39,7 @@ const Location = (props) => {
 
 const Map = (props) => {
     const viewport = createViewport(props.mapOptions);
+    const miniViewport = createViewport(props.miniMapOptions);
 
     const stops = getStopsFromRoutes(props.routes)
         .filter(({ stopId }) => stopId !== props.stop.stopId)
@@ -57,6 +58,7 @@ const Map = (props) => {
             <div className={styles.miniMap} style={miniMapStyle}>
                 <div className={styles.container}>
                     <img src={props.miniMapImage} role="presentation"/>
+                    <Location viewport={miniViewport} {...props.stop}/>
                 </div>
             </div>
         </div>
