@@ -9,7 +9,7 @@ function fetchStopPosterProps(id) {
     return Promise.all([fetchStop(id), fetchTimetable(id), fetchRoutes(id)])
         .then(([stop, timetable, routes]) => {
             const mapOptions = {
-                center: [stop.lat, stop.lon],
+                center: [stop.lon, stop.lat],
                 width: 1500,
                 height: 1200,
                 scale: 1,
@@ -17,7 +17,7 @@ function fetchStopPosterProps(id) {
             };
 
             const miniMapOptions = {
-                center: [stop.lat, stop.lon],
+                center: [stop.lon, stop.lat],
                 width: 450,
                 height: 360,
                 zoom: 9,

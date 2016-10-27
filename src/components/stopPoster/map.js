@@ -20,7 +20,7 @@ function createViewport(mapOptions) {
 }
 
 const Stop = (props) => {
-    const [left, top] = props.viewport.project([props.stop.lat, props.stop.lon]);
+    const [left, top] = props.viewport.project([props.stop.lon, props.stop.lat]);
     return (
         <div className={styles.stop} style={{ left, top }}>
             <img src={busStopIcon} role="presentation"/>
@@ -29,7 +29,7 @@ const Stop = (props) => {
 };
 
 const Location = (props) => {
-    const [left, top] = props.viewport.project([props.lat, props.lon]);
+    const [left, top] = props.viewport.project([props.lon, props.lat]);
     return (
         <div className={styles.location} style={{ left, top }}>
             <img src={locationIcon} role="presentation"/>
@@ -42,7 +42,7 @@ const Map = (props) => {
 
     const stops = getStopsFromRoutes(props.routes)
         .filter(({ stopId }) => stopId !== props.stop.stopId)
-        .filter(({ lon, lat }) => viewport.contains([lat, lon]));
+        .filter(({ lon, lat }) => viewport.contains([lon, lat]));
 
     const mapStyle = { width: props.mapOptions.width, height: props.mapOptions.height };
     const miniMapStyle = { width: props.miniMapOptions.width, height: props.miniMapOptions.height };
