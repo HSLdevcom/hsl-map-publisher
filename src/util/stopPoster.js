@@ -1,11 +1,11 @@
 import viewportMercator from "viewport-mercator-project";
 import { fetchStop, fetchStops, fetchRoutes, fetchTimetable, fetchMap } from "util/api";
 
-function fetchMapStops(viewport) {
+function fetchStopsInViewport(viewport, stopToOmit) {
     // FIXME: Fetch active stops groups with valid timetables instead of all stops
     return fetchStops().then((stops) => {
         const visibleStops = stops
-            .filter(({ stopId }) => stopId !== stop.stopId)
+            .filter(({ stopId }) => stopId !== stopToOmit.stopId)
             .filter(({ lon, lat }) => viewport.contains([lon, lat]));
 
         const promises = visibleStops.map(stop =>
@@ -43,7 +43,8 @@ function fetchMaps(stop) {
         height: mapOptions.height,
     });
 
-    return Promise.all([fetchMap(mapOptions), fetchMap(miniMapOptions), fetchMapStops(viewport)])
+    return Promise
+        .all([fetchMap(mapOptions), fetchMap(miniMapOptions), fetchStopsInViewport(viewport, stop)])
         .then(([map, miniMap, stops]) => ({ map, miniMap, mapOptions, miniMapOptions, stops }));
 }
 

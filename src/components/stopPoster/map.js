@@ -7,15 +7,26 @@ import tramStopIcon from "icons/stopTram.svg"; // eslint-disable-line
 
 import styles from "./map.css";
 
+const Location = () => (
+    <div className={styles.location}>
+        <img src={locationIcon} role="presentation"/>
+    </div>
+);
+
 const Stop = props => (
     <div className={styles.stop} style={{ left: props.x, top: props.y }}>
         <img src={busStopIcon} role="presentation"/>
     </div>
 );
 
-const Location = () => (
-    <div className={styles.location}>
-        <img src={locationIcon} role="presentation"/>
+const Label = props => (
+    <div className={styles.label} style={{ left: props.x, top: props.y }}>
+        <div className={styles.labelTitle}>{props.address_fi}</div>
+        {props.routes.map((route, index) => (
+            <div key={index} className={styles.labelItem}>
+                {route.routeId} &rarr; {route.destination_fi}
+            </div>
+        ))}
     </div>
 );
 
@@ -28,6 +39,7 @@ const Map = (props) => {
             <div className={styles.container}>
                 <img src={props.map} role="presentation"/>
                 {props.stops.map((stop, index) => <Stop key={index} {...stop}/>)}
+                {props.stops.map((stop, index) => <Label key={index} {...stop}/>)}
                 <Location/>
             </div>
             <div className={styles.miniMap} style={miniMapStyle}>
