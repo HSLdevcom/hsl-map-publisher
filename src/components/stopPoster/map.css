@@ -33,6 +33,8 @@
 
 .location {
     position: absolute;
+    left: 50%;
+    top: 50%;
     width: 54px;
     height: 54px;
     margin-left: -27px;

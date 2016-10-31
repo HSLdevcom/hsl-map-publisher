@@ -37,7 +37,7 @@ const StopPoster = props => (
                 <Spacer width={50}/>
 
                 <div>
-                    <Map {...props}/>
+                    <Map {...props.map}/>
                     <Title>Linjojen reitit</Title>
                     <RouteDiagram stop={props.stop} routes={props.routes}/>
                 </div>
