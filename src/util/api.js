@@ -32,6 +32,16 @@ function fetchStop(stopId) {
 }
 
 /**
+ * Fetches all stops
+ * @returns {Promise}
+ */
+function fetchStops() {
+    return fetch(`${API_URL}/stops`)
+        .then(response => response.json())
+        .then(stops => stops.map(stop => ({ ...stop, shortId: trimShortId(stop.shortId) })));
+}
+
+/**
  * Fetches timetable for stop
  * @param {String|Number} stopId - Stop identifier e.g. 4200210
  * @returns {Promise} - Object containing departure list for weekdays, saturdays and sundays
@@ -96,6 +106,7 @@ function fetchMap(mapOptions) {
 
 export {
     fetchStop,
+    fetchStops,
     fetchTimetable,
     fetchRoutes,
     fetchMap,

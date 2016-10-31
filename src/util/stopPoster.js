@@ -1,8 +1,25 @@
 import viewportMercator from "viewport-mercator-project";
-import { fetchStop, fetchTimetable, fetchRoutes, fetchMap } from "util/api";
-import { getStopsFromRoutes } from "util/routes";
+import { fetchStop, fetchStops, fetchRoutes, fetchTimetable, fetchMap } from "util/api";
 
-function fetchMaps(stop, routes) {
+function fetchMapStops(viewport) {
+    // FIXME: Fetch active stops groups with valid timetables instead of all stops
+    return fetchStops().then((stops) => {
+        const visibleStops = stops
+            .filter(({ stopId }) => stopId !== stop.stopId)
+            .filter(({ lon, lat }) => viewport.contains([lon, lat]));
+
+        const promises = visibleStops.map(stop =>
+            fetchRoutes(stop.stopId).then((routes) => {
+                const [x, y] = viewport.project([stop.lon, stop.lat]);
+                return { ...stop, routes, x, y };
+            })
+        );
+
+        return Promise.all(promises);
+    });
+}
+
+function fetchMaps(stop) {
     const mapOptions = {
         center: [stop.lon, stop.lat],
         width: 1500,
@@ -26,16 +43,8 @@ function fetchMaps(stop, routes) {
         height: mapOptions.height,
     });
 
-    const stops = getStopsFromRoutes(routes)
-        .filter(({ stopId }) => stopId !== stop.stopId)
-        .filter(({ lon, lat }) => viewport.contains([lon, lat]))
-        .map((stop) => {
-            const [x, y] = viewport.project([stop.lon, stop.lat]);
-            return { ...stop, x, y };
-        });
-
-    return Promise.all([fetchMap(mapOptions), fetchMap(miniMapOptions)])
-        .then(([map, miniMap]) => ({ map, miniMap, mapOptions, miniMapOptions, stops }));
+    return Promise.all([fetchMap(mapOptions), fetchMap(miniMapOptions), fetchMapStops(viewport)])
+        .then(([map, miniMap, stops]) => ({ map, miniMap, mapOptions, miniMapOptions, stops }));
 }
 
 /**

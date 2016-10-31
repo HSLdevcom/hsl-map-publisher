@@ -1,17 +1,3 @@
-import uniq from "lodash/uniq";
-
-/**
- * Returns list on unique stops where routes stop
- * @param routes
- * @returns {Array}
- */
-function getStopsFromRoutes(routes) {
-    const stops = routes
-        .map(route => route.stops)
-        .reduce((prev, cur) => [...prev, ...cur])
-        .filter(({ stopId }) => stopId !== stop.stopId);
-    return uniq(stops, ({ stopId }) => stopId);
-}
 
 /**
  * Returns an index where stop list differs from path
@@ -109,6 +95,5 @@ function routesToPaths(stop, routes) {
 }
 
 export {
-    getStopsFromRoutes,
-    routesToPaths,
+    routesToPaths, // eslint-disable-line import/prefer-default-export
 };
