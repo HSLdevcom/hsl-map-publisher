@@ -27,7 +27,7 @@ const StopPoster = props => (
             <Header {...props.stop}/>
 
             <div className={styles.content}>
-                <div className={styles.left}>
+                <div>
                     <Routes routes={props.routes}/>
                     <Title>Pysäkkiaikataulu</Title>
                     <Timetable {...props.timetable}/>
@@ -36,8 +36,8 @@ const StopPoster = props => (
 
                 <Spacer width={50}/>
 
-                <div className={styles.right}>
-                    <Map mapImage={props.mapImage} miniMapImage={props.miniMapImage}/>
+                <div>
+                    <Map {...props.map}/>
                     <Title>Linjojen reitit</Title>
                     <RouteDiagram stop={props.stop} routes={props.routes}/>
                 </div>
