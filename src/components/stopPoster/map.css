@@ -43,16 +43,12 @@
 
 .label {
     position: absolute;
+    max-width: 260px;
     padding: 8px;
     margin-left: 25px;
     font-family: fontFamily;
     background: hsla(0, 0%, 100%, 0.8);
     border-radius: 5px;
-}
-
-.header {
-    display: flex;
-    align-items: center;
 }
 
 .title {
@@ -67,9 +63,12 @@
     margin: 2px 5px;
 }
 
-.labelItem {
-    display: flex;
-    justify-content: space-between;
+.content {
     font-size: 13px;
     color: background;
+    padding: 0 5px;
+}
+
+.row {
+    display: flex;
 }
