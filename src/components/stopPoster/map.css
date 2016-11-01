@@ -50,10 +50,21 @@
     border-radius: 5px;
 }
 
-.labelTitle {
+.header {
+    display: flex;
+    align-items: center;
+}
+
+.title {
     color: gray;
     font-size: 16px;
     font-weight: 700;
+}
+
+.subtitle {
+    composes: title;
+    font-size: 13px;
+    margin: 2px 5px;
 }
 
 .labelItem {

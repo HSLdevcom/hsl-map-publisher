@@ -21,7 +21,10 @@ const Stop = props => (
 
 const Label = props => (
     <div className={styles.label} style={{ left: props.x, top: props.y }}>
-        <div className={styles.labelTitle}>{props.address_fi}</div>
+        <div className={styles.header}>
+            <div className={styles.title}>{props.address_fi}</div>
+            <div className={styles.subtitle}>({props.stopId})</div>
+        </div>
         {props.routes.map((route, index) => (
             <div key={index} className={styles.labelItem}>
                 {route.routeId} &rarr; {route.destination_fi}
