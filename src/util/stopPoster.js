@@ -16,11 +16,11 @@ const MINI_MAP_ZOOM = 9;
 
 function createViewport(stop, zoom) {
     return viewportMercator({
-        longitude: stop.lon,
-        latitude: stop.lat,
-        zoom: zoom,
         width: MAP_WIDTH,
         height: MAP_HEIGHT,
+        longitude: stop.lon,
+        latitude: stop.lat,
+        zoom,
     });
 }
 
@@ -34,24 +34,24 @@ function calculateStopsViewport(activeStop, stops) {
         viewport = createViewport(activeStop, zoom);
         visibleStops = visibleStops
             .filter(({ stopId }) => stopId !== activeStop.stopId)
-            .filter(({ lon, lat }) => viewport.contains([lon, lat]));
-        if(visibleStops.length <= MAX_STOPS) break;
+            .filter(({ lon, lat }) => viewport.contains([lon, lat])); // eslint-disable-line
+        if (visibleStops.length <= MAX_STOPS) break;
     }
 
-    const projectedStops = visibleStops.map(stop => {
+    const projectedStops = visibleStops.map((stop) => {
         // Calculate pixel coordinates for each stops
         const [x, y] = viewport.project([stop.lon, stop.lat]);
         return { ...stop, x, y };
     });
 
-    return { stops: projectedStops, viewport, zoom };
+    return { stops: projectedStops, zoom };
 }
 
-function fetchCompleteStops({ stops, viewport, zoom }) {
-    const promises = stops.map(
-        stop => fetchRoutes(stop.stopId).then((routes) => ({ ...stop, routes }))
+function fetchCompleteStops(options) {
+    const promises = options.stops.map(
+        stop => fetchRoutes(stop.stopId).then(routes => ({ ...stop, routes }))
     );
-    return Promise.all(promises).then(stops => ({ stops, zoom }));
+    return Promise.all(promises).then(stops => ({ stops, zoom: options.zoom }));
 }
 
 function fetchMaps(stop) {
@@ -64,7 +64,7 @@ function fetchMaps(stop) {
                 center: [stop.lon, stop.lat],
                 width: MAP_WIDTH,
                 height: MAP_HEIGHT,
-                zoom: zoom,
+                zoom,
             };
 
             const miniMapOptions = {
@@ -77,8 +77,8 @@ function fetchMaps(stop) {
             // Remove map options and use constants and stop lat lon in map component?
             return Promise
                 .all([fetchMap(mapOptions), fetchMap(miniMapOptions)])
-                .then(([map, miniMap]) => ({map, miniMap, mapOptions, miniMapOptions, stops}));
-    });
+                .then(([map, miniMap]) => ({ map, miniMap, mapOptions, miniMapOptions, stops }));
+        });
 }
 
 /**
