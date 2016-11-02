@@ -42,7 +42,7 @@ const Label = props => (
     <div className={styles.label} style={{ left: props.x, top: props.y }}>
         <Row>
             <div className={styles.title}>{props.address_fi}</div>
-            <div className={styles.subtitle}>({props.stopId})</div>
+            <div className={styles.subtitle}>({props.shortId})</div>
         </Row>
         <div className={styles.content}>
             <RouteList routes={props.routes}/>
