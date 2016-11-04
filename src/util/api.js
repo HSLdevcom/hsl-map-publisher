@@ -22,7 +22,7 @@ function trimRouteId(id) {
 
 /**
  * Fetches stop info
- * @param {String|Number} stopId - Stop identifier e.g. 4200210
+ * @param {String} stopId - Stop identifier e.g. 4200210
  * @returns {Promise}
  */
 function fetchStop(stopId) {
@@ -43,7 +43,7 @@ function fetchStops() {
 
 /**
  * Fetches timetable for stop
- * @param {String|Number} stopId - Stop identifier e.g. 4200210
+ * @param {String} stopId - Stop identifier e.g. 4200210
  * @returns {Promise} - Object containing departure list for weekdays, saturdays and sundays
  */
 function fetchTimetable(stopId) {
