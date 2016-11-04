@@ -1,4 +1,5 @@
 import React from "react";
+import { Row } from "components/util";
 
 import locationIcon from "icons/location.svg";
 import busStopIcon from "icons/stopBus.svg";
@@ -6,6 +7,8 @@ import busStopIcon from "icons/stopBus.svg";
 import tramStopIcon from "icons/stopTram.svg"; // eslint-disable-line
 
 import styles from "./map.css";
+
+const MAX_LABEL_ROWS = 6;
 
 const Location = () => (
     <div className={styles.location}>
@@ -19,17 +22,31 @@ const Stop = props => (
     </div>
 );
 
+const RouteList = (props) => {
+    if (props.routes.length > MAX_LABEL_ROWS) {
+        const routeIds = props.routes.map(({ routeId }) => routeId).join(", ");
+        return <div>{routeIds}</div>;
+    }
+    return (
+        <div>
+            {props.routes.map((route, index) => (
+                <Row key={index}>
+                    {route.routeId} &rarr; {route.destination_fi}
+                </Row>
+            ))}
+        </div>
+    );
+};
+
 const Label = props => (
     <div className={styles.label} style={{ left: props.x, top: props.y }}>
-        <div className={styles.header}>
+        <Row>
             <div className={styles.title}>{props.address_fi}</div>
             <div className={styles.subtitle}>({props.stopId})</div>
+        </Row>
+        <div className={styles.content}>
+            <RouteList routes={props.routes}/>
         </div>
-        {props.routes.map((route, index) => (
-            <div key={index} className={styles.labelItem}>
-                {route.routeId} &rarr; {route.destination_fi}
-            </div>
-        ))}
     </div>
 );
 
