@@ -1,10 +1,8 @@
 import React from "react";
 import { Row } from "components/util";
+import { getSymbol } from "util/stops";
 
 import locationIcon from "icons/location.svg";
-import busStopIcon from "icons/stopBus.svg";
-// TODO: Use tram icon for tram stops
-import tramStopIcon from "icons/stopTram.svg"; // eslint-disable-line
 
 import styles from "./map.css";
 
@@ -18,7 +16,7 @@ const Location = () => (
 
 const Stop = props => (
     <div className={styles.stop} style={{ left: props.x, top: props.y }}>
-        <img src={busStopIcon} role="presentation"/>
+        <img src={getSymbol(props.stopId)} role="presentation"/>
     </div>
 );
 
