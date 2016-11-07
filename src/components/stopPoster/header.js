@@ -36,8 +36,8 @@ const Header = props => (
         <Row>
             <Icon src={busIcon}/>
             <Group>
-                <Title>{props.address_fi}</Title>
-                <Subtitle>{props.address_se}</Subtitle>
+                <Title>{props.name_fi}</Title>
+                <Subtitle>{props.name_se}</Subtitle>
             </Group>
         </Row>
 

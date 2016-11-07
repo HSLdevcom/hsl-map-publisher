@@ -5,7 +5,7 @@ import tramStopIcon from "icons/stopTram.svg";
 
 /**
  * Returns stop symbol as data URL
- * @param {string] stopId - Stop long id
+ * @param {String} stopId - Stop long id
  * @returns - Stop symbol
  */
 function getSymbol(stopId) {
