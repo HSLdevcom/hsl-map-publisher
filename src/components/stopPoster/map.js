@@ -1,4 +1,6 @@
 import React from "react";
+import ItemContainer from "components/itemContainer";
+import ItemWrapper from "components/itemWrapper";
 import { Row } from "components/util";
 import { getSymbol } from "util/stops";
 
@@ -15,7 +17,7 @@ const Location = () => (
 );
 
 const Stop = props => (
-    <div className={styles.stop} style={{ left: props.x, top: props.y }}>
+    <div className={styles.stop}>
         <img src={getSymbol(props.stopId)} role="presentation"/>
     </div>
 );
@@ -52,18 +54,33 @@ const Map = (props) => {
     const mapStyle = { width: props.mapOptions.width, height: props.mapOptions.height };
     const miniMapStyle = { width: props.miniMapOptions.width, height: props.miniMapOptions.height };
 
+    // TODO: Add location <Location/>
+
     return (
         <div className={styles.root} style={mapStyle}>
             <div className={styles.container}>
                 <img src={props.map} role="presentation"/>
-                {props.stops.map((stop, index) => <Stop key={index} {...stop}/>)}
-                {props.stops.map((stop, index) => <Label key={index} {...stop}/>)}
-                <Location/>
             </div>
+
+            <div className={styles.overlays}>
+                <ItemContainer>
+                    {props.stops.map((stop, index) => (
+                        <ItemWrapper key={index} x={stop.x} y={stop.y} isFixed>
+                            <Stop {...stop}/>
+                        </ItemWrapper>
+                    ))}
+                    {props.stops.map((stop, index) => (
+                        <ItemWrapper key={index} x={stop.x} y={stop.y} distance={50}>
+                            <Label {...stop}/>
+                        </ItemWrapper>
+                    ))}
+                </ItemContainer>
+            </div>
+
             <div className={styles.miniMap} style={miniMapStyle}>
                 <div className={styles.container}>
                     <img src={props.miniMap} role="presentation"/>
-                    <Location/>
+
                 </div>
             </div>
         </div>

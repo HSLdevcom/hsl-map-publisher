@@ -17,7 +17,6 @@
     width: 100%;
     height: 100%;
     border-radius: borderRadius;
-    overflow: hidden;
 }
 
 .container img {
@@ -25,8 +24,16 @@
     border-radius: borderRadius;
 }
 
-.stop {
+.overlays {
     position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.stop {
     width: 34px;
     height: 34px;
     margin-left: -17px;
@@ -44,10 +51,9 @@
 }
 
 .label {
-    position: absolute;
     max-width: 260px;
     padding: 10px;
-    margin-left: 25px;
+    margin: 10px;
     font-family: fontFamily;
     background: hsla(0, 0%, 100%, 0.8);
     border-radius: 5px;
