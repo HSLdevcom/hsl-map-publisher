@@ -46,21 +46,21 @@ class CollisionBuffer {
 
 class ItemContainer extends Component {
 
+    // FIXME: Wait for web fonts to load to get correct width and height of children
     componentDidMount() {
-        this.updateChildren();
+        setTimeout(() =>  this.updateChildren(), 4000);
     }
 
     componentDidUpdate() {
-        this.updateChildren();
+        setTimeout(() =>  this.updateChildren(), 4000);
     }
 
-    getCollisionCount(width, height, childPositions) {
+    getCollisionCount(width, height, positions) {
         const buffer = new CollisionBuffer(width, height);
-        for (const position of childPositions) {
-            // TODO: Use top and left instead of x and y
+        for (const position of positions) {
             buffer.addRectangle({
-                left: Math.floor(position.x),
-                top: Math.floor(position.y),
+                left: Math.floor(position.left),
+                top: Math.floor(position.top),
                 width: Math.floor(position.width),
                 height: Math.floor(position.height),
             });
@@ -68,11 +68,30 @@ class ItemContainer extends Component {
         return buffer.getCollisionCount();
     }
 
-    getUpdatedPositions(childPositions, childIndex, diff) {
-        return childPositions.map((position, index) => {
-            if (index === childIndex) {
-                // TODO: Rotate instead of moving on x axis
-                return { ...position, x: position.x + diff };
+    updatePosition(position, angleDiff = 0) {
+        const angle = position.angle + angleDiff;
+        const a = position.width / 2 + position.distance;
+        const b = position.height / 2 + position.distance;
+
+        const tanv = Math.tan(angle * Math.PI / 180);
+        const xAbs = a * b / Math.sqrt(Math.pow(b, 2) + Math.pow(a, 2) * Math.pow(tanv, 2));
+        const yAbs = a * b / Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2) / Math.pow(tanv, 2));
+
+        const x = Math.abs(angle) < 90 ? xAbs : - xAbs;
+        const y = Math.abs(angle - 90) < 90 ? yAbs : - yAbs;
+
+        return {
+            ...position,
+            left: position.x + x - position.width / 2,
+            top: position.y + y - position.height / 2,
+            angle,
+        };
+    }
+
+    getUpdatedPositions(positions, indexToUpdate, angleDiff) {
+        return positions.map((position, index) => {
+            if (index === indexToUpdate) {
+                return this.updatePosition(position, angleDiff);
             }
             return position;
         });
@@ -82,35 +101,31 @@ class ItemContainer extends Component {
         const width = this.root.offsetWidth;
         const height = this.root.offsetHeight;
 
-        console.log(`Root w/h: ${width} ${height}`); // eslint-disable-line
-        console.log(`Child count: ${this.childRefs.length}`); // eslint-disable-line
-
-        let childPositions = this.childRefs.map(child => child.getPosition());
+        let positions = this.childRefs
+            .map(child => child.getPosition())
+            .map(position => this.updatePosition(position));
 
         for (let i = 0; i < MAX_ITERATIONS; i++) {
             let isPositionsUpdated = false;
-            for (let childIndex = 0; childIndex < childPositions.length; childIndex++) {
-                if (!childPositions[childIndex].isFixed) {
-                    const leftPositions = this.getUpdatedPositions(childPositions, childIndex, -5);
-                    const rightPositions = this.getUpdatedPositions(childPositions, childIndex, 5);
-                    const originalCost = this.getCollisionCount(width, height, childPositions);
+            for (let index = 0; index < positions.length; index++) {
+                if (!positions[index].isFixed) {
+                    const leftPositions = this.getUpdatedPositions(positions, index, -5);
+                    const rightPositions = this.getUpdatedPositions(positions, index, 5);
+                    const originalCost = this.getCollisionCount(width, height, positions);
                     const leftCost = this.getCollisionCount(width, height, leftPositions);
                     const rightCost = this.getCollisionCount(width, height, rightPositions);
 
                     if (leftCost < originalCost || rightCost < originalCost) {
-                        childPositions = leftCost < rightCost ? leftPositions : rightPositions;
+                        positions = leftCost < rightCost ? leftPositions : rightPositions;
                         isPositionsUpdated = true;
                     }
                 }
             }
-            if (!isPositionsUpdated) {
-                console.log("Placement not updated, breaking"); // eslint-disable-line
-                break;
-            }
+            if (!isPositionsUpdated) break;
         }
 
         this.childRefs.forEach((ref, index) => {
-            ref.setPosition(childPositions[index].x, childPositions[index].y);
+            ref.setPosition(positions[index].top, positions[index].left);
         });
     }
 
