@@ -3,47 +3,6 @@ import styles from "./itemContainer.css";
 
 const MAX_ITERATIONS = 100;
 
-class CollisionBuffer {
-    constructor(width, height) {
-        this.width = width;
-        this.height = height;
-
-        this.overflowCount = 0;
-        this.cells = [];
-        for (let y = 0; y < this.height; y++) {
-            this.cells[y] = [];
-            for (let x = 0; x < this.width; x++) {
-                this.cells[y][x] = 0;
-            }
-        }
-    }
-
-    addRectangle(dimensions) {
-        const { left, top, width, height } = dimensions;
-        for (let y = top; y < top + height; y++) {
-            for (let x = left; x < left + width; x++) {
-                if (x > 0 && x < this.width && y > 0 && y < this.height) {
-                    this.cells[y][x] += 1;
-                } else {
-                    this.overflowCount += 1;
-                }
-            }
-        }
-    }
-
-    getCollisionCount() {
-        let overlapCount = 0;
-        for (let y = 0; y < this.height; y++) {
-            for (let x = 0; x < this.width; x++) {
-                if (this.cells[y][x] > 1) {
-                    overlapCount += this.cells[y][x];
-                }
-            }
-        }
-        return overlapCount + this.overflowCount;
-    }
-}
-
 class ItemContainer extends Component {
 
     // FIXME: Wait for web fonts to load to get correct width and height of children
@@ -55,17 +14,24 @@ class ItemContainer extends Component {
         setTimeout(() =>  this.updateChildren(), 4000);
     }
 
+    getIntersectionArea(a, b) {
+        const width = Math.min(a.left + a.width, b.left + b.width) - Math.max(a.left, b.left);
+        const height = Math.min(a.top + a.height, b.top + b.height) - Math.max(a.top, b.top);
+        return Math.max(0, width) * Math.max(0, height);
+    }
+
     getCollisionCount(width, height, positions) {
-        const buffer = new CollisionBuffer(width, height);
-        for (const position of positions) {
-            buffer.addRectangle({
-                left: Math.floor(position.left),
-                top: Math.floor(position.top),
-                width: Math.floor(position.width),
-                height: Math.floor(position.height),
-            });
+        const boundingBox = { left: 0, top: 0, width, height };
+        let overflow = 0;
+        let overlap = 0;
+        for(let i = 0; i < positions.length; i++) {
+            const rectArea = positions[i].width * positions[i].height;
+            overflow += rectArea - this.getIntersectionArea(boundingBox, positions[i]);
+            for(let j = i + 1; j < positions.length; j++) {
+                overlap += this.getIntersectionArea(positions[i], positions[j]);
+            }
         }
-        return buffer.getCollisionCount();
+        return overlap + overflow;
     }
 
     updatePosition(position, angleDiff = 0) {
@@ -109,14 +75,14 @@ class ItemContainer extends Component {
             let isPositionsUpdated = false;
             for (let index = 0; index < positions.length; index++) {
                 if (!positions[index].isFixed) {
-                    const leftPositions = this.getUpdatedPositions(positions, index, -5);
-                    const rightPositions = this.getUpdatedPositions(positions, index, 5);
-                    const originalCost = this.getCollisionCount(width, height, positions);
-                    const leftCost = this.getCollisionCount(width, height, leftPositions);
-                    const rightCost = this.getCollisionCount(width, height, rightPositions);
+                    const positionsCW = this.getUpdatedPositions(positions, index, -1);
+                    const positionsCCW = this.getUpdatedPositions(positions, index, 1);
+                    const count = this.getCollisionCount(width, height, positions);
+                    const countCW = this.getCollisionCount(width, height, positionsCW);
+                    const countCCW = this.getCollisionCount(width, height, positionsCCW);
 
-                    if (leftCost < originalCost || rightCost < originalCost) {
-                        positions = leftCost < rightCost ? leftPositions : rightPositions;
+                    if (countCW < count || countCCW < count) {
+                        positions = countCW < countCCW ? positionsCW : positionsCCW;
                         isPositionsUpdated = true;
                     }
                 }
