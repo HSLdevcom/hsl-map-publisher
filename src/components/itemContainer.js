@@ -1,17 +1,17 @@
 import React, { Component } from "react";
 import styles from "./itemContainer.css";
 
-const MAX_ITERATIONS = 100;
+const MAX_ITERATIONS = 1000;
 
 class ItemContainer extends Component {
 
     // FIXME: Wait for web fonts to load to get correct width and height of children
     componentDidMount() {
-        setTimeout(() =>  this.updateChildren(), 4000);
+        this.updateChildren();
     }
 
     componentDidUpdate() {
-        setTimeout(() =>  this.updateChildren(), 4000);
+        this.updateChildren();
     }
 
     getIntersectionArea(a, b) {
@@ -24,27 +24,36 @@ class ItemContainer extends Component {
         const boundingBox = { left: 0, top: 0, width, height };
         let overflow = 0;
         let overlap = 0;
-        for(let i = 0; i < positions.length; i++) {
-            const rectArea = positions[i].width * positions[i].height;
-            overflow += rectArea - this.getIntersectionArea(boundingBox, positions[i]);
-            for(let j = i + 1; j < positions.length; j++) {
-                overlap += this.getIntersectionArea(positions[i], positions[j]);
+        for (let i = 0; i < positions.length; i++) {
+            if (!positions[i].isFixed) {
+                const rectArea = positions[i].width * positions[i].height;
+                overflow += rectArea - this.getIntersectionArea(boundingBox, positions[i]);
+            }
+            for (let j = i + 1; j < positions.length; j++) {
+                if (!positions[i].isFixed || !positions[j].isFixed) {
+                    overlap += this.getIntersectionArea(positions[i], positions[j]);
+                }
             }
         }
         return overlap + overflow;
     }
 
     updatePosition(position, angleDiff = 0) {
-        const angle = position.angle + angleDiff;
+        let angle = (position.angle + angleDiff) % 360;
+        if(angle < 0) angle = 360 + angle;
+
         const a = position.width / 2 + position.distance;
         const b = position.height / 2 + position.distance;
 
-        const tanv = Math.tan(angle * Math.PI / 180);
-        const xAbs = a * b / Math.sqrt(Math.pow(b, 2) + Math.pow(a, 2) * Math.pow(tanv, 2));
-        const yAbs = a * b / Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2) / Math.pow(tanv, 2));
+        const closestRightAngle = Math.round(angle / 90) * 90;
+        const isHorizontal = closestRightAngle % 180 === 0;
 
-        const x = Math.abs(angle) < 90 ? xAbs : - xAbs;
-        const y = Math.abs(angle - 90) < 90 ? yAbs : - yAbs;
+        const tanv = Math.tan(Math.abs(closestRightAngle - angle) * Math.PI / 180);
+        const xAbs = isHorizontal ? a : a * tanv;
+        const yAbs = isHorizontal ? b * tanv : b;
+
+        const x = (angle < 90 || angle > 270) ? xAbs : -xAbs;
+        const y = (angle < 180) ? yAbs : -yAbs;
 
         return {
             ...position,
@@ -70,24 +79,24 @@ class ItemContainer extends Component {
         let positions = this.childRefs
             .map(child => child.getPosition())
             .map(position => this.updatePosition(position));
+        let collisionCount = this.getCollisionCount(width, height, positions);
 
-        for (let i = 0; i < MAX_ITERATIONS; i++) {
-            let isPositionsUpdated = false;
+        for(let i = 0; i < MAX_ITERATIONS; i++) {
+            if(!collisionCount) break;
             for (let index = 0; index < positions.length; index++) {
                 if (!positions[index].isFixed) {
-                    const positionsCW = this.getUpdatedPositions(positions, index, -1);
-                    const positionsCCW = this.getUpdatedPositions(positions, index, 1);
-                    const count = this.getCollisionCount(width, height, positions);
+                    const positionsCW = this.getUpdatedPositions(positions, index, 1);
+                    const positionsCCW = this.getUpdatedPositions(positions, index, -1);
                     const countCW = this.getCollisionCount(width, height, positionsCW);
                     const countCCW = this.getCollisionCount(width, height, positionsCCW);
 
-                    if (countCW < count || countCCW < count) {
+                    // Update even when equal to previous to remove complete overlap / overflow
+                    if (countCW <= collisionCount || countCCW <= collisionCount) {
+                        collisionCount = countCW < countCCW ? countCW : countCCW;
                         positions = countCW < countCCW ? positionsCW : positionsCCW;
-                        isPositionsUpdated = true;
                     }
                 }
             }
-            if (!isPositionsUpdated) break;
         }
 
         this.childRefs.forEach((ref, index) => {

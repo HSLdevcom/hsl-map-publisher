@@ -65,12 +65,12 @@ const Map = (props) => {
             <div className={styles.overlays}>
                 <ItemContainer>
                     {props.stops.map((stop, index) => (
-                        <ItemWrapper key={index} x={stop.x} y={stop.y} isFixed>
+                        <ItemWrapper key={index} x={stop.x} y={stop.y} angle={45} isFixed>
                             <Stop {...stop}/>
                         </ItemWrapper>
                     ))}
                     {props.stops.map((stop, index) => (
-                        <ItemWrapper key={index} x={stop.x} y={stop.y} distance={50}>
+                        <ItemWrapper key={index} x={stop.x} y={stop.y} distance={30}>
                             <Label {...stop}/>
                         </ItemWrapper>
                     ))}

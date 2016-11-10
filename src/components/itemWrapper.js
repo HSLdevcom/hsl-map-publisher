@@ -9,13 +9,10 @@ class ItemWrapper extends Component {
     }
 
     setPosition(top, left) {
-        // TODO: Handle fixed wrappers
-        if(!top || !left) return;
         this.setState({ top, left });
     }
 
     getPosition() {
-        console.log("Wrapper request. Height " + this.root.offsetHeight);
         return {
             x: this.props.x,
             y: this.props.y,
@@ -25,10 +22,6 @@ class ItemWrapper extends Component {
             height: this.root.offsetHeight,
             isFixed: !!this.props.isFixed,
         };
-    }
-
-    componentDidMount() {
-        console.log("Wrapper did mount. Height: " + this.root.offsetHeight);
     }
 
     render() {
