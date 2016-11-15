@@ -75,24 +75,25 @@ class ItemContainer extends Component {
     updateChildren() {
         const width = this.root.offsetWidth;
         const height = this.root.offsetHeight;
+        const steps = [90, 45, 3];
 
         let positions = this.childRefs
             .map(child => child.getPosition())
             .map(position => this.updatePosition(position));
-        let collisionCount = this.getCollisionCount(width, height, positions);
+        let count = this.getCollisionCount(width, height, positions);
 
         for(let i = 0; i < MAX_ITERATIONS; i++) {
-            if(!collisionCount) break;
+            if (count <= 0) break;
+            const step = steps[i % steps.length];
             for (let index = 0; index < positions.length; index++) {
                 if (!positions[index].isFixed) {
-                    const positionsCW = this.getUpdatedPositions(positions, index, 1);
-                    const positionsCCW = this.getUpdatedPositions(positions, index, -1);
+                    const positionsCW = this.getUpdatedPositions(positions, index, step);
+                    const positionsCCW = this.getUpdatedPositions(positions, index, -step);
                     const countCW = this.getCollisionCount(width, height, positionsCW);
                     const countCCW = this.getCollisionCount(width, height, positionsCCW);
 
-                    // Update even when equal to previous to remove complete overlap / overflow
-                    if (countCW <= collisionCount || countCCW <= collisionCount) {
-                        collisionCount = countCW < countCCW ? countCW : countCCW;
+                    if (countCW <= count || countCCW <= count) {
+                        count = countCW < countCCW ? countCW : countCCW;
                         positions = countCW < countCCW ? positionsCW : positionsCCW;
                     }
                 }

@@ -70,7 +70,7 @@ const Map = (props) => {
                         </ItemWrapper>
                     ))}
                     {props.stops.map((stop, index) => (
-                        <ItemWrapper key={index} x={stop.x} y={stop.y} distance={30}>
+                        <ItemWrapper key={index} x={stop.x} y={stop.y} distance={15}>
                             <Label {...stop}/>
                         </ItemWrapper>
                     ))}
