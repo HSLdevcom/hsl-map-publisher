@@ -62,7 +62,7 @@ const Map = (props) => {
 
     return (
         <div className={styles.root} style={mapStyle}>
-            <div className={styles.container}>
+            <div className={styles.map}>
                 <img src={props.map} role="presentation"/>
             </div>
 
@@ -98,11 +98,9 @@ const Map = (props) => {
             </div>
 
             <div className={styles.miniMap} style={miniMapStyle}>
-                <div className={styles.container}>
-                    <img src={props.miniMap} role="presentation"/>
-                    <div className={styles.center} style={{ margin: -LOCATION_RADIUS_MINI }}>
-                        <Location size={LOCATION_RADIUS_MINI * 2}/>
-                    </div>
+                <img src={props.miniMap} role="presentation"/>
+                <div className={styles.center} style={{ margin: -LOCATION_RADIUS_MINI }}>
+                    <Location size={LOCATION_RADIUS_MINI * 2}/>
                 </div>
             </div>
         </div>
