@@ -33,21 +33,10 @@
     overflow: hidden;
 }
 
-.stop {
-    width: 34px;
-    height: 34px;
-    margin-left: -17px;
-    margin-top: -17px;
-}
-
-.location {
+.center {
     position: absolute;
-    left: 50%;
     top: 50%;
-    width: 54px;
-    height: 54px;
-    margin-left: -27px;
-    margin-top: -27px;
+    left: 50%;
 }
 
 .label {
