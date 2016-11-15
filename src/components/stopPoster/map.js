@@ -11,10 +11,13 @@ import styles from "./map.css";
 // Max rows in label
 const MAX_LABEL_ROWS = 6;
 
-// Symbol size
+// Map symbol size
 const STOP_RADIUS = 17;
 const LOCATION_RADIUS = 27;
 const LOCATION_RADIUS_MINI = 18;
+
+// Mini map position
+const MINI_MAP_MARGIN = 50;
 
 const Location = props => (
     <div style={{ width: props.size, height: props.size }}>
@@ -57,8 +60,23 @@ const Label = props => (
 );
 
 const Map = (props) => {
-    const mapStyle = { width: props.mapOptions.width, height: props.mapOptions.height };
-    const miniMapStyle = { width: props.miniMapOptions.width, height: props.miniMapOptions.height };
+    const mapStyle = {
+        width: props.mapOptions.width,
+        height: props.mapOptions.height,
+    };
+    const miniMapStyle = {
+        width: props.miniMapOptions.width,
+        height: props.miniMapOptions.height,
+    };
+    const miniMapPosition = {
+        x: mapStyle.width - MINI_MAP_MARGIN - miniMapStyle.width,
+        y: mapStyle.height + MINI_MAP_MARGIN - miniMapStyle.height,
+    };
+
+    // Filter out stops that are behind the mini map
+    const stops = props.stops.filter(
+        stop => stop.x < miniMapPosition.x || stop.y < miniMapPosition.y
+    );
 
     return (
         <div className={styles.root} style={mapStyle}>
@@ -68,7 +86,7 @@ const Map = (props) => {
 
             <div className={styles.overlays}>
                 <ItemContainer>
-                    {props.stops.map((stop, index) => (
+                    {stops.map((stop, index) => (
                         <ItemWrapper
                             key={index}
                             x={stop.x - STOP_RADIUS}
@@ -89,7 +107,7 @@ const Map = (props) => {
                         <Location size={LOCATION_RADIUS * 2}/>
                     </ItemWrapper>
 
-                    {props.stops.map((stop, index) => (
+                    {stops.map((stop, index) => (
                         <ItemWrapper key={index} x={stop.x} y={stop.y} distance={15}>
                             <Label {...stop}/>
                         </ItemWrapper>
