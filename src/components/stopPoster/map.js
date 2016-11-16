@@ -17,7 +17,8 @@ const LOCATION_RADIUS = 27;
 const LOCATION_RADIUS_MINI = 18;
 
 // Mini map position
-const MINI_MAP_MARGIN = 50;
+const MINI_MAP_MARGIN_RIGHT = 60;
+const MINI_MAP_MARGIN_BOTTOM = -40;
 
 const Location = props => (
     <div style={{ width: props.size, height: props.size }}>
@@ -65,17 +66,15 @@ const Map = (props) => {
         height: props.mapOptions.height,
     };
     const miniMapStyle = {
+        left: mapStyle.width - MINI_MAP_MARGIN_RIGHT - props.miniMapOptions.width,
+        top: mapStyle.height - MINI_MAP_MARGIN_BOTTOM - props.miniMapOptions.height,
         width: props.miniMapOptions.width,
         height: props.miniMapOptions.height,
-    };
-    const miniMapPosition = {
-        x: mapStyle.width - MINI_MAP_MARGIN - miniMapStyle.width,
-        y: mapStyle.height + MINI_MAP_MARGIN - miniMapStyle.height,
     };
 
     // Filter out stops that are behind the mini map
     const stops = props.stops.filter(
-        stop => stop.x < miniMapPosition.x || stop.y < miniMapPosition.y
+        stop => stop.x < miniMapStyle.left || stop.y < miniMapStyle.top
     );
 
     return (
@@ -112,6 +111,15 @@ const Map = (props) => {
                             <Label {...stop}/>
                         </ItemWrapper>
                     ))}
+
+                    <ItemWrapper
+                        x={miniMapStyle.left}
+                        y={miniMapStyle.top}
+                        angle={45}
+                        isFixed
+                    >
+                        <div style={miniMapStyle}/>
+                    </ItemWrapper>
                 </ItemContainer>
             </div>
 

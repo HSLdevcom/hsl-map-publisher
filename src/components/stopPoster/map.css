@@ -22,8 +22,6 @@
 .miniMap {
     composes: mapContainer;
     position: absolute;
-    right: 50px;
-    bottom: -50px;
     border: 10px solid background;
 }
 
