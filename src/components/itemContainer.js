@@ -107,8 +107,8 @@ class ItemContainer extends Component {
 
     render() {
         this.childRefs = [];
-        const children = React.Children.map(this.props.children, (child) => {
-            const props = { ref: ref => this.childRefs.push(ref) };
+        const children = React.Children.map(this.props.children, (child, index) => {
+            const props = { ref: (ref) => { this.childRefs[index] = ref; } };
             return child ? React.cloneElement(child, props) : null;
         });
         return (
