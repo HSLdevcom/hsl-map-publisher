@@ -1,4 +1,6 @@
 import React from "react";
+import ItemContainer from "components/itemContainer";
+import ItemWrapper from "components/itemWrapper";
 import { Row } from "components/util";
 import { getSymbol } from "util/stops";
 
@@ -6,16 +8,26 @@ import locationIcon from "icons/location.svg";
 
 import styles from "./map.css";
 
+// Max rows in label
 const MAX_LABEL_ROWS = 6;
 
-const Location = () => (
-    <div className={styles.location}>
+// Map symbol size
+const STOP_RADIUS = 17;
+const LOCATION_RADIUS = 27;
+const LOCATION_RADIUS_MINI = 18;
+
+// Mini map position
+const MINI_MAP_MARGIN_RIGHT = 60;
+const MINI_MAP_MARGIN_BOTTOM = -40;
+
+const Location = props => (
+    <div style={{ width: props.size, height: props.size }}>
         <img src={locationIcon} role="presentation"/>
     </div>
 );
 
 const Stop = props => (
-    <div className={styles.stop} style={{ left: props.x, top: props.y }}>
+    <div style={{ width: props.size, height: props.size }}>
         <img src={getSymbol(props.stopId)} role="presentation"/>
     </div>
 );
@@ -49,21 +61,72 @@ const Label = props => (
 );
 
 const Map = (props) => {
-    const mapStyle = { width: props.mapOptions.width, height: props.mapOptions.height };
-    const miniMapStyle = { width: props.miniMapOptions.width, height: props.miniMapOptions.height };
+    const mapStyle = {
+        width: props.mapOptions.width,
+        height: props.mapOptions.height,
+    };
+    const miniMapStyle = {
+        left: mapStyle.width - MINI_MAP_MARGIN_RIGHT - props.miniMapOptions.width,
+        top: mapStyle.height - MINI_MAP_MARGIN_BOTTOM - props.miniMapOptions.height,
+        width: props.miniMapOptions.width,
+        height: props.miniMapOptions.height,
+    };
+
+    // Filter out stops that are behind the mini map
+    const stops = props.stops.filter(
+        stop => stop.x < miniMapStyle.left || stop.y < miniMapStyle.top
+    );
 
     return (
         <div className={styles.root} style={mapStyle}>
-            <div className={styles.container}>
+            <div className={styles.map}>
                 <img src={props.map} role="presentation"/>
-                {props.stops.map((stop, index) => <Stop key={index} {...stop}/>)}
-                {props.stops.map((stop, index) => <Label key={index} {...stop}/>)}
-                <Location/>
             </div>
+
+            <div className={styles.overlays}>
+                <ItemContainer>
+                    {stops.map((stop, index) => (
+                        <ItemWrapper
+                            key={index}
+                            x={stop.x - STOP_RADIUS}
+                            y={stop.y - STOP_RADIUS}
+                            angle={45}
+                            isFixed
+                        >
+                            <Stop {...stop} size={STOP_RADIUS * 2}/>
+                        </ItemWrapper>
+                    ))}
+
+                    <ItemWrapper
+                        x={(mapStyle.width / 2) - LOCATION_RADIUS}
+                        y={(mapStyle.height / 2) - LOCATION_RADIUS}
+                        angle={45}
+                        isFixed
+                    >
+                        <Location size={LOCATION_RADIUS * 2}/>
+                    </ItemWrapper>
+
+                    {stops.map((stop, index) => (
+                        <ItemWrapper key={index} x={stop.x} y={stop.y} distance={15}>
+                            <Label {...stop}/>
+                        </ItemWrapper>
+                    ))}
+
+                    <ItemWrapper
+                        x={miniMapStyle.left}
+                        y={miniMapStyle.top}
+                        angle={45}
+                        isFixed
+                    >
+                        <div style={miniMapStyle}/>
+                    </ItemWrapper>
+                </ItemContainer>
+            </div>
+
             <div className={styles.miniMap} style={miniMapStyle}>
-                <div className={styles.container}>
-                    <img src={props.miniMap} role="presentation"/>
-                    <Location/>
+                <img src={props.miniMap} role="presentation"/>
+                <div className={styles.center} style={{ margin: -LOCATION_RADIUS_MINI }}>
+                    <Location size={LOCATION_RADIUS_MINI * 2}/>
                 </div>
             </div>
         </div>

@@ -4,50 +4,40 @@
     position: relative;
 }
 
-.miniMap {
-    position: absolute;
-    right: 50px;
-    bottom: -50px;
-    border: 10px solid background;
-    border-radius: borderRadius;
-}
-
-.container {
-    position: relative;
-    width: 100%;
-    height: 100%;
+.mapContainer {
     border-radius: borderRadius;
     overflow: hidden;
 }
 
-.container img {
+.mapContainer img {
     width: 100%;
-    border-radius: borderRadius;
 }
 
-.stop {
-    position: absolute;
-    width: 34px;
-    height: 34px;
-    margin-left: -17px;
-    margin-top: -17px;
+.map {
+    composes: mapContainer;
+    width: 100%;
+    height: 100%;
 }
 
-.location {
+.miniMap {
+    composes: mapContainer;
     position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 54px;
-    height: 54px;
-    margin-left: -27px;
-    margin-top: -27px;
+    border: 10px solid background;
+}
+
+.overlays {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 .label {
-    position: absolute;
     max-width: 260px;
     padding: 10px;
-    margin-left: 25px;
+    margin: 10px;
     font-family: fontFamily;
     background: hsla(0, 0%, 100%, 0.8);
     border-radius: 5px;
@@ -73,4 +63,10 @@
 
 .row {
     display: flex;
+}
+
+.center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
 }
