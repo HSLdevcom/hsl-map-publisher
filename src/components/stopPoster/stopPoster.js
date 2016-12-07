@@ -1,5 +1,6 @@
-import React from "react";
-import { JustifiedColumn, Spacer } from "components/util";
+import React, { Component } from "react";
+import { JustifiedColumn, Spacer, FlexSpacer } from "components/util";
+import { fetchStopPosterProps } from "util/stopPoster";
 
 import Header from "./header";
 import Footer from "./footer";
@@ -19,34 +20,60 @@ const Title = props => (
     </div>
 );
 
-const FlexSpacer = () => <div style={{ flex: "2" }}/>;
+class StopPoster extends Component {
 
-const StopPoster = props => (
-    <div className={styles.root}>
-        <JustifiedColumn>
-            <Header {...props.stop}/>
+    componentDidMount() {
+        if (this.props.stopId) {
+            this.fetchContent(this.props.stopId);
+        }
+    }
 
-            <div className={styles.content}>
-                <div>
-                    <Routes routes={props.routes}/>
-                    <Title>Pysäkkiaikataulu</Title>
-                    <Timetable {...props.timetable}/>
-                    <Info/>
-                </div>
+    componentDidUpdate(prevProps) {
+        if (this.props.stopId && this.props.stopId !== prevProps.stopId) {
+            this.fetchContent(this.props.stopId);
+        }
+    }
 
-                <Spacer width={50}/>
+    componentWillUnmount() { // eslint-disable-line
+        // TODO: Cancel ongoing request
+    }
 
-                <div>
-                    <Map {...props.map}/>
-                    <Title>Linjojen reitit</Title>
-                    <RouteDiagram stop={props.stop} routes={props.routes}/>
-                </div>
+    fetchContent(stopId) {
+        // TODO: Call on ready callback
+        fetchStopPosterProps(stopId).then(props => this.setState(props));
+    }
+
+    render() {
+        if (!this.state) return null;
+
+        return (
+            <div className={styles.root}>
+                <JustifiedColumn>
+                    <Header {...this.state.stop}/>
+
+                    <div className={styles.content}>
+                        <div>
+                            <Routes routes={this.state.routes}/>
+                            <Title>Pysäkkiaikataulu</Title>
+                            <Timetable {...this.state.timetable}/>
+                            <Info/>
+                        </div>
+
+                        <Spacer width={50}/>
+
+                        <div>
+                            <Map {...this.state.map}/>
+                            <Title>Linjojen reitit</Title>
+                            <RouteDiagram stop={this.state.stop} routes={this.state.routes}/>
+                        </div>
+                    </div>
+
+                    <FlexSpacer/>
+                    <Footer/>
+                </JustifiedColumn>
             </div>
-
-            <FlexSpacer/>
-            <Footer/>
-        </JustifiedColumn>
-    </div>
-);
+        );
+    }
+}
 
 export default StopPoster;

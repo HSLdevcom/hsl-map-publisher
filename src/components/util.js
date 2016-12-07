@@ -36,6 +36,8 @@ const Spacer = props => (
     <div style={{ flex: "0 0 auto", width: props.width || 0, height: props.height || 0 }}/>
 );
 
+const FlexSpacer = () => <div style={{ flex: "2" }}/>;
+
 const Image = props => (
     <img className={styles.image} role="presentation" {...props}/>
 );
@@ -48,5 +50,6 @@ export {
     Column,
     JustifiedColumn,
     Spacer,
+    FlexSpacer,
     Image,
 };
