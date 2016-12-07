@@ -83,12 +83,12 @@ function fetchMaps(stop) {
 
 /**
  * Fetches required props for stop poster component
- * @param id - Stop identifier
+ * @param stopId - Stop identifier
  * @returns {Promise}
  */
-function fetchStopPosterProps(id) {
+function fetchStopPosterProps(stopId) {
     return Promise
-        .all([fetchStop(id), fetchTimetable(id), fetchRoutes(id)])
+        .all([fetchStop(stopId), fetchTimetable(stopId), fetchRoutes(stopId)])
         .then(([stop, timetable, routes]) => (
             fetchMaps(stop, routes).then(map => ({ map, stop, timetable, routes }))
         ));
