@@ -27,6 +27,11 @@ class App extends Component {
         if (window.callPhantom) window.callPhantom();
     }
 
+    /**
+     * Sets component to render
+     * @param {String} component - Name of component to display
+     * @param {Object} options - Options passed to component
+     */
     setVisibleComponent(component, options) {
         this.setState({ component, options });
     }
