@@ -76,4 +76,8 @@ class StopPoster extends Component {
     }
 }
 
+StopPoster.propTypes = {
+    stopId: React.PropTypes.string.isRequired,
+};
+
 export default StopPoster;
