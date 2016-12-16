@@ -30,7 +30,7 @@ class StopPoster extends Component {
 
     componentDidUpdate(prevProps) {
         if (this.props.stopId && this.props.stopId !== prevProps.stopId) {
-            this.fetchContent(this.props.stopId);
+            this.fetchContent();
         }
     }
 
@@ -38,9 +38,12 @@ class StopPoster extends Component {
         // TODO: Cancel ongoing request
     }
 
-    fetchContent(stopId) {
-        // TODO: Call on ready callback
-        fetchStopPosterProps(stopId).then(props => this.setState(props));
+    fetchContent() {
+        fetchStopPosterProps(this.props.stopId).then((data) => {
+            this.setState(data, () => {
+                if (this.props.onReady) this.props.onReady();
+            });
+        });
     }
 
     render() {
@@ -78,6 +81,7 @@ class StopPoster extends Component {
 
 StopPoster.propTypes = {
     stopId: React.PropTypes.string.isRequired,
+    onReady: React.PropTypes.func,
 };
 
 export default StopPoster;

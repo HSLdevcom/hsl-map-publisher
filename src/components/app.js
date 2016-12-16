@@ -22,11 +22,6 @@ class App extends Component {
         window.setVisibleComponent = this.setVisibleComponent;
     }
 
-    componentDidUpdate() { // eslint-disable-line class-methods-use-this
-        // Let phantom know we're ready for a screenshot
-        if (window.callPhantom) window.callPhantom();
-    }
-
     /**
      * Sets component to render
      * @param {String} component - Name of component to display
@@ -38,8 +33,14 @@ class App extends Component {
 
     render() {
         if (!this.state.component || !this.state.options) return null;
+
         const ComponentToRender = components[this.state.component];
-        return ComponentToRender ? <ComponentToRender {...this.state.options}/> : null;
+        if (!ComponentToRender) return null;
+
+        // Let phantom know the component is ready
+        const onReady = window.callPhantom ? window.callPhantom : null;
+
+        return <ComponentToRender {...this.state.options} onReady={onReady}/>;
     }
 }
 
