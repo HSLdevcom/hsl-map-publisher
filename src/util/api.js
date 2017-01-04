@@ -1,4 +1,3 @@
-
 // TODO: Get API URL as env variable
 const API_URL = "http://localhost:8000";
 
@@ -92,7 +91,7 @@ function fetchMap(mapOptions) {
     const options = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(mapOptions),
+        body: JSON.stringify({ options: mapOptions }),
     };
 
     return fetch(`${API_URL}/generateImage`, options)
