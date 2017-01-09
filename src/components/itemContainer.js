@@ -77,7 +77,10 @@ class ItemContainer extends Component {
         const height = this.root.offsetHeight;
         const steps = [90, 45, 3];
 
-        let positions = this.childRefs
+        // Get refs to mounted children
+        const refs = this.childRefs.filter(child => !!child);
+
+        let positions = refs
             .map(child => child.getPosition())
             .map(position => ItemContainer.updatePosition(position));
         let count = ItemContainer.getCollisionCount(width, height, positions);
@@ -100,7 +103,7 @@ class ItemContainer extends Component {
             }
         }
 
-        this.childRefs.forEach((ref, index) => {
+        refs.forEach((ref, index) => {
             ref.setPosition(positions[index].top, positions[index].left);
         });
     }
@@ -120,3 +123,5 @@ class ItemContainer extends Component {
 }
 
 export default ItemContainer;
+
+
