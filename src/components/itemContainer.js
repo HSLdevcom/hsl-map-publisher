@@ -3,6 +3,9 @@ import styles from "./itemContainer.css";
 
 const MAX_ITERATIONS = 1000;
 
+/**
+ * Container for ItemWrappers whose position will be adjusted for minimal overlap
+ */
 class ItemContainer extends Component {
 
     static getIntersectionArea(a, b) {
@@ -38,6 +41,12 @@ class ItemContainer extends Component {
         });
     }
 
+    /**
+     * Returns updated position for component
+     * @param {Object} position
+     * @param {number} angleDiff - Degrees to rotate (default 0; only update left and right values)
+     * @returns {Object} - Updated position
+     */
     static updatePosition(position, angleDiff = 0) {
         let angle = (position.angle + angleDiff) % 360;
         if (angle < 0) angle = 360 + angle;
@@ -88,13 +97,16 @@ class ItemContainer extends Component {
         for (let i = 0; i < MAX_ITERATIONS; i++) {
             if (count <= 0) break;
             const step = steps[i % steps.length];
+
             for (let index = 0; index < positions.length; index++) {
                 if (!positions[index].isFixed) {
+                    // Rotate position clockwise and counterclockwise and count overlap + overflow
                     const positionsCW = ItemContainer.getUpdatedPositions(positions, index, step);
                     const positionsCCW = ItemContainer.getUpdatedPositions(positions, index, -step);
                     const countCW = ItemContainer.getCollisionCount(width, height, positionsCW);
                     const countCCW = ItemContainer.getCollisionCount(width, height, positionsCCW);
 
+                    // Save positions if overlap + overflow reduced
                     if (countCW <= count || countCCW <= count) {
                         count = countCW < countCCW ? countCW : countCCW;
                         positions = countCW < countCCW ? positionsCW : positionsCCW;
@@ -123,5 +135,3 @@ class ItemContainer extends Component {
 }
 
 export default ItemContainer;
-
-
