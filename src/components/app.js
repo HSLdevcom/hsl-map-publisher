@@ -19,7 +19,9 @@ class App extends Component {
         // In development we'll use url hash to set initial state
         this.state = App.stateFromQueryString();
         // Publish method as a global to make it accessible from phantom
-        window.setVisibleComponent = this.setVisibleComponent;
+        window.setVisibleComponent = this.setVisibleComponent.bind(this);
+        // Let phantom know app is ready
+        if (window.callPhantom) window.callPhantom();
     }
 
     /**
