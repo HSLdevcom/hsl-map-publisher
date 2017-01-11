@@ -33,4 +33,13 @@ class ItemWrapper extends Component {
     }
 }
 
+ItemWrapper.propTypes = {
+    x: React.PropTypes.number.isRequired,
+    y: React.PropTypes.number.isRequired,
+    angle: React.PropTypes.number,
+    distance: React.PropTypes.number,
+    isFixed: React.PropTypes.bool,
+    children: React.PropTypes.element.isRequired,
+};
+
 export default ItemWrapper;
