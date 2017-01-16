@@ -60,13 +60,19 @@ function setPaperSize(page) {
 function generate(page, component, options, filename) {
     return new Promise((resolve, reject) => {
         // Set callback called by client app when component is ready
-        page.onCallback = () => {
+        page.onCallback = (output) => {
             page.onCallback = null;
-            // Save page as a pdf
-            return setPaperSize(page)
-                .then(() => capture(page, filename))
-                .then(() => resolve())
-                .catch(error => reject(error));
+            if (output) {
+                // Component generated output directly, save to file
+                fs.writeFileSync(filename, output);
+                resolve();
+            } else {
+                // No output, save page as a pdf instead
+                return setPaperSize(page)
+                    .then(() => capture(page, filename))
+                    .then(() => resolve())
+                    .catch(error => reject(error));
+            }
         };
         page.evaluate((component, options) => {
             window.setVisibleComponent(component, options)

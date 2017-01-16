@@ -2,9 +2,11 @@ import React, { Component } from "react";
 import queryString from "query-string";
 
 import StopPoster from "components/stopPoster/stopPoster.js";
+import RouteMap from "components/routeMap/routeMap.js";
 
 const components = {
     StopPoster,
+    RouteMap,
 };
 
 class App extends Component {

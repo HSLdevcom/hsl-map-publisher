@@ -3,7 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 const fetch = require("node-fetch");
-const generator = require("./pdfGenerator");
+const generator = require("./generator");
 
 const API_URL = "http://localhost:8000";
 const OUTPUT_PATH = path.join(__dirname, "..", "output");
