@@ -20,6 +20,16 @@ function trimRouteId(id) {
 }
 
 /**
+ * Returns new route object with pretty ids
+ * @param {Object} route
+ */
+function trimRoute(route) {
+    const stops = route.stops.map(stop => ({ ...stop, routeId: trimRouteId(stop.shortId) }));
+    const routeId = trimRouteId(route.routeId);
+    return { ...route, routeId, stops };
+}
+
+/**
  * Fetches stop info
  * @param {String} stopId - Stop identifier e.g. 4200210
  * @returns {Promise}
@@ -61,6 +71,21 @@ function fetchTimetable(stopId) {
 }
 
 /**
+ * Fetch routes that match given id
+ * @param {String} routeId - Line or route identifier e.g. 102 (line) / 102T (route)
+ * @returns {Promise}
+ */
+function fetchRoute(routeId) {
+    return fetch(`${API_URL}/routesById/${routeId}`)
+        .then(response => response.json())
+        .then((routes) => {
+            // TODO: Choose route that is currently valid
+            const route = routes[0];
+            return trimRoute({ ...route, routeId });
+        });
+}
+
+/**
  * Fetch all routes that stop at given stop
  * @param {String} stopId - Stop identifier e.g. 4200210
  * @returns {Promise}
@@ -70,13 +95,10 @@ function fetchRoutes(stopId) {
         .then(response => response.json())
         .then((routesById) => {
             const routes = [];
-            Object.keys(routesById).forEach((key) => {
+            Object.keys(routesById).forEach((routeId) => {
                 // TODO: Choose route that is currently valid
-                const route = routesById[key][0];
-                const stops = route.stops.map(stop =>
-                    ({ ...stop, shortId: trimShortId(stop.shortId) }));
-                const routeId = trimRouteId(key);
-                routes.push({ ...route, routeId, stops });
+                const route = routesById[routeId][0];
+                routes.push(trimRoute({ ...route, routeId }));
             });
             return routes;
         });
@@ -107,6 +129,7 @@ export {
     fetchStop,
     fetchStops,
     fetchTimetable,
+    fetchRoute,
     fetchRoutes,
     fetchMap,
 };
