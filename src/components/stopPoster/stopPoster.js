@@ -39,11 +39,9 @@ class StopPoster extends Component {
     }
 
     fetchContent() {
-        fetchStopPosterProps(this.props.stopId).then((data) => {
-            this.setState(data, () => {
-                if (this.props.onReady) this.props.onReady();
-            });
-        });
+        fetchStopPosterProps(this.props.stopId)
+            .then(data => this.setState(data, () => this.props.onReady()))
+            .catch(error => this.props.onReady(error));
     }
 
     render() {
@@ -81,7 +79,7 @@ class StopPoster extends Component {
 
 StopPoster.propTypes = {
     stopId: React.PropTypes.string.isRequired,
-    onReady: React.PropTypes.func,
+    onReady: React.PropTypes.func.isRequired,
 };
 
 export default StopPoster;

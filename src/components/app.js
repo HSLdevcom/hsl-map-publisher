@@ -39,8 +39,11 @@ class App extends Component {
         const ComponentToRender = components[this.state.component];
         if (!ComponentToRender) return null;
 
-        // Let phantom know the component is ready
-        const onReady = window.callPhantom ? window.callPhantom : null;
+        const onReady = (error) => {
+            if (error) console.error(error); // eslint-disable-line no-console
+            // Let phantom know the component is ready
+            if (window.callPhantom) window.callPhantom();
+        };
 
         return <ComponentToRender {...this.state.options} onReady={onReady}/>;
     }
