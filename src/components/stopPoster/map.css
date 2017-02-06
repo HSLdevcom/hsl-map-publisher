@@ -34,6 +34,12 @@
     overflow: hidden;
 }
 
+.attribution {
+    padding: 20px;
+    font-family: fontFamily;
+    color: gray;
+}
+
 .label {
     max-width: 260px;
     padding: 10px;

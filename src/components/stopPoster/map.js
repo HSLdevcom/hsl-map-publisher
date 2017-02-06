@@ -20,6 +20,15 @@ const LOCATION_RADIUS_MINI = 18;
 const MINI_MAP_MARGIN_RIGHT = 60;
 const MINI_MAP_MARGIN_BOTTOM = -40;
 
+// Overlays
+const ATTRIBUTION_HEIGHT = 60;
+
+const Attribution = () => (
+    <div className={styles.attribution}>
+        &copy; OpenStreetMap
+    </div>
+);
+
 const Location = props => (
     <div style={{ width: props.size, height: props.size }}>
         <img src={locationIcon} role="presentation"/>
@@ -111,6 +120,10 @@ const Map = (props) => {
                             <Label {...stop}/>
                         </ItemWrapper>
                     ))}
+
+                    <ItemWrapper x={0} y={mapStyle.height - ATTRIBUTION_HEIGHT} angle={45} isFixed>
+                        <Attribution/>
+                    </ItemWrapper>
 
                     <ItemWrapper
                         x={miniMapStyle.left}
