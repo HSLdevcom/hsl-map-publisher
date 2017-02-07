@@ -1,4 +1,4 @@
-import viewportMercator from "viewport-mercator-project";
+import WebMercatorViewport from "viewport-mercator-project/dist/web-mercator-viewport";
 import { fetchStop, fetchStops, fetchRoutes, fetchTimetable, fetchMap } from "util/api";
 
 const MAX_STOPS = 8;
@@ -15,7 +15,7 @@ const MINI_MAP_HEIGHT = 360;
 const MINI_MAP_ZOOM = 9;
 
 function createViewport(stop, zoom) {
-    return viewportMercator({
+    return new WebMercatorViewport({
         width: MAP_WIDTH,
         height: MAP_HEIGHT,
         longitude: stop.lon,
@@ -24,15 +24,19 @@ function createViewport(stop, zoom) {
     });
 }
 
+function viewportContains(viewport, stop) {
+    const [x, y] = viewport.project([stop.lon, stop.lat]);
+    return x >= 0 && x <= viewport.width && y >= 0 && y <= viewport.height;
+}
+
 function calculateStopsViewport(centeredStop, stops) {
-    let zoom;
     let viewport;
     let visibleStops = stops.filter(({ stopId }) => stopId !== centeredStop.stopId);
 
     // Increase zoom level until only max number of stops visible
-    for (zoom = MIN_ZOOM; zoom <= MAX_ZOOM; zoom += STEP_ZOOM) {
+    for (let zoom = MIN_ZOOM; zoom <= MAX_ZOOM; zoom += STEP_ZOOM) {
         viewport = createViewport(centeredStop, zoom);
-        visibleStops = visibleStops.filter(({ lon, lat }) => viewport.contains([lon, lat])); // eslint-disable-line
+        visibleStops = visibleStops.filter(stop => viewportContains(viewport, stop)); // eslint-disable-line
         if (visibleStops.length <= MAX_STOPS) break;
     }
 
@@ -42,7 +46,7 @@ function calculateStopsViewport(centeredStop, stops) {
         return { ...stop, x, y };
     });
 
-    return { stops: projectedStops, zoom };
+    return { stops: projectedStops, viewport };
 }
 
 function fetchRoutesForStops(options) {
@@ -53,16 +57,17 @@ function fetchRoutesForStops(options) {
 }
 
 function fetchMaps(stop) {
-    // FIXME: Fetch active stops groups with valid timetables instead of all stops
     return fetchStops()
         .then(stops => calculateStopsViewport(stop, stops))
         .then(options => fetchRoutesForStops(options))
-        .then(({ stops, zoom }) => {
+        .then(({ stops, viewport }) => {
+            const pixelsPerMeter = viewport.getDistanceScales().pixelsPerMeter[0];
+
             const mapOptions = {
                 center: [stop.lon, stop.lat],
                 width: MAP_WIDTH,
                 height: MAP_HEIGHT,
-                zoom,
+                zoom: viewport.zoom,
             };
 
             const miniMapOptions = {
@@ -74,7 +79,14 @@ function fetchMaps(stop) {
 
             return Promise
                 .all([fetchMap(mapOptions), fetchMap(miniMapOptions)])
-                .then(([map, miniMap]) => ({ map, miniMap, mapOptions, miniMapOptions, stops }));
+                .then(([map, miniMap]) => ({
+                    map,
+                    mapOptions,
+                    miniMap,
+                    miniMapOptions,
+                    stops,
+                    pixelsPerMeter,
+                }));
         });
 }
 

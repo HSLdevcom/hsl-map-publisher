@@ -21,13 +21,25 @@ const MINI_MAP_MARGIN_RIGHT = 60;
 const MINI_MAP_MARGIN_BOTTOM = -40;
 
 // Overlays
-const ATTRIBUTION_HEIGHT = 60;
+const INFO_POSITION_TOP = 1120;
+const INFO_POSITION_LEFT = 20;
+const SCALEBAR_TARGET_WIDTH = 250;
 
 const Attribution = () => (
     <div className={styles.attribution}>
         &copy; OpenStreetMap
     </div>
 );
+
+const Scalebar = (props) => {
+    const meters = Math.ceil((SCALEBAR_TARGET_WIDTH / props.pixelsPerMeter) / 100) * 100;
+    return (
+        <div className={styles.scalebar}>
+            <div>{meters} m</div>
+            <div style={{ width: props.pixelsPerMeter * meters }}/>
+        </div>
+    );
+};
 
 const Location = props => (
     <div style={{ width: props.size, height: props.size }}>
@@ -121,8 +133,11 @@ const Map = (props) => {
                         </ItemWrapper>
                     ))}
 
-                    <ItemWrapper x={0} y={mapStyle.height - ATTRIBUTION_HEIGHT} angle={45} isFixed>
-                        <Attribution/>
+                    <ItemWrapper x={INFO_POSITION_LEFT} y={INFO_POSITION_TOP} angle={45} isFixed>
+                        <div>
+                            <Scalebar pixelsPerMeter={props.pixelsPerMeter}/>
+                            <Attribution/>
+                        </div>
                     </ItemWrapper>
 
                     <ItemWrapper

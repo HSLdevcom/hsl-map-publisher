@@ -59,6 +59,6 @@
     "react": "^15.3.1",
     "react-dom": "^15.3.1",
     "react-hot-loader": "^3.0.0-beta.3",
-    "viewport-mercator-project": "^2.1.0"
+    "viewport-mercator-project": "^3.0.0-rc2"
   }
 }
