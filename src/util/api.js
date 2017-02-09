@@ -24,7 +24,7 @@ function trimRouteId(id) {
  * @param {Object} route
  */
 function trimRoute(route) {
-    const stops = route.stops.map(stop => ({ ...stop, routeId: trimRouteId(stop.shortId) }));
+    const stops = route.stops.map(stop => ({ ...stop, shortId: trimShortId(stop.shortId) }));
     const routeId = trimRouteId(route.routeId);
     return { ...route, routeId, stops };
 }
