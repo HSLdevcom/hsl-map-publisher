@@ -25,7 +25,7 @@ function createViewport(stop, zoom) {
 }
 
 function viewportContains(viewport, stop) {
-    const [x, y] = viewport.project([stop.lon, stop.lat]);
+    const [x, y] = viewport.project([stop.lon, stop.lat], { topLeft: true });
     return x >= 0 && x <= viewport.width && y >= 0 && y <= viewport.height;
 }
 
@@ -42,7 +42,7 @@ function calculateStopsViewport(centeredStop, stops) {
 
     // Calculate pixel coordinates for each stop
     const projectedStops = visibleStops.map((stop) => {
-        const [x, y] = viewport.project([stop.lon, stop.lat]);
+        const [x, y] = viewport.project([stop.lon, stop.lat], { topLeft: true });
         return { ...stop, x, y };
     });
 
