@@ -1,6 +1,6 @@
 import React from "react";
 
-import Stop from "./stop.js";
+import Stop from "./stop";
 import styles from "./path.css";
 
 // Must match width and radius values in CSS
@@ -33,7 +33,7 @@ const Path = props => (
             <div>
                 <div className={styles.footer} style={{ width: getPathWidth(props.subpaths) }}/>
                 <div className={styles.subpaths}>
-                {props.subpaths.map((path, index) => <Path key={index} {...path}/>)}
+                    {props.subpaths.map((path, index) => <Path key={index} {...path}/>)}
                 </div>
             </div>
         }

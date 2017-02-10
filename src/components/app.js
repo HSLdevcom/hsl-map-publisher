@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import queryString from "query-string";
 
-import StopPoster from "components/stopPoster/stopPoster.js";
+import StopPoster from "components/stopPoster/stopPoster";
 
 const components = {
     StopPoster,
