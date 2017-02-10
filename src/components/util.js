@@ -8,11 +8,19 @@ const Row = props => (
     </div>
 );
 
+Row.propTypes = {
+    children: React.PropTypes.node.isRequired,
+};
+
 const JustifiedRow = props => (
     <div className={styles.justifiedRow}>
         {props.children}
     </div>
 );
+
+JustifiedRow.propTypes = {
+    children: React.PropTypes.node.isRequired,
+};
 
 const WrappingRow = props => (
     <div className={styles.wrappingRow}>
@@ -20,11 +28,19 @@ const WrappingRow = props => (
     </div>
 );
 
+WrappingRow.propTypes = {
+    children: React.PropTypes.node.isRequired,
+};
+
 const Column = props => (
     <div className={styles.column}>
         {props.children}
     </div>
 );
+
+Column.propTypes = {
+    children: React.PropTypes.node.isRequired,
+};
 
 const JustifiedColumn = props => (
     <div className={styles.justifiedColumn}>
@@ -32,9 +48,23 @@ const JustifiedColumn = props => (
     </div>
 );
 
+JustifiedColumn.propTypes = {
+    children: React.PropTypes.node.isRequired,
+};
+
 const Spacer = props => (
-    <div style={{ flex: "0 0 auto", width: props.width || 0, height: props.height || 0 }}/>
+    <div style={{ flex: "0 0 auto", width: props.width, height: props.height }}/>
 );
+
+Spacer.defaultProps = {
+    width: 0,
+    height: 0,
+};
+
+Spacer.propTypes = {
+    width: React.PropTypes.number,
+    height: React.PropTypes.number,
+};
 
 const FlexSpacer = () => <div style={{ flex: "2" }}/>;
 

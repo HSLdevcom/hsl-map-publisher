@@ -91,18 +91,18 @@ function fetchMaps(stop) {
 }
 
 /**
- * Fetches required props for stop poster component
+ * Fetches required state for stop poster component
  * @param stopId - Stop identifier
  * @returns {Promise}
  */
-function fetchStopPosterProps(stopId) {
+function fetchStopPosterState(stopId) {
     return Promise
         .all([fetchStop(stopId), fetchTimetable(stopId), fetchRoutes(stopId)])
         .then(([stop, timetable, routes]) => (
-            fetchMaps(stop).then(map => ({ map, stop, timetable, routes }))
+            fetchMaps(stop).then(maps => ({ maps, stop, timetable, routes }))
         ));
 }
 
 export {
-    fetchStopPosterProps, // eslint-disable-line import/prefer-default-export
+    fetchStopPosterState, // eslint-disable-line import/prefer-default-export
 };
