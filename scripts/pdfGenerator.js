@@ -1,22 +1,12 @@
 "use strict";
 
-var fs = require("fs");
-var path = require("path");
-const fetch = require("node-fetch");
+const fs = require("fs");
+const path = require("path");
 const driver = require("node-phantom-simple");
 
 const slimerPath = fs.readFileSync(path.join(__dirname, "../.slimerjs")).toString();
 
-// TODO: Get config from common config file
-const config = {
-    port: 3000,
-    outputPath: "output",
-    api: "http://localhost:8000"
-};
-
-function fetchStopIds() {
-    return fetch(`${config.api}/stopIds`).then(response => response.json());
-}
+const CLIENT_PORT = 3000;
 
 function createBrowser() {
     return new Promise((resolve, reject) => {
@@ -32,7 +22,13 @@ function createPage(browser) {
 
 function open(page) {
     return new Promise((resolve, reject) => {
-        page.open(`http://localhost:${config.port}`, err => err ? reject(err) : resolve(page));
+        page.open(`http://localhost:${CLIENT_PORT}`, (error, status) => {
+            if(status === "success") {
+                resolve(page);
+            } else {
+                reject(new Error("Failed to open client app"));
+            }
+        });
     });
 }
 
@@ -53,56 +49,56 @@ function setPaperSize(page) {
     });
 }
 
-function generatePdf(page, stopId) {
-    console.log(`Generating (id: ${stopId})`); // eslint-disable-line no-console
-    return new Promise((resolve) => {
+/**
+ * Generates a file from component
+ * @param page
+ * @param {string} component - React component to render
+ * @param {Object} options - Props to pass to component
+ * @param {string} filename - Output file
+ * @returns {Promise}
+ */
+function generate(page, component, options, filename) {
+    return new Promise((resolve, reject) => {
+        // Set callback called by client app when component is ready
         page.onCallback = () => {
             page.onCallback = null;
-            const filename = path.join(config.outputPath, `${stopId}.pdf`);
-            setPaperSize(page)
+            // Save page as a pdf
+            return setPaperSize(page)
                 .then(() => capture(page, filename))
                 .then(() => resolve())
-                .catch(error => console.error(error));
+                .catch(error => reject(error));
         };
-        page.evaluate((stopId) => window.setView(stopId), stopId, () => null);
+        page.evaluate((component, options) => {
+            window.setVisibleComponent(component, options)
+        }, component, options, () => null);
     });
 }
 
-function generatePdfs(page) {
-    try {
-        fs.mkdirSync(config.outputPath);
-    } catch(error) {
-        if(error.code !== "EEXIST") throw error;
-    }
-
-    page.onError = (message, stack) => {
-        console.error(`Error in client: ${message}`); // eslint-disable-line no-console
-        process.exit(1);
-    };
-
-    page.onConsoleMessage = (message) => {
-        console.log(`Output in client: ${message}`); // eslint-disable-line no-console
-    };
-
-    fetchStopIds().then(stopIds => {
-        let prev;
-        stopIds.forEach(stopId => {
-            if(prev) {
-                prev = prev.then(() => generatePdf(page, stopId));
-            } else {
-                prev = generatePdf(page, stopId);
-            }
-        });
-        prev.then(() => process.exit());
+function initialize() {
+    return new Promise((resolve, reject) => {
+        createBrowser()
+            .then(browser => createPage(browser))
+            .then((page) => {
+                page.onError = (message, stack) => {
+                    console.error(`Error in client: ${message}`); // eslint-disable-line no-console
+                    process.exit(1);
+                };
+                page.onConsoleMessage = (message) => {
+                    console.log(`Output in client: ${message}`); // eslint-disable-line no-console
+                };
+                // Initial callback called by client app when ready
+                page.onCallback = () => {
+                    resolve(page);
+                };
+                return open(page);
+            }).catch((error) => {
+                reject(error);
+            });
     });
 }
 
-createBrowser()
-    .then(browser => createPage(browser))
-    .then(page => open(page))
-    .then(page => generatePdfs(page))
-    .catch(error => {
-        console.error(error); // eslint-disable-line no-console
-        process.exit(1);
-    });
-
+/**
+ * Initializes publisher app in slimerjs and returns generate function
+ * @returns {Promise} - Generate function
+ */
+module.exports = () => initialize().then(page => generate.bind(null, page));

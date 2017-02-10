@@ -2,55 +2,50 @@ import React, { Component } from "react";
 import queryString from "query-string";
 
 import StopPoster from "components/stopPoster/stopPoster.js";
-import { fetchStopPosterProps } from "util/stopPoster";
 
-/**
- * Fetches data from API and dispatches an event to set corresponding view
- * @param {Number} stopId - Stop identifier
- */
-window.setView = (stopId) => {
-    fetchStopPosterProps(stopId).then((data) => {
-        const event = new CustomEvent("app:update", { detail: { data } });
-        window.dispatchEvent(event);
-    }).catch((error) => {
-        setTimeout(() => {
-            console.error(error); // eslint-disable-line no-console
-            // Throw new error outside the promise chain to trigger phantom's onError callback
-            throw new Error(`Failed to fetch stop info (id: ${stopId})`);
-        });
-    });
+const components = {
+    StopPoster,
 };
 
-// In development mode we'll use url hash to set view
-const params = queryString.parse(location.hash);
-if (params.id) window.setView(params.id);
-
 class App extends Component {
+
+    static stateFromQueryString() {
+        const { component, options } = queryString.parse(location.hash);
+        return (component && options) ? { component, options: JSON.parse(options) } : {};
+    }
+
     constructor() {
         super();
-        this.state = {};
-        this.updateView = this.updateView.bind(this);
-    }
-
-    componentDidMount() {
-        window.addEventListener("app:update", this.updateView);
-    }
-
-    componentDidUpdate() { // eslint-disable-line class-methods-use-this
-        // Let phantom know we're ready for a screenshot
+        // In development we'll use url hash to set initial state
+        this.state = App.stateFromQueryString();
+        // Publish method as a global to make it accessible from phantom
+        window.setVisibleComponent = this.setVisibleComponent.bind(this);
+        // Let phantom know app is ready
         if (window.callPhantom) window.callPhantom();
     }
 
-    componentWillUnmount() {
-        window.removeEventListener("app:update", this.updateView);
-    }
-
-    updateView(event) {
-        this.setState(event.detail);
+    /**
+     * Sets component to render
+     * @param {String} component - Name of component to display
+     * @param {Object} options - Options passed to component
+     */
+    setVisibleComponent(component, options) {
+        this.setState({ component, options });
     }
 
     render() {
-        return this.state.data ? <StopPoster {...this.state.data}/> : null;
+        if (!this.state.component || !this.state.options) return null;
+
+        const ComponentToRender = components[this.state.component];
+        if (!ComponentToRender) return null;
+
+        const onReady = (error) => {
+            if (error) console.error(error); // eslint-disable-line no-console
+            // Let phantom know the component is ready
+            if (window.callPhantom) window.callPhantom();
+        };
+
+        return <ComponentToRender {...this.state.options} onReady={onReady}/>;
     }
 }
 
