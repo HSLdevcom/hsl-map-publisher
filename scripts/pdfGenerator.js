@@ -7,6 +7,7 @@ const driver = require("node-phantom-simple");
 const slimerPath = fs.readFileSync(path.join(__dirname, "../.slimerjs")).toString();
 
 const CLIENT_PORT = 3000;
+const CLIENT_PPI = 96;
 
 function createBrowser() {
     return new Promise((resolve, reject) => {
@@ -38,13 +39,14 @@ function capture(page, filename) {
     });
 }
 
-function setPaperSize(page) {
+function setPaperSize(page, pixelWidth, pixelHeight) {
+    const options = {
+        width: `${pixelWidth / CLIENT_PPI}in`,
+        height: `${pixelHeight / CLIENT_PPI}in`,
+    };
     return new Promise((resolve) => {
-        // TODO: Get content size from callback. Define dimensions in mm instead of using magic zoom factors.
-        page.set("paperSize", {width: "2296px", height:"3385px"}, () => {
-            page.set("zoomFactor", 1.278, () => {
-                setTimeout(() => resolve(page), 100);
-            });
+        page.set("paperSize", options, () => {
+            setTimeout(() => resolve(page), 100);
         });
     });
 }
@@ -60,10 +62,10 @@ function setPaperSize(page) {
 function generate(page, component, options, filename) {
     return new Promise((resolve, reject) => {
         // Set callback called by client app when component is ready
-        page.onCallback = () => {
+        page.onCallback = (options) => {
             page.onCallback = null;
             // Save page as a pdf
-            return setPaperSize(page)
+            return setPaperSize(page, options.width, options.height)
                 .then(() => capture(page, filename))
                 .then(() => resolve())
                 .catch(error => reject(error));

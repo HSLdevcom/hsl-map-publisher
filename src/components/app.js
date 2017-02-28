@@ -42,10 +42,20 @@ class App extends Component {
         const onReady = (error) => {
             if (error) console.error(error); // eslint-disable-line no-console
             // Let phantom know the component is ready
-            if (window.callPhantom) window.callPhantom();
+            if (window.callPhantom) {
+                const options = {
+                    width: this.root.offsetWidth,
+                    height: this.root.offsetHeight,
+                };
+                window.callPhantom(options);
+            }
         };
 
-        return <ComponentToRender {...this.state.options} onReady={onReady}/>;
+        return (
+            <div style={{ display: "inline-block" }} ref={(ref) => { this.root = ref; }}>
+                <ComponentToRender {...this.state.options} onReady={onReady}/>
+            </div>
+        );
     }
 }
 
