@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, PropTypes } from "react";
 import styles from "./itemContainer.css";
 
 const MAX_ITERATIONS = 1000;
@@ -133,5 +133,9 @@ class ItemContainer extends Component {
         );
     }
 }
+
+ItemContainer.propTypes = {
+    children: PropTypes.node.isRequired, // ItemWrapper components
+};
 
 export default ItemContainer;

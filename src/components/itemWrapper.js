@@ -16,11 +16,11 @@ class ItemWrapper extends Component {
         return {
             x: this.props.x,
             y: this.props.y,
-            angle: this.props.angle || 0,
-            distance: this.props.distance || 0,
+            angle: this.props.angle,
+            distance: this.props.distance,
             width: this.root.offsetWidth,
             height: this.root.offsetHeight,
-            isFixed: !!this.props.isFixed,
+            isFixed: this.props.isFixed,
         };
     }
 
@@ -32,6 +32,12 @@ class ItemWrapper extends Component {
         );
     }
 }
+
+ItemWrapper.defaultProps = {
+    angle: 0,
+    distance: 0,
+    isFixed: false,
+};
 
 ItemWrapper.propTypes = {
     x: React.PropTypes.number.isRequired,

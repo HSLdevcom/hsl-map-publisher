@@ -1,8 +1,9 @@
-import React from "react";
+import React, { PropTypes } from "react";
 import ItemContainer from "components/itemContainer";
 import ItemWrapper from "components/itemWrapper";
 import { Row } from "components/util";
 import { getSymbol } from "util/stops";
+import CustomTypes from "util/customTypes";
 
 import locationIcon from "icons/location.svg";
 
@@ -41,17 +42,30 @@ const Scalebar = (props) => {
     );
 };
 
-const Location = props => (
+Scalebar.propTypes = {
+    pixelsPerMeter: PropTypes.number.isRequired,
+};
+
+const LocationSymbol = props => (
     <div style={{ width: props.size, height: props.size }}>
         <img src={locationIcon} role="presentation"/>
     </div>
 );
 
-const Stop = props => (
+LocationSymbol.propTypes = {
+    size: PropTypes.number.isRequired,
+};
+
+const StopSymbol = props => (
     <div style={{ width: props.size, height: props.size }}>
         <img src={getSymbol(props.stopId)} role="presentation"/>
     </div>
 );
+
+StopSymbol.propTypes = {
+    size: PropTypes.number.isRequired,
+    stopId: PropTypes.string.isRequired,
+};
 
 const RouteList = (props) => {
     if (props.routes.length > MAX_LABEL_ROWS) {
@@ -69,6 +83,10 @@ const RouteList = (props) => {
     );
 };
 
+RouteList.propTypes = {
+    routes: PropTypes.arrayOf(PropTypes.shape(CustomTypes.route)).isRequired,
+};
+
 const Label = props => (
     <div className={styles.label} style={{ left: props.x, top: props.y }}>
         <Row>
@@ -80,6 +98,12 @@ const Label = props => (
         </div>
     </div>
 );
+
+Label.propTypes = {
+    ...CustomTypes.stop,
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+};
 
 const Map = (props) => {
     const mapStyle = {
@@ -114,7 +138,7 @@ const Map = (props) => {
                             angle={45}
                             isFixed
                         >
-                            <Stop {...stop} size={STOP_RADIUS * 2}/>
+                            <StopSymbol {...stop} size={STOP_RADIUS * 2}/>
                         </ItemWrapper>
                     ))}
 
@@ -124,7 +148,7 @@ const Map = (props) => {
                         angle={45}
                         isFixed
                     >
-                        <Location size={LOCATION_RADIUS * 2}/>
+                        <LocationSymbol size={LOCATION_RADIUS * 2}/>
                     </ItemWrapper>
 
                     {stops.map((stop, index) => (
@@ -154,11 +178,24 @@ const Map = (props) => {
             <div className={styles.miniMap} style={miniMapStyle}>
                 <img src={props.miniMap} role="presentation"/>
                 <div className={styles.center} style={{ margin: -LOCATION_RADIUS_MINI }}>
-                    <Location size={LOCATION_RADIUS_MINI * 2}/>
+                    <LocationSymbol size={LOCATION_RADIUS_MINI * 2}/>
                 </div>
             </div>
         </div>
     );
+};
+
+Map.propTypes = {
+    map: PropTypes.string.isRequired,
+    mapOptions: PropTypes.shape(CustomTypes.mapOptions).isRequired,
+    miniMap: PropTypes.string.isRequired,
+    miniMapOptions: PropTypes.shape(CustomTypes.mapOptions).isRequired,
+    stops: PropTypes.arrayOf(PropTypes.shape({
+        ...CustomTypes.stop,
+        x: PropTypes.number.isRequired,
+        y: PropTypes.number.isRequired,
+    })).isRequired,
+    pixelsPerMeter: PropTypes.number.isRequired,
 };
 
 export default Map;

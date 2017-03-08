@@ -1,6 +1,7 @@
-import React from "react";
+import React, { PropTypes } from "react";
 import groupBy from "lodash/groupBy";
 import { Row, WrappingRow, Spacer } from "components/util";
+import CustomTypes from "util/customTypes";
 
 import styles from "./timetable.css";
 
@@ -24,6 +25,11 @@ const Header = props => (
     </div>
 );
 
+Header.propTypes = {
+    title_fi: PropTypes.string.isRequired,
+    title_se: PropTypes.string.isRequired,
+};
+
 const Departure = props => (
     <div className={styles.item}>
         <strong>{props.minutes < 10 && "0"}{props.minutes}</strong>/{props.routeId}
@@ -32,7 +38,9 @@ const Departure = props => (
     </div>
 );
 
-const DepartureRow = props => (
+Departure.propTypes = CustomTypes.departure;
+
+const TableRow = props => (
     <Row>
         <div className={styles.itemPadded}>
             <strong>{props.hours < 10 && "0"}{props.hours}</strong>
@@ -45,19 +53,30 @@ const DepartureRow = props => (
     </Row>
 );
 
+TableRow.propTypes = {
+    hours: React.PropTypes.number.isRequired,
+    departures: React.PropTypes.arrayOf(React.PropTypes.shape(CustomTypes.departure)).isRequired,
+};
+
 const Table = (props) => {
     const departuresByHour = groupBy(props.departures, "hours");
     // Sort hours from 5 to 4
-    const sortValue = value => (parseInt(value, 10) + 19) % 24;
-    const sortedHours = Object.keys(departuresByHour).sort((a, b) => sortValue(a) - sortValue(b));
+    const sortValue = value => (value + 19) % 24;
+    const sortedHours = Object.keys(departuresByHour)
+        .map(hours => parseInt(hours, 10))
+        .sort((hours, other) => sortValue(hours) - sortValue(other));
 
     return (
         <div className={styles.table}>
             {sortedHours.map(hours => (
-                <DepartureRow key={hours} hours={hours} departures={departuresByHour[hours]}/>
+                <TableRow key={hours} hours={hours} departures={departuresByHour[hours]}/>
             ))}
         </div>
     );
+};
+
+Table.propTypes = {
+    departures: React.PropTypes.arrayOf(React.PropTypes.shape(CustomTypes.departure)),
 };
 
 const Timetable = props => (
@@ -89,5 +108,11 @@ const Timetable = props => (
         </div>
     </div>
 );
+
+Timetable.propTypes = {
+    weekdays: React.PropTypes.arrayOf(React.PropTypes.shape(CustomTypes.departure)),
+    saturdays: React.PropTypes.arrayOf(React.PropTypes.shape(CustomTypes.departure)),
+    sundays: React.PropTypes.arrayOf(React.PropTypes.shape(CustomTypes.departure)),
+};
 
 export default Timetable;
