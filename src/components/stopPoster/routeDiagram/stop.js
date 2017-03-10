@@ -5,7 +5,7 @@ import styles from "./stop.css";
 const Stop = props => (
     <div>
         <div className={styles.stop}>
-            <div className={styles.left}>{props.duration} {props.isFirst && "min"}</div>
+            <div className={styles.left}/>
             <div className={styles.separator}>
                 <div className={styles.separatorTop}/>
                 <div className={styles.separatorSymbol}/>

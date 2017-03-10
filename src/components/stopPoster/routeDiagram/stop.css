@@ -11,11 +11,6 @@
 
 .left {
     width: leftWidth;
-    padding-top: 8px;
-    padding-right: 15px;
-    font-size: 13px;
-    text-align: right;
-    box-sizing: border-box;
 }
 
 .right {

@@ -84,8 +84,7 @@ function routesToPaths(stop, routes) {
     // Get stops after given stop
     const stopLists = routes.map(({ stops }) => {
         const index = stops.map(({ stopId }) => stopId).indexOf(stop.stopId);
-        return stops.slice(index).map(item =>
-            ({ ...item, duration: item.duration - stops[index].duration }));
+        return stops.slice(index);
     });
 
     stopLists.forEach(stops => addStops(paths, stops));

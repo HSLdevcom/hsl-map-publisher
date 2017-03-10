@@ -4,7 +4,7 @@ import Stop from "./stop";
 import styles from "./path.css";
 
 // Must match width and radius values in CSS
-const PATH_WIDTH = 292;
+const PATH_WIDTH = 246;
 const LINE_RADIUS = 20;
 
 function getPathWidth(paths, isRoot = true) {
