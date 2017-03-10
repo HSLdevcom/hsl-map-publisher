@@ -1,4 +1,9 @@
 
+function isEqualStop(stop, other) {
+    return (stop.name_fi === other.name_fi) &&
+           (stop.name_se === other.name_se)
+}
+
 /**
  * Returns an index where stop list differs from path
  * @param {Object} path
@@ -7,7 +12,7 @@
  */
 function findSplitIndex(path, stops) {
     for (let i = 0; i < path.stops.length; i++) {
-        if (i === stops.length || stops[i].stopId !== path.stops[i].stopId) {
+        if (i === stops.length || !isEqualStop(stops[i], path.stops[i])) {
             return i;
         }
     }
