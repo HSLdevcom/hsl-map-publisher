@@ -1,7 +1,14 @@
 
+const MAX_WIDTH = 6;
+
 function isEqualStop(stop, other) {
     return (stop.name_fi === other.name_fi) &&
-           (stop.name_se === other.name_se)
+           (stop.name_se === other.name_se);
+}
+
+function mergeStops(stop, other) {
+    const destinations = [...(stop.destinations || []), ...(other.destinations || [])];
+    return (destinations.length > 0) ? { ...stop, destinations } : stop;
 }
 
 /**
@@ -30,13 +37,14 @@ const addStops = (paths, stops) => {
     }
 
     for (const path of paths) {
-        const index = findSplitIndex(path, stops);
+        const splitIndex = findSplitIndex(path, stops);
 
-        if (index) {
-            const commonStops = path.stops.slice(0, index);
-            const remainingPath = path.stops.slice(index);
+        if (splitIndex) {
+            const commonStops = path.stops.slice(0, splitIndex)
+                .map((stop, index) => mergeStops(stop, stops[index]));
+            const remainingPath = path.stops.slice(splitIndex);
             // Stops that don't belong to current path
-            const remainingStops = stops.slice(index);
+            const remainingStops = stops.slice(splitIndex);
 
             if (remainingStops.length) {
                 if (remainingPath.length) {
@@ -60,42 +68,80 @@ const addStops = (paths, stops) => {
     paths.push({ stops });
 };
 
-/**
- * Recursively adds route info to stops where routes terminate
- * @param {Object} path
- * @param {Array} routes
- */
-function addDestinations(path, routes) {
-    for (const stop of path.stops) {
-        const destinations = routes
-            .filter(({ stops }) => stops[stops.length - 1].stopId === stop.stopId)
-            .map(({ routeId, destination_fi }) => ({ id: routeId, title: destination_fi }));
-        if (destinations.length) stop.destinations = destinations;
-    }
+function getPathWidth(path) {
     if (path.subpaths) {
-        path.subpaths.forEach(subpath => addDestinations(subpath, routes));
+        return path.subpaths.reduce((prev, cur) => prev + getPathWidth(cur), 0);
     }
+    return 1;
+}
+
+function getPathHeight(path) {
+    const subHeight = path.subpaths.reduce((prev, cur) => Math.max(getPathHeight(cur), prev), 0);
+    return path.stops.length + subHeight;
+}
+
+/**
+ * Returns deepest (largest amount of preceding nodes) path with two or more sub paths
+ * @param {Object} path
+ * @param {number} initialDepth
+ * @returns {Object} - Path
+ */
+function findDeepestBranch(path, initialDepth = 0) {
+    if (!path.subpaths) return null;
+    let pathToReturn = { depth: initialDepth + path.stops.length, path };
+    path.subpaths.forEach((subpath) => {
+        const pathCandidate = findDeepestBranch(subpath, initialDepth + path.stops.length);
+        if (pathCandidate && pathCandidate.depth > pathToReturn.depth) {
+            pathToReturn = pathCandidate;
+        }
+    });
+    return pathToReturn;
+}
+
+function mergePath(pathToMerge) {
+    const destinations = [...pathToMerge.subpaths, pathToMerge]
+        .reduce((prev, path) => [...prev, ...path.stops], [])
+        .reduce((prev, stop) => [...prev, ...(stop.destinations || [])], []);
+
+    pathToMerge.stops = [  // eslint-disable-line no-param-reassign
+        ...pathToMerge.stops,
+        { isPlaceHolder: true, destinations },
+    ];
+    delete pathToMerge.subpaths; // eslint-disable-line no-param-reassign
+}
+
+function generalizePath(path) {
+    while (getPathWidth(path) > MAX_WIDTH) {
+        mergePath(findDeepestBranch(path).path);
+    }
+    return path;
 }
 
 /**
  * Returns routes as a tree representing connections from given stop
  * @param {Object} stop
  * @param {Array} routes
- * @returns {{subpaths: Array}}
+ * @returns {Object}
  */
 function routesToPaths(stop, routes) {
     const paths = [];
 
     // Get stops after given stop
-    const stopLists = routes.map(({ stops }) => {
-        const index = stops.map(({ stopId }) => stopId).indexOf(stop.stopId);
-        return stops.slice(index);
+    const stopLists = routes.map((route) => {
+        const index = route.stops.map(({ stopId }) => stopId).indexOf(stop.stopId);
+        const lastStop = {
+            ...route.stops[route.stops.length - 1],
+            destinations: [{
+                id: route.routeId,
+                title: route.destination_fi,
+            }],
+        };
+        const otherStops = route.stops.slice(index, route.stops.length - 1);
+        return [...otherStops, lastStop];
     });
 
     stopLists.forEach(stops => addStops(paths, stops));
-    paths.forEach(path => addDestinations(path, routes));
-
-    return (paths.length > 1) ? { subpaths: paths } : paths[0];
+    return generalizePath((paths.length > 1) ? { subpaths: paths } : paths[0]);
 }
 
 export {
