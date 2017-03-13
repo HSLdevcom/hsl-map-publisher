@@ -118,6 +118,20 @@ function generalizePath(path) {
 }
 
 /**
+ * Sorts subpaths by to
+ * @param paths
+ * @returns {Object} - Sorted paths
+ */
+function sortPath(path) {
+    if (path.subpaths) {
+        const sortValue = subpath => getPathWidth(subpath);
+        path.subpaths.sort((a, b) => sortValue(a) - sortValue(b));
+        path.subpaths.forEach(subpath => sortPath(subpath));
+    }
+    return path;
+}
+
+/**
  * Returns routes as a tree representing connections from given stop
  * @param {Object} stop
  * @param {Array} routes
@@ -141,7 +155,11 @@ function routesToPaths(stop, routes) {
     });
 
     stopLists.forEach(stops => addStops(paths, stops));
-    return generalizePath((paths.length > 1) ? { subpaths: paths } : paths[0]);
+
+    const path = (paths.length > 1) ? { subpaths: paths } : paths[0];
+    generalizePath(path);
+    sortPath(path);
+    return path;
 }
 
 export {
