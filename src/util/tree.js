@@ -1,0 +1,144 @@
+
+/**
+ * Returns an index where items differ from items in node
+ * @param {Object} node
+ * @param {Array} items
+ * @param {function} isEqual - Should return true if items are equal
+ * @returns {number} - One-based index (i.e. number of common items)
+ */
+function findSplitIndex(node, items, isEqual) {
+    for (let i = 0; i < node.items.length; i++) {
+        if (i === items.length || !isEqual(items[i], node.items[i])) {
+            return i;
+        }
+    }
+    return node.items.length;
+}
+
+/**
+ * Recursively adds given items to nodes and their child nodes
+ * @param {Array} nodes
+ * @param {Array} items
+ */
+const addItems = (nodes, items, options) => {
+    if (!items || !items.length) {
+        return;
+    }
+
+    const { isEqual, merge } = options;
+
+    for (const node of nodes) {
+        const splitIndex = findSplitIndex(node, items, isEqual);
+
+        if (splitIndex) {
+            const commonItems = node.items.slice(0, splitIndex)
+                .map((item, index) => merge(item, items[index]));
+            // Items that should be moved from current node to a new node
+            const itemsToRemove = node.items.slice(splitIndex);
+            // New items that don't belong to current node
+            const remainingItems = items.slice(splitIndex);
+
+            if (remainingItems.length) {
+                if (itemsToRemove.length) {
+                    if (!node.children) {
+                        node.children = [{ items: itemsToRemove }];
+                    } else {
+                        node.children = [{ items: itemsToRemove, children: node.children }];
+                    }
+                    node.items = commonItems;
+                }
+
+                if (!node.children) node.children = [];
+                addItems(node.children, remainingItems, options);
+            }
+
+            return;
+        }
+    }
+
+    // No common items found with any node. Add as new node.
+    nodes.push({ items });
+};
+
+function getWidth(node) {
+    if (node.children) {
+        return node.children.reduce((prev, cur) => prev + getWidth(cur), 0);
+    }
+    return 1;
+}
+
+function getHeight(node) {
+    let height = 0;
+    if (node.items) {
+        height += node.items.length;
+    }
+    if (node.children) {
+        height += node.children.reduce((prev, cur) => Math.max(getHeight(cur), prev), 0);
+    }
+    return height;
+}
+
+/**
+ * Returns lists as a tree
+ * @param {Array.<Object[]>} itemLists
+ * @param {Object} options
+ * @returns {Object}
+ */
+function itemsToTree(itemLists, options) {
+    const nodes = [];
+
+    itemLists.forEach(item => addItems(nodes, item, options));
+    const root = (nodes.length > 1) ? { children: nodes } : nodes[0];
+
+    return root;
+}
+
+/**
+ * Returns lowest (largest amount of preceding items) node with two or more children
+ * @param {Object} node - Root node
+ * @param {number} initialDepth
+ * @returns {Object} - Lowest branch
+ */
+function findLowestBranch(node, initialDepth = 0) {
+    if (!node.children) return null;
+    const depth = initialDepth + (node.items ? node.items.length : 0);
+    let branchToReturn = { depth, node };
+    node.children.forEach((child) => {
+        const candidate = findLowestBranch(child, depth);
+        if (candidate && candidate.depth > branchToReturn.depth) {
+            branchToReturn = candidate;
+        }
+    });
+    return branchToReturn;
+}
+
+/**
+ * Prunes tree and truncates item lists to fit tree in given dimensions
+ * @param {Object} root - Root node
+ * @param {Object} options - Options width, prune
+ */
+function generalizeTree(root, options) {
+    const { width, prune } = options;
+
+    while (getWidth(root) > width) {
+        prune(findLowestBranch(root).node);
+    }
+}
+
+/**
+ * Sorts nodes by sub tree width
+ * @param {Object} root - Root node
+ */
+function sortBranches(root) {
+    if (root.children) {
+        const sortValue = node => getWidth(node);
+        root.children.sort((a, b) => sortValue(a) - sortValue(b));
+        root.children.forEach(node => sortBranches(node));
+    }
+}
+
+export {
+    itemsToTree,
+    generalizeTree,
+    sortBranches,
+};

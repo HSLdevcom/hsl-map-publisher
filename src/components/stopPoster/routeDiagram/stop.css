@@ -36,15 +36,14 @@
 }
 
 .separatorTop {
-    width: lineWidth;
-    height: 10px;
-    background-color: lineColor;
-}
+     width: lineWidth;
+     height: 10px;
+    border-left: lineWidth solid lineColor;
+ }
 
 .separatorBottom {
-    width: lineWidth;
     height: 20px;
-    background-color: lineColor;
+    border-left: lineWidth solid lineColor;
 }
 
 .separatorSymbol {
@@ -56,29 +55,3 @@
     margin-bottom: calc(lineWidth / -2);
     margin-left: calc(-2.5 * lineWidth);
 }
-
-.destinations {
-    margin: 10px 0;
-    font-family: fontFamilyNarrow;
-    letter-spacing: -1px;
-}
-
-.destination {
-    display: flex;
-    align-items: baseline;
-}
-
-.destination *:first-child {
-    width: calc(80px + leftWidth);
-    margin-left: -80px;
-    font-size: 40px;
-    font-weight: 700;
-    text-align: right;
-}
-
-.destination *:last-child {
-    padding-left: 5px;
-    font-size: 25px;
-    font-weight: 500;
-}
-
