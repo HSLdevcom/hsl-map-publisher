@@ -52,6 +52,7 @@
     "whatwg-fetch": "^1.0.0"
   },
   "dependencies": {
+    "babel-preset-env": "^1.2.2",
     "classnames": "^2.2.5",
     "lodash": "^4.17.4",
     "node-fetch": "^1.6.3",
