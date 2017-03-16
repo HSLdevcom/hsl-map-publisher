@@ -1,17 +1,17 @@
-var webpack = require("webpack");
-var WebpackDevServer = require("webpack-dev-server");
+const webpack = require("webpack");
+const WebpackDevServer = require("webpack-dev-server");
 
-var config = require("./webpack.config");
+const config = require("./webpack.config");
 
-var options = {
+const options = {
     hot: process.env.NODE_ENV === "development",
     historyApiFallback: true,
     stats: {
-        colors: true
-    }
+        colors: true,
+    },
 };
 
-new WebpackDevServer(webpack(config), options).listen(3000, "localhost", function (err) {
+new WebpackDevServer(webpack(config), options).listen(3000, "localhost", (err) => {
     if (err) {
         console.log(err);
     }

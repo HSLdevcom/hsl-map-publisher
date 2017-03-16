@@ -1,30 +1,29 @@
-"use strict";
-
-const fs = require("fs");
 const path = require("path");
 const driver = require("node-phantom-simple");
 
-const slimerPath = fs.readFileSync(path.join(__dirname, "../.slimerjs")).toString();
+const slimerPath = path.join(__dirname, "..", "node_modules", ".bin", "slimerjs");
 
 const CLIENT_PORT = 3000;
 const CLIENT_PPI = 96;
 
 function createBrowser() {
     return new Promise((resolve, reject) => {
-        driver.create({path: slimerPath}, (err, browser) => err ? reject(err) : resolve(browser));
+        driver.create({ path: slimerPath }, (err, browser) =>
+          (err ? reject(err) : resolve(browser))
+        );
     });
 }
 
 function createPage(browser) {
     return new Promise((resolve, reject) => {
-        browser.createPage((err, page) => err ? reject(err) : resolve(page));
+        browser.createPage((err, page) => (err ? reject(err) : resolve(page)));
     });
 }
 
 function open(page) {
     return new Promise((resolve, reject) => {
         page.open(`http://localhost:${CLIENT_PORT}`, (error, status) => {
-            if(status === "success") {
+            if (status === "success") {
                 resolve(page);
             } else {
                 reject(new Error("Failed to open client app"));
@@ -35,7 +34,7 @@ function open(page) {
 
 function capture(page, filename) {
     return new Promise((resolve, reject) => {
-        page.render(filename, (err, status) => err ? reject(err) : resolve(status));
+        page.render(filename, (err, status) => (err ? reject(err) : resolve(status)));
     });
 }
 
@@ -71,7 +70,7 @@ function generate(page, component, options, filename) {
                 .catch(error => reject(error));
         };
         page.evaluate((component, options) => {
-            window.setVisibleComponent(component, options)
+            window.setVisibleComponent(component, options);
         }, component, options, () => null);
     });
 }
@@ -81,7 +80,7 @@ function initialize() {
         createBrowser()
             .then(browser => createPage(browser))
             .then((page) => {
-                page.onError = (message, stack) => {
+                page.onError = (message) => {
                     console.error(`Error in client: ${message}`); // eslint-disable-line no-console
                     process.exit(1);
                 };
