@@ -1,6 +1,7 @@
 import { itemsToTree, generalizeTree, sortBranches } from "util/tree";
 
 const MAX_WIDTH = 6;
+const MAX_HEIGHT = 20;
 
 function isEqual(stop, other) {
     return (stop.name_fi === other.name_fi) &&
@@ -24,6 +25,27 @@ function prune(branch) {
     delete branch.children; // eslint-disable-line no-param-reassign
 }
 
+function truncate(node) {
+    const { items } = node;
+    const gap = items.find(node => node.type === "gap");
+
+    if (gap) {
+        const index = items.indexOf(gap);
+        const removedNode = items.splice(index + ((index > items.length / 2) ? -1 : 1), 1);
+        if (removedNode.destinations) {
+            if (!gap.destinations) gap.destinations = [];
+            gap.destinations.push(removedNode.destinations);
+        }
+    } else {
+        const index = Math.floor(items.length / 2);
+        const itemToAdd = { type: "gap" };
+        const removedItem = items.splice(index, 1, itemToAdd);
+        if (removedItem.destinations) {
+            itemToAdd.destinations = removedItem.destinations;
+        }
+    }
+}
+
 /**
  * Returns routes as a tree representing connections from given stop
  * @param {Object} rootStop
@@ -45,7 +67,7 @@ function routesToTree(rootStop, routes) {
     });
 
     const root = itemsToTree(itemLists, { isEqual, merge });
-    generalizeTree(root, { width: MAX_WIDTH, prune });
+    generalizeTree(root, { width: MAX_WIDTH, height: MAX_HEIGHT, prune, truncate });
     sortBranches(root);
     return root;
 }

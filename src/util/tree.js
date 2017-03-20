@@ -95,15 +95,15 @@ function itemsToTree(itemLists, options) {
 
 /**
  * Returns lowest (largest amount of preceding items) node with two or more children
- * @param {Object} node - Root node
+ * @param {Object} root - Root node
  * @param {number} initialDepth
  * @returns {Object} - Lowest branch
  */
-function findLowestBranch(node, initialDepth = 0) {
-    if (!node.children) return null;
-    const depth = initialDepth + (node.items ? node.items.length : 0);
-    let branchToReturn = { depth, node };
-    node.children.forEach((child) => {
+function findLowestBranch(root, initialDepth = 0) {
+    if (!root.children) return null;
+    const depth = initialDepth + (root.items ? root.items.length : 0);
+    let branchToReturn = { depth, root };
+    root.children.forEach((child) => {
         const candidate = findLowestBranch(child, depth);
         if (candidate && candidate.depth > branchToReturn.depth) {
             branchToReturn = candidate;
@@ -113,15 +113,39 @@ function findLowestBranch(node, initialDepth = 0) {
 }
 
 /**
+ * Returns node with the most items from longest path
+ * @param {Object} node - Root node
+ * @returns {*}
+ */
+function findLongestPath(root) {
+    if (!root.children) {
+        return root;
+    }
+
+    // Find child node that is part of longest path
+    const child = root.children.reduce((prev, cur) => (
+        getHeight(cur) > getHeight(prev) ? cur  : prev
+    ));
+
+    // Find descendant with the most items from longest path
+    const node = findLongestPath(child);
+
+    return node.items.length > root.items.length ? node : root;
+}
+
+/**
  * Prunes tree and truncates item lists to fit tree in given dimensions
  * @param {Object} root - Root node
- * @param {Object} options - Options width, prune
+ * @param {Object} options - Options width, height, prune, truncate
  */
 function generalizeTree(root, options) {
-    const { width, prune } = options;
+    const { width, height, prune, truncate } = options;
 
     while (getWidth(root) > width) {
-        prune(findLowestBranch(root).node);
+        prune(findLowestBranch(root).root);
+    }
+    while (getHeight(root) > height) {
+        truncate(findLongestPath(root));
     }
 }
 
