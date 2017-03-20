@@ -27,7 +27,7 @@ function prune(branch) {
 
 function truncate(node) {
     const { items } = node;
-    const gap = items.find(node => node.type === "gap");
+    const gap = items.find(item => item.type === "gap");
 
     if (gap) {
         const index = items.indexOf(gap);

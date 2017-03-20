@@ -6,7 +6,7 @@
  * @param {function} isEqual - Should return true if items are equal
  * @returns {number} - One-based index (i.e. number of common items)
  */
-function findSplitIndex(node, items, isEqual) {
+function getCommonItemCount(node, items, isEqual) {
     for (let i = 0; i < node.items.length; i++) {
         if (i === items.length || !isEqual(items[i], node.items[i])) {
             return i;
@@ -28,28 +28,34 @@ const addItems = (nodes, items, options) => {
     const { isEqual, merge } = options;
 
     for (const node of nodes) {
-        const splitIndex = findSplitIndex(node, items, isEqual);
+        const count = getCommonItemCount(node, items, isEqual);
 
-        if (splitIndex) {
-            const commonItems = node.items.slice(0, splitIndex)
-                .map((item, index) => merge(item, items[index]));
-            // Items that should be moved from current node to a new node
-            const itemsToRemove = node.items.slice(splitIndex);
-            // New items that don't belong to current node
-            const remainingItems = items.slice(splitIndex);
+        if (count) {
+            const itemsToRemove = node.items.slice(Math.min(node.items.length, count));
+            const remainingItems = items.slice(Math.min(items.length, count));
+            const commonItems = node.items.slice(0, count).map((item, i) => merge(item, items[i]));
+
+            if (!node.children && (!itemsToRemove.length || !remainingItems.length)) {
+                node.items = [...commonItems, ...itemsToRemove, ...remainingItems];
+                return;
+            }
+
+            node.items = commonItems;
+
+            if (itemsToRemove.length) {
+                if (!node.children) {
+                    node.children = [{ items: itemsToRemove }];
+                } else {
+                    node.children = [{ items: itemsToRemove, children: node.children }];
+                }
+            }
 
             if (remainingItems.length) {
-                if (itemsToRemove.length) {
-                    if (!node.children) {
-                        node.children = [{ items: itemsToRemove }];
-                    } else {
-                        node.children = [{ items: itemsToRemove, children: node.children }];
-                    }
-                    node.items = commonItems;
+                if (!node.children) {
+                    node.children = [{ items: remainingItems }];
+                } else {
+                    addItems(node.children, remainingItems, options);
                 }
-
-                if (!node.children) node.children = [];
-                addItems(node.children, remainingItems, options);
             }
 
             return;
@@ -124,7 +130,7 @@ function findLongestPath(root) {
 
     // Find child node that is part of longest path
     const child = root.children.reduce((prev, cur) => (
-        getHeight(cur) > getHeight(prev) ? cur  : prev
+        getHeight(cur) > getHeight(prev) ? cur : prev
     ));
 
     // Find descendant with the most items from longest path
