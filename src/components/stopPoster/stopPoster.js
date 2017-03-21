@@ -1,16 +1,16 @@
 import React, { Component, PropTypes } from "react";
 import { JustifiedColumn, Spacer, FlexSpacer } from "components/util";
+import RouteDiagram from "components/routeDiagram/routeDiagramContainer";
+import Timetable from "components/timetable/timetableContainer";
 import { fetchStopPosterState } from "util/stopPoster";
 
 import Header from "./headerContainer";
 import Footer from "./footer";
 
 import Routes from "./routesContainer";
-import Timetable from "../timetable/timetableContainer";
 import Info from "./info";
 
 import Map from "./map";
-import RouteDiagram from "./routeDiagram/routeDiagram";
 
 import styles from "./stopPoster.css";
 
@@ -60,7 +60,7 @@ class StopPoster extends Component {
                         <div>
                             <Map {...this.state.maps}/>
                             <div className={styles.title}>Linjojen reitit</div>
-                            <RouteDiagram stop={this.state.stop} routes={this.state.routes}/>
+                            <RouteDiagram stopId={this.props.stopId} date={this.props.date}/>
                         </div>
                     </div>
 
