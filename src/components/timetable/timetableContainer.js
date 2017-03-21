@@ -16,10 +16,10 @@ function groupDepartures(departures) {
 
 function getNotes(routeSegment) {
     return (
-        routeSegment.hasRegularDayDepartures &&
+        (routeSegment.hasRegularDayDepartures &&
         routeSegment.notes.nodes
             .filter(note => note.noteType.includes("Y"))
-            .map(note => note.noteText)
+            .map(note => note.noteText)) || []
     );
 }
 
