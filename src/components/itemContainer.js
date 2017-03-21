@@ -4,6 +4,7 @@ import styles from "./itemContainer.css";
 const MAX_ITERATIONS = 10;
 const OVERLAP_COST_FIXED = 5;
 const DISTANCE_COST = 10;
+const MASK_MARGIN = 5;
 
 const angles = [-90, -40, -30, -20, -10, -5, -1, 1, 5, 10, 20, -30, 40, 90, 180];
 const distances = [-20, -5, 5, 20];
@@ -17,11 +18,31 @@ const Connector = props => (
     />
 );
 
+const Mask = props => (
+    <rect
+        x={props.left + MASK_MARGIN}
+        y={props.top + MASK_MARGIN}
+        width={props.width - (MASK_MARGIN * 2)}
+        height={props.height - (MASK_MARGIN * 2)}
+        fill="#000"
+    />
+);
+
 const Overlays = props => (
     <svg width={props.width} height={props.height}>
-        {props.positions.map((position, index) => (
-            !position.isFixed ? <Connector key={index} {...position}/> : null
-        ))}
+        <defs>
+            <mask id="label-mask" x="0" y="0" width="1" height="1">
+                <rect width={props.width} height={props.height} fill="#fff"/>
+                {props.positions.map((position, index) => (
+                    !position.isFixed ? <Mask key={index} {...position}/> : null
+                ))}
+            </mask>
+        </defs>
+        <g mask="url(#label-mask)">
+            {props.positions.map((position, index) => (
+                !position.isFixed ? <Connector key={index} {...position}/> : null
+            ))}
+        </g>
     </svg>
 );
 
