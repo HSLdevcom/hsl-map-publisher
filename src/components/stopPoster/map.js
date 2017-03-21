@@ -2,7 +2,7 @@ import React from "react";
 import ItemContainer from "components/itemContainer";
 import ItemFixed from "components/itemFixed";
 import ItemPositioned from "components/itemPositioned";
-import { Row, Column } from "components/util";
+import { Row } from "components/util";
 import { getSymbol } from "util/stops";
 
 import locationIcon from "icons/location.svg";
@@ -49,17 +49,15 @@ const RouteList = (props) => {
     );
 };
 
-const Label = props => {
-    return (
-        <div className={styles.label}>
-            <div className={styles.title}>{props.name_fi}</div>
-            <div className={styles.subtitle}>{props.name_se}</div>
-            <div className={styles.content}>
-                <RouteList routes={props.routes}/>
-            </div>
+const Label = props => (
+    <div className={styles.label}>
+        <div className={styles.title}>{props.name_fi}</div>
+        <div className={styles.subtitle}>{props.name_se}</div>
+        <div className={styles.content}>
+            <RouteList routes={props.routes}/>
         </div>
-    );
-};
+    </div>
+);
 
 const Map = (props) => {
     const mapStyle = {
@@ -87,7 +85,11 @@ const Map = (props) => {
             <div className={styles.overlays}>
                 <ItemContainer>
                     {stops.map((stop, index) => (
-                        <ItemFixed key={index} top={stop.y - STOP_RADIUS} left={stop.x - STOP_RADIUS}>
+                        <ItemFixed
+                            key={index}
+                            top={stop.y - STOP_RADIUS}
+                            left={stop.x - STOP_RADIUS}
+                        >
                             <Stop {...stop} size={STOP_RADIUS * 2}/>
                         </ItemFixed>
                     ))}
