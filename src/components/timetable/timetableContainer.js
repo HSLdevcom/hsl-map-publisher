@@ -1,8 +1,7 @@
 import { gql, graphql } from "react-apollo";
-import branch from "recompose/branch";
 import mapProps from "recompose/mapProps";
-import renderNothing from "recompose/renderNothing";
 
+import apolloWrapper from "util/apolloWrapper";
 
 import Timetable from "./timetable";
 
@@ -55,16 +54,12 @@ const timetableQuery = gql`
     }
 `;
 
-const TimetableContainer = branch(
-    props => props.data.loading || props.data.error,
-    renderNothing,
-    mapProps((props) => {
-        const { weekdays, saturdays, sundays } = groupDepartures(props.data.stop.departures.nodes);
+const propsMapper = mapProps((props) => {
+    const { weekdays, saturdays, sundays } = groupDepartures(props.data.stop.departures.nodes);
+    const notes = new Set(...props.data.stop.routeSegments.nodes.map(getNotes));
+    return { weekdays, saturdays, sundays, notes };
+});
 
-        const notes = new Set(...props.data.stop.routeSegments.nodes.map(getNotes));
-
-        return { weekdays, saturdays, sundays, notes };
-    })
-)(Timetable);
+const TimetableContainer = apolloWrapper(propsMapper)(Timetable);
 
 export default graphql(timetableQuery)(TimetableContainer);
