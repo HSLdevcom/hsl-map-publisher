@@ -1,0 +1,8 @@
+@value white, fontFamily, fontFamilyNarrow from "styles/common.css";
+@value leftWidth, rightWidth, lineColor, lineWidth from "./values.css";
+
+.root {
+    height: 20px;
+    margin-left: leftWidth;
+    border-left: lineWidth dotted lineColor;
+}
