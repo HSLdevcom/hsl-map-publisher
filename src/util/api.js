@@ -11,12 +11,21 @@ function trimShortId(id) {
 }
 
 /**
+ * Returns whether a route id is a so called number variant
+ * @param {String} id - Route id
+ * @returns {String}
+ */
+function isNumberVariant(id) {
+    return /.{5}[0-9]/.test(id);
+}
+
+/**
  * Returns route id without area code or leading zeros
  * @param {String} id - Route id
  * @returns {String}
  */
 function trimRouteId(id) {
-    if (/.{5}[0-9]/.test(id)) {
+    if (isNumberVariant(id)) {
         // Do not show number variants
         return id.substring(1, 5).replace(/^[0]+/g, "");
     }
@@ -136,5 +145,6 @@ export {
     fetchRoute,
     fetchRoutes,
     fetchMap,
+    isNumberVariant,
     trimRouteId,
 };

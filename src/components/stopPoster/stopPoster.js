@@ -5,7 +5,7 @@ import { fetchStopPosterState } from "util/stopPoster";
 import Header from "./headerContainer";
 import Footer from "./footer";
 
-import Routes from "./routes";
+import Routes from "./routesContainer";
 import Timetable from "../timetable/timetableContainer";
 import Info from "./info";
 
@@ -49,7 +49,7 @@ class StopPoster extends Component {
 
                     <div className={styles.content}>
                         <div>
-                            <Routes routes={this.state.routes}/>
+                            <Routes stopId={this.props.stopId} date={this.props.date}/>
                             <div className={styles.title}>Pysäkkiaikataulu</div>
                             <Timetable stopId={this.props.stopId} date={this.props.date}/>
                             <Info/>
