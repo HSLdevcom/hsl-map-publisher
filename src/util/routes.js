@@ -34,16 +34,16 @@ function truncate(node) {
     if (gap) {
         const index = items.indexOf(gap);
         const removedNode = items.splice(index + ((index > items.length / 2) ? -1 : 1), 1);
-        if (removedNode.destinations) {
+        if (removedNode[0].destinations) {
             if (!gap.destinations) gap.destinations = [];
-            gap.destinations.push(removedNode.destinations);
+            gap.destinations.push(removedNode[0].destinations);
         }
     } else {
         const index = Math.floor(items.length / 2);
         const itemToAdd = { type: "gap" };
         const removedItem = items.splice(index, 1, itemToAdd);
-        if (removedItem.destinations) {
-            itemToAdd.destinations = removedItem.destinations;
+        if (removedItem[0].destinations) {
+            itemToAdd.destinations = removedItem[0].destinations;
         }
     }
 }
