@@ -27,13 +27,6 @@ const route = {
     stops: PropTypes.arrayOf(PropTypes.shape({ ...stop, duration: PropTypes.number.isRequired })),
 };
 
-const departure = {
-    hours: PropTypes.number.isRequired,
-    minutes: PropTypes.number.isRequired,
-    isAccessible: PropTypes.bool.isRequired,
-    isFridayOnly: PropTypes.bool.isRequired,
-};
-
 const mapOptions = {
     center: PropTypes.arrayOf(PropTypes.number).isRequired,
     zoom: PropTypes.number.isRequired,
@@ -42,5 +35,4 @@ const mapOptions = {
     scale: PropTypes.number,
 };
 
-export default { stop, route, departure, mapOptions };
-
+export default { stop, route, mapOptions };

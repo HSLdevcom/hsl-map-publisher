@@ -3,9 +3,11 @@ import queryString from "query-string";
 import { ApolloClient, createNetworkInterface, ApolloProvider } from "react-apollo";
 
 import StopPoster from "components/stopPoster/stopPoster";
+import Timetable from "components/timetable/timetableContainer";
 
 const components = {
     StopPoster,
+    Timetable,
 };
 
 const client = new ApolloClient({

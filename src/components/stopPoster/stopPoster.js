@@ -6,7 +6,7 @@ import Header from "./headerContainer";
 import Footer from "./footer";
 
 import Routes from "./routes";
-import Timetable from "./timetable";
+import Timetable from "../timetable/timetableContainer";
 import Info from "./info";
 
 import Map from "./map";
@@ -51,7 +51,7 @@ class StopPoster extends Component {
                         <div>
                             <Routes routes={this.state.routes}/>
                             <div className={styles.title}>Pysäkkiaikataulu</div>
-                            <Timetable {...this.state.timetable}/>
+                            <Timetable stopId={this.props.stopId} date={this.props.date}/>
                             <Info/>
                         </div>
 
@@ -74,6 +74,7 @@ class StopPoster extends Component {
 
 StopPoster.propTypes = {
     stopId: PropTypes.string.isRequired,
+    date: PropTypes.string.isRequired,
     onReady: PropTypes.func.isRequired,
 };
 

@@ -16,6 +16,10 @@ function trimShortId(id) {
  * @returns {String}
  */
 function trimRouteId(id) {
+    if (/.{5}[0-9]/.test(id)) {
+        // Do not show number variants
+        return id.substring(1, 5).replace(/^[0]+/g, "");
+    }
     return id.substring(1).replace(/^[0]+/g, "");
 }
 
@@ -132,4 +136,5 @@ export {
     fetchRoute,
     fetchRoutes,
     fetchMap,
+    trimRouteId,
 };
