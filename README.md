@@ -18,6 +18,6 @@ npm run start:hot
 
 Generate stop posters:
 ```
-npm start
-node scripts/pdfGenerator.js
+npm run start
+npm run generate
 ```
