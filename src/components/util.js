@@ -72,6 +72,23 @@ const Image = props => (
     <img className={styles.image} role="presentation" {...props}/>
 );
 
+const Warning = (props) => {
+    console.error(props.data.error); // eslint-disable-line no-console
+
+    return (
+        <div className={styles.error}>
+            {props.data.error.message}
+        </div>);
+};
+
+Warning.propTypes = {
+    data: React.PropTypes.shape({
+        error: React.PropTypes.shape({
+            message: React.PropTypes.string.isRequired,
+        }).isRequired,
+    }).isRequired,
+};
+
 
 export {
     Row,
@@ -82,4 +99,5 @@ export {
     Spacer,
     FlexSpacer,
     Image,
+    Warning,
 };
