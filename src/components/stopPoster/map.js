@@ -2,7 +2,7 @@ import React from "react";
 import ItemContainer from "components/itemContainer";
 import ItemFixed from "components/itemFixed";
 import ItemPositioned from "components/itemPositioned";
-import { Row } from "components/util";
+import { Row, Column } from "components/util";
 import { getSymbol } from "util/stops";
 
 import locationIcon from "icons/location.svg";
@@ -52,10 +52,8 @@ const RouteList = (props) => {
 const Label = props => {
     return (
         <div className={styles.label}>
-            <Row>
-                <div className={styles.title}>{props.name_fi}</div>
-                <div className={styles.subtitle}>({props.shortId})</div>
-            </Row>
+            <div className={styles.title}>{props.name_fi}</div>
+            <div className={styles.subtitle}>{props.name_se}</div>
             <div className={styles.content}>
                 <RouteList routes={props.routes}/>
             </div>

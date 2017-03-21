@@ -39,26 +39,30 @@
     padding: 10px;
     margin: 5px;
     font-family: fontFamily;
-    background: white;
-    border: 2px solid background;
+    background: hsla(0, 0%, 100%, 0.8);
 }
 
 .title {
     color: gray;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
 }
 
 .subtitle {
-    composes: title;
+    color: gray;
     font-size: 13px;
-    margin: 2px 5px 0;
+    font-weight: 500;
 }
 
 .content {
     font-size: 13px;
     color: background;
     padding: 5px 0;
+    font-weight: 500;
+}
+
+.route {
+    font-family: fontFamilyNarrow;
 }
 
 .row {
