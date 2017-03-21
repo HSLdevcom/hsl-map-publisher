@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from "react";
 import { JustifiedColumn, Spacer, FlexSpacer } from "components/util";
 import { fetchStopPosterState } from "util/stopPoster";
 
-import Header from "./header";
+import Header from "./headerContainer";
 import Footer from "./footer";
 
 import Routes from "./routes";
@@ -45,7 +45,7 @@ class StopPoster extends Component {
         return (
             <div className={styles.root}>
                 <JustifiedColumn>
-                    <Header {...this.state.stop}/>
+                    <Header stopId={this.props.stopId}/>
 
                     <div className={styles.content}>
                         <div>
