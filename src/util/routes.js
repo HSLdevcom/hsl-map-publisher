@@ -39,7 +39,7 @@ function truncate(node) {
             gap.destinations.push(removedNode[0].destinations);
         }
     } else {
-        const index = Math.floor(items.length / 2);
+        const index = items.length - 1;
         const itemToAdd = { type: "gap" };
         const removedItem = items.splice(index, 1, itemToAdd);
         if (removedItem[0].destinations) {
