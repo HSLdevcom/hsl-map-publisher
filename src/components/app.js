@@ -1,11 +1,18 @@
 import React, { Component } from "react";
 import queryString from "query-string";
+import { ApolloClient, createNetworkInterface, ApolloProvider } from "react-apollo";
 
 import StopPoster from "components/stopPoster/stopPoster";
 
 const components = {
     StopPoster,
 };
+
+const client = new ApolloClient({
+    networkInterface: createNetworkInterface({
+        uri: "http://kartat.hsl.fi/jore/graphql",
+    }),
+});
 
 class App extends Component {
 
@@ -56,7 +63,9 @@ class App extends Component {
 
         return (
             <div style={{ display: "inline-block" }} ref={(ref) => { this.root = ref; }}>
-                <ComponentToRender {...this.state.options} onReady={onReady}/>
+                <ApolloProvider client={client}>
+                    <ComponentToRender {...this.state.options} onReady={onReady}/>
+                </ApolloProvider>
             </div>
         );
     }
