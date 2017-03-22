@@ -84,7 +84,7 @@ const RouteList = (props) => {
         <div>
             {props.routes.map((route, index) => (
                 <Row key={index}>
-                    {route.routeId} &rarr; {route.destination_fi}
+                    {route.routeId} &rarr; {route.destinationFi}
                 </Row>
             ))}
         </div>
@@ -97,8 +97,8 @@ RouteList.propTypes = {
 
 const Label = props => (
     <div className={styles.label}>
-        <div className={styles.title}>{props.name_fi}</div>
-        <div className={styles.subtitle}>{props.name_se}</div>
+        <div className={styles.title}>{props.nameFi}</div>
+        <div className={styles.subtitle}>{props.nameSe}</div>
         <div className={styles.content}>
             <RouteList routes={props.routes}/>
         </div>
@@ -131,7 +131,11 @@ const Map = (props) => {
     return (
         <div className={styles.root} style={mapStyle}>
             <div className={styles.map}>
-                <img src={props.map} role="presentation"/>
+                <img
+                    // eslint-disable-next-line no-param-reassign
+                    ref={el => el && props.map.then((map) => { el.src = map; })}
+                    role="presentation"
+                />
             </div>
 
             <div className={styles.overlays}>
@@ -154,7 +158,13 @@ const Map = (props) => {
                     </ItemFixed>
 
                     {stops.map((stop, index) => (
-                        <ItemPositioned key={index} x={stop.x} y={stop.y} distance={25}>
+                        <ItemPositioned
+                            key={index}
+                            x={stop.x}
+                            y={stop.y}
+                            distance={25}
+                            angle={(stop.calculatedHeading + 270) % 360}
+                        >
                             <Label {...stop}/>
                         </ItemPositioned>
                     ))}
@@ -173,7 +183,11 @@ const Map = (props) => {
             </div>
 
             <div className={styles.miniMap} style={miniMapStyle}>
-                <img src={props.miniMap} role="presentation"/>
+                <img
+                    // eslint-disable-next-line no-param-reassign
+                    ref={el => el && props.miniMap.then((miniMap) => { el.src = miniMap; })}
+                    role="presentation"
+                />
                 <div className={styles.center} style={{ margin: -LOCATION_RADIUS_MINI }}>
                     <LocationSymbol size={LOCATION_RADIUS_MINI * 2}/>
                 </div>
@@ -183,9 +197,9 @@ const Map = (props) => {
 };
 
 Map.propTypes = {
-    map: PropTypes.string.isRequired,
+    map: PropTypes.instanceOf(Promise).isRequired,
     mapOptions: PropTypes.shape(CustomTypes.mapOptions).isRequired,
-    miniMap: PropTypes.string.isRequired,
+    miniMap: PropTypes.instanceOf(Promise).isRequired,
     miniMapOptions: PropTypes.shape(CustomTypes.mapOptions).isRequired,
     stops: PropTypes.arrayOf(PropTypes.shape({
         ...CustomTypes.stop,

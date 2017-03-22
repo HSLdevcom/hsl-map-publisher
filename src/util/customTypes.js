@@ -4,10 +4,10 @@ import { PropTypes } from "react";
 const stop = {
     stopId: PropTypes.string.isRequired,
     shortId: PropTypes.string.isRequired,
-    name_fi: PropTypes.string.isRequired,
-    name_se: PropTypes.string.isRequired,
-    address_fi: PropTypes.string.isRequired,
-    address_se: PropTypes.string.isRequired,
+    nameFi: PropTypes.string.isRequired,
+    nameSe: PropTypes.string.isRequired,
+    addressFi: PropTypes.string.isRequired,
+    addressSe: PropTypes.string.isRequired,
 
     lon: PropTypes.number.isRequired,
     lat: PropTypes.number.isRequired,
@@ -22,8 +22,8 @@ const route = {
     dateBegin: PropTypes.string.isRequired,
     dateEnd: PropTypes.string.isRequired,
     direction: PropTypes.string.isRequired,
-    destination_fi: PropTypes.string.isRequired,
-    destination_se: PropTypes.string.isRequired,
+    destinationFi: PropTypes.string.isRequired,
+    destinationSe: PropTypes.string.isRequired,
     stops: PropTypes.arrayOf(PropTypes.shape({ ...stop, duration: PropTypes.number.isRequired })),
 };
 
