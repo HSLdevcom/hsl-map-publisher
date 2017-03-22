@@ -1,50 +1,28 @@
-"use strict";
-
-const fs = require("fs");
 const path = require("path");
-const driver = require("node-phantom-simple");
+const driver = require("node-phantom-promise");
 
-const slimerPath = fs.readFileSync(path.join(__dirname, "../.slimerjs")).toString();
+const slimerPath = path.join(__dirname, "..", "node_modules", ".bin", "slimerjs");
 
 const CLIENT_PORT = 3000;
+const CLIENT_PPI = 96;
 
-function createBrowser() {
-    return new Promise((resolve, reject) => {
-        driver.create({path: slimerPath}, (err, browser) => err ? reject(err) : resolve(browser));
-    });
+async function open(page) {
+    const status = await page.open(`http://localhost:${CLIENT_PORT}`);
+
+    if (status !== "success") {
+        throw new Error("Failed to open client app");
+    }
+    return page;
 }
 
-function createPage(browser) {
-    return new Promise((resolve, reject) => {
-        browser.createPage((err, page) => err ? reject(err) : resolve(page));
-    });
-}
-
-function open(page) {
-    return new Promise((resolve, reject) => {
-        page.open(`http://localhost:${CLIENT_PORT}`, (error, status) => {
-            if(status === "success") {
-                resolve(page);
-            } else {
-                reject(new Error("Failed to open client app"));
-            }
-        });
-    });
-}
-
-function capture(page, filename) {
-    return new Promise((resolve, reject) => {
-        page.render(filename, (err, status) => err ? reject(err) : resolve(status));
-    });
-}
-
-function setPaperSize(page) {
+function setPaperSize(page, pixelWidth, pixelHeight) {
+    const options = {
+        width: `${pixelWidth / CLIENT_PPI}in`,
+        height: `${pixelHeight / CLIENT_PPI}in`,
+    };
     return new Promise((resolve) => {
-        // TODO: Get content size from callback. Define dimensions in mm instead of using magic zoom factors.
-        page.set("paperSize", {width: "2296px", height:"3385px"}, () => {
-            page.set("zoomFactor", 1.278, () => {
-                setTimeout(() => resolve(page), 100);
-            });
+        page.set("paperSize", options, () => {
+            setTimeout(() => resolve(page), 100);
         });
     });
 }
@@ -60,40 +38,39 @@ function setPaperSize(page) {
 function generate(page, component, options, filename) {
     return new Promise((resolve, reject) => {
         // Set callback called by client app when component is ready
-        page.onCallback = () => {
+        page.onCallback = (options) => {
             page.onCallback = null;
             // Save page as a pdf
-            return setPaperSize(page)
-                .then(() => capture(page, filename))
+            return setPaperSize(page, options.width, options.height)
+                .then(() => page.render(filename))
                 .then(() => resolve())
                 .catch(error => reject(error));
         };
         page.evaluate((component, options) => {
-            window.setVisibleComponent(component, options)
+            window.setVisibleComponent(component, options);
         }, component, options, () => null);
     });
 }
 
-function initialize() {
-    return new Promise((resolve, reject) => {
-        createBrowser()
-            .then(browser => createPage(browser))
-            .then((page) => {
-                page.onError = (message, stack) => {
-                    console.error(`Error in client: ${message}`); // eslint-disable-line no-console
-                    process.exit(1);
-                };
-                page.onConsoleMessage = (message) => {
-                    console.log(`Output in client: ${message}`); // eslint-disable-line no-console
-                };
-                // Initial callback called by client app when ready
-                page.onCallback = () => {
-                    resolve(page);
-                };
-                return open(page);
-            }).catch((error) => {
-                reject(error);
-            });
+async function initialize() {
+    const browser = await driver.create({ path: slimerPath });
+
+    const page = await browser.createPage();
+
+    page.onError = (message) => {
+        console.error(`Error in client: ${message}`); // eslint-disable-line no-console
+        process.exit(1);
+    };
+    page.onConsoleMessage = (message) => {
+        console.log(`Output in client: ${message}`); // eslint-disable-line no-console
+    };
+
+    return new Promise((resolve) => {
+        // Initial callback called by client app when ready
+        page.onCallback = () => {
+            resolve(page);
+        };
+        open(page);
     });
 }
 
@@ -101,4 +78,7 @@ function initialize() {
  * Initializes publisher app in slimerjs and returns generate function
  * @returns {Promise} - Generate function
  */
-module.exports = () => initialize().then(page => generate.bind(null, page));
+module.exports = async () => {
+    const page = await initialize();
+    return generate.bind(null, page);
+};

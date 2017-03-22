@@ -1,6 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 import { Row, JustifiedRow, Image } from "components/util";
+import CustomTypes from "util/customTypes";
 
 import busIcon from "icons/bus.svg";
 import logoIcon from "icons/logo.svg";
@@ -8,6 +9,15 @@ import noSmokingIcon from "icons/nosmoking.svg";
 
 import styles from "./header.css";
 
+const Group = props => (
+    <div style={{ marginLeft: 15, marginRight: 15 }}>
+        {props.children}
+    </div>
+);
+
+Group.propTypes = {
+    children: React.PropTypes.node.isRequired,
+};
 
 const Title = props => (
     <div className={classNames(styles.title, { [styles.small]: props.small })}>
@@ -15,20 +25,32 @@ const Title = props => (
     </div>
 );
 
+Title.defaultProps = {
+    small: false,
+};
+
+Title.propTypes = {
+    children: React.PropTypes.string.isRequired,
+    small: React.PropTypes.bool,
+};
+
 const Subtitle = props => (
     <div className={classNames(styles.subtitle, { [styles.small]: props.small })}>
         {props.children}
     </div>
 );
 
+Subtitle.defaultProps = {
+    small: false,
+};
+
+Subtitle.propTypes = {
+    children: React.PropTypes.string.isRequired,
+    small: React.PropTypes.bool,
+};
+
 const Icon = props => (
     <Image {...props} style={{ height: 160, marginLeft: 15, marginRight: 15 }}/>
-);
-
-const Group = props => (
-    <div style={{ marginLeft: 15, marginRight: 15 }}>
-        {props.children}
-    </div>
 );
 
 const Header = props => (
@@ -57,5 +79,7 @@ const Header = props => (
         </Row>
     </JustifiedRow>
 );
+
+Header.propTypes = CustomTypes.stop;
 
 export default Header;

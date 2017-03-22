@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import queryString from "query-string";
 
-import StopPoster from "components/stopPoster/stopPoster.js";
+import StopPoster from "components/stopPoster/stopPoster";
 
 const components = {
     StopPoster,
@@ -18,6 +18,9 @@ class App extends Component {
         super();
         // In development we'll use url hash to set initial state
         this.state = App.stateFromQueryString();
+    }
+
+    componentDidMount() {
         // Publish method as a global to make it accessible from phantom
         window.setVisibleComponent = this.setVisibleComponent.bind(this);
         // Let phantom know app is ready
@@ -42,10 +45,20 @@ class App extends Component {
         const onReady = (error) => {
             if (error) console.error(error); // eslint-disable-line no-console
             // Let phantom know the component is ready
-            if (window.callPhantom) window.callPhantom();
+            if (window.callPhantom) {
+                const options = {
+                    width: this.root.offsetWidth,
+                    height: this.root.offsetHeight,
+                };
+                window.callPhantom(options);
+            }
         };
 
-        return <ComponentToRender {...this.state.options} onReady={onReady}/>;
+        return (
+            <div style={{ display: "inline-block" }} ref={(ref) => { this.root = ref; }}>
+                <ComponentToRender {...this.state.options} onReady={onReady}/>
+            </div>
+        );
     }
 }
 

@@ -1,99 +1,77 @@
+import { itemsToTree, generalizeTree, sortBranches } from "util/tree";
 
-/**
- * Returns an index where stop list differs from path
- * @param {Object} path
- * @param {Array} stops
- * @returns {number} - One-based index (i.e. number of common stops)
- */
-function findSplitIndex(path, stops) {
-    for (let i = 0; i < path.stops.length; i++) {
-        if (i === stops.length || stops[i].stopId !== path.stops[i].stopId) {
-            return i;
-        }
-    }
-    return path.stops.length;
+const MAX_WIDTH = 6;
+const MAX_HEIGHT = 20;
+
+function isEqual(stop, other) {
+    return (stop.name_fi === other.name_fi) &&
+           (stop.name_se === other.name_se);
 }
 
-/**
- * Recursively adds given stops to path and its subpaths
- * @param {Array} paths
- * @param {Array} stops
- */
-const addStops = (paths, stops) => {
-    if (!stops || !stops.length) {
-        return;
-    }
+function merge(stop, other) {
+    const destinations = [...(stop.destinations || []), ...(other.destinations || [])];
+    return (destinations.length > 0) ? { ...stop, destinations } : stop;
+}
 
-    for (const path of paths) {
-        const index = findSplitIndex(path, stops);
+function prune(branch) {
+    const destinations = [...branch.children, branch]
+        .reduce((prev, node) => [...prev, ...node.items], [])
+        .reduce((prev, stop) => [...prev, ...(stop.destinations || [])], []);
 
-        if (index) {
-            const commonStops = path.stops.slice(0, index);
-            const remainingPath = path.stops.slice(index);
-            // Stops that don't belong to current path
-            const remainingStops = stops.slice(index);
+    branch.items = [  // eslint-disable-line no-param-reassign
+        ...branch.items,
+        { type: "gap", destinations },
+    ];
+    delete branch.children; // eslint-disable-line no-param-reassign
+}
 
-            if (remainingStops.length) {
-                if (remainingPath.length) {
-                    if (!path.subpaths) {
-                        path.subpaths = [{ stops: remainingPath }];
-                    } else {
-                        path.subpaths = [{ stops: remainingPath, subpaths: path.subpaths }];
-                    }
-                    path.stops = commonStops;
-                }
+function truncate(node) {
+    const { items } = node;
+    const gap = items.find(item => item.type === "gap");
 
-                if (!path.subpaths) path.subpaths = [];
-                addStops(path.subpaths, remainingStops);
-            }
-
-            return;
+    if (gap) {
+        const index = items.indexOf(gap);
+        const removedNode = items.splice(index + ((index > items.length / 2) ? -1 : 1), 1);
+        if (removedNode.destinations) {
+            if (!gap.destinations) gap.destinations = [];
+            gap.destinations.push(removedNode.destinations);
         }
-    }
-
-    // No common stops found with paths. Add as new path.
-    paths.push({ stops });
-};
-
-/**
- * Recursively adds route info to stops where routes terminate
- * @param {Object} path
- * @param {Array} routes
- */
-function addDestinations(path, routes) {
-    for (const stop of path.stops) {
-        const destinations = routes
-            .filter(({ stops }) => stops[stops.length - 1].stopId === stop.stopId)
-            .map(({ routeId, destination_fi }) => ({ id: routeId, title: destination_fi }));
-        if (destinations.length) stop.destinations = destinations;
-    }
-    if (path.subpaths) {
-        path.subpaths.forEach(subpath => addDestinations(subpath, routes));
+    } else {
+        const index = Math.floor(items.length / 2);
+        const itemToAdd = { type: "gap" };
+        const removedItem = items.splice(index, 1, itemToAdd);
+        if (removedItem.destinations) {
+            itemToAdd.destinations = removedItem.destinations;
+        }
     }
 }
 
 /**
  * Returns routes as a tree representing connections from given stop
- * @param {Object} stop
+ * @param {Object} rootStop
  * @param {Array} routes
- * @returns {{subpaths: Array}}
+ * @returns {Object}
  */
-function routesToPaths(stop, routes) {
-    const paths = [];
-
+function routesToTree(rootStop, routes) {
     // Get stops after given stop
-    const stopLists = routes.map(({ stops }) => {
-        const index = stops.map(({ stopId }) => stopId).indexOf(stop.stopId);
-        return stops.slice(index).map(item =>
-            ({ ...item, duration: item.duration - stops[index].duration }));
+    const itemLists = routes.map((route) => {
+        const rootIndex = route.stops.map(({ stopId }) => stopId).indexOf(rootStop.stopId);
+
+        return route.stops.slice(rootIndex).map((stop, index, stops) => {
+            const item = { ...stop, type: "stop" };
+            if (index === stops.length - 1) {
+                item.destinations = [{ id: route.routeId, title: route.destination_fi }];
+            }
+            return item;
+        });
     });
 
-    stopLists.forEach(stops => addStops(paths, stops));
-    paths.forEach(path => addDestinations(path, routes));
-
-    return (paths.length > 1) ? { subpaths: paths } : paths[0];
+    const root = itemsToTree(itemLists, { isEqual, merge });
+    generalizeTree(root, { width: MAX_WIDTH, height: MAX_HEIGHT, prune, truncate });
+    sortBranches(root);
+    return root;
 }
 
 export {
-    routesToPaths, // eslint-disable-line import/prefer-default-export
+    routesToTree, // eslint-disable-line import/prefer-default-export
 };

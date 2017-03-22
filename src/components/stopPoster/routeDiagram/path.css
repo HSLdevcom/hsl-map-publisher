@@ -39,6 +39,6 @@
     border-left: lineWidth solid lineColor;
 }
 
-.subpaths {
+.children {
     display: flex;
 }

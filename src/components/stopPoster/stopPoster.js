@@ -1,6 +1,6 @@
-import React, { Component } from "react";
+import React, { Component, PropTypes } from "react";
 import { JustifiedColumn, Spacer, FlexSpacer } from "components/util";
-import { fetchStopPosterProps } from "util/stopPoster";
+import { fetchStopPosterState } from "util/stopPoster";
 
 import Header from "./header";
 import Footer from "./footer";
@@ -14,23 +14,18 @@ import RouteDiagram from "./routeDiagram/routeDiagram";
 
 import styles from "./stopPoster.css";
 
-const Title = props => (
-    <div className={styles.title}>
-        {props.children}
-    </div>
-);
 
 class StopPoster extends Component {
 
     componentDidMount() {
         if (this.props.stopId) {
-            this.fetchContent(this.props.stopId);
+            this.fetchState(this.props.stopId);
         }
     }
 
     componentDidUpdate(prevProps) {
         if (this.props.stopId && this.props.stopId !== prevProps.stopId) {
-            this.fetchContent();
+            this.fetchState(this.props.stopId);
         }
     }
 
@@ -38,9 +33,9 @@ class StopPoster extends Component {
         // TODO: Cancel ongoing request
     }
 
-    fetchContent() {
-        fetchStopPosterProps(this.props.stopId)
-            .then(data => this.setState(data, () => this.props.onReady()))
+    fetchState() {
+        fetchStopPosterState(this.props.stopId)
+            .then(state => this.setState(state, () => this.props.onReady()))
             .catch(error => this.props.onReady(error));
     }
 
@@ -55,7 +50,7 @@ class StopPoster extends Component {
                     <div className={styles.content}>
                         <div>
                             <Routes routes={this.state.routes}/>
-                            <Title>Pysäkkiaikataulu</Title>
+                            <div className={styles.title}>Pysäkkiaikataulu</div>
                             <Timetable {...this.state.timetable}/>
                             <Info/>
                         </div>
@@ -63,8 +58,8 @@ class StopPoster extends Component {
                         <Spacer width={50}/>
 
                         <div>
-                            <Map {...this.state.map}/>
-                            <Title>Linjojen reitit</Title>
+                            <Map {...this.state.maps}/>
+                            <div className={styles.title}>Linjojen reitit</div>
                             <RouteDiagram stop={this.state.stop} routes={this.state.routes}/>
                         </div>
                     </div>
@@ -78,8 +73,8 @@ class StopPoster extends Component {
 }
 
 StopPoster.propTypes = {
-    stopId: React.PropTypes.string.isRequired,
-    onReady: React.PropTypes.func.isRequired,
+    stopId: PropTypes.string.isRequired,
+    onReady: PropTypes.func.isRequired,
 };
 
 export default StopPoster;

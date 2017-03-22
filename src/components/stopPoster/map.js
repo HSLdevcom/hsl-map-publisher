@@ -1,9 +1,10 @@
-import React from "react";
+import React, { PropTypes } from "react";
 import ItemContainer from "components/itemContainer";
 import ItemFixed from "components/itemFixed";
 import ItemPositioned from "components/itemPositioned";
 import { Row } from "components/util";
 import { getSymbol } from "util/stops";
+import CustomTypes from "util/customTypes";
 
 import locationIcon from "icons/location.svg";
 
@@ -21,17 +22,51 @@ const LOCATION_RADIUS_MINI = 18;
 const MINI_MAP_MARGIN_RIGHT = 60;
 const MINI_MAP_MARGIN_BOTTOM = -40;
 
-const Location = props => (
+// Overlays
+const INFO_POSITION_TOP = 1120;
+const INFO_POSITION_LEFT = 20;
+const SCALEBAR_TARGET_WIDTH = 250;
+
+const Attribution = () => (
+    <div className={styles.attribution}>
+        &copy; OpenStreetMap
+    </div>
+);
+
+const Scalebar = (props) => {
+    const meters = Math.ceil((SCALEBAR_TARGET_WIDTH / props.pixelsPerMeter) / 100) * 100;
+    return (
+        <div className={styles.scalebar}>
+            <div>{meters} m</div>
+            <div style={{ width: props.pixelsPerMeter * meters }}/>
+        </div>
+    );
+};
+
+Scalebar.propTypes = {
+    pixelsPerMeter: PropTypes.number.isRequired,
+};
+
+const LocationSymbol = props => (
     <div style={{ width: props.size, height: props.size }}>
         <img src={locationIcon} role="presentation"/>
     </div>
 );
 
-const Stop = props => (
+LocationSymbol.propTypes = {
+    size: PropTypes.number.isRequired,
+};
+
+const StopSymbol = props => (
     <div style={{ width: props.size, height: props.size }}>
         <img src={getSymbol(props.stopId)} role="presentation"/>
     </div>
 );
+
+StopSymbol.propTypes = {
+    size: PropTypes.number.isRequired,
+    stopId: PropTypes.string.isRequired,
+};
 
 const RouteList = (props) => {
     if (props.routes.length > MAX_LABEL_ROWS) {
@@ -49,6 +84,10 @@ const RouteList = (props) => {
     );
 };
 
+RouteList.propTypes = {
+    routes: PropTypes.arrayOf(PropTypes.shape(CustomTypes.route)).isRequired,
+};
+
 const Label = props => (
     <div className={styles.label}>
         <div className={styles.title}>{props.name_fi}</div>
@@ -58,6 +97,12 @@ const Label = props => (
         </div>
     </div>
 );
+
+Label.propTypes = {
+    ...CustomTypes.stop,
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+};
 
 const Map = (props) => {
     const mapStyle = {
@@ -90,7 +135,7 @@ const Map = (props) => {
                             top={stop.y - STOP_RADIUS}
                             left={stop.x - STOP_RADIUS}
                         >
-                            <Stop {...stop} size={STOP_RADIUS * 2}/>
+                            <StopSymbol {...stop} size={STOP_RADIUS * 2}/>
                         </ItemFixed>
                     ))}
 
@@ -98,7 +143,7 @@ const Map = (props) => {
                         top={(mapStyle.height / 2) - LOCATION_RADIUS}
                         left={(mapStyle.width / 2) - LOCATION_RADIUS}
                     >
-                        <Location size={LOCATION_RADIUS * 2}/>
+                        <LocationSymbol size={LOCATION_RADIUS * 2}/>
                     </ItemFixed>
 
                     {stops.map((stop, index) => (
@@ -106,6 +151,13 @@ const Map = (props) => {
                             <Label {...stop}/>
                         </ItemPositioned>
                     ))}
+
+                    <ItemFixed top={INFO_POSITION_TOP} left={INFO_POSITION_LEFT}>
+                        <div>
+                            <Scalebar pixelsPerMeter={props.pixelsPerMeter}/>
+                            <Attribution/>
+                        </div>
+                    </ItemFixed>
 
                     <ItemFixed top={miniMapStyle.top} left={miniMapStyle.left}>
                         <div style={miniMapStyle}/>
@@ -116,11 +168,24 @@ const Map = (props) => {
             <div className={styles.miniMap} style={miniMapStyle}>
                 <img src={props.miniMap} role="presentation"/>
                 <div className={styles.center} style={{ margin: -LOCATION_RADIUS_MINI }}>
-                    <Location size={LOCATION_RADIUS_MINI * 2}/>
+                    <LocationSymbol size={LOCATION_RADIUS_MINI * 2}/>
                 </div>
             </div>
         </div>
     );
+};
+
+Map.propTypes = {
+    map: PropTypes.string.isRequired,
+    mapOptions: PropTypes.shape(CustomTypes.mapOptions).isRequired,
+    miniMap: PropTypes.string.isRequired,
+    miniMapOptions: PropTypes.shape(CustomTypes.mapOptions).isRequired,
+    stops: PropTypes.arrayOf(PropTypes.shape({
+        ...CustomTypes.stop,
+        x: PropTypes.number.isRequired,
+        y: PropTypes.number.isRequired,
+    })).isRequired,
+    pixelsPerMeter: PropTypes.number.isRequired,
 };
 
 export default Map;
