@@ -3,7 +3,7 @@ import React, { Component } from "react";
 class ItemFixed extends Component {
     constructor(props) {
         super(props);
-        this.state = { top: props.top, left: 0 };
+        this.state = { top: props.top, left: props.left };
     }
 
     setPosition(top, left) {

@@ -3,7 +3,8 @@ import React, { Component } from "react";
 class ItemPositioned extends Component {
     constructor(props) {
         super(props);
-        this.state = { top: 0, left: 0 };
+        // Use anchor coordinates before actual position is computed
+        this.state = { top: props.x, left: props.y };
     }
 
     setPosition(top, left) {
