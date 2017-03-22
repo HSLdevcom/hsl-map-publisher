@@ -6,7 +6,7 @@ HSL Map Publisher
 Install dependencies:
 
 ```
-npm install
+yarn install
 ```
 
 ### Usage

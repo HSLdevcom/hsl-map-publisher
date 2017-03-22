@@ -5,7 +5,7 @@ const modulesValues = require("postcss-modules-values");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 function getDevtool(env) {
-    return (env === "development") ? "cheap-module-eval-source-map" : "cheap-module-source-map";
+    return (env === "development") ? "eval" : "cheap-module-source-map";
 }
 
 function getEntry(env) {
