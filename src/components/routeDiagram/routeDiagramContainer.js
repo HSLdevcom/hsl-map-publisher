@@ -1,5 +1,6 @@
 import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
+import sortBy from "lodash/sortBy";
 import { isNumberVariant, trimRouteId } from "util/api";
 import apolloWrapper from "util/apolloWrapper";
 import { routesToTree } from "util/routes";
@@ -21,6 +22,7 @@ const routeDiagramQuery = gql`
                         }
                     nextStops {
                         nodes {
+                            stopIndex
                             stopByStopId {
                                 nameFi
                                 nameSe
@@ -42,7 +44,8 @@ const propsMapper = mapProps(props => ({
         .map(routeSegment => ({
             routeId: trimRouteId(routeSegment.routeId),
             ...routeSegment.route.nodes[0],
-            stops: routeSegment.nextStops.nodes.map(node => node.stopByStopId),
+            stops: sortBy(routeSegment.nextStops.nodes, node => node.stopIndex)
+                .map(node => node.stopByStopId),
         }))),
 }));
 
