@@ -33,6 +33,13 @@ function trimRouteId(id) {
 }
 
 /**
+  * Returns true if the route segment is only for dropping off passengers
+  */
+function isDropOffOnly({ pickupDropoffType }) {
+    return pickupDropoffType === null || pickupDropoffType === 2;
+}
+
+/**
  * Returns new route object with pretty ids
  * @param {Object} route
  */
@@ -126,4 +133,5 @@ export {
     fetchMap,
     isNumberVariant,
     trimRouteId,
+    isDropOffOnly,
 };

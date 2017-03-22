@@ -1,9 +1,22 @@
 import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
+import find from "lodash/find";
 
 import apolloWrapper from "util/apolloWrapper";
+import { isDropOffOnly } from "util/api";
 
 import Timetable from "./timetable";
+
+function filterDepartures(departures, routeSegments) {
+    return departures.filter(
+        departure =>
+            !isDropOffOnly(find(routeSegments, {
+                routeId: departure.routeId,
+                direction: departure.direction,
+            })
+        )
+    );
+}
 
 function groupDepartures(departures) {
     return {
@@ -15,12 +28,10 @@ function groupDepartures(departures) {
 }
 
 function getNotes(routeSegment) {
-    return (
-        (routeSegment.hasRegularDayDepartures &&
+    return (routeSegment.hasRegularDayDepartures &&
         routeSegment.notes.nodes
             .filter(note => note.noteType.includes("Y"))
-            .map(note => note.noteText)) || []
-    );
+            .map(note => note.noteText)) || [];
 }
 
 const timetableQuery = gql`
@@ -29,7 +40,10 @@ const timetableQuery = gql`
 
             routeSegments: routeSegmentsForDate(date: $date) {
                 nodes {
+                    routeId
+                    direction
                     hasRegularDayDepartures
+                    pickupDropoffType
                     notes {
                         nodes {
                             noteText
@@ -45,6 +59,7 @@ const timetableQuery = gql`
                     minutes
                     note
                     routeId
+                    direction
                     dayType
                     isNextDay
                     isAccessible
@@ -55,7 +70,12 @@ const timetableQuery = gql`
 `;
 
 const propsMapper = mapProps((props) => {
-    const { weekdays, saturdays, sundays } = groupDepartures(props.data.stop.departures.nodes);
+    const { weekdays, saturdays, sundays } = groupDepartures(
+        filterDepartures(
+            props.data.stop.departures.nodes,
+            props.data.stop.routeSegments.nodes
+        )
+    );
     const notes = new Set(...props.data.stop.routeSegments.nodes.map(getNotes));
     return { weekdays, saturdays, sundays, notes };
 });
