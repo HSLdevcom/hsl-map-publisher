@@ -1,7 +1,7 @@
 import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
 import sortBy from "lodash/sortBy";
-import { isNumberVariant, trimRouteId } from "util/api";
+import { isNumberVariant, trimRouteId, isDropOffOnly } from "util/api";
 import apolloWrapper from "util/apolloWrapper";
 import { routesToTree } from "util/routes";
 
@@ -14,6 +14,7 @@ const routeDiagramQuery = gql`
                 nodes {
                     routeId
                     hasRegularDayDepartures
+                    pickupDropoffType
                     route {
                         nodes {
                             destinationFi
@@ -41,6 +42,7 @@ const propsMapper = mapProps(props => ({
         props.data.stop.routeSegments.nodes
         .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
         .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
+        .filter(routeSegment => !isDropOffOnly(routeSegment))
         .map(routeSegment => ({
             routeId: trimRouteId(routeSegment.routeId),
             ...routeSegment.route.nodes[0],
