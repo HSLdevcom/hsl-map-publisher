@@ -1,6 +1,7 @@
 import React from "react";
 import ItemContainer from "components/itemContainer";
-import ItemWrapper from "components/itemWrapper";
+import ItemFixed from "components/itemFixed";
+import ItemPositioned from "components/itemPositioned";
 import { Row } from "components/util";
 import { getSymbol } from "util/stops";
 
@@ -48,17 +49,19 @@ const RouteList = (props) => {
     );
 };
 
-const Label = props => (
-    <div className={styles.label} style={{ left: props.x, top: props.y }}>
-        <Row>
-            <div className={styles.title}>{props.name_fi}</div>
-            <div className={styles.subtitle}>({props.shortId})</div>
-        </Row>
-        <div className={styles.content}>
-            <RouteList routes={props.routes}/>
+const Label = props => {
+    return (
+        <div className={styles.label}>
+            <Row>
+                <div className={styles.title}>{props.name_fi}</div>
+                <div className={styles.subtitle}>({props.shortId})</div>
+            </Row>
+            <div className={styles.content}>
+                <RouteList routes={props.routes}/>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 const Map = (props) => {
     const mapStyle = {
@@ -86,40 +89,27 @@ const Map = (props) => {
             <div className={styles.overlays}>
                 <ItemContainer>
                     {stops.map((stop, index) => (
-                        <ItemWrapper
-                            key={index}
-                            x={stop.x - STOP_RADIUS}
-                            y={stop.y - STOP_RADIUS}
-                            angle={45}
-                            isFixed
-                        >
+                        <ItemFixed key={index} top={stop.y - STOP_RADIUS} left={stop.x - STOP_RADIUS}>
                             <Stop {...stop} size={STOP_RADIUS * 2}/>
-                        </ItemWrapper>
+                        </ItemFixed>
                     ))}
 
-                    <ItemWrapper
-                        x={(mapStyle.width / 2) - LOCATION_RADIUS}
-                        y={(mapStyle.height / 2) - LOCATION_RADIUS}
-                        angle={45}
-                        isFixed
+                    <ItemFixed
+                        top={(mapStyle.height / 2) - LOCATION_RADIUS}
+                        left={(mapStyle.width / 2) - LOCATION_RADIUS}
                     >
                         <Location size={LOCATION_RADIUS * 2}/>
-                    </ItemWrapper>
+                    </ItemFixed>
 
                     {stops.map((stop, index) => (
-                        <ItemWrapper key={index} x={stop.x} y={stop.y} distance={15}>
+                        <ItemPositioned key={index} x={stop.x} y={stop.y} distance={25}>
                             <Label {...stop}/>
-                        </ItemWrapper>
+                        </ItemPositioned>
                     ))}
 
-                    <ItemWrapper
-                        x={miniMapStyle.left}
-                        y={miniMapStyle.top}
-                        angle={45}
-                        isFixed
-                    >
+                    <ItemFixed top={miniMapStyle.top} left={miniMapStyle.left}>
                         <div style={miniMapStyle}/>
-                    </ItemWrapper>
+                    </ItemFixed>
                 </ItemContainer>
             </div>
 

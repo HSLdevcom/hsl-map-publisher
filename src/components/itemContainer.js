@@ -1,12 +1,42 @@
 import React, { Component } from "react";
 import styles from "./itemContainer.css";
 
-const MAX_ITERATIONS = 1000;
+const MAX_ITERATIONS = 10;
+const OVERLAP_COST_FIXED = 5;
+const DISTANCE_COST = 10;
+
+const angles = [-90, -40, -30, -20, -10, -5, -1, 1, 5, 10, 20, -30, 40, 90, 180];
+const distances = [-20, -5, 5, 20];
+
+const Connector = props => (
+    <path
+        d={`M${props.x} ${props.y} L${props.x + props.meta.cx} ${props.y + props.meta.cy}`}
+        fill="none"
+        stroke="#007AC9"
+        strokeWidth="2"
+    />
+);
+
+const Overlays = props => (
+    <svg width={props.width} height={props.height}>
+        {props.positions.map((position, index) => (
+            !position.isFixed ? <Connector key={index} {...position}/> : null
+        ))}
+    </svg>
+);
 
 /**
- * Container for ItemWrappers whose position will be adjusted for minimal overlap
+ * Container for items whose position will be adjusted for minimal overlap
  */
 class ItemContainer extends Component {
+
+    static getDistanceCost(positions) {
+        let sum = 0;
+        positions.forEach((position) => {
+            if (position.meta) sum += position.meta.distance - position.distance;
+        });
+        return sum * DISTANCE_COST;
+    }
 
     static getIntersectionArea(a, b) {
         const width = Math.min(a.left + a.width, b.left + b.width) - Math.max(a.left, b.left);
@@ -14,10 +44,99 @@ class ItemContainer extends Component {
         return Math.max(0, width) * Math.max(0, height);
     }
 
-    static getCollisionCount(width, height, positions) {
-        const boundingBox = { left: 0, top: 0, width, height };
+    static getOverlappingComponents(positions, parentIndex) {
+        const matchedIndexes = [];
+        positions.forEach((position, index) => {
+            if (index !== parentIndex && !positions[index].isFixed &&
+                ItemContainer.getIntersectionArea(positions[index], positions[parentIndex]) > 0) {
+                matchedIndexes.push(index);
+            }
+        });
+        return matchedIndexes;
+    }
+
+    /**
+     * Returns updated position for component
+     * @param {Object} position
+     * @param {Object} diff - Changes to position (Optional; only update left and right values)
+     * @param {number} diff.angles - Degrees to rotate
+     * @param {number} diff.distance - Pixels to add to distance from anchor x, y
+     * @returns {Object} - Updated position
+     */
+    static updatePosition(position, diff = {}) {
+        if (position.isFixed) {
+            return position;
+        }
+
+        let distance = position.meta ? position.meta.distance : position.distance;
+        let angle = position.meta ? position.meta.angle : position.angle;
+
+        if (diff.angle) angle = (angle + diff.angle) % 360;
+        if (diff.distance) distance += diff.distance;
+        if (distance < position.distance) distance = position.distance;
+
+        const a = position.width / 2;
+        const b = position.height / 2;
+        const cos = Math.cos((angle * Math.PI) / 180);
+        const sin = Math.sin((angle * Math.PI) / 180);
+
+        let radius = Math.min(a, b) + distance;
+        let cx;
+        let cy;
+        let dx;
+        let dy;
+
+        do {
+            cx = radius * cos;
+            cy = radius * sin;
+            dx = Math.max(Math.abs(cx) - a, 0);
+            dy = Math.max(Math.abs(cy) - b, 0);
+            radius += 1;
+        } while (Math.sqrt((dx * dx) + (dy * dy)) < distance);
+
+        return {
+            ...position,
+            left: Math.round((position.x + cx) - (position.width / 2)),
+            top: Math.round((position.y + cy) - (position.height / 2)),
+            meta: { angle, distance, cx, cy },
+        };
+    }
+
+    static getUpdatedPositions(positions, indexToUpdate, diff) {
+        return positions.map((position, index) => {
+            if (index === indexToUpdate) {
+                return ItemContainer.updatePosition(position, diff);
+            }
+            return position;
+        });
+    }
+
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
+
+    componentDidMount() {
+        this.updateChildren();
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.children !== this.props.children) {
+            this.updateChildren();
+        }
+    }
+
+    getCollisionCost(positions) {
         let overflow = 0;
         let overlap = 0;
+
+        const boundingBox = {
+            left: 0,
+            top: 0,
+            width: this.root.offsetWidth,
+            height: this.root.offsetHeight,
+        };
+
         for (let i = 0; i < positions.length; i++) {
             if (!positions[i].isFixed) {
                 const rectArea = positions[i].width * positions[i].height;
@@ -25,99 +144,82 @@ class ItemContainer extends Component {
             }
             for (let j = i + 1; j < positions.length; j++) {
                 if (!positions[i].isFixed || !positions[j].isFixed) {
-                    overlap += ItemContainer.getIntersectionArea(positions[i], positions[j]);
+                    const area = ItemContainer.getIntersectionArea(positions[i], positions[j]);
+                    const isFixed = positions[i].isFixed || positions[j].isFixed;
+                    overlap += isFixed ? area * OVERLAP_COST_FIXED : area;
                 }
             }
         }
         return overlap + overflow;
     }
 
-    static getUpdatedPositions(positions, indexToUpdate, angleDiff) {
-        return positions.map((position, index) => {
-            if (index === indexToUpdate) {
-                return ItemContainer.updatePosition(position, angleDiff);
-            }
-            return position;
+    getPlacement(positions) {
+        const collision = this.getCollisionCost(positions);
+        const distance = ItemContainer.getDistanceCost(positions);
+        const cost = collision + distance;
+        return { positions, cost };
+    }
+
+    getPlacements(positions, indexToMove) {
+        const diffs = angles.reduce(
+            (prev, angle) => ([...prev, ...distances.map(distance => ({ angle, distance }))])
+        );
+        return diffs.map((diff) => {
+            const updatedPositions = positions.map((position, index) => (
+                index === indexToMove ? ItemContainer.updatePosition(position, diff) : position
+            ));
+            return this.getPlacement(updatedPositions);
         });
     }
 
-    /**
-     * Returns updated position for component
-     * @param {Object} position
-     * @param {number} angleDiff - Degrees to rotate (default 0; only update left and right values)
-     * @returns {Object} - Updated position
-     */
-    static updatePosition(position, angleDiff = 0) {
-        let angle = (position.angle + angleDiff) % 360;
-        if (angle < 0) angle = 360 + angle;
-
-        const a = (position.width / 2) + position.distance;
-        const b = (position.height / 2) + position.distance;
-
-        const closestRightAngle = Math.round(angle / 90) * 90;
-        const isHorizontal = closestRightAngle % 180 === 0;
-
-        const tanv = Math.tan((Math.abs(closestRightAngle - angle) * Math.PI) / 180);
-        const xAbs = isHorizontal ? a : a * tanv;
-        const yAbs = isHorizontal ? b * tanv : b;
-
-        const x = (angle < 90 || angle > 270) ? xAbs : -xAbs;
-        const y = (angle < 180) ? yAbs : -yAbs;
-
-        return {
-            ...position,
-            left: (position.x + x) - (position.width / 2),
-            top: (position.y + y) - (position.height / 2),
-            angle,
-        };
-    }
-
-    // FIXME: Wait for web fonts to load to get correct width and height of children
-    componentDidMount() {
-        this.updateChildren();
-    }
-
-    componentDidUpdate() {
-        this.updateChildren();
+    getPlacementsForOverlapping(placements, indexToOverlap) {
+        return placements
+            .map(({ positions }) => (
+                ItemContainer
+                    .getOverlappingComponents(positions, indexToOverlap)
+                    .map(index => this.getPlacements(positions, index))
+                    .reduce((prev, cur) => [...prev, ...cur], [])
+            )).reduce((prev, cur) => [...prev, ...cur], []);
     }
 
     updateChildren() {
-        const width = this.root.offsetWidth;
-        const height = this.root.offsetHeight;
-        const steps = [90, 45, 3];
-
         // Get refs to mounted children
-        const refs = this.childRefs.filter(child => !!child);
+        const refs = this.childRefs.filter(ref => !!ref);
 
-        let positions = refs
-            .map(child => child.getPosition())
+        // Calculate initial positions and collisions
+        const initialPositions = refs
+            .map(ref => ref.getPosition())
             .map(position => ItemContainer.updatePosition(position));
-        let count = ItemContainer.getCollisionCount(width, height, positions);
+        let placement = this.getPlacement(initialPositions);
 
-        for (let i = 0; i < MAX_ITERATIONS; i++) {
-            if (count <= 0) break;
-            const step = steps[i % steps.length];
+        for (let iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
+            if (placement.cost <= 0) break;
 
-            for (let index = 0; index < positions.length; index++) {
-                if (!positions[index].isFixed) {
-                    // Rotate position clockwise and counterclockwise and count overlap + overflow
-                    const positionsCW = ItemContainer.getUpdatedPositions(positions, index, step);
-                    const positionsCCW = ItemContainer.getUpdatedPositions(positions, index, -step);
-                    const countCW = ItemContainer.getCollisionCount(width, height, positionsCW);
-                    const countCCW = ItemContainer.getCollisionCount(width, height, positionsCCW);
+            placement.positions.forEach((position, index, positions) => { // eslint-disable-line
+                if (position.isFixed) return;
 
-                    // Save positions if overlap + overflow reduced
-                    if (countCW <= count || countCCW <= count) {
-                        count = countCW < countCCW ? countCW : countCCW;
-                        positions = countCW < countCCW ? positionsCW : positionsCCW;
-                    }
+                // Get potential positions for component at index
+                const placements = this.getPlacements(positions, index);
+
+                // Get potential positions for components overlapping component at index
+                const placementForOverlapping = this.getPlacementsForOverlapping(placements, index);
+
+                const nextPlacement = [
+                    ...placements,
+                    ...placementForOverlapping,
+                ].reduce((prev, cur) => (cur.cost < prev.cost ? cur : prev));
+
+                if (nextPlacement.cost < placement.cost) {
+                    placement = nextPlacement;
                 }
-            }
+            });
         }
 
         refs.forEach((ref, index) => {
-            ref.setPosition(positions[index].top, positions[index].left);
+            ref.setPosition(placement.positions[index].top, placement.positions[index].left);
         });
+
+        this.setState({ positions: placement.positions });
     }
 
     render() {
@@ -128,6 +230,11 @@ class ItemContainer extends Component {
         });
         return (
             <div className={styles.root} ref={(ref) => { this.root = ref; }}>
+                {this.state.positions && <Overlays
+                    width={this.root.offsetWidth}
+                    height={this.root.offsetHeight}
+                    positions={this.state.positions}
+                />}
                 {children}
             </div>
         );

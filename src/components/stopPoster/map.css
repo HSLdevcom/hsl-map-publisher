@@ -37,10 +37,10 @@
 .label {
     max-width: 260px;
     padding: 10px;
-    margin: 10px;
+    margin: 5px;
     font-family: fontFamily;
-    background: hsla(0, 0%, 100%, 0.8);
-    border-radius: 5px;
+    background: white;
+    border: 2px solid background;
 }
 
 .title {
