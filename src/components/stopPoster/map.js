@@ -1,6 +1,7 @@
 import React, { PropTypes } from "react";
 import ItemContainer from "components/itemContainer";
-import ItemWrapper from "components/itemWrapper";
+import ItemFixed from "components/itemFixed";
+import ItemPositioned from "components/itemPositioned";
 import { Row } from "components/util";
 import { getSymbol } from "util/stops";
 import CustomTypes from "util/customTypes";
@@ -11,6 +12,7 @@ import styles from "./map.css";
 
 // Max rows in label
 const MAX_LABEL_ROWS = 6;
+const MAX_LABEL_CHARS = 36;
 
 // Map symbol size
 const STOP_RADIUS = 17;
@@ -69,8 +71,14 @@ StopSymbol.propTypes = {
 
 const RouteList = (props) => {
     if (props.routes.length > MAX_LABEL_ROWS) {
-        const routeIds = props.routes.map(({ routeId }) => routeId).join(", ");
-        return <div>{routeIds}</div>;
+        let rowLength = 0;
+        const components = props.routes.map(({ routeId }, index, routes) => {
+            const content = `${routeId}${(index < routes.length - 1) ? ", " : ""}`;
+            const isNewLine = rowLength + content.length > MAX_LABEL_CHARS;
+            rowLength = isNewLine ? content.length : rowLength + content.length;
+            return <span key={index}>{isNewLine && <br/>}{content}</span>;
+        });
+        return <div>{components}</div>;
     }
     return (
         <div>
@@ -88,11 +96,9 @@ RouteList.propTypes = {
 };
 
 const Label = props => (
-    <div className={styles.label} style={{ left: props.x, top: props.y }}>
-        <Row>
-            <div className={styles.title}>{props.name_fi}</div>
-            <div className={styles.subtitle}>({props.shortId})</div>
-        </Row>
+    <div className={styles.label}>
+        <div className={styles.title}>{props.name_fi}</div>
+        <div className={styles.subtitle}>{props.name_se}</div>
         <div className={styles.content}>
             <RouteList routes={props.routes}/>
         </div>
@@ -131,47 +137,38 @@ const Map = (props) => {
             <div className={styles.overlays}>
                 <ItemContainer>
                     {stops.map((stop, index) => (
-                        <ItemWrapper
+                        <ItemFixed
                             key={index}
-                            x={stop.x - STOP_RADIUS}
-                            y={stop.y - STOP_RADIUS}
-                            angle={45}
-                            isFixed
+                            top={stop.y - STOP_RADIUS}
+                            left={stop.x - STOP_RADIUS}
                         >
                             <StopSymbol {...stop} size={STOP_RADIUS * 2}/>
-                        </ItemWrapper>
+                        </ItemFixed>
                     ))}
 
-                    <ItemWrapper
-                        x={(mapStyle.width / 2) - LOCATION_RADIUS}
-                        y={(mapStyle.height / 2) - LOCATION_RADIUS}
-                        angle={45}
-                        isFixed
+                    <ItemFixed
+                        top={(mapStyle.height / 2) - LOCATION_RADIUS}
+                        left={(mapStyle.width / 2) - LOCATION_RADIUS}
                     >
                         <LocationSymbol size={LOCATION_RADIUS * 2}/>
-                    </ItemWrapper>
+                    </ItemFixed>
 
                     {stops.map((stop, index) => (
-                        <ItemWrapper key={index} x={stop.x} y={stop.y} distance={15}>
+                        <ItemPositioned key={index} x={stop.x} y={stop.y} distance={25}>
                             <Label {...stop}/>
-                        </ItemWrapper>
+                        </ItemPositioned>
                     ))}
 
-                    <ItemWrapper x={INFO_POSITION_LEFT} y={INFO_POSITION_TOP} angle={45} isFixed>
+                    <ItemFixed top={INFO_POSITION_TOP} left={INFO_POSITION_LEFT}>
                         <div>
                             <Scalebar pixelsPerMeter={props.pixelsPerMeter}/>
                             <Attribution/>
                         </div>
-                    </ItemWrapper>
+                    </ItemFixed>
 
-                    <ItemWrapper
-                        x={miniMapStyle.left}
-                        y={miniMapStyle.top}
-                        angle={45}
-                        isFixed
-                    >
+                    <ItemFixed top={miniMapStyle.top} left={miniMapStyle.left}>
                         <div style={miniMapStyle}/>
-                    </ItemWrapper>
+                    </ItemFixed>
                 </ItemContainer>
             </div>
 

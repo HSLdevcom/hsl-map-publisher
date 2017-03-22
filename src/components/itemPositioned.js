@@ -1,11 +1,10 @@
 import React, { Component } from "react";
 
-import styles from "./itemWrapper.css";
-
-class ItemWrapper extends Component {
+class ItemPositioned extends Component {
     constructor(props) {
         super(props);
-        this.initialState = { top: 0, left: 0 };
+        // Use anchor coordinates before actual position is computed
+        this.state = { top: props.y, left: props.x };
     }
 
     setPosition(top, left) {
@@ -14,38 +13,35 @@ class ItemWrapper extends Component {
 
     getPosition() {
         return {
-            x: this.props.x,
-            y: this.props.y,
-            angle: this.props.angle,
-            distance: this.props.distance,
             width: this.root.offsetWidth,
             height: this.root.offsetHeight,
-            isFixed: this.props.isFixed,
+            x: this.props.x,
+            y: this.props.y,
+            initialDistance: this.props.distance,
+            initialAngle: this.props.angle,
         };
     }
 
     render() {
+        const style = { ...this.state, position: "absolute" };
         return (
-            <div ref={(ref) => { this.root = ref; }} className={styles.root} style={this.state}>
+            <div ref={(ref) => { this.root = ref; }} style={style}>
                 {this.props.children}
             </div>
         );
     }
 }
 
-ItemWrapper.defaultProps = {
+ItemPositioned.defaultProps = {
     angle: 0,
-    distance: 0,
-    isFixed: false,
 };
 
-ItemWrapper.propTypes = {
+ItemPositioned.propTypes = {
     x: React.PropTypes.number.isRequired,
     y: React.PropTypes.number.isRequired,
+    distance: React.PropTypes.number.isRequired,
     angle: React.PropTypes.number,
-    distance: React.PropTypes.number,
-    isFixed: React.PropTypes.bool,
     children: React.PropTypes.element.isRequired,
 };
 
-export default ItemWrapper;
+export default ItemPositioned;
