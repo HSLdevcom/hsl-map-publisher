@@ -12,6 +12,7 @@ import styles from "./map.css";
 
 // Max rows in label
 const MAX_LABEL_ROWS = 6;
+const MAX_LABEL_CHARS = 36;
 
 // Map symbol size
 const STOP_RADIUS = 17;
@@ -70,8 +71,14 @@ StopSymbol.propTypes = {
 
 const RouteList = (props) => {
     if (props.routes.length > MAX_LABEL_ROWS) {
-        const routeIds = props.routes.map(({ routeId }) => routeId).join(", ");
-        return <div>{routeIds}</div>;
+        let rowLength = 0;
+        const components = props.routes.map(({ routeId }, index, routes) => {
+            const content = `${routeId}${(index < routes.length - 1) ? ", " : ""}`;
+            const isNewLine = rowLength + content.length > MAX_LABEL_CHARS;
+            rowLength = isNewLine ? content.length : rowLength + content.length;
+            return <span key={index}>{isNewLine && <br/>}{content}</span>;
+        });
+        return <div>{components}</div>;
     }
     return (
         <div>

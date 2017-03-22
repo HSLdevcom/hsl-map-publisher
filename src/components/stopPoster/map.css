@@ -61,10 +61,10 @@
 }
 
 .label {
-    max-width: 260px;
     padding: 10px;
     margin: 5px;
     font-family: fontFamily;
+    white-space: nowrap;
     background: hsla(0, 0%, 100%, 0.8);
 }
 
