@@ -163,7 +163,7 @@ const Map = (props) => {
                             x={stop.x}
                             y={stop.y}
                             distance={25}
-                            angle={(stop.calculatedHeading + 270) % 360}
+                            angle={stop.calculatedHeading}
                         >
                             <Label {...stop}/>
                         </ItemPositioned>
