@@ -18,6 +18,13 @@ const Connector = props => (
     />
 );
 
+Connector.propTypes = {
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+    cx: PropTypes.number.isRequired,
+    cy: PropTypes.number.isRequired,
+};
+
 const Mask = props => (
     <rect
         x={props.left + MASK_MARGIN}
@@ -27,6 +34,13 @@ const Mask = props => (
         fill="#000"
     />
 );
+
+Mask.propTypes = {
+    left: PropTypes.number.isRequired,
+    top: PropTypes.number.isRequired,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
+};
 
 const Overlays = props => (
     <svg width={props.width} height={props.height}>
@@ -45,6 +59,23 @@ const Overlays = props => (
         </g>
     </svg>
 );
+
+Overlays.propTypes = {
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
+    positions: PropTypes.arrayOf(PropTypes.oneOfType([
+        PropTypes.shape({
+            top: PropTypes.number.isRequired,
+            left: PropTypes.number.isRequired,
+            width: PropTypes.number.isRequired,
+            height: PropTypes.number.isRequired,
+        }),
+        PropTypes.shape({
+            ...Connector.propTypes,
+            ...Mask.propTypes,
+        }),
+    ])).isRequired,
+};
 
 /**
  * Container for items whose position will be adjusted for minimal overlap
@@ -122,7 +153,7 @@ class ItemContainer extends Component {
             distance,
             angle,
             cx,
-            cy
+            cy,
         };
     }
 
