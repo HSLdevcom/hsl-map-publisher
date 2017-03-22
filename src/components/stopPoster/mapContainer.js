@@ -96,7 +96,7 @@ const mapPositionQuery = gql`
 const propsMapper = mapProps((props) => {
     const viewport = createViewport(props.data.stop, MIN_ZOOM);
     const [minLon, minLat] = viewport.unproject([0, 0]);
-    const [maxLon, maxLat] = viewport.unproject([MAP_WIDTH, MAP_HEIGHT]);
+    const [maxLon, maxLat] = viewport.unproject([viewport.width, viewport.height]);
 
     return ({ stop: props.data.stop, minLat, minLon, maxLat, maxLon, date: props.date });
 });
