@@ -11,7 +11,7 @@ const distances = [-20, -5, 5, 20];
 
 const Connector = props => (
     <path
-        d={`M${props.x} ${props.y} L${props.x + props.meta.cx} ${props.y + props.meta.cy}`}
+        d={`M${props.x} ${props.y} L${props.x + props.cx} ${props.y + props.cy}`}
         fill="none"
         stroke="#007AC9"
         strokeWidth="2"
@@ -54,7 +54,7 @@ class ItemContainer extends Component {
     static getDistanceCost(positions) {
         let sum = 0;
         positions.forEach((position) => {
-            if (position.meta) sum += position.meta.distance - position.distance;
+            if (position.distance) sum += position.distance - position.initialDistance;
         });
         return sum * DISTANCE_COST;
     }
@@ -89,8 +89,8 @@ class ItemContainer extends Component {
             return position;
         }
 
-        let distance = position.meta ? position.meta.distance : position.distance;
-        let angle = position.meta ? position.meta.angle : position.angle;
+        let distance = "distance" in position ? position.distance : position.initialDistance;
+        let angle = "angle" in position ? position.angle : position.initialAngle;
 
         if (diff.angle) angle = (angle + diff.angle) % 360;
         if (diff.distance) distance += diff.distance;
@@ -119,7 +119,10 @@ class ItemContainer extends Component {
             ...position,
             left: Math.round((position.x + cx) - (position.width / 2)),
             top: Math.round((position.y + cy) - (position.height / 2)),
-            meta: { angle, distance, cx, cy },
+            distance,
+            angle,
+            cx,
+            cy
         };
     }
 
@@ -183,8 +186,8 @@ class ItemContainer extends Component {
 
     getPlacements(positions, indexToMove) {
         const diffs = angles.reduce(
-            (prev, angle) => ([...prev, ...distances.map(distance => ({ angle, distance }))])
-        );
+            (prev, angle) => ([...prev, ...distances.map(distance => ({ angle, distance }))]),
+        []);
         return diffs.map((diff) => {
             const updatedPositions = positions.map((position, index) => (
                 index === indexToMove ? ItemContainer.updatePosition(position, diff) : position

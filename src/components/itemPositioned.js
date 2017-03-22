@@ -4,7 +4,7 @@ class ItemPositioned extends Component {
     constructor(props) {
         super(props);
         // Use anchor coordinates before actual position is computed
-        this.state = { top: props.x, left: props.y };
+        this.state = { top: props.y, left: props.x };
     }
 
     setPosition(top, left) {
@@ -17,8 +17,8 @@ class ItemPositioned extends Component {
             height: this.root.offsetHeight,
             x: this.props.x,
             y: this.props.y,
-            distance: this.props.distance,
-            angle: this.props.angle,
+            initialDistance: this.props.distance,
+            initialAngle: this.props.angle,
         };
     }
 
