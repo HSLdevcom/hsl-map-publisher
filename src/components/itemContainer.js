@@ -4,6 +4,7 @@ import styles from "./itemContainer.css";
 const MAX_ITERATIONS = 10;
 const OVERLAP_COST_FIXED = 5;
 const DISTANCE_COST = 10;
+const ANGLE_COST = 1;
 const MASK_MARGIN = 5;
 
 const angles = [-90, -40, -30, -20, -10, -5, -1, 1, 5, 10, 20, -30, 40, 90, 180];
@@ -88,6 +89,17 @@ class ItemContainer extends Component {
             if (position.distance) sum += position.distance - position.initialDistance;
         });
         return sum * DISTANCE_COST;
+    }
+
+    static getAngleCost(positions) {
+        let sum = 0;
+        positions.forEach((position) => {
+            if (position.angle) {
+                const phi = Math.abs(position.angle - position.initialAngle) % 360;
+                sum += phi > 180 ? 360 - phi : phi;
+            }
+        });
+        return sum * ANGLE_COST;
     }
 
     static getIntersectionArea(a, b) {
@@ -211,7 +223,8 @@ class ItemContainer extends Component {
     getPlacement(positions) {
         const collision = this.getCollisionCost(positions);
         const distance = ItemContainer.getDistanceCost(positions);
-        const cost = collision + distance;
+        const angle = ItemContainer.getAngleCost(positions);
+        const cost = collision + distance + angle;
         return { positions, cost };
     }
 
