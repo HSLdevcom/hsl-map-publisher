@@ -25,7 +25,7 @@ const nearbyStopsQuery = gql`
                     nodes {
                         routeId
                         hasRegularDayDepartures
-                        timingStopType
+                        pickupDropoffType
                         route {
                             nodes {
                                 destinationFi
