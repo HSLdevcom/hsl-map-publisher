@@ -4,6 +4,8 @@ import styles from "./itemContainer.css";
 const MAX_ITERATIONS = 10;
 const OVERLAP_COST_FIXED = 5;
 const DISTANCE_COST = 10;
+const OVERLAP_COST = 2;
+const OVERFLOW_COST = 4;
 const ANGLE_COST = 1;
 const MASK_MARGIN = 5;
 
@@ -213,11 +215,11 @@ class ItemContainer extends Component {
                 if (!positions[i].isFixed || !positions[j].isFixed) {
                     const area = ItemContainer.getIntersectionArea(positions[i], positions[j]);
                     const isFixed = positions[i].isFixed || positions[j].isFixed;
-                    overlap += isFixed ? area * OVERLAP_COST_FIXED : area;
+                    overlap += isFixed ? area * OVERLAP_COST_FIXED : area * OVERLAP_COST;
                 }
             }
         }
-        return overlap + overflow;
+        return overlap + (overflow * OVERFLOW_COST);
     }
 
     getPlacement(positions) {
