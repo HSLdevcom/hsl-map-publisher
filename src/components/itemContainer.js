@@ -252,6 +252,15 @@ class ItemContainer extends Component {
         return overlap + distances + intersections;
     }
 
+    shouldUpdateOverlapping(placements) {
+        for (const placement of placements) {
+            if (this.getCost(placement.positions, placement.indexes) < 1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     getPlacements(positions, indexToUpdate, updatedIndexes = []) {
         const indexes = [...updatedIndexes, indexToUpdate];
         return this.diffs
@@ -267,6 +276,8 @@ class ItemContainer extends Component {
     }
 
     getPlacementsForOverlapping(placements, indexToOverlap) {
+        if (!this.shouldUpdateOverlapping(placements)) return [];
+
         return placements.reduce((prev, { positions, indexes }) => {
             const index = this.getOverlappingComponent(positions, indexToOverlap);
             if (!index) return prev;
