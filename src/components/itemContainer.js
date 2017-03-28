@@ -1,10 +1,12 @@
 import React, { Component, PropTypes } from "react";
+import segseg from "segseg";
 import memoize from "util/memoize";
 
 import styles from "./itemContainer.css";
 
 const MAX_ITERATIONS = 40;
 const OVERLAP_COST_FIXED = 5;
+const INTERSECTION_COST = 50;
 const DISTANCE_COST = 1;
 
 const MASK_MARGIN = 5;
@@ -105,6 +107,16 @@ class ItemContainer extends Component {
     }
 
     /**
+     * Returns true if connecting lines of components a and b intersect
+     * @param {Object} a
+     * @param {Object} b
+     * @param {boolean}
+     */
+    static hasIntersectingLines(a, b) {
+        return segseg(a.x, a.y, a.cx, a.cy, b.x, b.y, b.cx, b.cy);
+    }
+
+    /**
      * Returns cost for increased distances from anchor
      * @param {Object[]} positions - Positions
      * @param {number[]} indexes - Indexes to check
@@ -168,6 +180,7 @@ class ItemContainer extends Component {
         super(props);
         this.state = {};
         this.getIntersectionArea = memoize(ItemContainer.getIntersectionArea, 2);
+        this.hasIntersectingLines = memoize(ItemContainer.hasIntersectingLines, 2);
         this.updatePosition = memoize(ItemContainer.updatePosition, 2);
     }
 
@@ -194,6 +207,25 @@ class ItemContainer extends Component {
     }
 
     /**
+     * Returns cost for intersecting connector lines from anchor to label
+     * @param {Object[]} positions - Positions
+     * @param {number[]} indexes - Indexes to check
+     * @returns {number}
+     */
+    getIntersectionCost(positions, indexes) {
+        let sum = 0;
+        indexes.forEach((i) => {
+            const a = positions[i];
+            indexes.forEach((j) => {
+                if (j <= i) return;
+                const b = positions[j];
+                if (this.hasIntersectingLines(a, b)) sum += 1;
+            });
+        });
+        return sum * INTERSECTION_COST;
+    }
+
+    /**
      * Returns cost for overlapping non-fixed components
      * @param {Object[]} positions - Positions
      * @param {number[]} indexes - Indexes to check
@@ -215,8 +247,9 @@ class ItemContainer extends Component {
 
     getCost(positions, indexes) {
         const overlap = this.getOverlapCost(positions, indexes);
+        const intersections = this.getIntersectionCost(positions, indexes);
         const distances = ItemContainer.getDistanceCost(positions, indexes);
-        return overlap + distances;
+        return overlap + distances + intersections;
     }
 
     getPlacements(positions, indexToUpdate, updatedIndexes = []) {
@@ -311,6 +344,7 @@ class ItemContainer extends Component {
         this.setState({ positions: placement.positions });
 
         this.getIntersectionArea.cache.clear();
+        this.hasIntersectingLines.cache.clear();
         this.updatePosition.cache.clear();
     }
 
