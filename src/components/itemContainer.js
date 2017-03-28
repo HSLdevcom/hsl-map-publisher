@@ -1,8 +1,9 @@
 import React, { Component, PropTypes } from "react";
+import memoize from "util/memoize";
 
 import styles from "./itemContainer.css";
 
-const MAX_ITERATIONS = 50;
+const MAX_ITERATIONS = 40;
 const OVERLAP_COST_FIXED = 5;
 const DISTANCE_COST = 1;
 
@@ -166,6 +167,8 @@ class ItemContainer extends Component {
     constructor(props) {
         super(props);
         this.state = {};
+        this.getIntersectionArea = memoize(ItemContainer.getIntersectionArea, 2);
+        this.updatePosition = memoize(ItemContainer.updatePosition, 2);
     }
 
     componentDidMount() {
@@ -183,7 +186,7 @@ class ItemContainer extends Component {
     getOverlappingComponent(positions, indexToOverlap) {
         for (let i = 0; i < positions.length; i++) {
             if (i !== indexToOverlap && !positions[i].isFixed &&
-                ItemContainer.getIntersectionArea(positions[i], positions[indexToOverlap]) > 0) {
+                this.getIntersectionArea(positions[i], positions[indexToOverlap]) > 0) {
                 return i;
             }
         }
@@ -201,7 +204,7 @@ class ItemContainer extends Component {
         indexes.forEach((i) => {
             for (let j = 0; j < positions.length; j++) {
                 if (!indexes.includes(j) || j > i) {
-                    const area = ItemContainer.getIntersectionArea(positions[i], positions[j]);
+                    const area = this.getIntersectionArea(positions[i], positions[j]);
                     const isFixed = positions[i].isFixed || positions[j].isFixed;
                     overlap += (isFixed ? area * OVERLAP_COST_FIXED : area);
                 }
@@ -220,7 +223,7 @@ class ItemContainer extends Component {
         const indexes = [...updatedIndexes, indexToUpdate];
         return this.diffs
             .map((diff) => {
-                const updatedPosition = ItemContainer.updatePosition(positions[indexToUpdate], diff);
+                const updatedPosition = this.updatePosition(positions[indexToUpdate], diff);
                 if (!updatedPosition || this.hasOverflow(updatedPosition)) return null;
                 return positions.map(
                     (position, index) => ((index === indexToUpdate) ? updatedPosition : position)
@@ -251,7 +254,7 @@ class ItemContainer extends Component {
 
     hasOverflow(position) {
         const rectArea = position.width * position.height;
-        const overflow = rectArea - ItemContainer.getIntersectionArea(this.boundingBox, position);
+        const overflow = rectArea - this.getIntersectionArea(this.boundingBox, position);
         return overflow > 0;
     }
 
@@ -275,7 +278,7 @@ class ItemContainer extends Component {
         // Calculate initial positions and collisions
         const initialPositions = refs
             .map(ref => ref.getPosition())
-            .map(position => ItemContainer.updatePosition(position));
+            .map(position => this.updatePosition(position));
         let placement = { positions: initialPositions };
 
         for (let iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
@@ -306,6 +309,9 @@ class ItemContainer extends Component {
         });
 
         this.setState({ positions: placement.positions });
+
+        this.getIntersectionArea.cache.clear();
+        this.updatePosition.cache.clear();
     }
 
     render() {
