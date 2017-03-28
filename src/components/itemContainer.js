@@ -8,8 +8,15 @@ const DISTANCE_COST = 1;
 
 const MASK_MARGIN = 5;
 
-const angles = [-90, -40, -30, -20, -10, -5, -1, 1, 5, 10, 20, -30, 40, 90, 180];
-const distances = [-20, -5, 5, 20];
+const ANGLES = [-32, -16, -8, -4, -1, 0, 1, 4, 8, 16, 32];
+const DISTANCES = [-25, -10, -1, 0, 1, 10, 25];
+const FACTORS = [5, 3, 2, 1];
+
+const diffs = FACTORS.map(f => (
+    ANGLES.reduce((prev, angle) => (
+        [...prev, ...DISTANCES.map(distance => ({ angle: angle * f, distance: distance * f }))]
+    ), [])
+));
 
 const Connector = props => (
     <path
@@ -211,10 +218,7 @@ class ItemContainer extends Component {
 
     getPlacements(positions, indexToUpdate, updatedIndexes = []) {
         const indexes = [...updatedIndexes, indexToUpdate];
-        const diffs = angles.reduce(
-            (prev, angle) => ([...prev, ...distances.map(distance => ({ angle, distance }))]),
-            []);
-        return diffs
+        return this.diffs
             .map((diff) => {
                 const updatedPosition = ItemContainer.updatePosition(positions[indexToUpdate], diff);
                 if (!updatedPosition || this.hasOverflow(updatedPosition)) return null;
@@ -260,6 +264,10 @@ class ItemContainer extends Component {
         };
     }
 
+    updateDiffs(iteration) {
+        this.diffs = diffs[Math.round((diffs.length - 1) * (iteration / MAX_ITERATIONS))];
+    }
+
     updateChildren() {
         // Get refs to mounted children
         const refs = this.childRefs.filter(ref => !!ref);
@@ -272,6 +280,7 @@ class ItemContainer extends Component {
 
         for (let iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
             const previousPlacement = placement;
+            this.updateDiffs(iteration);
 
             placement.positions.forEach((position, index, positions) => { // eslint-disable-line
                 if (position.isFixed) return;
