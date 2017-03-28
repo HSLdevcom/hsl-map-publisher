@@ -214,12 +214,10 @@ class ItemContainer extends Component {
      */
     getIntersectionCost(positions, indexes) {
         let sum = 0;
-        indexes.forEach((i) => {
-            const a = positions[i];
+        positions.forEach((position, i) => {
             indexes.forEach((j) => {
                 if (j <= i) return;
-                const b = positions[j];
-                if (this.hasIntersectingLines(a, b)) sum += 1;
+                if (this.hasIntersectingLines(position, positions[j])) sum += 1;
             });
         });
         return sum * INTERSECTION_COST;
