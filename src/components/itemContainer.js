@@ -4,7 +4,7 @@ import memoize from "util/memoize";
 
 import styles from "./itemContainer.css";
 
-const MAX_ITERATIONS = 40;
+const ITERATIONS_PER_FACTOR = 10;
 const OVERLAP_COST_FIXED = 5;
 const INTERSECTION_COST = 50;
 const DISTANCE_COST = 1;
@@ -252,15 +252,6 @@ class ItemContainer extends Component {
         return overlap + distances + intersections;
     }
 
-    shouldUpdateOverlapping(placements) {
-        for (const placement of placements) {
-            if (this.getCost(placement.positions, placement.indexes) < 1) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     getPlacements(positions, indexToUpdate, updatedIndexes = []) {
         const indexes = [...updatedIndexes, indexToUpdate];
         return this.diffs
@@ -275,7 +266,7 @@ class ItemContainer extends Component {
             .map(value => ({ positions: value, indexes }));
     }
 
-    getPlacementsForOverlapping(placements, indexToOverlap) {
+    getPlacementsOverlapping(placements, indexToOverlap) {
         if (!this.shouldUpdateOverlapping(placements)) return [];
 
         return placements.reduce((prev, { positions, indexes }) => {
@@ -283,6 +274,15 @@ class ItemContainer extends Component {
             if (!index) return prev;
             return [...prev, ...this.getPlacements(positions, index, indexes)];
         }, []);
+    }
+
+    shouldUpdateOverlapping(placements) {
+        for (const placement of placements) {
+            if (this.getCost(placement.positions, placement.indexes) < 1) {
+                return false;
+            }
+        }
+        return true;
     }
 
     comparePlacements(placement, other) {
@@ -311,8 +311,8 @@ class ItemContainer extends Component {
         };
     }
 
-    updateDiffs(iteration) {
-        this.diffs = diffs[Math.round((diffs.length - 1) * (iteration / MAX_ITERATIONS))];
+    updateDiffs(index) {
+        this.diffs = diffs[Math.min(index, diffs.length)];
     }
 
     updateChildren() {
@@ -325,27 +325,29 @@ class ItemContainer extends Component {
             .map(position => this.updatePosition(position));
         let placement = { positions: initialPositions };
 
-        for (let iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
-            const previousPlacement = placement;
-            this.updateDiffs(iteration);
+        for (let factor = 0; factor < FACTORS.length; factor++) {
+            this.updateDiffs(factor);
+            for (let iteration = 0; iteration < ITERATIONS_PER_FACTOR; iteration++) {
+                const previousPlacement = placement;
 
-            placement.positions.forEach((position, index, positions) => { // eslint-disable-line
-                if (position.isFixed) return;
+                placement.positions.forEach((position, index, positions) => { // eslint-disable-line
+                    if (position.isFixed) return;
 
-                // Get potential positions for component at index
-                const placements = this.getPlacements(positions, index);
+                    // Get potential positions for component at index
+                    const placements = this.getPlacements(positions, index);
 
-                // Get potential positions for components overlapping component at index
-                const placementForOverlapping = this.getPlacementsForOverlapping(placements, index);
+                    // Get potential positions for components overlapping component at index
+                    const placementsOverlapping = this.getPlacementsOverlapping(placements, index);
 
-                placement = [
-                    placement,
-                    ...placements,
-                    ...placementForOverlapping,
-                ].reduce((prev, cur) => this.comparePlacements(prev, cur));
-            });
+                    placement = [
+                        placement,
+                        ...placements,
+                        ...placementsOverlapping,
+                    ].reduce((prev, cur) => this.comparePlacements(prev, cur));
+                });
 
-            if (placement === previousPlacement) break;
+                if (placement === previousPlacement) break;
+            }
         }
 
         refs.forEach((ref, index) => {
