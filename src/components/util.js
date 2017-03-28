@@ -72,7 +72,6 @@ const Image = props => (
     <img className={styles.image} role="presentation" {...props}/>
 );
 
-
 export {
     Row,
     JustifiedRow,

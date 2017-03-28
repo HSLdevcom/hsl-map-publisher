@@ -61,8 +61,10 @@
     "node-phantom-promise": "^1.0.3",
     "query-string": "^4.3.2",
     "react": "^15.4.2",
+    "react-apollo": "^1.0.0-rc.3",
     "react-dom": "^15.4.2",
     "react-hot-loader": "^3.0.0-beta.6",
+    "recompose": "^0.22.0",
     "viewport-mercator-project": "^3.0.0-rc2"
   }
 }

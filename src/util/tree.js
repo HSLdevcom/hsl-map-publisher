@@ -136,7 +136,7 @@ function findLongestPath(root) {
     // Find descendant with the most items from longest path
     const node = findLongestPath(child);
 
-    return node.items.length > root.items.length ? node : root;
+    return node.items.length > (root.items ? root.items.length : 0) ? node : root;
 }
 
 /**

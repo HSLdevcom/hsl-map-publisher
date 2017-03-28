@@ -1,7 +1,6 @@
 import React from "react";
 import classNames from "classnames";
 import { Row, JustifiedRow, Image } from "components/util";
-import CustomTypes from "util/customTypes";
 
 import busIcon from "icons/bus.svg";
 import logoIcon from "icons/logo.svg";
@@ -58,8 +57,8 @@ const Header = props => (
         <Row>
             <Icon src={busIcon}/>
             <Group>
-                <Title>{props.name_fi}</Title>
-                <Subtitle>{props.name_se}</Subtitle>
+                <Title>{props.nameFi}</Title>
+                <Subtitle>{props.nameSe}</Subtitle>
             </Group>
         </Row>
 
@@ -80,6 +79,10 @@ const Header = props => (
     </JustifiedRow>
 );
 
-Header.propTypes = CustomTypes.stop;
+Header.propTypes = {
+    nameFi: React.PropTypes.string.isRequired,
+    nameSe: React.PropTypes.string.isRequired,
+    shortId: React.PropTypes.string.isRequired,
+};
 
 export default Header;
