@@ -114,7 +114,7 @@ class ItemContainer extends Component {
      * @param {boolean}
      */
     static hasIntersectingLines(a, b) {
-        return segseg(a.x, a.y, a.cx, a.cy, b.x, b.y, b.cx, b.cy);
+        return segseg(a.x, a.y, a.x + a.cx, a.y + a.cy, b.x, b.y, b.x + b.cx, b.y + b.cy);
     }
 
     /**
@@ -311,9 +311,9 @@ class ItemContainer extends Component {
     }
 
     hasOverflow(position) {
-        const rectArea = position.width * position.height;
-        const overflow = rectArea - this.getIntersectionArea(this.boundingBox, position);
-        return overflow > 0;
+        return position.left < 0 || position.top < 0 ||
+              (position.left + position.width) > this.boundingBox.width ||
+              (position.top + position.height) > this.boundingBox.height;
     }
 
     updateBoundingBox() {
