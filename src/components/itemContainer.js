@@ -295,9 +295,9 @@ class ItemContainer extends Component {
     }
 
     hasOverflow(position) {
-        const rectArea = position.width * position.height;
-        const overflow = rectArea - this.getIntersectionArea(this.boundingBox, position);
-        return overflow > 0;
+        return position.left < 0 || position.top < 0 ||
+              (position.left + position.width) > this.boundingBox.width ||
+              (position.top + position.height) > this.boundingBox.height;
     }
 
     updateBoundingBox() {
