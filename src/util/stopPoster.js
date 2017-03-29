@@ -1,5 +1,5 @@
 import WebMercatorViewport from "viewport-mercator-project/dist/web-mercator-viewport";
-import { fetchStop, fetchStops, fetchRoutes, fetchTimetable, fetchMap } from "util/api";
+import { fetchStop, fetchStops, fetchRoutes, fetchMap } from "util/api";
 
 const MAX_STOPS = 8;
 
@@ -97,9 +97,9 @@ function fetchMaps(stop) {
  */
 function fetchStopPosterState(stopId) {
     return Promise
-        .all([fetchStop(stopId), fetchTimetable(stopId), fetchRoutes(stopId)])
-        .then(([stop, timetable, routes]) => (
-            fetchMaps(stop).then(maps => ({ maps, stop, timetable, routes }))
+        .all([fetchStop(stopId)])
+        .then(([stop]) => (
+            fetchMaps(stop).then(maps => ({ maps }))
         ));
 }
 

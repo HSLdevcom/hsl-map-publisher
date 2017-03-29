@@ -7,6 +7,8 @@ const csv = require("csv");
 const API_URL = "http://kartat.hsl.fi";
 const OUTPUT_PATH = path.join(__dirname, "..", "output");
 
+const DATE = "2017-03-20";
+
 function fetchStopIds() {
     return fetch(`${API_URL}/stopIds`).then(response => response.json());
 }
@@ -27,7 +29,7 @@ async function main() {
 
     for (const stopId of stopIds) {
         console.log(`Generating (id: ${stopId})`); // eslint-disable-line no-console
-        const options = { stopId };
+        const options = { stopId, date: DATE };
         const filename = path.join(OUTPUT_PATH, `${stopId}.png`);
         await generatePdf("StopPoster", options, filename); // eslint-disable-line no-await-in-loop
     }

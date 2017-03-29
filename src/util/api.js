@@ -11,12 +11,32 @@ function trimShortId(id) {
 }
 
 /**
+ * Returns whether a route id is a so called number variant
+ * @param {String} id - Route id
+ * @returns {String}
+ */
+function isNumberVariant(id) {
+    return /.{5}[0-9]/.test(id);
+}
+
+/**
  * Returns route id without area code or leading zeros
  * @param {String} id - Route id
  * @returns {String}
  */
 function trimRouteId(id) {
+    if (isNumberVariant(id)) {
+        // Do not show number variants
+        return id.substring(1, 5).replace(/^[0]+/g, "");
+    }
     return id.substring(1).replace(/^[0]+/g, "");
+}
+
+/**
+  * Returns true if the route segment is only for dropping off passengers
+  */
+function isDropOffOnly({ pickupDropoffType }) {
+    return pickupDropoffType === null || pickupDropoffType === 2;
 }
 
 /**
@@ -48,26 +68,6 @@ function fetchStops() {
     return fetch(`${API_URL}/stops`)
         .then(response => response.json())
         .then(stops => stops.map(stop => ({ ...stop, shortId: trimShortId(stop.shortId) })));
-}
-
-/**
- * Fetches timetable for stop
- * @param {String} stopId - Stop identifier e.g. 4200210
- * @returns {Promise} - Object containing departure list for weekdays, saturdays and sundays
- */
-function fetchTimetable(stopId) {
-    return fetch(`${API_URL}/timetables/${stopId}`)
-        .then(response => response.json())
-        .then((timetables) => {
-            // TODO: Choose timetable that is currently valid
-            const departures = timetables[0].departures;
-            for (const key of Object.keys(departures)) {
-                for (const departure of departures[key]) {
-                    departure.routeId = trimRouteId(departure.routeId);
-                }
-            }
-            return departures;
-        });
 }
 
 /**
@@ -128,8 +128,10 @@ function fetchMap(mapOptions) {
 export {
     fetchStop,
     fetchStops,
-    fetchTimetable,
     fetchRoute,
     fetchRoutes,
     fetchMap,
+    isNumberVariant,
+    trimRouteId,
+    isDropOffOnly,
 };

@@ -14,8 +14,8 @@ const Stop = props => (
             />
         </div>
         <div className={styles.right}>
-            <div className={styles.title}>{props.name_fi}</div>
-            <div className={styles.subtitle}>{props.name_se}</div>
+            <div className={styles.title}>{props.nameFi}</div>
+            <div className={styles.subtitle}>{props.nameSe}</div>
         </div>
     </div>
 );

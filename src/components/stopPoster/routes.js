@@ -11,10 +11,10 @@ const Routes = props => (
                 <div className={styles.identifier}>{route.routeId}</div>
                 <div>
                     <div className={styles.title}>
-                        {route.destination_fi}
+                        {route.destinationFi}
                     </div>
                     <div className={styles.subtitle}>
-                        {route.destination_se}
+                        {route.destinationSe}
                     </div>
                 </div>
             </Row>

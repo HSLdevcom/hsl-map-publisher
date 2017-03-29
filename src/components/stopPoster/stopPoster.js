@@ -1,16 +1,16 @@
 import React, { Component, PropTypes } from "react";
 import { JustifiedColumn, Spacer, FlexSpacer } from "components/util";
+import RouteDiagram from "components/routeDiagram/routeDiagramContainer";
+import Timetable from "components/timetable/timetableContainer";
 import { fetchStopPosterState } from "util/stopPoster";
 
-import Header from "./header";
+import Header from "./headerContainer";
 import Footer from "./footer";
 
-import Routes from "./routes";
-import Timetable from "./timetable";
+import Routes from "./routesContainer";
 import Info from "./info";
 
 import Map from "./map";
-import RouteDiagram from "./routeDiagram/routeDiagram";
 
 import styles from "./stopPoster.css";
 
@@ -45,13 +45,13 @@ class StopPoster extends Component {
         return (
             <div className={styles.root}>
                 <JustifiedColumn>
-                    <Header {...this.state.stop}/>
+                    <Header stopId={this.props.stopId}/>
 
                     <div className={styles.content}>
                         <div>
-                            <Routes routes={this.state.routes}/>
+                            <Routes stopId={this.props.stopId} date={this.props.date}/>
                             <div className={styles.title}>Pysäkkiaikataulu</div>
-                            <Timetable {...this.state.timetable}/>
+                            <Timetable stopId={this.props.stopId} date={this.props.date}/>
                             <Info/>
                         </div>
 
@@ -60,7 +60,7 @@ class StopPoster extends Component {
                         <div>
                             <Map {...this.state.maps}/>
                             <div className={styles.title}>Linjojen reitit</div>
-                            <RouteDiagram stop={this.state.stop} routes={this.state.routes}/>
+                            <RouteDiagram stopId={this.props.stopId} date={this.props.date}/>
                         </div>
                     </div>
 
@@ -74,6 +74,7 @@ class StopPoster extends Component {
 
 StopPoster.propTypes = {
     stopId: PropTypes.string.isRequired,
+    date: PropTypes.string.isRequired,
     onReady: PropTypes.func.isRequired,
 };
 
