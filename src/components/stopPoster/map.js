@@ -132,8 +132,20 @@ const Map = (props) => {
         <div className={styles.root} style={mapStyle}>
             <div className={styles.map}>
                 <img
-                    // eslint-disable-next-line no-param-reassign
-                    ref={el => el && props.map.then((map) => { el.src = map; })}
+                    ref={el => el && props.map.then((map) => {
+                        if (window.callPhantom) {
+                            // eslint-disable-next-line no-param-reassign
+                            el.onload = () => {
+                                const options = {
+                                    width: document.body.offsetWidth,
+                                    height: document.body.offsetHeight,
+                                };
+                                window.callPhantom(options);
+                            };
+                        }
+                        // eslint-disable-next-line no-param-reassign
+                        el.src = map;
+                    })}
                     role="presentation"
                 />
             </div>
