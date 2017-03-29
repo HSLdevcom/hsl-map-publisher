@@ -1,4 +1,4 @@
-import React, { PropTypes } from "react";
+import React, { Component, PropTypes } from "react";
 import { JustifiedColumn, Spacer, FlexSpacer } from "components/util";
 import RouteDiagram from "components/routeDiagram/routeDiagramContainer";
 import Timetable from "components/timetable/timetableContainer";
@@ -13,35 +13,37 @@ import Map from "./mapContainer";
 
 import styles from "./stopPoster.css";
 
+// eslint-disable-next-line react/prefer-stateless-function
+class StopPoster extends Component {
+    render() {
+        return (
+            <div className={styles.root}>
+                <JustifiedColumn>
+                    <Header stopId={this.props.stopId}/>
 
-function StopPoster(props) {
-    return (
-        <div className={styles.root}>
-            <JustifiedColumn>
-                <Header stopId={props.stopId}/>
+                    <div className={styles.content}>
+                        <div>
+                            <Routes stopId={this.props.stopId} date={this.props.date}/>
+                            <div className={styles.title}>Pysäkkiaikataulu</div>
+                            <Timetable stopId={this.props.stopId} date={this.props.date}/>
+                            <Info/>
+                        </div>
 
-                <div className={styles.content}>
-                    <div>
-                        <Routes stopId={props.stopId} date={props.date}/>
-                        <div className={styles.title}>Pysäkkiaikataulu</div>
-                        <Timetable stopId={props.stopId} date={props.date}/>
-                        <Info/>
+                        <Spacer width={50}/>
+
+                        <div>
+                            <Map stopId={this.props.stopId} date={this.props.date}/>
+                            <div className={styles.title}>Linjojen reitit</div>
+                            <RouteDiagram stopId={this.props.stopId} date={this.props.date}/>
+                        </div>
                     </div>
 
-                    <Spacer width={50}/>
-
-                    <div>
-                        <Map stopId={props.stopId} date={props.date}/>
-                        <div className={styles.title}>Linjojen reitit</div>
-                        <RouteDiagram stopId={props.stopId} date={props.date}/>
-                    </div>
-                </div>
-
-                <FlexSpacer/>
-                <Footer/>
-            </JustifiedColumn>
-        </div>
-    );
+                    <FlexSpacer/>
+                    <Footer/>
+                </JustifiedColumn>
+            </div>
+        );
+    }
 }
 
 StopPoster.propTypes = {
