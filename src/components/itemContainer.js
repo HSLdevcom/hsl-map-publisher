@@ -113,7 +113,7 @@ class ItemContainer extends Component {
      * @param {boolean}
      */
     static hasIntersectingLines(a, b) {
-        return segseg(a.x, a.y, a.cx, a.cy, b.x, b.y, b.cx, b.cy);
+        return segseg(a.x, a.y, a.x + a.cx, a.y + a.cy, b.x, b.y, b.x + b.cx, b.y + b.cy);
     }
 
     /**
