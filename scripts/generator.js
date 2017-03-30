@@ -7,18 +7,32 @@ const slimerPath = path.join(__dirname, "..", "node_modules", ".bin", slimerjs);
 const CLIENT_PORT = 3000;
 const CLIENT_PPI = 96;
 
+let browser;
+let page;
+let stream;
 let previous = Promise.resolve();
 
-async function open(page) {
+async function open() {
     const status = await page.open(`http://localhost:${CLIENT_PORT}`);
 
     if (status !== "success") {
         throw new Error("Failed to open client app");
     }
-    return page;
 }
 
-function setPaperSize(page, pixelWidth, pixelHeight) {
+function logInfo(message) {
+    const content = `INFO: ${message}`;
+    console.log(content); // eslint-disable-line no-console
+    if (stream) stream.write(`${content}\n`);
+}
+
+function logError(error) {
+    const content = `ERROR: ${error instanceof Error ? error.message : error}\n`;
+    console.error(content); // eslint-disable-line no-console
+    if (stream) stream.write(`${content}\n`);
+}
+
+function setPaperSize(pixelWidth, pixelHeight) {
     const options = {
         width: `${pixelWidth / CLIENT_PPI}in`,
         height: `${pixelHeight / CLIENT_PPI}in`,
@@ -32,16 +46,12 @@ function setPaperSize(page, pixelWidth, pixelHeight) {
 
 /**
  * Renders component to pdf or bitmap file
- * @param page
- * @param {string} component - React component to render
- * @param {Object} options - Props to pass to component
- * @param {string} directory - Output directory
- * @param {string} filename - Output filename
  * @returns {Promise}
  */
-function render(page, component, options, directory, filename) {
+function render(options) {
+    const { component, props, directory, filename } = options;
+
     return new Promise((resolve, reject) => {
-        console.log(`Generating ${filename}`); // eslint-disable-line no-console
         // Set callback called by client app when component is ready
         page.onCallback = (options) => {
             page.onCallback = null;
@@ -50,44 +60,51 @@ function render(page, component, options, directory, filename) {
                 .then(() => resolve())
                 .catch(error => reject(error));
         };
-        page.evaluate((component, options) => {
-            window.setVisibleComponent(component, options);
-        }, component, options, () => null);
+        page.evaluate((component, props) => {
+            window.setVisibleComponent(component, props);
+        }, component, props, () => null);
     });
 }
 
-function generate(...args) {
+/**
+ * Adds component to render queue
+ * @param {Object} options
+ * @param {Writable} options.stream - Writable stream for log messages
+ * @param {string} options.component - React component to render
+ * @param {Object} options.props - Props to pass to component
+ * @param {string} options.directory - Output directory
+ * @param {string} options.filename - Output filename
+ * @returns {Promise}
+ */
+function generate(options) {
     previous = previous
-        .then(() => render.apply(null, args))
-        .catch(error => console.log(error));
+        .then(() => {
+           stream = options.stream;
+           logInfo(`Generating ${options.filename}`);
+           return render(options);
+        })
+        .catch((error) => {
+            logError(error);
+        }).then(() => {
+            stream = null;
+        });
+    return previous;
 }
 
 async function initialize() {
-    const browser = await driver.create({ path: slimerPath });
-    const page = await browser.createPage();
+    browser = await driver.create({ path: slimerPath });
+    page = await browser.createPage();
 
-    page.onError = (message) => {
-        console.error(`Error in client: ${message}`); // eslint-disable-line no-console
-        process.exit(1);
-    };
-    page.onConsoleMessage = (message) => {
-        console.log(`Output in client: ${message}`); // eslint-disable-line no-console
-    };
+    page.onError = error => logError(error);
+    page.onConsoleMessage = message => logInfo(message);
 
     return new Promise((resolve) => {
         // Initial callback called by client app when ready
         page.onCallback = () => {
             resolve(page);
         };
-        open(page);
+        open(`http://localhost:${CLIENT_PORT}`);
     });
 }
 
-/**
- * Initializes publisher app in slimerjs and returns generate function
- * @returns {Promise} - Generate function
- */
-module.exports = async () => {
-    const page = await initialize();
-    return generate.bind(null, page);
-};
+module.exports = { initialize, generate };

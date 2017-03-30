@@ -1,5 +1,5 @@
-const path = require("path");
 const fs = require("fs");
+const path = require("path");
 
 const Koa = require("koa");
 const Router = require("koa-router");
@@ -11,7 +11,7 @@ const moment = require("moment");
 const fetch = require("node-fetch");
 const csv = require("csv");
 
-const generator = require("./pdfGenerator");
+const generator = require("./generator");
 
 const PORT = 4000;
 const API_URL = "http://kartat.hsl.fi";
@@ -33,15 +33,26 @@ function fetchStopsWithShelter() {
     ));
 }
 
-function generateFiles(generate, component, options) {
-    const identifier = moment().format("YYYY-MM-DD-HHmm-");
+function generateFiles(component, props) {
+    const identifier = moment().format("YYYY-MM-DD-HHmm-sSSSSS");
     const basePath = path.join(OUTPUT_PATH, identifier);
 
     fs.mkdirSync(basePath);
+    const stream = fs.createWriteStream(path.join(basePath, "build.log"));
 
-    for (let i = 0; i < options.length; i++) {
-        generate(component, options[i], basePath, `${i + 1}.png`);
+    let last;
+    for (let i = 0; i < props.length; i++) {
+        const options = {
+            stream,
+            component,
+            props: props[i],
+            directory: basePath,
+            filename: `${i + 1}.png`,
+        };
+        last = generator.generate(options);
     }
+    last.then(() => stream.end("DONE"));
+
     return identifier;
 }
 
@@ -58,20 +69,20 @@ function errorResponse(ctx, error) {
 }
 
 async function main() {
-    const generate = await generator();
+    await generator.initialize();
 
     const app = new Koa();
     const router = new Router();
 
     router.post("/", (ctx) => {
-        const { component, options } = ctx.request.body;
+        const { component, props } = ctx.request.body;
 
-        if (!component || !options || !options instanceof Array) {
+        if (typeof component !== "string" || !props instanceof Array || !props.length) {
             return errorResponse(ctx, new Error("Invalid request body"));
         }
 
         try {
-            const path = generateFiles(generate, component, options);
+            const path = generateFiles(component, props);
             successResponse(ctx, { path });
         } catch (error) {
             errorResponse(ctx, error);
