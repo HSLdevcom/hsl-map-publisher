@@ -7,6 +7,8 @@ const slimerPath = path.join(__dirname, "..", "node_modules", ".bin", slimerjs);
 const CLIENT_PORT = 3000;
 const CLIENT_PPI = 96;
 
+let previous = Promise.resolve();
+
 async function open(page) {
     const status = await page.open(`http://localhost:${CLIENT_PORT}`);
 
@@ -29,21 +31,22 @@ function setPaperSize(page, pixelWidth, pixelHeight) {
 }
 
 /**
- * Generates a file from component
+ * Renders component to pdf or bitmap file
  * @param page
  * @param {string} component - React component to render
  * @param {Object} options - Props to pass to component
- * @param {string} filename - Output file
+ * @param {string} directory - Output directory
+ * @param {string} filename - Output filename
  * @returns {Promise}
  */
-function generate(page, component, options, filename) {
+function render(page, component, options, directory, filename) {
     return new Promise((resolve, reject) => {
+        console.log(`Generating ${filename}`); // eslint-disable-line no-console
         // Set callback called by client app when component is ready
         page.onCallback = (options) => {
             page.onCallback = null;
-            // Save page as a pdf
             return setPaperSize(page, options.width, options.height)
-                .then(() => page.render(filename))
+                .then(() => page.render(path.join(directory, filename)))
                 .then(() => resolve())
                 .catch(error => reject(error));
         };
@@ -53,9 +56,14 @@ function generate(page, component, options, filename) {
     });
 }
 
+function generate(...args) {
+    previous = previous
+        .then(() => render.apply(null, args))
+        .catch(error => console.log(error));
+}
+
 async function initialize() {
     const browser = await driver.create({ path: slimerPath });
-
     const page = await browser.createPage();
 
     page.onError = (message) => {

@@ -34,24 +34,14 @@ function fetchStopsWithShelter() {
 }
 
 function generateFiles(generate, component, options) {
-    const identifier = moment().format("YYYY-MM-DD-HHmmss");
+    const identifier = moment().format("YYYY-MM-DD-HHmm-");
     const basePath = path.join(OUTPUT_PATH, identifier);
 
-    try {
-        fs.mkdirSync(basePath);
-    } catch (e) {
-        if (e.code != "EEXIST") {
-            throw e;
-        }
+    fs.mkdirSync(basePath);
+
+    for (let i = 0; i < options.length; i++) {
+        generate(component, options[i], basePath, `${i + 1}.png`);
     }
-
-    // TODO: Generate all
-    console.log(`Generating ${0}`); // eslint-disable-line no-console
-    const filename = path.join(basePath, `${0}.png`);
-    console.log("Filename filename");
-    generate(component, options[0], filename)
-        .catch(error => console.log(error));
-
     return identifier;
 }
 
