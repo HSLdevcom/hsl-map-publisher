@@ -6,6 +6,7 @@ import styles from "./itemContainer.css";
 
 const ITERATIONS_PER_FACTOR = 10;
 const OVERLAP_COST_FIXED = 5;
+const OVERFLOW_COST = 5000;
 const INTERSECTION_COST = 50;
 const DISTANCE_COST = 1;
 const ANGLE_COST = 0.5;
@@ -114,7 +115,7 @@ class ItemContainer extends Component {
      * @param {boolean}
      */
     static hasIntersectingLines(a, b) {
-        return segseg(a.x, a.y, a.x + a.cx, a.y + a.cy, b.x, b.y, b.x + b.cx, b.y + b.cy);
+        return !!segseg(a.x, a.y, a.x + a.cx, a.y + a.cy, b.x, b.y, b.x + b.cx, b.y + b.cy);
     }
 
     /**
@@ -258,12 +259,18 @@ class ItemContainer extends Component {
         return overlap;
     }
 
+    getOverflowCost(positions, indexes) {
+        return OVERFLOW_COST * indexes.reduce((prev, index) =>
+            (this.hasOverflow(positions[index]) ? (prev + 1) : prev), 0);
+    }
+
     getCost(positions, indexes) {
         const overlap = this.getOverlapCost(positions, indexes);
+        const overflow = this.getOverflowCost(positions, indexes);
         const intersections = this.getIntersectionCost(positions, indexes);
         const distances = ItemContainer.getDistanceCost(positions, indexes);
         const angle = ItemContainer.getAngleCost(positions, indexes);
-        return overlap + distances + intersections + angle;
+        return overlap + overflow + distances + intersections + angle;
     }
 
     getPlacements(positions, indexToUpdate, updatedIndexes = []) {
@@ -300,9 +307,6 @@ class ItemContainer extends Component {
     }
 
     comparePlacements(placement, other) {
-        // Initial placement, always return other
-        if (!placement.indexes) return other;
-
         const indexes = [...new Set([...placement.indexes, ...other.indexes])];
         const cost = this.getCost(placement.positions, indexes);
         const costOther = this.getCost(other.positions, indexes);
@@ -337,28 +341,28 @@ class ItemContainer extends Component {
         const initialPositions = refs
             .map(ref => ref.getPosition())
             .map(position => this.updatePosition(position));
-        let placement = { positions: initialPositions };
+        let placement = { positions: initialPositions, indexes: [] };
 
         for (let factor = 0; factor < FACTORS.length; factor++) {
             this.updateDiffs(factor);
             for (let iteration = 0; iteration < ITERATIONS_PER_FACTOR; iteration++) {
                 const previousPlacement = placement;
 
-                placement.positions.forEach((position, index, positions) => { // eslint-disable-line
-                    if (position.isFixed) return;
+                for (let i = 0; i < placement.positions.length; i++) {
+                    if (placement.positions[i].isFixed) continue; // eslint-disable-line no-continue
 
                     // Get potential positions for component at index
-                    const placements = this.getPlacements(positions, index);
+                    const placements = this.getPlacements(placement.positions, i);
 
                     // Get potential positions for components overlapping component at index
-                    const placementsOverlapping = this.getPlacementsOverlapping(placements, index);
+                    const placementsOverlapping = this.getPlacementsOverlapping(placements, i);
 
                     placement = [
                         placement,
                         ...placements,
                         ...placementsOverlapping,
                     ].reduce((prev, cur) => this.comparePlacements(prev, cur));
-                });
+                }
 
                 if (placement === previousPlacement) break;
             }
