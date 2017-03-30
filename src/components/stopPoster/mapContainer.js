@@ -13,22 +13,26 @@ const MINI_MAP_ZOOM = 9;
 
 const nearbyStopsQuery = gql`
     query nearbyStopsQuery($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $date: Date!) {
-        stops: stopsByBbox(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon) {
+        stops: stopGroupedByShortIdByBbox(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon) {
             nodes {
-                stopId
+                stopIds
                 lat
                 lon
                 nameFi
                 nameSe
-                calculatedHeading
-                routeSegments: routeSegmentsForDate(date: $date) {
+                stops {
                     nodes {
-                        routeId
-                        hasRegularDayDepartures
-                        pickupDropoffType
-                        route {
+                        calculatedHeading
+                        routeSegments: routeSegmentsForDate(date: $date) {
                             nodes {
-                                destinationFi
+                                routeId
+                                hasRegularDayDepartures
+                                pickupDropoffType
+                                route {
+                                    nodes {
+                                        destinationFi
+                                    }
+                                }
                             }
                         }
                     }
@@ -38,17 +42,22 @@ const nearbyStopsQuery = gql`
     }
 `;
 
+const flatMap = (array, map) => array.reduce((a, b) => a.concat(map(b)), []);
+
 const stopsMapper = stop => ({
     ...stop,
-    routes: stop.routeSegments.nodes
-        .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
-        .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
-        .filter(routeSegment => !isDropOffOnly(routeSegment))
-        .map(routeSegment => ({
-            routeId: trimRouteId(routeSegment.routeId),
-            destinationFi: routeSegment.route.nodes[0].destinationFi,
-        }))
-        .sort(routeCompare),
+    // Assume all stops face the same way
+    calculatedHeading: stop.stops.nodes[0].calculatedHeading,
+    routes: flatMap(stop.stops.nodes, node =>
+        node.routeSegments.nodes
+            .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
+            .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
+            .filter(routeSegment => !isDropOffOnly(routeSegment))
+            .map(routeSegment => ({
+                routeId: trimRouteId(routeSegment.routeId),
+                destinationFi: routeSegment.route.nodes[0].destinationFi,
+            }))
+        ).sort(routeCompare),
 });
 
 const nearbyStopsMapper = mapProps((props) => {
