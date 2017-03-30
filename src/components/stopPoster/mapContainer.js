@@ -1,5 +1,6 @@
 import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
+import flatMap from "lodash/flatMap";
 import apolloWrapper from "util/apolloWrapper";
 import { isNumberVariant, trimRouteId, isDropOffOnly, fetchMap } from "util/api";
 import { MIN_ZOOM, MAP_WIDTH, MAP_HEIGHT, createViewport, calculateStopsViewport } from "util/stopPoster";
@@ -41,8 +42,6 @@ const nearbyStopsQuery = gql`
         }
     }
 `;
-
-const flatMap = (array, map) => array.reduce((a, b) => a.concat(map(b)), []);
 
 const stopsMapper = stop => ({
     ...stop,

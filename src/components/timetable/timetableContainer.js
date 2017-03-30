@@ -1,6 +1,7 @@
 import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
 import find from "lodash/find";
+import flatMap from "lodash/flatMap";
 
 import apolloWrapper from "util/apolloWrapper";
 import { isDropOffOnly } from "util/api";
@@ -71,8 +72,6 @@ const timetableQuery = gql`
         }
     }
 `;
-
-const flatMap = (array, map) => array.reduce((a, b) => a.concat(map(b)), []);
 
 const propsMapper = mapProps((props) => {
     const { weekdays, saturdays, sundays } = groupDepartures(
