@@ -37,46 +37,54 @@ function getNotes(routeSegment) {
 const timetableQuery = gql`
     query timetableQuery($stopId: String!, $date: Date!) {
         stop: stopByStopId(stopId: $stopId) {
-
-            routeSegments: routeSegmentsForDate(date: $date) {
+            siblings {
                 nodes {
-                    routeId
-                    direction
-                    hasRegularDayDepartures
-                    pickupDropoffType
-                    notes {
+                    routeSegments: routeSegmentsForDate(date: $date) {
                         nodes {
-                            noteText
-                            noteType
+                            routeId
+                            direction
+                            hasRegularDayDepartures
+                            pickupDropoffType
+                            notes {
+                                nodes {
+                                    noteText
+                                    noteType
+                                }
+                            }
                         }
                     }
-                }
-            }
 
-            departures: departuresGropuped (date: $date) {
-                nodes {
-                    hours
-                    minutes
-                    note
-                    routeId
-                    direction
-                    dayType
-                    isNextDay
-                    isAccessible
+                    departures: departuresGropuped (date: $date) {
+                        nodes {
+                            hours
+                            minutes
+                            note
+                            routeId
+                            direction
+                            dayType
+                            isNextDay
+                            isAccessible
+                        }
+                    }
                 }
             }
         }
     }
 `;
 
+const flatMap = (array, map) => array.reduce((a, b) => a.concat(map(b)), []);
+
 const propsMapper = mapProps((props) => {
     const { weekdays, saturdays, sundays } = groupDepartures(
-        filterDepartures(
-            props.data.stop.departures.nodes,
-            props.data.stop.routeSegments.nodes
-        )
+        flatMap(props.data.stop.siblings.nodes, stop => filterDepartures(
+            stop.departures.nodes,
+            stop.routeSegments.nodes
+        ))
     );
-    const notes = new Set(...props.data.stop.routeSegments.nodes.map(getNotes));
+    const notes = new Set(...flatMap(
+      props.data.stop.siblings.nodes,
+      stop => stop.routeSegments.nodes.map(getNotes)
+    ));
     return { weekdays, saturdays, sundays, notes };
 });
 
