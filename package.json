@@ -9,7 +9,8 @@
     "build": "npm run clean && npm run bundle",
     "start": "cross-env NODE_ENV=production node server.js",
     "start:hot": "cross-env NODE_ENV=development node server.js",
-    "generate": "node --harmony-async-await scripts/generateStopPosters.js"
+    "serve": "cross-env NODE_ENV=production node --harmony-async-await scripts/server.js",
+    "serve:hot": "cross-env NODE_ENV=development nodemon --harmony-async-await scripts/server.js"
   },
   "repository": {
     "type": "git",
@@ -56,9 +57,16 @@
   "dependencies": {
     "classnames": "^2.2.5",
     "csv": "^1.1.1",
+    "koa": "^2.2.0",
+    "koa-json-body": "^5.3.0",
+    "koa-router": "7.0.1",
+    "koa-serve-list": "^1.0.1",
+    "koa-static": "^3.0.0",
     "lodash": "^4.17.4",
+    "moment": "^2.18.1",
     "node-fetch": "^1.6.3",
     "node-phantom-promise": "^1.0.3",
+    "nodemon": "^1.11.0",
     "query-string": "^4.3.2",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
