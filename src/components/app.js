@@ -10,8 +10,8 @@ const components = {
 class App extends Component {
 
     static stateFromQueryString() {
-        const { component, options } = queryString.parse(location.hash);
-        return (component && options) ? { component, options: JSON.parse(options) } : {};
+        const { component, props } = queryString.parse(location.hash);
+        return (component && props) ? { component, props: JSON.parse(props) } : {};
     }
 
     constructor() {
@@ -32,12 +32,12 @@ class App extends Component {
      * @param {String} component - Name of component to display
      * @param {Object} options - Options passed to component
      */
-    setVisibleComponent(component, options) {
-        this.setState({ component, options });
+    setVisibleComponent(component, props) {
+        this.setState({ component, props });
     }
 
     render() {
-        if (!this.state.component || !this.state.options) return null;
+        if (!this.state.component || !this.state.props) return null;
 
         const ComponentToRender = components[this.state.component];
         if (!ComponentToRender) return null;
@@ -56,7 +56,7 @@ class App extends Component {
 
         return (
             <div style={{ display: "inline-block" }} ref={(ref) => { this.root = ref; }}>
-                <ComponentToRender {...this.state.options} onReady={onReady}/>
+                <ComponentToRender {...this.state.props} onReady={onReady}/>
             </div>
         );
     }
