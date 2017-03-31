@@ -20,11 +20,15 @@ class StopPoster extends Component {
     componentDidMount() {
         if (this.props.stopId) {
             this.fetchState(this.props.stopId);
+        } else {
+            this.props.onReady(new Error("Invalid props"));
         }
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.stopId && this.props.stopId !== prevProps.stopId) {
+        if (!this.props.stopId) {
+            this.props.onReady(new Error("Invalid props"));
+        } else if (this.props.stopId !== prevProps.stopId) {
             this.fetchState(this.props.stopId);
         }
     }

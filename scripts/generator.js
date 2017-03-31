@@ -27,7 +27,7 @@ function logInfo(message) {
 }
 
 function logError(error) {
-    const content = `ERROR: ${error instanceof Error ? error.message : error}\n`;
+    const content = `ERROR: ${error instanceof Error ? error.message : error}`;
     console.error(content); // eslint-disable-line no-console
     if (stream) stream.write(`${content}\n`);
 }
@@ -55,6 +55,10 @@ function render(options) {
         // Set callback called by client app when component is ready
         page.onCallback = (options) => {
             page.onCallback = null;
+            if (options.error) {
+                reject(options.error);
+                return;
+            }
             return setPaperSize(page, options.width, options.height)
                 .then(() => page.render(path.join(directory, filename)))
                 .then(() => resolve())
