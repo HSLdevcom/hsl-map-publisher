@@ -61,7 +61,13 @@ function render(options) {
             }
             return setPaperSize(page, options.width, options.height)
                 .then(() => page.render(path.join(directory, filename)))
-                .then(() => resolve())
+                .then((success) => {
+                   if (!success) {
+                      reject(new Error("Failed to render page"));
+                      return;
+		   }
+                   resolve();
+                })
                 .catch(error => reject(error));
         };
         page.evaluate((component, props) => {
