@@ -12,7 +12,7 @@ const StopTable = props => (
             </TableRow>
         </TableHeader>
 
-        <TableBody displayRowCheckbox deselectOnClickaway showRowHover>
+        <TableBody displayRowCheckbox showRowHover deselectOnClickaway={false}>
             {props.rows.map((row, i) => (
                 <TableRow key={i} selected={row.isSelected}>
                     {row.values.map((value, j) => (
