@@ -7,10 +7,12 @@
     "clean": "rimraf dist",
     "bundle": "cross-env NODE_ENV=production webpack --config webpack.config.js",
     "build": "npm run clean && npm run bundle",
-    "start": "cross-env NODE_ENV=production node server.js",
-    "start:hot": "cross-env NODE_ENV=development node server.js",
-    "serve": "cross-env NODE_ENV=production node --harmony-async-await scripts/server.js",
-    "serve:hot": "cross-env NODE_ENV=development nodemon --harmony-async-await scripts/server.js"
+    "ui": "cross-env NODE_ENV=production node server.ui",
+    "ui:hot": "cross-env NODE_ENV=development node server.ui",
+    "start": "cross-env NODE_ENV=production node server.src",
+    "start:hot": "cross-env NODE_ENV=development node server.src",
+    "serve": "cross-env NODE_ENV=production node --harmony-async-await scripts/server",
+    "serve:hot": "cross-env NODE_ENV=development nodemon --harmony-async-await scripts/server"
   },
   "repository": {
     "type": "git",
