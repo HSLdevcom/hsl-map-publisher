@@ -1,0 +1,22 @@
+
+.root {
+    margin: 10px 30px;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 800px;
+}
+
+.column {
+    flex: 30%;
+
+}
+
+.radio {
+    margin-bottom: 15px;
+}
