@@ -10,6 +10,7 @@ const serveStatic = require("koa-static");
 const moment = require("moment");
 const fetch = require("node-fetch");
 const pick = require("lodash/pick");
+const iconv = require("iconv-lite");
 const csv = require("csv");
 
 const generator = require("./generator");
@@ -21,13 +22,15 @@ const OUTPUT_PATH = path.join(__dirname, "..", "output");
 // FIXME: Fetch stops from graphql when data available
 function fetchStopsWithShelter() {
     return new Promise((resolve, reject) => {
-        fs.createReadStream(`${__dirname}/jr_map_pysakit_varustus.txt`).pipe(
-            csv.parse({ delimiter: "#", columns: true }, (err, data) => {
+        fs.createReadStream(`${__dirname}/jr_map_pysakit_varustus.txt`)
+            .pipe(iconv.decodeStream("ISO-8859-1"))
+            .pipe(csv.parse({ delimiter: "#", columns: true }, (err, data) => {
                 if (err) reject(err);
                 const stops = data
                     .filter(stop => stop.pysakkityyppi.includes("katos"))
                     .map(stop => ({
-                        stopId: stop.lyhyt_nro,
+                        stopId: stop.tunnus,
+                        shortId: stop.lyhyt_nro,
                         type: `${stop.aikataulutyyppi_hsl}${stop.aikataulutyyppi_hkl}`,
                         index: stop.ajojarjestys
                     }));
