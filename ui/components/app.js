@@ -1,21 +1,22 @@
-import React, { Component, PropTypes } from "react";
+import React, { Component } from "react";
 
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import getMuiTheme from "material-ui/styles/getMuiTheme";
 
-import AppBar from "material-ui/AppBar";
 import DatePicker from "material-ui/DatePicker";
-import { RadioButton, RadioButtonGroup } from "material-ui/RadioButton";
 import RaisedButton from "material-ui/RaisedButton";
-import Divider from 'material-ui/Divider';
+import Divider from "material-ui/Divider";
+
+import RadioGroup from "components/radioGroup";
+import StopTable from "components/stopTable";
 
 import styles from "./app.css";
 
 const muiTheme = getMuiTheme({});
 
 const labelsByComponent = {
-    "StopPoster": "Pysäkkijuliste",
-    "Timetable": "Aikataulu",
+    StopPoster: "Pysäkkijuliste",
+    Timetable: "Aikataulu",
 };
 
 const tableTypes = {
@@ -23,21 +24,22 @@ const tableTypes = {
     groups: "Listat",
 };
 
-const RadioGroup = (props) => (
-    <RadioButtonGroup name="component" defaultSelected={Object.keys(props.items)[0]}>
-        {Object.keys(props.items).map(key => (
-            <RadioButton
-                key={key}
-                value={key}
-                label={props.items[key]}
-                className={styles.radio}
-            />
-        ))}
-    </RadioButtonGroup>
-);
-
-RadioGroup.propTypes = {
-    items: React.PropTypes.objectOf(React.PropTypes.string)
+const tableProps = {
+    columns: ["Tunnus", "Nimi"],
+    rows: [
+        {
+            isSelected: false,
+            values: ["124567", "Hello"],
+        },
+        {
+            isSelected: false,
+            values: ["124567", "Hello"],
+        },
+        {
+            isSelected: false,
+            values: ["124567", "Hello"],
+        },
+    ],
 };
 
 class App extends Component {
@@ -66,6 +68,8 @@ class App extends Component {
                             <DatePicker defaultDate={new Date()}/>
                         </div>
                     </div>
+
+                    <StopTable {...tableProps}/>
 
                     <Divider/>
                     <br/>
