@@ -8,10 +8,10 @@ function getDevtool() {
     return (process.env.NODE_ENV === "development") ? "eval" : "cheap-module-source-map";
 }
 
-function getEntry(entry) {
+function getEntry(entry, port) {
     if (process.env.NODE_ENV === "development") {
         return [
-            "webpack-dev-server/client?http://localhost:3000",
+            `webpack-dev-server/client?http://localhost:${port}`,
             "webpack/hot/only-dev-server",
             "react-hot-loader/patch",
             "babel-polyfill",
@@ -42,11 +42,11 @@ function getPlugins() {
 }
 
 module.exports = (options) => {
-    const { directory, entry } = options;
+    const { directory, entry, port } = options;
 
     return {
         devtool: getDevtool(),
-        entry: getEntry(entry),
+        entry: getEntry(entry, port),
         plugins: getPlugins(),
         resolve: {
             modulesDirectories: ["node_modules", directory],
