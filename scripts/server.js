@@ -32,7 +32,8 @@ function fetchStopsWithShelter() {
                     .map(stop => ({
                         stopId: stop.tunnus,
                         shortId: stop.lyhyt_nro,
-                        type: `${stop.aikataulutyyppi_hsl}${stop.aikataulutyyppi_hkl}`,
+                        nameFi: stop.nimi_suomi,
+                        group: `${stop.aikataulutyyppi_hsl}${stop.aikataulutyyppi_hkl}`,
                         index: stop.ajojarjestys,
                     }));
                 resolve(stops);
