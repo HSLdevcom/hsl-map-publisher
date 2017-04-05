@@ -1,11 +1,10 @@
 import React, { Component } from "react";
 
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
-import getMuiTheme from "material-ui/styles/getMuiTheme";
+import muiTheme from "styles/theme";
 
 import DatePicker from "material-ui/DatePicker";
 import RaisedButton from "material-ui/RaisedButton";
-import Divider from "material-ui/Divider";
 
 import RadioGroup from "components/radioGroup";
 import StopTable from "components/stopTable";
@@ -13,8 +12,6 @@ import StopTable from "components/stopTable";
 import { fetchStops } from "util/stops";
 
 import styles from "./app.css";
-
-const muiTheme = getMuiTheme({});
 
 const labelsByComponent = {
     StopPoster: "Pysäkkijuliste",
@@ -68,11 +65,13 @@ class App extends Component {
                         </div>
                     </div>
 
-                    <StopTable {...this.state.data}/>
+                    <div className={styles.main}>
+                        <StopTable {...this.state.data}/>
+                    </div>
 
-                    <Divider/>
-                    <br/>
-                    <RaisedButton primary label="Generoi"/>
+                    <div className={styles.footer}>
+                        <RaisedButton primary style={{ height: 45 }} label="Generoi"/>
+                    </div>
                 </div>
             </MuiThemeProvider>
         );
