@@ -1,4 +1,4 @@
-@value white, gray, fontFamily, fontFamilyNarrow, borderRadius from "styles/common.css";
+@value white, gray, fontFamily, fontFamilyNarrow, borderRadius, hslBlue from "styles/common.css";
 
 .root {
     color: gray;
@@ -13,7 +13,7 @@
     padding: 10px 20px;
     font-size: 70px;
     font-weight: 700;
-    text-align: right;
+    color: hslBlue;
 }
 
 .title {
