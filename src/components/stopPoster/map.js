@@ -6,7 +6,7 @@ import { Row } from "components/util";
 import { getSymbol } from "util/stops";
 import CustomTypes from "util/customTypes";
 
-import locationIcon from "icons/location.svg";
+import locationIcon from "icons/marker.svg";
 
 import styles from "./map.css";
 
@@ -15,9 +15,9 @@ const MAX_LABEL_ROWS = 6;
 const MAX_LABEL_CHARS = 36;
 
 // Map symbol size
-const STOP_RADIUS = 17;
-const LOCATION_RADIUS = 27;
-const LOCATION_RADIUS_MINI = 18;
+const STOP_RADIUS = 15;
+const LOCATION_RADIUS = 22;
+const LOCATION_RADIUS_MINI = 5;
 
 // Mini map position
 const MINI_MAP_MARGIN_RIGHT = 60;
@@ -50,7 +50,7 @@ Scalebar.propTypes = {
 
 const LocationSymbol = props => (
     <div style={{ width: props.size, height: props.size }}>
-        <img src={locationIcon} role="presentation"/>
+        <img src={locationIcon} role="presentation" style={{ width: "100%" }}/>
     </div>
 );
 
