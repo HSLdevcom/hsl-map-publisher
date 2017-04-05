@@ -13,13 +13,14 @@ Row.propTypes = {
 };
 
 const JustifiedRow = props => (
-    <div className={styles.justifiedRow}>
+    <div className={styles.justifiedRow} style={props.style}>
         {props.children}
     </div>
 );
 
 JustifiedRow.propTypes = {
     children: React.PropTypes.node.isRequired,
+    style: React.PropTypes.object,
 };
 
 const WrappingRow = props => (
