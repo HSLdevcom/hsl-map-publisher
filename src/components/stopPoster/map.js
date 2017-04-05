@@ -66,7 +66,7 @@ const StopSymbol = props => (
 
 StopSymbol.propTypes = {
     size: PropTypes.number.isRequired,
-    stopId: PropTypes.string.isRequired,
+    stopIds: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
 };
 
 const RouteList = (props) => {
