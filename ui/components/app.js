@@ -5,7 +5,6 @@ import muiTheme from "styles/theme";
 
 import DatePicker from "material-ui/DatePicker";
 import RaisedButton from "material-ui/RaisedButton";
-
 import RadioGroup from "components/radioGroup";
 import StopList from "components/stopList";
 
@@ -26,23 +25,60 @@ const tableTypes = {
 class App extends Component {
     constructor() {
         super();
-        this.state = {};
+        this.state = {
+            rows: [],
+            selectedDate: new Date(),
+        };
     }
 
     componentDidMount() {
         fetchStops().then((stops) => {
             const rows = stops.map(({ shortId, nameFi, stopId }) => ({
-                isSelected: false,
+                isChecked: false,
                 title: `${shortId} ${nameFi}`,
                 subtitle: `(${stopId})`,
-                ids: [stopId],
+                stopIds: [stopId],
             }));
             this.setState({ rows });
         });
     }
 
+
+    onDateChange(date) {
+        this.setState({ selectedDate: date });
+    }
+
+    onCheck(rowIndex, isChecked) {
+        const rows = this.state.rows.map(
+            (row, index) => ((rowIndex === index) ? { ...row, isChecked } : row)
+        );
+        this.setState({ rows });
+    }
+
+    onGenerate() {
+        const props = this.state.rows
+            .filter(({ isChecked }) => isChecked)
+            .reduce((prev, { stopIds }) => [...prev, ...stopIds], [])
+            .map(stopId => ({ stopId, date: this.state.selectedDate }));
+        const body = { component: "StopPoster", props };
+
+        fetch("http://localhost:4000", { method: "POST", body: JSON.stringify(body) })
+            .then(response => response.json())
+            .then((response) => {
+                this.resetRows();
+                window.open(response.url);
+            })
+            .catch((error) => {
+                console.log(error); // eslint-disable-line no-console
+            });
+    }
+
+    resetRows() {
+        this.setState({ rows: this.state.rows.map(row => ({ ...row, isChecked: false })) });
+    }
+
     render() {
-        if (!this.state.rows) return null;
+        const checkedRowCount = this.state.rows.filter(({ isChecked }) => isChecked).length;
 
         return (
             <MuiThemeProvider muiTheme={muiTheme}>
@@ -60,16 +96,29 @@ class App extends Component {
 
                         <div className={styles.column}>
                             <h3>Päivämäärä</h3>
-                            <DatePicker defaultDate={new Date()} container="inline"/>
+                            <DatePicker
+                                value={this.state.selectedDate}
+                                onChange={(event, date) => this.onDateChange(date)}
+                                container="inline"
+                            />
                         </div>
                     </div>
 
                     <div className={styles.main}>
-                        <StopList rows={this.state.rows}/>
+                        <StopList
+                            rows={this.state.rows}
+                            onCheck={(index, isChecked) => this.onCheck(index, isChecked)}
+                        />
                     </div>
 
                     <div className={styles.footer}>
-                        <RaisedButton primary style={{ height: 45 }} label="Generoi"/>
+                        <RaisedButton
+                            disabled={!checkedRowCount}
+                            onTouchTap={() => this.onGenerate()}
+                            label={`Generoi (${checkedRowCount})`}
+                            style={{ height: 45 }}
+                            primary
+                        />
                     </div>
                 </div>
             </MuiThemeProvider>

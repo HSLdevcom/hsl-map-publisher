@@ -17,19 +17,23 @@ PrimaryText.propTypes = {
     subtitle: PropTypes.string.isRequired,
 };
 
-function rowRenderer(rows) {
-    return ({ key, index, style }) => ( // eslint-disable-line react/prop-types
-        <div key={key} style={style}>
-            <ListItem
-                primaryText={<PrimaryText {...rows[index]}/>}
-                leftCheckbox={<Checkbox/>}
-            />
-        </div>
-    );
+function rowRenderer(rows, onCheck) {
+    return ({ key, index, style }) => { // eslint-disable-line react/prop-types
+        const { isChecked, title, subtitle } = rows[index];
+        const callback = (event, value) => onCheck(index, value);
+        return (
+            <div key={key} style={style}>
+                <ListItem
+                    leftCheckbox={<Checkbox checked={isChecked} onCheck={callback}/>}
+                    primaryText={<PrimaryText title={title} subtitle={subtitle}/>}
+                />
+            </div>
+        );
+    };
 }
 
 const StopList = (props) => {
-    const renderer = rowRenderer(props.rows);
+    const renderer = rowRenderer(props.rows, props.onCheck);
 
     return (
         <AutoSizer>
@@ -49,11 +53,11 @@ const StopList = (props) => {
 
 StopList.propTypes = {
     rows: PropTypes.arrayOf(PropTypes.shape({
-        isSelected: PropTypes.bool.isRequired,
+        isChecked: PropTypes.bool.isRequired,
         title: PropTypes.string.isRequired,
         subtitle: PropTypes.string.isRequired,
-        ids: PropTypes.arrayOf(PropTypes.string).isRequired,
     })).isRequired,
+    onCheck: PropTypes.func.isRequired,
 };
 
 export default StopList;
