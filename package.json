@@ -78,6 +78,7 @@
     "react-dom": "^15.4.2",
     "react-hot-loader": "^3.0.0-beta.6",
     "react-tap-event-plugin": "^2.0.1",
+    "react-virtualized": "^9.5.0",
     "segseg": "^0.2.2",
     "viewport-mercator-project": "^3.0.0-rc2"
   }

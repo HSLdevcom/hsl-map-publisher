@@ -7,7 +7,7 @@ import DatePicker from "material-ui/DatePicker";
 import RaisedButton from "material-ui/RaisedButton";
 
 import RadioGroup from "components/radioGroup";
-import StopTable from "components/stopTable";
+import StopList from "components/stopList";
 
 import { fetchStops } from "util/stops";
 
@@ -31,19 +31,18 @@ class App extends Component {
 
     componentDidMount() {
         fetchStops().then((stops) => {
-            const data = {
-                columns: ["Lyhyttunnus", "Pysäkkitunnus"],
-                rows: stops.map(({ shortId, stopId }) => ({
-                    isSelected: false,
-                    values: [shortId, stopId],
-                })),
-            };
-            this.setState({ data });
+            const rows = stops.map(({ shortId, nameFi, stopId }) => ({
+                isSelected: false,
+                title: `${shortId} ${nameFi}`,
+                subtitle: `(${stopId})`,
+                ids: [stopId],
+            }));
+            this.setState({ rows });
         });
     }
 
     render() {
-        if (!this.state.data) return null;
+        if (!this.state.rows) return null;
 
         return (
             <MuiThemeProvider muiTheme={muiTheme}>
@@ -61,12 +60,12 @@ class App extends Component {
 
                         <div className={styles.column}>
                             <h3>Päivämäärä</h3>
-                            <DatePicker defaultDate={new Date()}/>
+                            <DatePicker defaultDate={new Date()} container="inline"/>
                         </div>
                     </div>
 
                     <div className={styles.main}>
-                        <StopTable {...this.state.data}/>
+                        <StopList rows={this.state.rows}/>
                     </div>
 
                     <div className={styles.footer}>

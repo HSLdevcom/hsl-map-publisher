@@ -25,7 +25,6 @@
 .main {
     height: calc(100vh - 300px);
     min-height: 300px;
-    overflow: auto;
 }
 
 .footer {
