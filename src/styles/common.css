@@ -8,6 +8,6 @@
 @value gray: hsl(220, 2%, 35%);
 
 @value background: hsl(200, 100%, 40%);
-@value backgroundLight: hsl(202, 83%, 86%);
+@value backgroundLight: rgb(213, 232, 250);
 
 @value hslBlue: rgb(0, 122, 201);
