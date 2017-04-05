@@ -10,6 +10,8 @@ import Divider from "material-ui/Divider";
 import RadioGroup from "components/radioGroup";
 import StopTable from "components/stopTable";
 
+import { fetchStops } from "util/stops";
+
 import styles from "./app.css";
 
 const muiTheme = getMuiTheme({});
@@ -24,31 +26,28 @@ const tableTypes = {
     groups: "Listat",
 };
 
-const tableProps = {
-    columns: ["Tunnus", "Nimi"],
-    rows: [
-        {
-            isSelected: false,
-            values: ["124567", "Hello"],
-        },
-        {
-            isSelected: false,
-            values: ["124567", "Hello"],
-        },
-        {
-            isSelected: false,
-            values: ["124567", "Hello"],
-        },
-    ],
-};
-
 class App extends Component {
     constructor() {
         super();
         this.state = {};
     }
 
+    componentDidMount() {
+        fetchStops().then((stops) => {
+            const data = {
+                columns: ["Lyhyttunnus", "Pysäkkitunnus"],
+                rows: stops.map(({ shortId, stopId }) => ({
+                    isSelected: false,
+                    values: [shortId, stopId],
+                })),
+            };
+            this.setState({ data });
+        });
+    }
+
     render() {
+        if (!this.state.data) return null;
+
         return (
             <MuiThemeProvider muiTheme={muiTheme}>
                 <div className={styles.root}>
@@ -69,7 +68,7 @@ class App extends Component {
                         </div>
                     </div>
 
-                    <StopTable {...tableProps}/>
+                    <StopTable {...this.state.data}/>
 
                     <Divider/>
                     <br/>
