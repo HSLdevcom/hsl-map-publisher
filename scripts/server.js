@@ -9,7 +9,6 @@ const serveList = require("koa-serve-list");
 const serveStatic = require("koa-static");
 
 const moment = require("moment");
-const fetch = require("node-fetch");
 const urljoin = require("url-join");
 const pick = require("lodash/pick");
 const iconv = require("iconv-lite");
