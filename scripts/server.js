@@ -3,6 +3,7 @@ const path = require("path");
 
 const Koa = require("koa");
 const Router = require("koa-router");
+const cors = require("koa-cors");
 const body = require("koa-json-body");
 const serveList = require("koa-serve-list");
 const serveStatic = require("koa-static");
@@ -32,7 +33,7 @@ function fetchStopsWithShelter() {
                         stopId: stop.tunnus,
                         shortId: stop.lyhyt_nro,
                         type: `${stop.aikataulutyyppi_hsl}${stop.aikataulutyyppi_hkl}`,
-                        index: stop.ajojarjestys
+                        index: stop.ajojarjestys,
                     }));
                 resolve(stops);
             })
@@ -102,6 +103,7 @@ async function main() {
     });
 
     app
+        .use(cors())
         .use(body({ fallback: true }))
         .use(router.routes())
         .use(router.allowedMethods())
