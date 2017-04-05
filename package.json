@@ -80,6 +80,7 @@
     "react-tap-event-plugin": "^2.0.1",
     "react-virtualized": "^9.5.0",
     "segseg": "^0.2.2",
+    "url-join": "^1.1.0",
     "viewport-mercator-project": "^3.0.0-rc2"
   }
 }

@@ -10,6 +10,7 @@ const serveStatic = require("koa-static");
 
 const moment = require("moment");
 const fetch = require("node-fetch");
+const urljoin = require("url-join");
 const pick = require("lodash/pick");
 const iconv = require("iconv-lite");
 const csv = require("csv");
@@ -96,8 +97,9 @@ async function main() {
         }
 
         try {
-            const path = generateFiles(component, props);
-            successResponse(ctx, { path });
+            const identifier = generateFiles(component, props);
+            const url = urljoin("http://", ctx.request.host, ctx.request.url, identifier, "/");
+            successResponse(ctx, { url });
         } catch (error) {
             errorResponse(ctx, error);
         }
