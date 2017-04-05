@@ -32,6 +32,7 @@ const nearbyStopsQuery = gql`
                                 route {
                                     nodes {
                                         destinationFi
+                                        destinationSe
                                     }
                                 }
                             }
@@ -55,6 +56,7 @@ const stopsMapper = stop => ({
             .map(routeSegment => ({
                 routeId: trimRouteId(routeSegment.routeId),
                 destinationFi: routeSegment.route.nodes[0].destinationFi,
+                destinationSe: routeSegment.route.nodes[0].destinationSe,
             }))
         ).sort(routeCompare),
 });

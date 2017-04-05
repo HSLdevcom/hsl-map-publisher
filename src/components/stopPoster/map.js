@@ -84,7 +84,11 @@ const RouteList = (props) => {
         <div>
             {props.routes.map((route, index) => (
                 <Row key={index}>
-                    {route.routeId} &rarr; {route.destinationFi}
+                    <span style={{ width: "2em" }}>{route.routeId}</span>
+                    {"\xa0"}
+                    {route.destinationFi}
+                    {"\xa0"}
+                    <span style={{ fontWeight: 300 }}>{route.destinationSe}</span>
                 </Row>
             ))}
         </div>
