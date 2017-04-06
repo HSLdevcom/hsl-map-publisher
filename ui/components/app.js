@@ -8,18 +8,29 @@ import RaisedButton from "material-ui/RaisedButton";
 import RadioGroup from "components/radioGroup";
 import StopList from "components/stopList";
 
-import { fetchStops } from "util/stops";
+import { fetchStops, generate } from "util/api";
+import { stopsToRows, stopsToGroupRows } from "util/stops";
 
 import styles from "./app.css";
 
-const labelsByComponent = {
-    StopPoster: "Pysäkkijuliste",
-    Timetable: "Aikataulu",
+const componentsByType = {
+    Pysäkkijuliste: {
+        name: "StopPoster",
+        filter: stop => stop.hasShelter,
+    },
+    Aikataulu: {
+        name: "Timetable",
+        filter: stop => !stop.hasShelter,
+    },
 };
 
-const tableTypes = {
-    stops: "Pysäkit",
-    groups: "Listat",
+const rowFactoriesByType = {
+    Pysäkit: {
+        factory: stops => stopsToRows(stops),
+    },
+    Ajolistat: {
+        factory: stops => stopsToGroupRows(stops),
+    },
 };
 
 class App extends Component {
@@ -27,58 +38,72 @@ class App extends Component {
         super();
         this.state = {
             rows: [],
+            stops: [],
+            componentsByType,
+            selectedComponent: Object.values(componentsByType)[0],
+            rowFactoriesByType,
+            selectedRowFactory: Object.values(rowFactoriesByType)[0],
             selectedDate: new Date(),
         };
     }
 
     componentDidMount() {
-        fetchStops().then((stops) => {
-            const rows = stops.map(({ shortId, nameFi, stopId }) => ({
-                isChecked: false,
-                title: `${shortId} ${nameFi}`,
-                subtitle: `(${stopId})`,
-                stopIds: [stopId],
-            }));
-            this.setState({ rows });
-        });
+        fetchStops()
+            .then((stops) => {
+                this.setState({ stops }, () => this.resetRows());
+            }).catch((error) => {
+                console.error(error); // eslint-disable-line no-console
+            });
     }
 
+    onGenerate() {
+        const component = this.state.selectedComponent.name;
+        const props = this.state.rows
+            .filter(({ isChecked }) => isChecked)
+            .reduce((prev, { stopIds }) => [...prev, ...stopIds], [])
+            .map(stopId => ({ stopId, date: this.state.selectedDate }));
+
+        generate(component, props)
+            .then((url) => {
+                this.resetRows();
+                window.open(url);
+            })
+            .catch((error) => {
+                console.error(error); // eslint-disable-line no-console
+            });
+    }
 
     onDateChange(date) {
         this.setState({ selectedDate: date });
     }
 
-    onCheck(rowIndex, isChecked) {
+    onRowFactoryChange(value) {
+        this.setState({ selectedRowFactory: value }, () => this.resetRows());
+    }
+
+    onComponentChange(value) {
+        this.setState({ selectedComponent: value }, () => this.resetRows());
+    }
+
+    onRowChecked(rowIndex, isChecked) {
         const rows = this.state.rows.map(
             (row, index) => ((rowIndex === index) ? { ...row, isChecked } : row)
         );
         this.setState({ rows });
     }
 
-    onGenerate() {
-        const props = this.state.rows
-            .filter(({ isChecked }) => isChecked)
-            .reduce((prev, { stopIds }) => [...prev, ...stopIds], [])
-            .map(stopId => ({ stopId, date: this.state.selectedDate }));
-        const body = { component: "StopPoster", props };
-
-        fetch("http://localhost:4000", { method: "POST", body: JSON.stringify(body) })
-            .then(response => response.json())
-            .then((response) => {
-                this.resetRows();
-                window.open(response.url);
-            })
-            .catch((error) => {
-                console.log(error); // eslint-disable-line no-console
-            });
-    }
-
     resetRows() {
-        this.setState({ rows: this.state.rows.map(row => ({ ...row, isChecked: false })) });
+        const component = this.state.selectedComponent;
+        const stops = this.state.stops.filter(component.filter);
+        const rows = this.state.selectedRowFactory.factory(stops);
+        this.setState({ rows });
     }
 
     render() {
-        const checkedRowCount = this.state.rows.filter(({ isChecked }) => isChecked).length;
+        const stopCount = this.state.rows
+            .filter(({ isChecked }) => isChecked)
+            .map(({ stopIds }) => stopIds.length)
+            .reduce((prev, cur) => prev + cur, 0);
 
         return (
             <MuiThemeProvider muiTheme={muiTheme}>
@@ -86,12 +111,20 @@ class App extends Component {
                     <div className={styles.row}>
                         <div className={styles.column}>
                             <h3>Tuloste</h3>
-                            <RadioGroup items={labelsByComponent}/>
+                            <RadioGroup
+                                valuesByLabel={this.state.componentsByType}
+                                valueSelected={this.state.selectedComponent}
+                                onChange={value => this.onComponentChange(value)}
+                            />
                         </div>
 
                         <div className={styles.column}>
-                            <h3>Tyyppi</h3>
-                            <RadioGroup items={tableTypes}/>
+                            <h3>Näytä</h3>
+                            <RadioGroup
+                                valuesByLabel={this.state.rowFactoriesByType}
+                                valueSelected={this.state.selectedRowFactory}
+                                onChange={value => this.onRowFactoryChange(value)}
+                            />
                         </div>
 
                         <div className={styles.column}>
@@ -107,15 +140,15 @@ class App extends Component {
                     <div className={styles.main}>
                         <StopList
                             rows={this.state.rows}
-                            onCheck={(index, isChecked) => this.onCheck(index, isChecked)}
+                            onCheck={(index, isChecked) => this.onRowChecked(index, isChecked)}
                         />
                     </div>
 
                     <div className={styles.footer}>
                         <RaisedButton
-                            disabled={!checkedRowCount}
+                            disabled={!stopCount}
                             onTouchTap={() => this.onGenerate()}
-                            label={`Generoi (${checkedRowCount})`}
+                            label={`Generoi (${stopCount})`}
                             style={{ height: 45 }}
                             primary
                         />

@@ -4,12 +4,16 @@ import { RadioButton, RadioButtonGroup } from "material-ui/RadioButton";
 import styles from "./radioGroup.css";
 
 const RadioGroup = props => (
-    <RadioButtonGroup name="component" defaultSelected={Object.keys(props.items)[0]}>
-        {Object.keys(props.items).map(key => (
+    <RadioButtonGroup
+        name="component"
+        valueSelected={props.valueSelected}
+        onChange={(event, value) => props.onChange(value)}
+    >
+        {Object.keys(props.valuesByLabel).map(label => (
             <RadioButton
-                key={key}
-                value={key}
-                label={props.items[key]}
+                key={label}
+                label={label}
+                value={props.valuesByLabel[label]}
                 className={styles.radio}
             />
         ))}
@@ -17,7 +21,9 @@ const RadioGroup = props => (
 );
 
 RadioGroup.propTypes = {
-    items: PropTypes.objectOf(React.PropTypes.string).isRequired,
+    valuesByLabel: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+    valueSelected: PropTypes.any.isRequired, // eslint-disable-line react/forbid-prop-types
+    onChange: PropTypes.func.isRequired,
 };
 
 export default RadioGroup;

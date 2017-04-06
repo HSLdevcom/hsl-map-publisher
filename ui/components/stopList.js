@@ -42,7 +42,7 @@ const StopList = (props) => {
                     width={width}
                     height={height}
                     rowCount={props.rows.length}
-                    rowHeight={30}
+                    rowHeight={35}
                     rowRenderer={renderer}
                     tabIndex="none"
                 />
