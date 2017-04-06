@@ -76,7 +76,7 @@ const RouteList = (props) => {
             const content = `${routeId}${(index < routes.length - 1) ? ", " : ""}`;
             const isNewLine = rowLength + content.length > MAX_LABEL_CHARS;
             rowLength = isNewLine ? content.length : rowLength + content.length;
-            return <span key={index}>{isNewLine && <br/>}{content}</span>;
+            return <span className={styles.route} key={index}>{isNewLine && <br/>}{content}</span>;
         });
         return <div>{components}</div>;
     }
@@ -84,7 +84,7 @@ const RouteList = (props) => {
         <div>
             {props.routes.map((route, index) => (
                 <Row key={index}>
-                    <span style={{ width: "2em" }}>{route.routeId}</span>
+                    <span className={styles.route} style={{ width: "2em" }}>{route.routeId}</span>
                     {"\xa0"}
                     {route.destinationFi}
                     {"\xa0"}
