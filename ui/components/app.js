@@ -3,9 +3,12 @@ import React, { Component } from "react";
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import muiTheme from "styles/theme";
 
-import DatePicker from "material-ui/DatePicker";
+import Dialog from "material-ui/Dialog";
 import RaisedButton from "material-ui/RaisedButton";
+import FlatButton from "material-ui/FlatButton";
+import DatePicker from "material-ui/DatePicker";
 import RadioGroup from "components/radioGroup";
+
 import StopList from "components/stopList";
 
 import { fetchStops, generate } from "util/api";
@@ -52,6 +55,7 @@ class App extends Component {
             .then((stops) => {
                 this.setState({ stops }, () => this.resetRows());
             }).catch((error) => {
+                this.setState({ message: `Pysäkkien hakeminen epäonnistui: ${error.message}` });
                 console.error(error); // eslint-disable-line no-console
             });
     }
@@ -69,8 +73,13 @@ class App extends Component {
                 window.open(url);
             })
             .catch((error) => {
+                this.setState({ message: `Generointi epäonnistui: ${error.message}` });
                 console.error(error); // eslint-disable-line no-console
             });
+    }
+
+    onDialogClose() {
+        this.setState({ message: null });
     }
 
     onDateChange(date) {
@@ -108,6 +117,20 @@ class App extends Component {
         return (
             <MuiThemeProvider muiTheme={muiTheme}>
                 <div className={styles.root}>
+                    <Dialog
+                        open={!!this.state.message}
+                        onRequestClose={() => this.onDialogClose()}
+                        actions={[
+                            <FlatButton
+                                onTouchTap={() => this.onDialogClose()}
+                                label="OK"
+                                primary
+                            />,
+                        ]}
+                    >
+                        {this.state.message}
+                    </Dialog>
+
                     <div className={styles.row}>
                         <div className={styles.column}>
                             <h3>Tuloste</h3>
