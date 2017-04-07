@@ -32,18 +32,6 @@ function logError(error) {
     if (stream) stream.write(`${content}\n`);
 }
 
-function setPaperSize(pixelWidth, pixelHeight) {
-    const options = {
-        width: `${pixelWidth / CLIENT_PPI}in`,
-        height: `${pixelHeight / CLIENT_PPI}in`,
-    };
-    return new Promise((resolve) => {
-        page.set("paperSize", options, () => {
-            setTimeout(() => resolve(page), 100);
-        });
-    });
-}
-
 /**
  * Renders component to pdf or bitmap file
  * @returns {Promise}
@@ -53,22 +41,23 @@ function render(options) {
 
     return new Promise((resolve, reject) => {
         // Set callback called by client app when component is ready
-        page.onCallback = (options) => {
+        page.onCallback = ({ error, width, height }) => {
             page.onCallback = null;
-            if (options.error) {
-                reject(options.error);
+            if (error) {
+                reject(error);
                 return;
             }
-            return setPaperSize(page, options.width, options.height)
-                .then(() => page.render(path.join(directory, filename)))
+            page.render(path.join(directory, filename))
                 .then((success) => {
-                   if (!success) {
-                      reject(new Error("Failed to render page"));
-                      return;
-		   }
-                   resolve();
+                    if (!success) {
+                        reject(new Error("Failed to render page"));
+                        return;
+                    }
+                    resolve({ width, height });
                 })
-                .catch(error => reject(error));
+                .catch(error => {
+                    reject(error);
+                });
         };
         page.evaluate((component, props) => {
             window.setVisibleComponent(component, props);
@@ -95,8 +84,9 @@ function generate(options) {
         })
         .catch((error) => {
             logError(error);
-        }).then(() => {
+        }).then((dimensions) => {
             stream = null;
+            return dimensions;
         });
     return previous;
 }

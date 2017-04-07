@@ -13,6 +13,7 @@ const urljoin = require("url-join");
 const pick = require("lodash/pick");
 const iconv = require("iconv-lite");
 const csv = require("csv");
+const PDFDocument = require("pdfkit");
 
 const generator = require("./generator");
 
@@ -41,25 +42,51 @@ function fetchStopsWithShelter() {
     });
 }
 
+function generatePdf(directory, filenames, dimensions) {
+    const doc = new PDFDocument({ autoFirstPage: false });
+    doc.pipe(fs.createWriteStream(path.join(directory, "rgb.pdf")));
+
+    filenames.forEach((filename, index) => {
+        // Skip failed pages
+        if (!dimensions[index]) return;
+
+        doc.addPage({ size: [dimensions[index].width, dimensions[index].height] });
+        doc.image(path.join(directory, filename), 0, 0, { width: dimensions[index].width });
+    });
+    doc.end();
+}
+
 function generateFiles(component, props) {
     const identifier = moment().format("YYYY-MM-DD-HHmm-sSSSSS");
-    const basePath = path.join(OUTPUT_PATH, identifier);
+    const directory = path.join(OUTPUT_PATH, identifier);
 
-    fs.mkdirSync(basePath);
-    const stream = fs.createWriteStream(path.join(basePath, "build.log"));
+    fs.mkdirSync(directory);
+    const stream = fs.createWriteStream(path.join(directory, "build.log"));
 
-    let last;
+    const promises = [];
+    const filenames = [];
     for (let i = 0; i < props.length; i++) {
+        const filename = `${i + 1}.png`;
         const options = {
             stream,
+            filename,
+            directory,
             component,
             props: props[i],
-            directory: basePath,
-            filename: `${i + 1}.png`,
         };
-        last = generator.generate(options);
+        filenames.push(filename);
+        promises.push(generator.generate(options));
     }
-    last.then(() => stream.end("DONE"));
+
+    Promise.all(promises)
+        .then((dimensions) => {
+            generatePdf(directory, filenames, dimensions);
+            stream.end("DONE");
+        })
+        .catch((error) => {
+            console.error(error); // eslint-disable-line no-console
+            stream.end(`ERROR: ${error.message}`);
+        });
 
     return identifier;
 }
@@ -72,8 +99,8 @@ function successResponse(ctx, body) {
 function errorResponse(ctx, error) {
     ctx.status = 500;
     ctx.body = { error: error.message };
-    console.log(error);
-    console.log(error.stack);
+    console.error(error);
+    console.error(error.stack);
 }
 
 async function main() {
