@@ -26,6 +26,7 @@ function rowRenderer(rows, onCheck) {
                 <ListItem
                     leftCheckbox={<Checkbox checked={isChecked} onCheck={callback}/>}
                     primaryText={<PrimaryText title={title} subtitle={subtitle}/>}
+                    style={{ fontSize: 15 }}
                 />
             </div>
         );
