@@ -5,7 +5,6 @@ const slimerjs = /^win/.test(process.platform) ? "slimerjs.cmd" : "slimerjs";
 const slimerPath = path.join(__dirname, "..", "node_modules", ".bin", slimerjs);
 
 const CLIENT_PORT = 3000;
-const CLIENT_PPI = 96;
 
 let browser;
 let page;

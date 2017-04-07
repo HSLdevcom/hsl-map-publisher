@@ -21,6 +21,9 @@ const PORT = 4000;
 const API_URL = "http://kartat.hsl.fi";
 const OUTPUT_PATH = path.join(__dirname, "..", "output");
 
+const IMAGE_PPI = 300;
+const PDF_PPI = 72;
+
 // FIXME: Fetch stops from graphql when data available
 function fetchStopsWithShelter() {
     return new Promise((resolve, reject) => {
@@ -50,8 +53,12 @@ function generatePdf(directory, filenames, dimensions) {
         // Skip failed pages
         if (!dimensions[index]) return;
 
-        doc.addPage({ size: [dimensions[index].width, dimensions[index].height] });
-        doc.image(path.join(directory, filename), 0, 0, { width: dimensions[index].width });
+        // Dimensions in PDF points
+        const width = dimensions[index].width * (PDF_PPI / IMAGE_PPI);
+        const height = dimensions[index].height * (PDF_PPI / IMAGE_PPI);
+
+        doc.addPage({ size: [width, height] });
+        doc.image(path.join(directory, filename), 0, 0, { width });
     });
     doc.end();
 }
