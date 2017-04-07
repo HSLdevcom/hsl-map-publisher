@@ -27,15 +27,14 @@ function fetchStopsWithShelter() {
             .pipe(iconv.decodeStream("ISO-8859-1"))
             .pipe(csv.parse({ delimiter: "#", columns: true }, (err, data) => {
                 if (err) reject(err);
-                const stops = data
-                    .filter(stop => stop.pysakkityyppi.includes("katos"))
-                    .map(stop => ({
-                        stopId: stop.tunnus,
-                        shortId: stop.lyhyt_nro,
-                        nameFi: stop.nimi_suomi,
-                        group: `${stop.aikataulutyyppi_hsl}${stop.aikataulutyyppi_hkl}`,
-                        index: stop.ajojarjestys,
-                    }));
+                const stops = data.map(stop => ({
+                    stopId: stop.tunnus,
+                    shortId: stop.lyhyt_nro,
+                    nameFi: stop.nimi_suomi,
+                    group: `${stop.aikataulutyyppi_hsl}${stop.aikataulutyyppi_hkl}`,
+                    index: stop.ajojarjestys,
+                    hasShelter: stop.pysakkityyppi.includes("katos"),
+                }));
                 resolve(stops);
             })
         )
