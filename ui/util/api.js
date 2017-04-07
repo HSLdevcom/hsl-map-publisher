@@ -20,4 +20,4 @@ async function generate(component, props) {
 export {
     fetchStops,
     generate,
-}
+};

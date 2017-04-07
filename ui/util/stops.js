@@ -34,14 +34,14 @@ function stopsToRows(stops) {
 function stopsToGroupRows(stops) {
     const stopsByGroup = groupStops(stops);
 
-    return Object.keys(stopsByGroup).map(group => {
-            const stops = stopsByGroup[group];
-            return {
-                isChecked: false,
-                title: group,
-                subtitle: `${stops[0].shortId} - ${stops[stops.length - 1].shortId} (${stops.length} pysäkkiä)`,
-                stopIds: stops.map(({ stopId }) => stopId),
-            };
+    return Object.keys(stopsByGroup).map((group) => {
+        const stopsInGroup = stopsByGroup[group];
+        return {
+            isChecked: false,
+            title: group,
+            subtitle: `${stopsInGroup[0].shortId} - ${stopsInGroup[stopsInGroup.length - 1].shortId} (${stopsInGroup.length} pysäkkiä)`,
+            stopIds: stopsInGroup.map(({ stopId }) => stopId),
+        };
     });
 }
 
