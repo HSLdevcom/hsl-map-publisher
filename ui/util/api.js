@@ -1,5 +1,5 @@
 
-const API_URL = "http://localhost:4000";
+const API_URL = "api";
 
 async function fetchStops() {
     const response = await fetch(`${API_URL}/stops`);

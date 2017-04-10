@@ -1,4 +1,14 @@
 const createServer = require("./server.base");
 const config = require("./webpack.config.ui");
 
-module.exports = createServer({ config, port: 5000 });
+const options = {
+    proxy: {
+        "/api/**": {
+            target: "http://localhost:4000",
+            pathRewrite: { "^/api": "" },
+            secure: false,
+        },
+    },
+};
+
+module.exports = createServer(config, 5000, options);
