@@ -52,6 +52,7 @@ module.exports = (options) => {
             modulesDirectories: ["node_modules", directory],
         },
         output: {
+            publicPath: "",
             path: path.join(__dirname, "dist"),
             filename: "bundle.js",
         },

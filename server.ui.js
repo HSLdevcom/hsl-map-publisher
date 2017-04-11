@@ -3,9 +3,10 @@ const config = require("./webpack.config.ui");
 
 const options = {
     proxy: {
-        "/api/**": {
+        "/api": {
             target: "http://localhost:4000",
             pathRewrite: { "^/api": "" },
+            changeOrigin: true,
             secure: false,
         },
     },

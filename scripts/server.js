@@ -9,7 +9,6 @@ const serveList = require("koa-serve-list");
 const serveStatic = require("koa-static");
 
 const moment = require("moment");
-const urljoin = require("url-join");
 const pick = require("lodash/pick");
 const iconv = require("iconv-lite");
 const csv = require("csv");
@@ -121,7 +120,7 @@ async function main() {
         successResponse(ctx, stops);
     });
 
-    router.post("/", (ctx) => {
+    router.post("/generate", (ctx) => {
         const { component, props } = ctx.request.body;
 
         if (typeof component !== "string" || !props instanceof Array || !props.length) {
@@ -129,9 +128,8 @@ async function main() {
         }
 
         try {
-            const identifier = generateFiles(component, props);
-            const url = urljoin("http://", ctx.request.host, ctx.request.url, identifier, "/");
-            successResponse(ctx, { url });
+            const path = generateFiles(component, props);
+            successResponse(ctx, { path });
         } catch (error) {
             errorResponse(ctx, error);
         }

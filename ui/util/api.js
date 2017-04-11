@@ -10,11 +10,11 @@ async function fetchStops() {
 async function generate(component, props) {
     const options = { method: "POST", body: JSON.stringify({ component, props }) };
 
-    const response = await fetch(API_URL, options);
+    const response = await fetch(`${API_URL}/generate`, options);
     if (!response.ok) throw new Error(response.statusText);
 
-    const { url } = await response.json();
-    return url;
+    const { path } = await response.json();
+    return `${API_URL}/${path}/`;
 }
 
 export {
