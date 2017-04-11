@@ -22,12 +22,13 @@ RUN yarn
 # Bundle app source
 COPY . ${WORK}
 
-EXPOSE 4000
+EXPOSE 5000
 
 CMD \
   cd ${WORK} && \
   Xorg -dpi 96 -nolisten tcp -noreset +extension GLX +extension RANDR +extension RENDER -logfile ./10.log -config ./xorg.conf :10 & \
   sleep 15 && \
   node_modules/.bin/forever start -c "npm start" ./ && \
+  node_modules/.bin/forever start -c "npm run ui" ./ && \
   DISPLAY=":10" node_modules/.bin/forever start -c "npm run serve" ./ && \
-  node_modules/.bin/forever --fifo logs 1
+  node_modules/.bin/forever --fifo logs 2
