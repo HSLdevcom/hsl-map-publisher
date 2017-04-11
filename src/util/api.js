@@ -1,5 +1,4 @@
-// TODO: Get API URL as env variable
-const API_URL = "http://localhost:8000";
+const API_URL = "http://kartat.hsl.fi";
 
 /**
  * Returns formatted stop id
