@@ -25,7 +25,7 @@ const OUTPUT_PATH = path.join(__dirname, "..", "output");
 const TEMPLATE = template(fs.readFileSync(path.join(__dirname, "index.html")));
 
 // FIXME: Fetch stops from graphql when data available
-function fetchStopsWithShelter() {
+function fetchStops() {
     return new Promise((resolve, reject) => {
         fs.createReadStream(`${__dirname}/jr_map_pysakit_varustus.txt`)
             .pipe(iconv.decodeStream("ISO-8859-1"))
@@ -112,7 +112,7 @@ function errorResponse(ctx, error) {
 }
 
 async function main() {
-    const stops = await fetchStopsWithShelter();
+    const stops = await fetchStops();
     await generator.initialize();
 
     const app = new Koa();
