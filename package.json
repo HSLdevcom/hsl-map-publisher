@@ -65,7 +65,6 @@
     "koa-cors": "^0.0.16",
     "koa-json-body": "^5.3.0",
     "koa-router": "7.0.1",
-    "koa-serve-list": "^1.0.1",
     "koa-static": "^3.0.0",
     "lodash": "^4.17.4",
     "material-ui": "^0.17.1",

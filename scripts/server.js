@@ -5,23 +5,24 @@ const Koa = require("koa");
 const Router = require("koa-router");
 const cors = require("koa-cors");
 const body = require("koa-json-body");
-const serveList = require("koa-serve-list");
 const serveStatic = require("koa-static");
 
 const moment = require("moment");
 const pick = require("lodash/pick");
+const template = require("lodash/template");
 const iconv = require("iconv-lite");
 const csv = require("csv");
 const PDFDocument = require("pdfkit");
 
 const generator = require("./generator");
 
-const PORT = 4000;
-const API_URL = "http://kartat.hsl.fi";
-const OUTPUT_PATH = path.join(__dirname, "..", "output");
-
 const IMAGE_PPI = 300;
 const PDF_PPI = 72;
+
+const PORT = 4000;
+
+const OUTPUT_PATH = path.join(__dirname, "..", "output");
+const TEMPLATE = template(fs.readFileSync(path.join(__dirname, "index.html")));
 
 // FIXME: Fetch stops from graphql when data available
 function fetchStopsWithShelter() {
@@ -97,8 +98,9 @@ function generateFiles(component, props) {
     return identifier;
 }
 
-function successResponse(ctx, body) {
+function successResponse(ctx, body, type = "application/json") {
     ctx.status = 200;
+    ctx.type = type;
     ctx.body = body;
 }
 
@@ -135,13 +137,24 @@ async function main() {
         }
     });
 
+    router.get("/:directory", (ctx, next) => {
+        const directory = ctx.params.directory.replace(/(\.|\/|\\)/g, "");
+        return new Promise((resolve) => {
+            fs.readdir(path.join(OUTPUT_PATH, directory), (err, files) => {
+                if (!err) {
+                    successResponse(ctx, TEMPLATE({ title: directory, items: files }), "text/html");
+                }
+                resolve();
+            });
+        });
+    });
+
     app
         .use(cors())
         .use(body({ fallback: true }))
         .use(router.routes())
         .use(router.allowedMethods())
         .use(serveStatic(OUTPUT_PATH))
-        .use(serveList(OUTPUT_PATH, { icons: true }))
         .listen(PORT, (err) => {
             if (err) {
                 console.error(err);
