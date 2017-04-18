@@ -35,3 +35,8 @@
 .image {
     max-width: 100%;
 }
+
+.error {
+    flex-grow: 1;
+    background: red;
+}

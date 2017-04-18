@@ -1,70 +1,40 @@
 import React, { Component, PropTypes } from "react";
 import { JustifiedColumn, Spacer, FlexSpacer } from "components/util";
-import { fetchStopPosterState } from "util/stopPoster";
+import RouteDiagram from "components/routeDiagram/routeDiagramContainer";
+import Timetable from "components/timetable/timetableContainer";
 
-import Header from "./header";
+import Header from "./headerContainer";
 import Footer from "./footer";
 
-import Routes from "./routes";
-import Timetable from "./timetable";
+import Routes from "./routesContainer";
 import Info from "./info";
 
-import Map from "./map";
-import RouteDiagram from "./routeDiagram/routeDiagram";
+import Map from "./mapContainer";
 
 import styles from "./stopPoster.css";
 
-
+// eslint-disable-next-line react/prefer-stateless-function
 class StopPoster extends Component {
-
-    componentDidMount() {
-        if (this.props.stopId) {
-            this.fetchState(this.props.stopId);
-        } else {
-            this.props.onReady(new Error("Invalid props"));
-        }
-    }
-
-    componentDidUpdate(prevProps) {
-        if (!this.props.stopId) {
-            this.props.onReady(new Error("Invalid props"));
-        } else if (this.props.stopId !== prevProps.stopId) {
-            this.fetchState(this.props.stopId);
-        }
-    }
-
-    componentWillUnmount() { // eslint-disable-line
-        // TODO: Cancel ongoing request
-    }
-
-    fetchState() {
-        fetchStopPosterState(this.props.stopId)
-            .then(state => this.setState(state, () => this.props.onReady()))
-            .catch(error => this.props.onReady(error));
-    }
-
     render() {
-        if (!this.state) return null;
-
         return (
             <div className={styles.root}>
                 <JustifiedColumn>
-                    <Header {...this.state.stop}/>
+                    <Header stopId={this.props.stopId}/>
 
                     <div className={styles.content}>
                         <div>
-                            <Routes routes={this.state.routes}/>
+                            <Routes stopId={this.props.stopId} date={this.props.date}/>
                             <div className={styles.title}>Pysäkkiaikataulu</div>
-                            <Timetable {...this.state.timetable}/>
+                            <Timetable stopId={this.props.stopId} date={this.props.date}/>
                             <Info/>
                         </div>
 
                         <Spacer width={50}/>
 
                         <div>
-                            <Map {...this.state.maps}/>
+                            <Map stopId={this.props.stopId} date={this.props.date}/>
                             <div className={styles.title}>Linjojen reitit</div>
-                            <RouteDiagram stop={this.state.stop} routes={this.state.routes}/>
+                            <RouteDiagram stopId={this.props.stopId} date={this.props.date}/>
                         </div>
                     </div>
 
@@ -78,7 +48,7 @@ class StopPoster extends Component {
 
 StopPoster.propTypes = {
     stopId: PropTypes.string.isRequired,
-    onReady: PropTypes.func.isRequired,
+    date: PropTypes.string.isRequired,
 };
 
 export default StopPoster;

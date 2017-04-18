@@ -4,8 +4,10 @@ const MAX_WIDTH = 6;
 const MAX_HEIGHT = 20;
 
 function isEqual(stop, other) {
-    return (stop.name_fi === other.name_fi) &&
-           (stop.name_se === other.name_se);
+    return ((stop.terminalId !== null) &&
+           (stop.terminalId === other.terminalId)) ||
+           ((stop.nameFi === other.nameFi) &&
+           (stop.nameSe === other.nameSe));
 }
 
 function merge(stop, other) {
@@ -32,39 +34,35 @@ function truncate(node) {
     if (gap) {
         const index = items.indexOf(gap);
         const removedNode = items.splice(index + ((index > items.length / 2) ? -1 : 1), 1);
-        if (removedNode.destinations) {
+        if (removedNode[0].destinations) {
             if (!gap.destinations) gap.destinations = [];
-            gap.destinations.push(removedNode.destinations);
+            gap.destinations.push(removedNode[0].destinations);
         }
     } else {
-        const index = Math.floor(items.length / 2);
+        const index = items.length - 1;
         const itemToAdd = { type: "gap" };
         const removedItem = items.splice(index, 1, itemToAdd);
-        if (removedItem.destinations) {
-            itemToAdd.destinations = removedItem.destinations;
+        if (removedItem[0].destinations) {
+            itemToAdd.destinations = removedItem[0].destinations;
         }
     }
 }
 
 /**
  * Returns routes as a tree representing connections from given stop
- * @param {Object} rootStop
  * @param {Array} routes
  * @returns {Object}
  */
-function routesToTree(rootStop, routes) {
+function routesToTree(routes) {
     // Get stops after given stop
-    const itemLists = routes.map((route) => {
-        const rootIndex = route.stops.map(({ stopId }) => stopId).indexOf(rootStop.stopId);
-
-        return route.stops.slice(rootIndex).map((stop, index, stops) => {
+    const itemLists = routes.map(route =>
+        route.stops.map((stop, index, stops) => {
             const item = { ...stop, type: "stop" };
             if (index === stops.length - 1) {
-                item.destinations = [{ id: route.routeId, title: route.destination_fi }];
+                item.destinations = [{ routeId: route.routeId, title: route.destinationFi }];
             }
             return item;
-        });
-    });
+        }));
 
     const root = itemsToTree(itemLists, { isEqual, merge });
     generalizeTree(root, { width: MAX_WIDTH, height: MAX_HEIGHT, prune, truncate });
