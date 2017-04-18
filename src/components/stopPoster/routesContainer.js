@@ -1,6 +1,6 @@
 import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
-import { isNumberVariant, trimRouteId, isDropOffOnly } from "util/api";
+import { isNumberVariant, trimRouteId, isDropOffOnly } from "util/domain";
 import apolloWrapper from "util/apolloWrapper";
 import routeCompare from "util/routeCompare";
 

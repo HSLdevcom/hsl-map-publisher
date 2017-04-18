@@ -1,7 +1,7 @@
 import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
 import sortBy from "lodash/sortBy";
-import { isNumberVariant, trimRouteId, isDropOffOnly } from "util/api";
+import { isNumberVariant, trimRouteId, isDropOffOnly } from "util/domain";
 import apolloWrapper from "util/apolloWrapper";
 import { routesToTree } from "util/routes";
 

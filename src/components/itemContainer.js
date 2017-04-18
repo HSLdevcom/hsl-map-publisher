@@ -9,6 +9,7 @@ const OVERLAP_COST_FIXED = 5;
 const OVERFLOW_COST = 5000;
 const INTERSECTION_COST = 50;
 const DISTANCE_COST = 1;
+const ANGLE_COST = 0.5;
 
 const MASK_MARGIN = 5;
 
@@ -127,6 +128,20 @@ class ItemContainer extends Component {
         return DISTANCE_COST * indexes.reduce((prev, index) =>
             prev + (positions[index].distance - positions[index].initialDistance), 0);
     }
+
+    /**
+     * Returns cost for increased angle compared to initial angle
+     * @param {Object[]} positions - Positions
+     * @param {number[]} indexes - Indexes to check
+     * @returns {number}
+     */
+    static getAngleCost(positions, indexes) {
+        return ANGLE_COST * indexes.reduce((prev, index) => {
+            const phi = Math.abs(positions[index].angle - positions[index].initialAngle) % 360;
+            return prev + phi > 180 ? 360 - phi : phi;
+        }, 0);
+    }
+
 
     /**
      * Returns updated position for component
@@ -254,7 +269,8 @@ class ItemContainer extends Component {
         const overflow = this.getOverflowCost(positions, indexes);
         const intersections = this.getIntersectionCost(positions, indexes);
         const distances = ItemContainer.getDistanceCost(positions, indexes);
-        return overlap + overflow + distances + intersections;
+        const angle = ItemContainer.getAngleCost(positions, indexes);
+        return overlap + overflow + distances + intersections + angle;
     }
 
     getPlacements(positions, indexToUpdate, updatedIndexes = []) {
