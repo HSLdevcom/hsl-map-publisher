@@ -3,7 +3,7 @@ import mapProps from "recompose/mapProps";
 import find from "lodash/find";
 
 import apolloWrapper from "util/apolloWrapper";
-import { isDropOffOnly } from "util/api";
+import { isDropOffOnly } from "util/domain";
 
 import Timetable from "./timetable";
 

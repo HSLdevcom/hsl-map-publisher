@@ -5,7 +5,7 @@ import sortBy from "lodash/sortBy";
 
 import styles from "./timetable.css";
 
-import { trimRouteId } from "../../util/api";
+import { trimRouteId } from "../../util/domain";
 
 const Header = props => (
     <div className={styles.header}>
