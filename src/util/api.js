@@ -8,11 +8,11 @@ const API_URL = "http://kartat.hsl.fi";
  * @returns {Promise} - Image as data URL
  */
 // eslint-disable-next-line import/prefer-default-export
-export function fetchMap(mapOptions) {
+export function fetchMap(mapOptions, mapStyle) {
     const options = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ options: mapOptions }),
+        body: JSON.stringify({ options: mapOptions, style: mapStyle }),
     };
 
     return fetch(`${API_URL}/generateImage`, options)
