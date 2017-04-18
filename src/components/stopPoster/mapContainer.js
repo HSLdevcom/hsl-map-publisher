@@ -2,7 +2,8 @@ import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
 import flatMap from "lodash/flatMap";
 import apolloWrapper from "util/apolloWrapper";
-import { isNumberVariant, trimRouteId, isDropOffOnly, fetchMap } from "util/api";
+import { fetchMap } from "util/api";
+import { isNumberVariant, trimRouteId, isDropOffOnly } from "util/domain";
 import { MIN_ZOOM, MAP_WIDTH, MAP_HEIGHT, createViewport, calculateStopsViewport } from "util/stopPoster";
 import routeCompare from "util/routeCompare";
 
