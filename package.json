@@ -56,6 +56,7 @@
   "dependencies": {
     "classnames": "^2.2.5",
     "csv": "^1.1.1",
+    "hsl-map-style": "https://github.com/HSLdevcom/hsl-map-style",
     "lodash": "^4.17.4",
     "node-fetch": "^1.6.3",
     "node-phantom-promise": "^1.0.3",
