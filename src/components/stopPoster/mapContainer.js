@@ -69,7 +69,7 @@ const nearbyStopsMapper = mapProps((props) => {
         lang: ["fi", "sv"],
         extensions: ["icons", "routes", "citybikes"],
         glyphsUrl: "http://kartat.hsl.fi/",
-        sourcesUrl: "dev-api.digitransit.fi/map/v1/",
+        sourcesUrl: "api.digitransit.fi/map/v1/",
     });
 
     mapStyle.sources.routes = {
