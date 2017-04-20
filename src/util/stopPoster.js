@@ -37,7 +37,7 @@ export function calculateStopsViewport(centeredStop, stops) {
 
     // Calculate pixel coordinates for each stop
     const projectedStops = visibleStops.map((stop) => {
-        const [x, y] = viewport.project([stop.lon, stop.lat], { topLeft: true });
+        const [x, y] = viewport.project([stop.lon, stop.lat]);
         return { ...stop, x, y };
     });
 
