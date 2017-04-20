@@ -7,7 +7,7 @@
 @value white: hsl(255, 100%, 100%);
 @value gray: hsl(220, 2%, 35%);
 
-@value background: hsl(200, 100%, 40%);
-@value backgroundLight: rgb(213, 232, 250);
-
 @value hslBlue: rgb(0, 122, 201);
+
+@value background: hslBlue;
+@value backgroundLight: rgb(213, 232, 250);
