@@ -20,8 +20,10 @@ const JustifiedRow = props => (
 
 JustifiedRow.propTypes = {
     children: React.PropTypes.node.isRequired,
-    style: React.PropTypes.object,
+    style: React.PropTypes.object, // eslint-disable-line react/forbid-prop-types
 };
+
+JustifiedRow.defaultProps = { style: {} };
 
 const WrappingRow = props => (
     <div className={styles.wrappingRow}>
