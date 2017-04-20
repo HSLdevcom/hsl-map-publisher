@@ -17,7 +17,7 @@ const MINI_MAP_ZOOM = 9;
 
 const nearbyStopsQuery = gql`
     query nearbyStopsQuery($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $date: Date!) {
-        stops: stopGroupedByShortIdByBbox(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon) {
+        stopGroups: stopGroupedByShortIdByBbox(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon) {
             nodes {
                 stopIds
                 lat
@@ -47,11 +47,11 @@ const nearbyStopsQuery = gql`
     }
 `;
 
-const stopsMapper = stop => ({
-    ...stop,
+const stopsMapper = stopGroup => ({
+    ...stopGroup,
     // Assume all stops face the same way
-    calculatedHeading: stop.stops.nodes[0].calculatedHeading,
-    routes: flatMap(stop.stops.nodes, node =>
+    calculatedHeading: stopGroup.stops.nodes[0].calculatedHeading,
+    routes: flatMap(stopGroup.stops.nodes, node =>
         node.routeSegments.nodes
             .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
             .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
@@ -64,7 +64,10 @@ const stopsMapper = stop => ({
 });
 
 const nearbyStopsMapper = mapProps((props) => {
-    const { stops, viewport } = calculateStopsViewport(props.stop, props.data.stops.nodes);
+    const { stopGroups, viewport } = calculateStopsViewport(
+        props.stop,
+        props.data.stopGroups.nodes
+    );
 
     const mapOptions = {
         center: [props.stop.lon, props.stop.lat],
@@ -94,7 +97,7 @@ const nearbyStopsMapper = mapProps((props) => {
 
     return {
         stop: props.stop,
-        stops: stops.map(stopsMapper),
+        stops: stopGroups.map(stopsMapper),
         pixelsPerMeter: viewport.getDistanceScales().pixelsPerMeter[0],
         map: fetchMap(mapOptions, mapStyle),
         mapOptions,
