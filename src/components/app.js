@@ -30,7 +30,6 @@ class App extends Component {
     }
 
     componentDidMount() {
-        this.isMounted = true;
         // Publish method as a global to make it accessible from phantom
         window.setVisibleComponent = this.setVisibleComponent.bind(this);
         // Let phantom know app is ready
@@ -48,7 +47,7 @@ class App extends Component {
 
     render() {
         if (!components[this.state.component] || !this.state.props) {
-            if (this.isMounted && window.callPhantom) {
+            if (window.callPhantom) {
                 window.callPhantom({ error: "Invalid component or props" });
             }
             return null;
