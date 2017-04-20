@@ -70,7 +70,7 @@ const stopsMapper = stopGroup => ({
 });
 
 const nearbyStopsMapper = mapProps((props) => {
-    const { stopGroups, viewport } = calculateStopsViewport(
+    const { stops: stopGroups, viewport } = calculateStopsViewport(
         props.stop,
         props.data.stopGroups.nodes
     );
