@@ -4,10 +4,15 @@ import flatMap from "lodash/flatMap";
 import apolloWrapper from "util/apolloWrapper";
 import { fetchMap } from "util/api";
 import { isNumberVariant, trimRouteId, isDropOffOnly } from "util/domain";
-import { MIN_ZOOM, MAP_WIDTH, MAP_HEIGHT, createViewport, calculateStopsViewport } from "util/stopPoster";
+import {
+    MIN_ZOOM,
+    MAP_WIDTH,
+    MAP_HEIGHT,
+    createViewport,
+    calculateStopsViewport,
+} from "util/stopPoster";
 import routeCompare from "util/routeCompare";
 import hslMapStyle from "hsl-map-style";
-
 
 import Map from "./map";
 
@@ -17,7 +22,7 @@ const MINI_MAP_ZOOM = 9;
 
 const nearbyStopsQuery = gql`
     query nearbyStopsQuery($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $date: Date!) {
-        stops: stopGroupedByShortIdByBbox(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon) {
+        stopGroups: stopGroupedByShortIdByBbox(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon) {
             nodes {
                 stopIds
                 lat
@@ -48,11 +53,11 @@ const nearbyStopsQuery = gql`
     }
 `;
 
-const stopsMapper = stop => ({
-    ...stop,
+const stopsMapper = stopGroup => ({
+    ...stopGroup,
     // Assume all stops face the same way
-    calculatedHeading: stop.stops.nodes[0].calculatedHeading,
-    routes: flatMap(stop.stops.nodes, node =>
+    calculatedHeading: stopGroup.stops.nodes[0].calculatedHeading,
+    routes: flatMap(stopGroup.stops.nodes, node =>
         node.routeSegments.nodes
             .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
             .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
@@ -61,12 +66,14 @@ const stopsMapper = stop => ({
                 routeId: trimRouteId(routeSegment.routeId),
                 destinationFi: routeSegment.route.nodes[0].destinationFi,
                 destinationSe: routeSegment.route.nodes[0].destinationSe,
-            }))
-        ).sort(routeCompare),
+            }))).sort(routeCompare),
 });
 
 const nearbyStopsMapper = mapProps((props) => {
-    const { stops, viewport } = calculateStopsViewport(props.stop, props.data.stops.nodes);
+    const { stopGroups, viewport } = calculateStopsViewport(
+        props.stop,
+        props.data.stopGroups.nodes
+    );
 
     const mapOptions = {
         center: [props.stop.lon, props.stop.lat],
@@ -96,7 +103,7 @@ const nearbyStopsMapper = mapProps((props) => {
 
     return {
         stop: props.stop,
-        stops: stops.map(stopsMapper),
+        stops: stopGroups.map(stopsMapper),
         pixelsPerMeter: viewport.getDistanceScales().pixelsPerMeter[0],
         map: fetchMap(mapOptions, mapStyle),
         mapOptions,
@@ -124,7 +131,7 @@ const propsMapper = mapProps((props) => {
     const [minLon, minLat] = viewport.unproject([0, 0]);
     const [maxLon, maxLat] = viewport.unproject([viewport.width, viewport.height]);
 
-    return ({ stop: props.data.stop, minLat, minLon, maxLat, maxLon, date: props.date });
+    return { stop: props.data.stop, minLat, minLon, maxLat, maxLon, date: props.date };
 });
 
 const MapContainer = apolloWrapper(propsMapper)(MapWithNearbyStops);
