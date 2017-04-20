@@ -107,11 +107,6 @@ const Timetable = props => (
             </div>
         }
         <Spacer height={20}/>
-        {props.weekdays.some(departure => departure.isAccessible === false) &&
-            <div className={styles.footnote}>
-                e) ei matalalattiavaunu / ej låggolvsvagn
-            </div>
-        }
         {props.notes.map(note =>
             <div key={note} className={styles.footnote}>
                 {note}

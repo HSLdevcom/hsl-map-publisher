@@ -85,10 +85,16 @@ const propsMapper = mapProps((props) => {
             stop.routeSegments.nodes
         ))
     );
-    const notes = uniq(flatMap(
+    let notes = flatMap(
       props.data.stop.siblings.nodes,
       stop => flatMap(stop.routeSegments.nodes, getNotes(props.isSummerTimetable))
-    ));
+    );
+    if (props.data.stop.siblings.nodes.some(stop =>
+      stop.departures.nodes.some(departure => departure.isAccessible === false))
+    ) {
+        notes.push("e) ei matalalattiavaunu / ej låggolvsvagn");
+    }
+    notes = uniq(notes).sort();
     return { weekdays, saturdays, sundays, notes, isSummerTimetable: props.isSummerTimetable };
 });
 
