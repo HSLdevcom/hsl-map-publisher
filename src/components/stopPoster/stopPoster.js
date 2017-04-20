@@ -25,7 +25,11 @@ class StopPoster extends Component {
                         <div>
                             <Routes stopId={this.props.stopId} date={this.props.date}/>
                             <div className={styles.title}>Pysäkkiaikataulu</div>
-                            <Timetable stopId={this.props.stopId} date={this.props.date}/>
+                            <Timetable
+                                stopId={this.props.stopId}
+                                date={this.props.date}
+                                isSummerTimetable={this.props.isSummerTimetable}
+                            />
                             <Info/>
                         </div>
 
@@ -49,6 +53,11 @@ class StopPoster extends Component {
 StopPoster.propTypes = {
     stopId: PropTypes.string.isRequired,
     date: PropTypes.string.isRequired,
+    isSummerTimetable: PropTypes.bool,
+};
+
+StopPoster.defaultProps = {
+    isSummerTimetable: false,
 };
 
 export default StopPoster;
