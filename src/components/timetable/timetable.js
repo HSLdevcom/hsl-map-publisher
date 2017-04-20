@@ -109,10 +109,10 @@ const Timetable = props => (
         <Spacer height={20}/>
         {props.weekdays.some(departure => departure.isAccessible === false) &&
             <div className={styles.footnote}>
-                e = ei matalalattia-ajoneuvo
+                e) ei matalalattiavaunu / ej låggolvsvagn
             </div>
         }
-        {[...props.notes].map(note =>
+        {props.notes.map(note =>
             <div key={note} className={styles.footnote}>
                 {note}
             </div>
@@ -124,7 +124,7 @@ Timetable.propTypes = {
     weekdays: React.PropTypes.arrayOf(React.PropTypes.shape(Table.propTypes.departures)),
     saturdays: React.PropTypes.arrayOf(React.PropTypes.shape(Table.propTypes.departures)),
     sundays: React.PropTypes.arrayOf(React.PropTypes.shape(Table.propTypes.departures)),
-    notes: React.PropTypes.instanceOf(Set).isRequired,
+    notes: React.PropTypes.arrayOf(React.PropTypes.string.isRequired).isRequired,
     isSummerTimetable: React.PropTypes.bool,
 };
 

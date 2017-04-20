@@ -2,6 +2,7 @@ import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
 import find from "lodash/find";
 import flatMap from "lodash/flatMap";
+import uniq from "lodash/uniq";
 
 import apolloWrapper from "util/apolloWrapper";
 import { isDropOffOnly } from "util/domain";
@@ -28,11 +29,15 @@ function groupDepartures(departures) {
     };
 }
 
-function getNotes(routeSegment) {
-    return (routeSegment.hasRegularDayDepartures &&
-        routeSegment.notes.nodes
-            .filter(note => note.noteType.includes("Y"))
-            .map(note => note.noteText)) || [];
+function getNotes(isSummerTimetable) {
+    return function getNotesInner(routeSegment) {
+        return (routeSegment.hasRegularDayDepartures &&
+            routeSegment.notes.nodes
+                .filter(note => note.noteType.includes("Y"))
+                .filter(note => note.noteType.includes("V") ||
+                    note.noteType.includes(isSummerTimetable ? "K" : "T"))
+                .map(note => note.noteText)) || [];
+    };
 }
 
 const timetableQuery = gql`
@@ -80,9 +85,9 @@ const propsMapper = mapProps((props) => {
             stop.routeSegments.nodes
         ))
     );
-    const notes = new Set(...flatMap(
+    const notes = uniq(flatMap(
       props.data.stop.siblings.nodes,
-      stop => stop.routeSegments.nodes.map(getNotes)
+      stop => flatMap(stop.routeSegments.nodes, getNotes(props.isSummerTimetable))
     ));
     return { weekdays, saturdays, sundays, notes, isSummerTimetable: props.isSummerTimetable };
 });
