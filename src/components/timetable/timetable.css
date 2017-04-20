@@ -40,12 +40,26 @@
     background-color: white;
 }
 
+.table > * {
+    border-radius: 8px;
+}
+
+.table strong {
+    font-weight: 700;
+}
+
 .item {
+    display: flex;
     min-width: 52px;
     padding: 4px 0;
     font-size: 12px;
     letter-spacing: -0.5px;
     line-height: 8px;
+}
+
+.minutes {
+    font-weight: 700;
+    min-width: 12px;
 }
 
 .itemPadded {
