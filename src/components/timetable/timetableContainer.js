@@ -33,7 +33,11 @@ function getNotes(isSummerTimetable) {
     return function getNotesInner(routeSegment) {
         return (routeSegment.hasRegularDayDepartures &&
             routeSegment.notes.nodes
+                // Y = Yleisöaikataulu
                 .filter(note => note.noteType.includes("Y"))
+                // V = Ympäri vuoden
+                // K = Vain kesäaikataulu
+                // T = Vain talviaikatalu
                 .filter(note => note.noteType.includes("V") ||
                     note.noteType.includes(isSummerTimetable ? "K" : "T"))
                 .map(note => note.noteText)) || [];
