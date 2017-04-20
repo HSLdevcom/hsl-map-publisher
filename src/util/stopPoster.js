@@ -1,6 +1,6 @@
 import WebMercatorViewport from "viewport-mercator-project/dist/web-mercator-viewport";
 
-const MAX_STOPS = 8;
+const MAX_STOPS = 12;
 
 const MAX_ZOOM = 18;
 export const MIN_ZOOM = 14;
