@@ -9,6 +9,10 @@
     border-radius: borderRadius;
 }
 
+.root.summer {
+    background-color: white;
+}
+
 .root strong {
     font-weight: 500;
 }
@@ -38,6 +42,10 @@
 
 .table > *:nth-child(odd) {
     background-color: white;
+}
+
+.root.summer .table > *:nth-child(odd) {
+  background-color: backgroundLight;
 }
 
 .table > * {

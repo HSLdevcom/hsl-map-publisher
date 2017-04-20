@@ -2,6 +2,7 @@ import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
 import find from "lodash/find";
 import flatMap from "lodash/flatMap";
+import uniq from "lodash/uniq";
 
 import apolloWrapper from "util/apolloWrapper";
 import { isDropOffOnly } from "util/domain";
@@ -28,11 +29,19 @@ function groupDepartures(departures) {
     };
 }
 
-function getNotes(routeSegment) {
-    return (routeSegment.hasRegularDayDepartures &&
-        routeSegment.notes.nodes
-            .filter(note => note.noteType.includes("Y"))
-            .map(note => note.noteText)) || [];
+function getNotes(isSummerTimetable) {
+    return function getNotesInner(routeSegment) {
+        return (routeSegment.hasRegularDayDepartures &&
+            routeSegment.notes.nodes
+                // Y = Yleisöaikataulu
+                .filter(note => note.noteType.includes("Y"))
+                // V = Ympäri vuoden
+                // K = Vain kesäaikataulu
+                // T = Vain talviaikatalu
+                .filter(note => note.noteType.includes("V") ||
+                    note.noteType.includes(isSummerTimetable ? "K" : "T"))
+                .map(note => note.noteText)) || [];
+    };
 }
 
 const timetableQuery = gql`
@@ -80,11 +89,17 @@ const propsMapper = mapProps((props) => {
             stop.routeSegments.nodes
         ))
     );
-    const notes = new Set(...flatMap(
+    let notes = flatMap(
       props.data.stop.siblings.nodes,
-      stop => stop.routeSegments.nodes.map(getNotes)
-    ));
-    return { weekdays, saturdays, sundays, notes };
+      stop => flatMap(stop.routeSegments.nodes, getNotes(props.isSummerTimetable))
+    );
+    // if (props.data.stop.siblings.nodes.some(stop =>
+    //   stop.departures.nodes.some(departure => departure.isAccessible === false))
+    // ) {
+    //     notes.push("e) ei matalalattiavaunu / ej låggolvsvagn");
+    // }
+    notes = uniq(notes).sort();
+    return { weekdays, saturdays, sundays, notes, isSummerTimetable: props.isSummerTimetable };
 });
 
 const TimetableContainer = apolloWrapper(propsMapper)(Timetable);
