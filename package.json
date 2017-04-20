@@ -83,6 +83,6 @@
     "react-virtualized": "^9.5.0",
     "recompose": "^0.22.0",
     "segseg": "^0.2.2",
-    "viewport-mercator-project": "^3.0.0-rc2"
+    "viewport-mercator-project": "^4.0.0"
   }
 }
