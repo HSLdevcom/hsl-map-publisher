@@ -4,10 +4,15 @@ import flatMap from "lodash/flatMap";
 import apolloWrapper from "util/apolloWrapper";
 import { fetchMap } from "util/api";
 import { isNumberVariant, trimRouteId, isDropOffOnly } from "util/domain";
-import { MIN_ZOOM, MAP_WIDTH, MAP_HEIGHT, createViewport, calculateStopsViewport } from "util/stopPoster";
+import {
+    MIN_ZOOM,
+    MAP_WIDTH,
+    MAP_HEIGHT,
+    createViewport,
+    calculateStopsViewport,
+} from "util/stopPoster";
 import routeCompare from "util/routeCompare";
 import hslMapStyle from "hsl-map-style";
-
 
 import Map from "./map";
 
@@ -59,8 +64,7 @@ const stopsMapper = stopGroup => ({
             .map(routeSegment => ({
                 routeId: trimRouteId(routeSegment.routeId),
                 destinationFi: routeSegment.route.nodes[0].destinationFi,
-            }))
-        ).sort(routeCompare),
+            }))).sort(routeCompare),
 });
 
 const nearbyStopsMapper = mapProps((props) => {
@@ -125,7 +129,7 @@ const propsMapper = mapProps((props) => {
     const [minLon, minLat] = viewport.unproject([0, 0]);
     const [maxLon, maxLat] = viewport.unproject([viewport.width, viewport.height]);
 
-    return ({ stop: props.data.stop, minLat, minLon, maxLat, maxLon, date: props.date });
+    return { stop: props.data.stop, minLat, minLon, maxLat, maxLon, date: props.date };
 });
 
 const MapContainer = apolloWrapper(propsMapper)(MapWithNearbyStops);
