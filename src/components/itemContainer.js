@@ -6,7 +6,7 @@ import styles from "./itemContainer.css";
 
 const ITERATIONS_PER_FACTOR = 10;
 const OVERLAP_COST_FIXED = 5;
-const OVERFLOW_COST = 5000;
+const OVERFLOW_COST = 500000;
 const INTERSECTION_COST = 50;
 const DISTANCE_COST = 1;
 const ANGLE_COST = 0.5;

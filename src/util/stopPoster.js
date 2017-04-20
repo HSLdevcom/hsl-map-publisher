@@ -26,7 +26,7 @@ function viewportContains(viewport, stop) {
 
 export function calculateStopsViewport(centeredStop, stops) {
     let viewport;
-    let visibleStops = stops.filter(({ stopId }) => stopId !== centeredStop.stopId);
+    let visibleStops = stops.filter(({ stopIds }) => !stopIds.includes(centeredStop.stopId));
 
     // Increase zoom level until only max number of stops visible
     for (let zoom = MIN_ZOOM; zoom <= MAX_ZOOM; zoom += STEP_ZOOM) {

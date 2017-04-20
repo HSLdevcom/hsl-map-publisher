@@ -2,6 +2,7 @@ import React, { PropTypes } from "react";
 import groupBy from "lodash/groupBy";
 import { Row, WrappingRow, Spacer } from "components/util";
 import sortBy from "lodash/sortBy";
+import classNames from "classnames";
 
 import styles from "./timetable.css";
 
@@ -86,7 +87,7 @@ Table.propTypes = {
 };
 
 const Timetable = props => (
-    <div className={styles.root}>
+    <div className={classNames(styles.root, { [styles.summer]: props.isSummerTimetable })}>
         {!!props.weekdays.length &&
             <div>
                 <Header titleFi="Maanantai - Perjantai" titleSe="Måndag - Fredag"/>
@@ -106,12 +107,7 @@ const Timetable = props => (
             </div>
         }
         <Spacer height={20}/>
-        {props.weekdays.some(departure => departure.isAccessible === false) &&
-            <div className={styles.footnote}>
-                e = ei matalalattia-ajoneuvo
-            </div>
-        }
-        {[...props.notes].map(note =>
+        {props.notes.map(note =>
             <div key={note} className={styles.footnote}>
                 {note}
             </div>
@@ -123,13 +119,15 @@ Timetable.propTypes = {
     weekdays: React.PropTypes.arrayOf(React.PropTypes.shape(Table.propTypes.departures)),
     saturdays: React.PropTypes.arrayOf(React.PropTypes.shape(Table.propTypes.departures)),
     sundays: React.PropTypes.arrayOf(React.PropTypes.shape(Table.propTypes.departures)),
-    notes: React.PropTypes.instanceOf(Set).isRequired,
+    notes: React.PropTypes.arrayOf(React.PropTypes.string.isRequired).isRequired,
+    isSummerTimetable: React.PropTypes.bool,
 };
 
 Timetable.defaultProps = {
     weekdays: null,
     saturdays: null,
     sundays: null,
+    isSummerTimetable: false,
 };
 
 export default Timetable;
