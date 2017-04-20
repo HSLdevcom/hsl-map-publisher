@@ -2,6 +2,7 @@ import React, { PropTypes } from "react";
 import groupBy from "lodash/groupBy";
 import { Row, WrappingRow, Spacer } from "components/util";
 import sortBy from "lodash/sortBy";
+import cx from "classnames";
 
 import styles from "./timetable.css";
 
@@ -86,7 +87,7 @@ Table.propTypes = {
 };
 
 const Timetable = props => (
-    <div className={styles.root}>
+    <div className={cx(styles.root, { [styles.summer]: props.isSummerTimetable })}>
         {!!props.weekdays.length &&
             <div>
                 <Header titleFi="Maanantai - Perjantai" titleSe="Måndag - Fredag"/>
@@ -124,12 +125,14 @@ Timetable.propTypes = {
     saturdays: React.PropTypes.arrayOf(React.PropTypes.shape(Table.propTypes.departures)),
     sundays: React.PropTypes.arrayOf(React.PropTypes.shape(Table.propTypes.departures)),
     notes: React.PropTypes.instanceOf(Set).isRequired,
+    isSummerTimetable: React.PropTypes.bool,
 };
 
 Timetable.defaultProps = {
     weekdays: null,
     saturdays: null,
     sundays: null,
+    isSummerTimetable: false,
 };
 
 export default Timetable;

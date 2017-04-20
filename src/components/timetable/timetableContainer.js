@@ -84,7 +84,7 @@ const propsMapper = mapProps((props) => {
       props.data.stop.siblings.nodes,
       stop => stop.routeSegments.nodes.map(getNotes)
     ));
-    return { weekdays, saturdays, sundays, notes };
+    return { weekdays, saturdays, sundays, notes, isSummerTimetable: props.isSummerTimetable };
 });
 
 const TimetableContainer = apolloWrapper(propsMapper)(Timetable);
