@@ -14,19 +14,19 @@
 }
 
 .right {
-    padding-top: 8px;
+    padding-top: 6px;
     padding-left: 10px;
     width: rightWidth;
     box-sizing: border-box;
 }
 
 .title {
-    font-weight: 700;
-    font-size: 13px;
+    font-weight: 500;
+    font-size: 11px;
 }
 
 .subtitle {
-    font-size: 12px;
+    font-size: 11px;
 }
 
 .separator {
@@ -37,12 +37,12 @@
 
 .separatorTop {
      width: lineWidth;
-     height: 10px;
+     height: 8px;
     border-left: lineWidth solid lineColor;
  }
 
 .separatorBottom {
-    height: 20px;
+    height: 16px;
     border-left: lineWidth solid lineColor;
 }
 
