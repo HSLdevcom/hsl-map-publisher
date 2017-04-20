@@ -14,7 +14,7 @@
 }
 
 .destination *:first-child {
-    width: calc(80px + leftWidth);
+    width: calc(72px + leftWidth);
     margin-left: -80px;
     font-size: 28px;
     text-align: right;
