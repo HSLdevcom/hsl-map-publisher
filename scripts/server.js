@@ -31,14 +31,16 @@ function fetchStops() {
             .pipe(iconv.decodeStream("ISO-8859-1"))
             .pipe(csv.parse({ delimiter: "#", columns: true }, (err, data) => {
                 if (err) reject(err);
-                const stops = data.map(stop => ({
-                    stopId: stop.tunnus,
-                    shortId: stop.lyhyt_nro,
-                    nameFi: stop.nimi_suomi,
-                    group: `${stop.aikataulutyyppi_hsl}${stop.aikataulutyyppi_hkl}`,
-                    index: stop.ajojarjestys,
-                    hasShelter: stop.pysakkityyppi.includes("katos"),
-                }));
+                const stops = data
+                    .map(stop => ({
+                        stopId: stop.tunnus,
+                        shortId: stop.lyhyt_nro,
+                        nameFi: stop.nimi_suomi,
+                        group: `${stop.aikataulutyyppi_hsl}${stop.aikataulutyyppi_hkl}`,
+                        index: stop.ajojarjestys,
+                        hasShelter: stop.pysakkityyppi.includes("katos"),
+                    }))
+                    .sort((a, b) => a.shortId.localeCompare(b.shortId));
                 resolve(stops);
             })
         )
