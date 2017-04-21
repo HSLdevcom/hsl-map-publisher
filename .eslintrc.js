@@ -29,9 +29,6 @@ module.exports = {
         "jsx-a11y/img-has-alt": ["off"],
         "import/named": ["error"]
     },
-    settings: {
-        "import/resolver": "webpack"
-    },
     env: {
         "browser": true,
         "node": true,

@@ -1,6 +1,5 @@
-// TODO: Get API URL as env variable
-const API_URL = "http://kartat.hsl.fi";
 
+const API_URL = "http://kartat.hsl.fi";
 
 /**
  * Returns a map image
