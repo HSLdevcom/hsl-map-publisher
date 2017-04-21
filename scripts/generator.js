@@ -78,12 +78,14 @@ function generate(options) {
     previous = previous
         .then(() => {
            stream = options.stream;
-           logInfo(`Generating ${options.filename}`);
+           logInfo(`Rendering ${options.component} to ${options.filename}`);
+           logInfo(`Using props ${JSON.stringify(options.props)}`);
            return render(options);
         })
         .catch((error) => {
             logError(error);
-        }).then((dimensions) => {
+        })
+        .then((dimensions) => {
             stream = null;
             return dimensions;
         });
