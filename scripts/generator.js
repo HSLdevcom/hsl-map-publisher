@@ -1,12 +1,16 @@
+const fs = require("fs");
 const path = require("path");
 const driver = require("node-phantom-promise");
-const sharp = require("sharp");
+const PNGEncoder = require("png-stream").Encoder;
+const PNGDecoder = require("png-stream").Decoder;
+const concat = require("concat-frames");
+const TileMergeStream = require("tile-merge-stream");
 
 const slimerjs = /^win/.test(process.platform) ? "slimerjs.cmd" : "slimerjs";
 const slimerPath = path.join(__dirname, "..", "node_modules", ".bin", slimerjs);
 
 const CLIENT_PORT = 3000;
-const TILE_SIZE = 2000;
+const TILE_SIZE = 3000;
 
 let browser;
 let page;
@@ -33,8 +37,30 @@ function logError(error) {
     if (stream) stream.write(`${content}\n`);
 }
 
+function flushBuffer(buffer, stream) {
+    return new Promise((resolve, reject) => {
+        const decoder = new PNGDecoder();
+
+        decoder.on("error", error => reject(error));
+        decoder.pipe(
+            concat(([{ width, height, pixels }]) => {
+                if (!stream.write({ width, height, data: pixels })) {
+                    stream.once("drain", () => resolve());
+                } else {
+                    process.nextTick(() => resolve());
+                }
+            })
+        );
+        decoder.end(buffer);
+    });
+}
+
 async function captureScreenshot(totalWidth, totalHeight, filename) {
-    let tiles = [];
+    const tileStream = new TileMergeStream({ width: totalWidth, height: totalHeight, channels: 4 });
+
+    const outStream = tileStream
+        .pipe(new PNGEncoder(totalWidth, totalHeight, { colorSpace: "rgba" }))
+        .pipe(fs.createWriteStream(filename));
 
     let top = 0;
     while (top < totalHeight) {
@@ -42,31 +68,20 @@ async function captureScreenshot(totalWidth, totalHeight, filename) {
         let height = Math.min(TILE_SIZE, totalHeight - top);
         while (left < totalWidth) {
             let width = Math.min(TILE_SIZE, totalWidth - left);
-            await page.set("clipRect", { top, left, width, height });
-            const base64 = await page.renderBase64({ format: "png" });
-            const buffer = Buffer.from(base64, "base64");
-            tiles.push({ top, left, buffer });
+            await page.set("clipRect", {top, left, width, height});
+            const base64 = await page.renderBase64({format: "png"});
+            await flushBuffer(Buffer.from(base64, "base64"), tileStream);
             left += width;
         }
         top += height;
     }
 
-    const options = {
-        width: totalWidth,
-        height: totalHeight,
-        channels: 4,
-        background: "black",
-    }
+    tileStream.end();
 
-    let data = await sharp(null, { create: options }).raw().toBuffer();
-
-    for (const tile of tiles) {
-        const { top, left, buffer } = tile;
-        data = await sharp(data, { raw: options }).overlayWith(buffer, { top, left }).raw().toBuffer();
-    }
-
-    await sharp(data, { raw: options }).toFile(filename);
-
+    return new Promise((resolve, error) => {
+        outStream.on("finish", () => resolve());
+        outStream.on("error", () => reject(error));
+    });
 }
 
 /**
