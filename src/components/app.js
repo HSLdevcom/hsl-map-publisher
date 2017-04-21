@@ -19,8 +19,8 @@ const client = new ApolloClient({
 class App extends Component {
 
     static stateFromQueryString() {
-        const { component, options } = queryString.parse(location.hash);
-        return (component && options) ? { component, options: JSON.parse(options) } : {};
+        const { component, props } = queryString.parse(location.hash);
+        return (component && props) ? { component, props: JSON.parse(props) } : {};
     }
 
     constructor() {
@@ -39,34 +39,42 @@ class App extends Component {
     /**
      * Sets component to render
      * @param {String} component - Name of component to display
-     * @param {Object} options - Options passed to component
+     * @param {Object} props - Props passed to component
      */
-    setVisibleComponent(component, options) {
-        this.setState({ component, options });
+    setVisibleComponent(component, props) {
+        this.setState({ component, props });
     }
 
     render() {
-        if (!this.state.component || !this.state.options) return null;
+        if (!components[this.state.component] || !this.state.props) {
+            if (window.callPhantom) {
+                window.callPhantom({ error: "Invalid component or props" });
+            }
+            return null;
+        }
 
         const ComponentToRender = components[this.state.component];
-        if (!ComponentToRender) return null;
 
         const onReady = (error) => {
-            if (error) console.error(error); // eslint-disable-line no-console
             // Let phantom know the component is ready
             if (window.callPhantom) {
-                const options = {
+                if (error) {
+                    window.callPhantom({ error: error.message });
+                    return;
+                }
+                window.callPhantom({
                     width: this.root.offsetWidth,
                     height: this.root.offsetHeight,
-                };
-                window.callPhantom(options);
+                });
+            } else if (error) {
+                console.error(error); // eslint-disable-line no-console
             }
         };
 
         return (
             <div style={{ display: "inline-block" }} ref={(ref) => { this.root = ref; }}>
                 <ApolloProvider client={client}>
-                    <ComponentToRender {...this.state.options} onReady={onReady}/>
+                    <ComponentToRender {...this.state.props} onReady={onReady}/>
                 </ApolloProvider>
             </div>
         );

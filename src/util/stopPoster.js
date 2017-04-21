@@ -1,4 +1,4 @@
-import WebMercatorViewport from "viewport-mercator-project/dist/web-mercator-viewport";
+import { PerspectiveMercatorViewport } from "viewport-mercator-project";
 
 const MAX_STOPS = 8;
 
@@ -10,7 +10,7 @@ export const MAP_WIDTH = 1500;
 export const MAP_HEIGHT = 1200;
 
 export function createViewport(stop, zoom) {
-    return new WebMercatorViewport({
+    return new PerspectiveMercatorViewport({
         width: MAP_WIDTH,
         height: MAP_HEIGHT,
         longitude: stop.lon,
@@ -37,7 +37,7 @@ export function calculateStopsViewport(centeredStop, stops) {
 
     // Calculate pixel coordinates for each stop
     const projectedStops = visibleStops.map((stop) => {
-        const [x, y] = viewport.project([stop.lon, stop.lat], { topLeft: true });
+        const [x, y] = viewport.project([stop.lon, stop.lat]);
         return { ...stop, x, y };
     });
 

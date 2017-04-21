@@ -1,0 +1,35 @@
+
+.root {
+    display: flex;
+    flex-flow: column;
+    width: 100%;
+    max-width: 1000px;
+    height: 100%;
+    padding: 10px 30px;
+    margin: auto;
+    box-sizing: border-box;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 10px 0;
+}
+
+.column {
+    flex: 32%;
+}
+
+.main {
+    height: calc(100vh - 300px);
+    min-height: 300px;
+}
+
+.footer {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    margin: 30px 0;
+}

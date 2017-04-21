@@ -28,9 +28,6 @@ module.exports = {
         "react/no-array-index-key": ["off"],
         "jsx-a11y/img-has-alt": ["off"]
     },
-    settings: {
-        "import/resolver": "webpack"
-    },
     env: {
         "browser": true,
         "node": true,

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title><%- title %></title>
+    </head>
+    <body style="margin: 25px">
+            <% items.forEach((item) => { %>
+                <div>
+                    <a href="<%- item %>"><%- item %></a>
+                </div>
+            <% }); %>
+    </body>
+</html>
