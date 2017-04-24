@@ -65,7 +65,6 @@
     "iconv-lite": "^0.4.15",
     "json-loader": "^0.5.4",
     "koa": "^2.2.0",
-    "koa-cors": "^0.0.16",
     "koa-json-body": "^5.3.0",
     "koa-router": "7.0.1",
     "koa-static": "^3.0.0",

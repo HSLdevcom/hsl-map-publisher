@@ -3,7 +3,6 @@ const path = require("path");
 
 const Koa = require("koa");
 const Router = require("koa-router");
-const cors = require("koa-cors");
 const body = require("koa-json-body");
 const serveStatic = require("koa-static");
 
@@ -150,7 +149,6 @@ async function main() {
     });
 
     app
-        .use(cors())
         .use(body({ fallback: true }))
         .use(router.routes())
         .use(router.allowedMethods())
