@@ -12,6 +12,7 @@ const template = require("lodash/template");
 const iconv = require("iconv-lite");
 const csv = require("csv");
 const PDFDocument = require("pdfkit");
+const fetch = require("node-fetch");
 
 const generator = require("./generator");
 
@@ -23,6 +24,21 @@ const PORT = 4000;
 const OUTPUT_PATH = path.join(__dirname, "..", "output");
 const TEMPLATE = template(fs.readFileSync(path.join(__dirname, "index.html")));
 
+const API_URL = "http://kartat.hsl.fi/jore/graphql";
+
+function fetchStopIds() {
+    const options = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: "query AllStops {allStops { nodes { stopId}} }" }),
+    };
+
+    return fetch(API_URL, options)
+        .then(response => response.json())
+        .then(json => json.data.allStops.nodes.map(stop => stop.stopId));
+}
+
+
 // FIXME: Fetch stops from graphql when data available
 function fetchStops() {
     return new Promise((resolve, reject) => {
@@ -30,17 +46,19 @@ function fetchStops() {
             .pipe(iconv.decodeStream("ISO-8859-1"))
             .pipe(csv.parse({ delimiter: "#", columns: true }, (err, data) => {
                 if (err) reject(err);
-                const stops = data.map(stop => ({
-                    stopId: stop.tunnus,
-                    shortId: stop.lyhyt_nro,
-                    nameFi: stop.nimi_suomi,
-                    group: `${stop.aikataulutyyppi_hsl}${stop.aikataulutyyppi_hkl}`,
-                    index: stop.ajojarjestys,
-                    hasShelter: stop.pysakkityyppi.includes("katos"),
-                }));
+                const stops = data
+                    .map(stop => ({
+                        stopId: stop.tunnus,
+                        shortId: stop.lyhyt_nro,
+                        nameFi: stop.nimi_suomi,
+                        group: `${stop.aikataulutyyppi_hsl}${stop.aikataulutyyppi_hkl}`,
+                        index: stop.ajojarjestys,
+                        hasShelter: stop.pysakkityyppi.includes("katos"),
+                    }))
+                    .sort((a, b) => a.shortId.localeCompare(b.shortId));
                 resolve(stops);
             })
-        )
+        );
     });
 }
 
@@ -111,7 +129,9 @@ function errorResponse(ctx, error) {
 }
 
 async function main() {
-    const stops = await fetchStops();
+    let stops = await fetchStops();
+    const stopIds = await fetchStopIds();
+    stops = stops.filter(stop => stopIds.includes(stop.stopId));
     await generator.initialize();
 
     const app = new Koa();
@@ -124,7 +144,7 @@ async function main() {
     router.post("/generate", (ctx) => {
         const { component, props } = ctx.request.body;
 
-        if (typeof component !== "string" || !props instanceof Array || !props.length) {
+        if (typeof component !== "string" || !(props instanceof Array) || !props.length) {
             return errorResponse(ctx, new Error("Invalid request body"));
         }
 

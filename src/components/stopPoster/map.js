@@ -60,13 +60,13 @@ LocationSymbol.propTypes = {
 
 const StopSymbol = props => (
     <div style={{ width: props.size, height: props.size }}>
-        <img src={getSymbol(props.stopId)} role="presentation"/>
+        <img src={getSymbol(props.stopIds[0])} role="presentation"/>
     </div>
 );
 
 StopSymbol.propTypes = {
     size: PropTypes.number.isRequired,
-    stopId: PropTypes.string.isRequired,
+    stopIds: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
 };
 
 const RouteList = (props) => {

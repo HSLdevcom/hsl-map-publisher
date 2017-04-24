@@ -71,6 +71,7 @@
     "lodash": "^4.17.4",
     "material-ui": "^0.17.1",
     "moment": "^2.18.1",
+    "node-fetch": "^1.6.3",
     "node-phantom-promise": "^1.0.3",
     "nodemon": "^1.11.0",
     "pdfkit": "^0.8.0",
@@ -85,6 +86,6 @@
     "recompose": "^0.22.0",
     "segseg": "^0.2.2",
     "tile-merge-stream": "HSLdevcom/tile-merge-stream",
-    "viewport-mercator-project": "^3.0.0-rc2"
+    "viewport-mercator-project": "^4.0.0"
   }
 }

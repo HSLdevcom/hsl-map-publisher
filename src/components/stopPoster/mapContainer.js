@@ -1,12 +1,18 @@
 import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
+import flatMap from "lodash/flatMap";
 import apolloWrapper from "util/apolloWrapper";
 import { fetchMap } from "util/api";
 import { isNumberVariant, trimRouteId, isDropOffOnly } from "util/domain";
-import { MIN_ZOOM, MAP_WIDTH, MAP_HEIGHT, createViewport, calculateStopsViewport } from "util/stopPoster";
+import {
+    MIN_ZOOM,
+    MAP_WIDTH,
+    MAP_HEIGHT,
+    createViewport,
+    calculateStopsViewport,
+} from "util/stopPoster";
 import routeCompare from "util/routeCompare";
 import hslMapStyle from "hsl-map-style";
-
 
 import Map from "./map";
 
@@ -16,22 +22,26 @@ const MINI_MAP_ZOOM = 9;
 
 const nearbyStopsQuery = gql`
     query nearbyStopsQuery($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $date: Date!) {
-        stops: stopsByBbox(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon) {
+        stopGroups: stopGroupedByShortIdByBbox(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon) {
             nodes {
-                stopId
+                stopIds
                 lat
                 lon
                 nameFi
                 nameSe
-                calculatedHeading
-                routeSegments: routeSegmentsForDate(date: $date) {
+                stops {
                     nodes {
-                        routeId
-                        hasRegularDayDepartures
-                        pickupDropoffType
-                        route {
+                        calculatedHeading
+                        routeSegments: routeSegmentsForDate(date: $date) {
                             nodes {
-                                destinationFi
+                                routeId
+                                hasRegularDayDepartures
+                                pickupDropoffType
+                                route {
+                                    nodes {
+                                        destinationFi
+                                    }
+                                }
                             }
                         }
                     }
@@ -42,21 +52,26 @@ const nearbyStopsQuery = gql`
     }
 `;
 
-const stopsMapper = stop => ({
-    ...stop,
-    routes: stop.routeSegments.nodes
-        .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
-        .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
-        .filter(routeSegment => !isDropOffOnly(routeSegment))
-        .map(routeSegment => ({
-            routeId: trimRouteId(routeSegment.routeId),
-            destinationFi: routeSegment.route.nodes[0].destinationFi,
-        }))
-        .sort(routeCompare),
+const stopsMapper = stopGroup => ({
+    ...stopGroup,
+    // Assume all stops face the same way
+    calculatedHeading: stopGroup.stops.nodes[0].calculatedHeading,
+    routes: flatMap(stopGroup.stops.nodes, node =>
+        node.routeSegments.nodes
+            .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
+            .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
+            .filter(routeSegment => !isDropOffOnly(routeSegment))
+            .map(routeSegment => ({
+                routeId: trimRouteId(routeSegment.routeId),
+                destinationFi: routeSegment.route.nodes[0].destinationFi,
+            }))).sort(routeCompare),
 });
 
 const nearbyStopsMapper = mapProps((props) => {
-    const { stops, viewport } = calculateStopsViewport(props.stop, props.data.stops.nodes);
+    const { stops: stopGroups, viewport } = calculateStopsViewport(
+        props.stop,
+        props.data.stopGroups.nodes
+    );
 
     const mapOptions = {
         center: [props.stop.lon, props.stop.lat],
@@ -86,7 +101,7 @@ const nearbyStopsMapper = mapProps((props) => {
 
     return {
         stop: props.stop,
-        stops: stops.map(stopsMapper),
+        stops: stopGroups.map(stopsMapper),
         pixelsPerMeter: viewport.getDistanceScales().pixelsPerMeter[0],
         map: fetchMap(mapOptions, mapStyle),
         mapOptions,
@@ -112,9 +127,9 @@ const mapPositionQuery = gql`
 const propsMapper = mapProps((props) => {
     const viewport = createViewport(props.data.stop, MIN_ZOOM);
     const [minLon, minLat] = viewport.unproject([0, 0]);
-    const [maxLon, maxLat] = viewport.unproject([viewport.width, viewport.height]);
+    const [maxLon, maxLat] = viewport.unproject([MAP_WIDTH, MAP_HEIGHT]);
 
-    return ({ stop: props.data.stop, minLat, minLon, maxLat, maxLon, date: props.date });
+    return { stop: props.data.stop, minLat, minLon, maxLat, maxLon, date: props.date };
 });
 
 const MapContainer = apolloWrapper(propsMapper)(MapWithNearbyStops);

@@ -1,6 +1,8 @@
 import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
 import find from "lodash/find";
+import flatMap from "lodash/flatMap";
+import uniq from "lodash/uniq";
 
 import apolloWrapper from "util/apolloWrapper";
 import { isDropOffOnly } from "util/domain";
@@ -27,42 +29,53 @@ function groupDepartures(departures) {
     };
 }
 
-function getNotes(routeSegment) {
-    return (routeSegment.hasRegularDayDepartures &&
-        routeSegment.notes.nodes
-            .filter(note => note.noteType.includes("Y"))
-            .map(note => note.noteText)) || [];
+function getNotes(isSummerTimetable) {
+    return function getNotesInner(routeSegment) {
+        return (routeSegment.hasRegularDayDepartures &&
+            routeSegment.notes.nodes
+                // Y = Yleisöaikataulu
+                .filter(note => note.noteType.includes("Y"))
+                // V = Ympäri vuoden
+                // K = Vain kesäaikataulu
+                // T = Vain talviaikatalu
+                .filter(note => note.noteType.includes("V") ||
+                    note.noteType.includes(isSummerTimetable ? "K" : "T"))
+                .map(note => note.noteText)) || [];
+    };
 }
 
 const timetableQuery = gql`
     query timetableQuery($stopId: String!, $date: Date!) {
         stop: stopByStopId(stopId: $stopId) {
-
-            routeSegments: routeSegmentsForDate(date: $date) {
+            siblings {
                 nodes {
-                    routeId
-                    direction
-                    hasRegularDayDepartures
-                    pickupDropoffType
-                    notes {
+                    routeSegments: routeSegmentsForDate(date: $date) {
                         nodes {
-                            noteText
-                            noteType
+                            routeId
+                            direction
+                            hasRegularDayDepartures
+                            pickupDropoffType
+                            notes {
+                                nodes {
+                                    noteText
+                                    noteType
+                                }
+                            }
                         }
                     }
-                }
-            }
 
-            departures: departuresGropuped (date: $date) {
-                nodes {
-                    hours
-                    minutes
-                    note
-                    routeId
-                    direction
-                    dayType
-                    isNextDay
-                    isAccessible
+                    departures: departuresGropuped (date: $date) {
+                        nodes {
+                            hours
+                            minutes
+                            note
+                            routeId
+                            direction
+                            dayType
+                            isNextDay
+                            isAccessible
+                        }
+                    }
                 }
             }
         }
@@ -71,13 +84,22 @@ const timetableQuery = gql`
 
 const propsMapper = mapProps((props) => {
     const { weekdays, saturdays, sundays } = groupDepartures(
-        filterDepartures(
-            props.data.stop.departures.nodes,
-            props.data.stop.routeSegments.nodes
-        )
+        flatMap(props.data.stop.siblings.nodes, stop => filterDepartures(
+            stop.departures.nodes,
+            stop.routeSegments.nodes
+        ))
     );
-    const notes = new Set(...props.data.stop.routeSegments.nodes.map(getNotes));
-    return { weekdays, saturdays, sundays, notes };
+    let notes = flatMap(
+      props.data.stop.siblings.nodes,
+      stop => flatMap(stop.routeSegments.nodes, getNotes(props.isSummerTimetable))
+    );
+    // if (props.data.stop.siblings.nodes.some(stop =>
+    //   stop.departures.nodes.some(departure => departure.isAccessible === false))
+    // ) {
+    //     notes.push("e) ei matalalattiavaunu / ej låggolvsvagn");
+    // }
+    notes = uniq(notes).sort();
+    return { weekdays, saturdays, sundays, notes, isSummerTimetable: props.isSummerTimetable };
 });
 
 const TimetableContainer = apolloWrapper(propsMapper)(Timetable);
