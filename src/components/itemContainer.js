@@ -297,6 +297,31 @@ class ItemContainer extends Component {
         }, []);
     }
 
+    getNextPlacement(placement, index) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (placement.positions[index].isFixed) {
+                    resolve(placement);
+                    return;
+                }
+
+                // Get potential positions for component at index
+                const placements = this.getPlacements(placement.positions, index);
+
+                // Get potential positions for components overlapping component at index
+                const placementsOverlapping = this.getPlacementsOverlapping(placements, index);
+
+                const nextPlacement = [
+                    placement,
+                    ...placements,
+                    ...placementsOverlapping,
+                ].reduce((prev, cur) => this.comparePlacements(prev, cur));
+
+                resolve(nextPlacement);
+            });
+        });
+    }
+
     shouldUpdateOverlapping(placements) {
         for (const placement of placements) {
             if (this.getCost(placement.positions, placement.indexes) < 1) {
@@ -333,7 +358,7 @@ class ItemContainer extends Component {
         this.diffs = diffs[Math.min(index, diffs.length)];
     }
 
-    updateChildren() {
+    async updateChildren() {
         // Get refs to mounted children
         const refs = this.childRefs.filter(ref => !!ref);
 
@@ -347,23 +372,9 @@ class ItemContainer extends Component {
             this.updateDiffs(factor);
             for (let iteration = 0; iteration < ITERATIONS_PER_FACTOR; iteration++) {
                 const previousPlacement = placement;
-
                 for (let i = 0; i < placement.positions.length; i++) {
-                    if (placement.positions[i].isFixed) continue; // eslint-disable-line no-continue
-
-                    // Get potential positions for component at index
-                    const placements = this.getPlacements(placement.positions, i);
-
-                    // Get potential positions for components overlapping component at index
-                    const placementsOverlapping = this.getPlacementsOverlapping(placements, i);
-
-                    placement = [
-                        placement,
-                        ...placements,
-                        ...placementsOverlapping,
-                    ].reduce((prev, cur) => this.comparePlacements(prev, cur));
+                    placement = await this.getNextPlacement(placement, i); // eslint-disable-line
                 }
-
                 if (placement === previousPlacement) break;
             }
         }

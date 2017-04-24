@@ -62,6 +62,7 @@ class App extends Component {
                     window.callPhantom({ error: error.message });
                     return;
                 }
+
                 window.callPhantom({
                     width: this.root.offsetWidth,
                     height: this.root.offsetHeight,
@@ -71,8 +72,9 @@ class App extends Component {
             }
         };
 
+        // FIXME: Remove unused id prop when onReady callback is called again
         return (
-            <div style={{ display: "inline-block" }} ref={(ref) => { this.root = ref; }}>
+            <div id="app-root" style={{ display: "inline-block" }} ref={(ref) => { this.root = ref; }}>
                 <ApolloProvider client={client}>
                     <ComponentToRender {...this.state.props} onReady={onReady}/>
                 </ApolloProvider>
