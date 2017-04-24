@@ -1,10 +1,16 @@
+const fs = require("fs");
 const path = require("path");
 const driver = require("node-phantom-promise");
+const PNGEncoder = require("png-stream").Encoder;
+const PNGDecoder = require("png-stream").Decoder;
+const concat = require("concat-frames");
+const TileMergeStream = require("tile-merge-stream");
 
 const slimerjs = /^win/.test(process.platform) ? "slimerjs.cmd" : "slimerjs";
 const slimerPath = path.join(__dirname, "..", "node_modules", ".bin", slimerjs);
 
 const CLIENT_PORT = 3000;
+const TILE_SIZE = 3000;
 
 let browser;
 let page;
@@ -31,11 +37,58 @@ function logError(error) {
     if (stream) stream.write(`${content}\n`);
 }
 
+function flushBuffer(buffer, stream) {
+    return new Promise((resolve, reject) => {
+        const decoder = new PNGDecoder();
+
+        decoder.on("error", error => reject(error));
+        decoder.pipe(
+            concat(([{ width, height, pixels }]) => {
+                if (!stream.write({ width, height, data: pixels })) {
+                    stream.once("drain", () => resolve());
+                } else {
+                    process.nextTick(() => resolve());
+                }
+            })
+        );
+        decoder.end(buffer);
+    });
+}
+
+async function captureScreenshot(totalWidth, totalHeight, filename) {
+    const tileStream = new TileMergeStream({ width: totalWidth, height: totalHeight, channels: 4 });
+
+    const outStream = tileStream
+        .pipe(new PNGEncoder(totalWidth, totalHeight, { colorSpace: "rgba" }))
+        .pipe(fs.createWriteStream(filename));
+
+    let top = 0;
+    while (top < totalHeight) {
+        let left = 0;
+        let height = Math.min(TILE_SIZE, totalHeight - top);
+        while (left < totalWidth) {
+            let width = Math.min(TILE_SIZE, totalWidth - left);
+            await page.set("clipRect", {top, left, width, height});
+            const base64 = await page.renderBase64({format: "png"});
+            await flushBuffer(Buffer.from(base64, "base64"), tileStream);
+            left += width;
+        }
+        top += height;
+    }
+
+    tileStream.end();
+
+    return new Promise((resolve, error) => {
+        outStream.on("finish", () => resolve());
+        outStream.on("error", () => reject(error));
+    });
+}
+
 /**
- * Renders component to pdf or bitmap file
+ * Renders component to bitmap file
  * @returns {Promise}
  */
-function render(options) {
+function renderComponent(options) {
     const { component, props, directory, filename } = options;
 
     return new Promise((resolve, reject) => {
@@ -46,17 +99,9 @@ function render(options) {
                 reject(error);
                 return;
             }
-            page.render(path.join(directory, filename))
-                .then((success) => {
-                    if (!success) {
-                        reject(new Error("Failed to render page"));
-                        return;
-                    }
-                    resolve({ width, height });
-                })
-                .catch(error => {
-                    reject(error);
-                });
+            captureScreenshot(width, height, path.join(directory, filename))
+                .then(() => resolve({ width, height }))
+                .catch(error => reject(error));
         };
         page.evaluate((component, props) => {
             window.setVisibleComponent(component, props);
@@ -80,7 +125,7 @@ function generate(options) {
            stream = options.stream;
            logInfo(`Rendering ${options.component} to ${options.filename}`);
            logInfo(`Using props ${JSON.stringify(options.props)}`);
-           return render(options);
+           return renderComponent(options);
         })
         .catch((error) => {
             logError(error);

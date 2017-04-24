@@ -132,6 +132,7 @@ const Map = (props) => {
         stop => stop.x < miniMapStyle.left || stop.y < miniMapStyle.top
     );
 
+    // FIXME: Do not call phantom directly, use App -> onReady instead
     return (
         <div className={styles.root} style={mapStyle}>
             <div className={styles.map}>
@@ -140,9 +141,10 @@ const Map = (props) => {
                         if (window.callPhantom) {
                             // eslint-disable-next-line no-param-reassign
                             el.onload = () => {
+                                const root = document.getElementById("app-root");
                                 const options = {
-                                    width: document.body.offsetWidth,
-                                    height: document.body.offsetHeight,
+                                    width: root.offsetWidth,
+                                    height: root.offsetHeight,
                                 };
                                 window.callPhantom(options);
                             };

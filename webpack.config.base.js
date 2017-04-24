@@ -86,6 +86,10 @@ module.exports = (options) => {
                     test: /\.svg$/,
                     loader: "url-loader?mimetype=image/svg+xml",
                 },
+                {
+                    test: /\.json$/,
+                    loader: "json-loader",
+                }
             ],
         },
         postcss: [modulesValues, autoprefixer],
