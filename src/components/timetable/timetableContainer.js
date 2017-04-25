@@ -102,11 +102,11 @@ const propsMapper = mapProps((props) => {
     // }
     notes = uniq(notes).sort();
 
-    const dateBegin = flatMap(
+    const dateBegin = props.dateBegin ? props.dateBegin : flatMap(
       props.data.stop.siblings.nodes,
       stop => stop.departures.nodes.map(departure => departure.dateBegin)
     ).sort((a, b) => (a > b ? -1 : (a < b ? 1 : 0)))[0]; // eslint-disable-line no-nested-ternary
-    const dateEnd = flatMap(
+    const dateEnd = props.dateEnd ? props.dateEnd : flatMap(
       props.data.stop.siblings.nodes,
       stop => stop.departures.nodes.map(departure => departure.dateEnd)
     ).sort((a, b) => (a < b ? -1 : (a > b ? 1 : 0)))[0]; // eslint-disable-line no-nested-ternary
