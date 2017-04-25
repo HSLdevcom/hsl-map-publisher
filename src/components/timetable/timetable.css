@@ -67,3 +67,12 @@
     font-family: fontFamilyNarrow;
     color: background;
 }
+
+.validity {
+    margin: 15px;
+    font-family: fontFamily;
+    font-size: 12px;
+    line-height: 13px;
+    letter-spacing: -0.5px;
+    color: background;
+}

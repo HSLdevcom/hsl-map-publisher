@@ -1,6 +1,6 @@
 import React, { PropTypes } from "react";
 import groupBy from "lodash/groupBy";
-import { Row, WrappingRow, Spacer } from "components/util";
+import { Row, WrappingRow } from "components/util";
 import sortBy from "lodash/sortBy";
 import classNames from "classnames";
 
@@ -106,7 +106,9 @@ const Timetable = props => (
                 <Table departures={props.sundays}/>
             </div>
         }
-        <Spacer height={20}/>
+        <div className={`${styles.validity}`}>
+          Aikataulut voimassa {props.dateBegin} - {props.dateEnd}
+        </div>
         {props.notes.map(note =>
             <div key={note} className={styles.footnote}>
                 {note}
@@ -121,6 +123,9 @@ Timetable.propTypes = {
     sundays: React.PropTypes.arrayOf(React.PropTypes.shape(Table.propTypes.departures)),
     notes: React.PropTypes.arrayOf(React.PropTypes.string.isRequired).isRequired,
     isSummerTimetable: React.PropTypes.bool,
+    dateBegin: React.PropTypes.string.isRequired,
+    dateEnd: React.PropTypes.string.isRequired,
+
 };
 
 Timetable.defaultProps = {
