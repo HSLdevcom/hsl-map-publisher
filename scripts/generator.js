@@ -32,8 +32,8 @@ function logInfo(message) {
 }
 
 function logError(error) {
-    const content = `ERROR: ${error instanceof Error ? error.message : error}`;
-    console.error(content); // eslint-disable-line no-console
+    const content = `ERROR: ${error.message}`;
+    console.error(error); // eslint-disable-line no-console
     if (stream) stream.write(`${content}\n`);
 }
 
@@ -68,8 +68,8 @@ async function captureScreenshot(totalWidth, totalHeight, filename) {
         let height = Math.min(TILE_SIZE, totalHeight - top);
         while (left < totalWidth) {
             let width = Math.min(TILE_SIZE, totalWidth - left);
-            await page.set("clipRect", {top, left, width, height});
-            const base64 = await page.renderBase64({format: "png"});
+            await page.set("clipRect", {top, left, width, height });
+            const base64 = await page.renderBase64({ format: "png" });
             await flushBuffer(Buffer.from(base64, "base64"), tileStream);
             left += width;
         }
@@ -96,16 +96,14 @@ function renderComponent(options) {
         page.onCallback = ({ error, width, height }) => {
             page.onCallback = null;
             if (error) {
-                reject(error);
+                reject(new Error(error));
                 return;
             }
             captureScreenshot(width, height, path.join(directory, filename))
                 .then(() => resolve({ width, height }))
                 .catch(error => reject(error));
         };
-        page.evaluate((component, props) => {
-            window.setVisibleComponent(component, props);
-        }, component, props, () => null);
+        open(`http://localhost:${CLIENT_PORT}/#component=${component}&props=${JSON.stringify(props)}`);
     });
 }
 
@@ -143,14 +141,6 @@ async function initialize() {
 
     page.onError = error => logError(error);
     page.onConsoleMessage = message => logInfo(message);
-
-    return new Promise((resolve) => {
-        // Initial callback called by client app when ready
-        page.onCallback = () => {
-            resolve(page);
-        };
-        open(`http://localhost:${CLIENT_PORT}`);
-    });
 }
 
 module.exports = { initialize, generate };
