@@ -66,10 +66,6 @@ module.exports = (options) => {
             ],
             loaders: [
                 {
-                    test: /\.json$/,
-                    loader: "json-loader",
-                },
-                {
                     test: /\.js$/,
                     loaders: ["babel"],
                     exclude: /node_modules/,
@@ -89,7 +85,7 @@ module.exports = (options) => {
                 {
                     test: /\.json$/,
                     loader: "json-loader",
-                }
+                },
             ],
         },
         postcss: [modulesValues, autoprefixer],
