@@ -50,6 +50,23 @@ const Icon = props => (
     <Image {...props} style={{ height: 180, marginLeft: 0, marginRight: 30 }}/>
 );
 
+const getZoneForStop = (shortId) => {
+    if (shortId.startsWith("H")) return "Helsinki";
+    else if (shortId.startsWith("V")) return "Vantaa";
+    else if (shortId.startsWith("Si1403")) return "Vantaa";
+    else if (shortId.startsWith("Si1404")) return "Vantaa";
+    else if (shortId.startsWith("Nu0029")) return "Vantaa";
+    else if (shortId.startsWith("Nu0030")) return "Vantaa";
+    else if (shortId.startsWith("E")) return "Espoo-Kauniainen";
+    else if (shortId.startsWith("Ka")) return "Espoo-Kauniainen";
+    else if (shortId.startsWith("Ke")) return "Kerava-Sipoo";
+    else if (shortId.startsWith("Si")) return "Kerava-Sipoo";
+    else if (shortId.startsWith("Pn4017")) return "Kerava-Sipoo";
+    else if (shortId.startsWith("Pn4018")) return "Kerava-Sipoo";
+    else if (shortId.startsWith("Ki")) return "Kirkkonummi";
+    return null;
+};
+
 const Header = props => (
     <JustifiedRow style={{ margin: "0 10px" }}>
         <div style={{ display: "flex", flexDirection: "row" }}>
@@ -62,7 +79,7 @@ const Header = props => (
         <CenteringColumn>
             <Title small>Lippuvyöhyke</Title>
             <Subtitle small>Resezon</Subtitle>
-            <div className={styles.zone}>Helsinki</div>
+            <div className={styles.zone}>{getZoneForStop(props.shortId)}</div>
         </CenteringColumn>
         <CenteringColumn>
             <Title small>Pysäkkinumero</Title>
