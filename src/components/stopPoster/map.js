@@ -8,6 +8,8 @@ import CustomTypes from "util/customTypes";
 
 import locationIcon from "icons/location.svg";
 
+import MapImage from "./mapImage";
+
 import styles from "./map.css";
 
 // Max rows in label
@@ -131,13 +133,7 @@ const Map = (props) => {
     return (
         <div className={styles.root} style={mapStyle}>
             <div className={styles.map}>
-                <img
-                    ref={el => el && props.map.then((map) => {
-                        // eslint-disable-next-line no-param-reassign
-                        el.src = map;
-                    })}
-                    role="presentation"
-                />
+                <MapImage src={props.map}/>
             </div>
 
             <div className={styles.overlays}>
@@ -185,11 +181,7 @@ const Map = (props) => {
             </div>
 
             <div className={styles.miniMap} style={miniMapStyle}>
-                <img
-                    // eslint-disable-next-line no-param-reassign
-                    ref={el => el && props.miniMap.then((miniMap) => { el.src = miniMap; })}
-                    role="presentation"
-                />
+                <MapImage src={props.miniMap}/>
                 <div className={styles.center} style={{ margin: -LOCATION_RADIUS_MINI }}>
                     <LocationSymbol size={LOCATION_RADIUS_MINI * 2}/>
                 </div>
