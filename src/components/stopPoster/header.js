@@ -1,6 +1,6 @@
 import React from "react";
 import classNames from "classnames";
-import { JustifiedRow, JustifiedColumn, Image } from "components/util";
+import { JustifiedRow, CenteringColumn, Image } from "components/util";
 
 import busIcon from "icons/bus.svg";
 
@@ -59,16 +59,16 @@ const Header = props => (
                 <Subtitle>{props.nameSe}</Subtitle>
             </Group>
         </div>
-        <JustifiedColumn>
+        <CenteringColumn>
             <Title small>Lippuvyöhyke</Title>
             <Subtitle small>Resezon</Subtitle>
             <div className={styles.zone}>Helsinki</div>
-        </JustifiedColumn>
-        <JustifiedColumn>
+        </CenteringColumn>
+        <CenteringColumn>
             <Title small>Pysäkkinumero</Title>
             <Subtitle small>Hållplatsnummer</Subtitle>
             <div className={styles.stop}>{props.shortId}</div>
-        </JustifiedColumn>
+        </CenteringColumn>
     </JustifiedRow>
 );
 
