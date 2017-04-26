@@ -21,7 +21,7 @@ class StopPoster extends Component {
                     <Header stopId={this.props.stopId}/>
 
                     <div className={styles.content}>
-                        <div>
+                        <div className={styles.leftColumn}>
                             <Routes stopId={this.props.stopId} date={this.props.date}/>
                             <div className={styles.title}>
                                 Pysäkkiaikataulu&nbsp;&nbsp;

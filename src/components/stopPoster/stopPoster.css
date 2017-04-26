@@ -14,6 +14,10 @@
     margin: 50px 0;
 }
 
+.leftColumn {
+    flex-grow: 1;
+}
+
 .title {
     font-family: fontFamily;
     font-weight: 700;
