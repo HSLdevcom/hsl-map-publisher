@@ -27,6 +27,10 @@
 
 .title {
     font-size: 18px;
-    font-weight: 700;
+    font-weight: 500;
     font-family: fontFamily;
+}
+
+.subtitle {
+  font-weight: 300;
 }
