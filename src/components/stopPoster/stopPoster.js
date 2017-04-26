@@ -23,7 +23,10 @@ class StopPoster extends Component {
                     <div className={styles.content}>
                         <div>
                             <Routes stopId={this.props.stopId} date={this.props.date}/>
-                            <div className={styles.title}>Pysäkkiaikataulu</div>
+                            <div className={styles.title}>
+                                Pysäkkiaikataulu&nbsp;&nbsp;
+                                <span className={styles.subtitle}>Hållplatstidtabell</span>
+                            </div>
                             <Timetable
                                 stopId={this.props.stopId}
                                 date={this.props.date}
@@ -35,7 +38,10 @@ class StopPoster extends Component {
 
                         <div>
                             <Map stopId={this.props.stopId} date={this.props.date}/>
-                            <div className={styles.title}>Linjojen reitit</div>
+                            <div className={styles.title}>
+                                Linjojen reitit&nbsp;&nbsp;
+                                <span className={styles.subtitle}>Linjernas rutter</span>
+                            </div>
                             <RouteDiagram stopId={this.props.stopId} date={this.props.date}/>
                         </div>
                     </div>
