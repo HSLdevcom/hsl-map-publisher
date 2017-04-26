@@ -83,7 +83,7 @@
     "react-hot-loader": "^3.0.0-beta.6",
     "react-tap-event-plugin": "^2.0.1",
     "react-virtualized": "^9.5.0",
-    "recompose": "^0.22.0",
+    "recompose": "^0.23.1",
     "segseg": "^0.2.2",
     "tile-merge-stream": "HSLdevcom/tile-merge-stream",
     "viewport-mercator-project": "^4.0.0"
