@@ -7,7 +7,6 @@ import Header from "./headerContainer";
 import Footer from "./footer";
 
 import Routes from "./routesContainer";
-import Info from "./info";
 
 import Map from "./mapContainer";
 
@@ -30,7 +29,6 @@ class StopPoster extends Component {
                                 date={this.props.date}
                                 isSummerTimetable={this.props.isSummerTimetable}
                             />
-                            <Info/>
                         </div>
 
                         <Spacer width={50}/>
