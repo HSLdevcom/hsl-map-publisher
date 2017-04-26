@@ -24,6 +24,14 @@
     max-height: 100%;
 }
 
+.centeringColumn {
+    display: flex;
+    flex-flow: column wrap;
+    align-items: center;
+    max-height: 100%;
+}
+
+
 .justifiedColumn {
     display: flex;
     flex-flow: column nowrap;

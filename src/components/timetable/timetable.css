@@ -3,7 +3,7 @@
 .root {
     padding: 10px 20px 30px;
     color: gray;
-    font-weight: 400;
+    font-weight: 300;
     font-family: fontFamilyNarrow;
     background: backgroundLight;
     border-radius: borderRadius;
@@ -14,7 +14,7 @@
 }
 
 .root strong {
-    font-weight: 700;
+    font-weight: 500;
 }
 
 .header {
@@ -45,15 +45,29 @@
 }
 
 .root.summer .table > *:nth-child(odd) {
-    background-color: backgroundLight;
+  background-color: backgroundLight;
+}
+
+.table > * {
+    border-radius: 8px;
+}
+
+.table strong {
+    font-weight: 700;
 }
 
 .item {
+    display: flex;
     min-width: 52px;
     padding: 4px 0;
     font-size: 12px;
-    letter-spacing: -0.5px;
+    letter-spacing: -.025em;
     line-height: 8px;
+}
+
+.minutes {
+    font-weight: 700;
+    min-width: 12px;
 }
 
 .itemPadded {

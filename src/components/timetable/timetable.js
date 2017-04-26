@@ -35,7 +35,9 @@ Header.propTypes = {
 
 const Departure = props => (
     <div className={styles.item}>
-        <strong>{props.minutes < 10 && "0"}{props.minutes}</strong>/{trimRouteId(props.routeId)}
+        <div className={styles.minutes}>{props.minutes < 10 && "0"}{props.minutes}</div>
+        /&#x202F;
+        {trimRouteId(props.routeId)}
         {!props.isAccessible && "e"}{props.note}
     </div>
 );

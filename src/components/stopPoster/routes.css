@@ -1,4 +1,4 @@
-@value white, gray, fontFamily, fontFamilyNarrow, borderRadius from "styles/common.css";
+@value white, gray, fontFamily, fontFamilyNarrow, borderRadius, hslBlue from "styles/common.css";
 
 .root {
     color: gray;
@@ -9,20 +9,26 @@
 
 .identifier {
     font-family: fontFamilyNarrow;
-    width: 140px;
-    padding: 10px 20px;
+    padding: 0px 10px;
     font-size: 70px;
     font-weight: 700;
-    text-align: right;
+    color: hslBlue;
+}
+
+.row {
+    height: 84px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .title {
     font-family: fontFamily;
     font-size: 28px;
-    font-weight: 700;
+    font-weight: 500;
 }
 
 .subtitle {
     composes: title;
-    font-weight: 400;
+    font-weight: 300;
 }
