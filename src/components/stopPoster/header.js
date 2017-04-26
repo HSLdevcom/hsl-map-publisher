@@ -67,7 +67,7 @@ const Header = props => (
         <CenteringColumn>
             <Title small>Pysäkkinumero</Title>
             <Subtitle small>Hållplatsnummer</Subtitle>
-            <div className={styles.stop}>{props.shortId}</div>
+            <div className={styles.stop}>{props.shortId.replace(" ", "")}</div>
         </CenteringColumn>
     </JustifiedRow>
 );
