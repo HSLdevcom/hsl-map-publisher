@@ -1,4 +1,5 @@
-import React, { PropTypes } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import groupBy from "lodash/groupBy";
 import { Row, WrappingRow, Spacer } from "components/util";
 import sortBy from "lodash/sortBy";
@@ -62,8 +63,8 @@ const TableRow = props => (
 
 
 TableRow.propTypes = {
-    hours: React.PropTypes.string.isRequired,
-    departures: React.PropTypes.arrayOf(React.PropTypes.shape(Departure.propTypes)).isRequired,
+    hours: PropTypes.string.isRequired,
+    departures: PropTypes.arrayOf(PropTypes.shape(Departure.propTypes)).isRequired,
 };
 
 const Table = (props) => {
@@ -80,7 +81,7 @@ const Table = (props) => {
 };
 
 Table.propTypes = {
-    departures: React.PropTypes.arrayOf(React.PropTypes.shape({
+    departures: PropTypes.arrayOf(PropTypes.shape({
         hours: PropTypes.number.isRequired,
         ...Departure.propTypes,
     })).isRequired,
@@ -116,11 +117,11 @@ const Timetable = props => (
 );
 
 Timetable.propTypes = {
-    weekdays: React.PropTypes.arrayOf(React.PropTypes.shape(Table.propTypes.departures)),
-    saturdays: React.PropTypes.arrayOf(React.PropTypes.shape(Table.propTypes.departures)),
-    sundays: React.PropTypes.arrayOf(React.PropTypes.shape(Table.propTypes.departures)),
-    notes: React.PropTypes.arrayOf(React.PropTypes.string.isRequired).isRequired,
-    isSummerTimetable: React.PropTypes.bool,
+    weekdays: PropTypes.arrayOf(PropTypes.shape(Table.propTypes.departures)),
+    saturdays: PropTypes.arrayOf(PropTypes.shape(Table.propTypes.departures)),
+    sundays: PropTypes.arrayOf(PropTypes.shape(Table.propTypes.departures)),
+    notes: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+    isSummerTimetable: PropTypes.bool,
 };
 
 Timetable.defaultProps = {
