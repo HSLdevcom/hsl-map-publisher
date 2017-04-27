@@ -2,14 +2,14 @@
 
 .title {
     font-family: fontFamily;
-    font-size: 70px;
-    font-weight: 700;
+    font-size: 80px;
+    font-weight: 500;
     white-space: nowrap;
 }
 
 .subtitle {
     composes: title;
-    font-weight: 400;
+    font-weight: 300;
 }
 
 .small {
