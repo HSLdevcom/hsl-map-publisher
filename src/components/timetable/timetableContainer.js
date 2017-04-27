@@ -105,11 +105,11 @@ const propsMapper = mapProps((props) => {
     const dateBegin = props.dateBegin ? props.dateBegin : flatMap(
       props.data.stop.siblings.nodes,
       stop => stop.departures.nodes.map(departure => departure.dateBegin)
-    ).sort((a, b) => (a > b ? -1 : (a < b ? 1 : 0)))[0]; // eslint-disable-line no-nested-ternary
+    ).sort((a, b) => b.localeCompare(a))[0];
     const dateEnd = props.dateEnd ? props.dateEnd : flatMap(
       props.data.stop.siblings.nodes,
       stop => stop.departures.nodes.map(departure => departure.dateEnd)
-    ).sort((a, b) => (a < b ? -1 : (a > b ? 1 : 0)))[0]; // eslint-disable-line no-nested-ternary
+    ).sort((a, b) => a.localeCompare(b))[0];
 
     return {
         weekdays,
