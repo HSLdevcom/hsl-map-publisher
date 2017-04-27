@@ -74,6 +74,8 @@ const timetableQuery = gql`
                             dayType
                             isNextDay
                             isAccessible
+                            dateBegin
+                            dateEnd
                         }
                     }
                 }
@@ -99,7 +101,25 @@ const propsMapper = mapProps((props) => {
     //     notes.push("e) ei matalalattiavaunu / ej låggolvsvagn");
     // }
     notes = uniq(notes).sort();
-    return { weekdays, saturdays, sundays, notes, isSummerTimetable: props.isSummerTimetable };
+
+    const dateBegin = props.dateBegin ? props.dateBegin : flatMap(
+      props.data.stop.siblings.nodes,
+      stop => stop.departures.nodes.map(departure => departure.dateBegin)
+    ).sort((a, b) => b.localeCompare(a))[0];
+    const dateEnd = props.dateEnd ? props.dateEnd : flatMap(
+      props.data.stop.siblings.nodes,
+      stop => stop.departures.nodes.map(departure => departure.dateEnd)
+    ).sort((a, b) => a.localeCompare(b))[0];
+
+    return {
+        weekdays,
+        saturdays,
+        sundays,
+        notes,
+        isSummerTimetable: props.isSummerTimetable,
+        dateBegin,
+        dateEnd,
+    };
 });
 
 const TimetableContainer = apolloWrapper(propsMapper)(Timetable);

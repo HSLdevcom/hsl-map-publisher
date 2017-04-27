@@ -29,6 +29,8 @@ class StopPoster extends Component {
                                 stopId={this.props.stopId}
                                 date={this.props.date}
                                 isSummerTimetable={this.props.isSummerTimetable}
+                                dateBegin={this.props.dateBegin}
+                                dateEnd={this.props.dateEnd}
                             />
                             <Info/>
                         </div>
@@ -54,10 +56,14 @@ StopPoster.propTypes = {
     stopId: PropTypes.string.isRequired,
     date: PropTypes.string.isRequired,
     isSummerTimetable: PropTypes.bool,
+    dateBegin: PropTypes.string,
+    dateEnd: PropTypes.string,
 };
 
 StopPoster.defaultProps = {
     isSummerTimetable: false,
+    dateBegin: null,
+    dateEnd: null,
 };
 
 export default StopPoster;

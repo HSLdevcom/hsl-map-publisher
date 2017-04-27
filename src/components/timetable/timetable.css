@@ -1,6 +1,7 @@
 @value fontFamily, fontFamilyNarrow, gray, white, background, backgroundLight, borderRadius from "styles/common.css";
 
 .root {
+    position: relative;
     padding: 10px 20px 30px;
     color: gray;
     font-weight: 300;
@@ -33,7 +34,7 @@
     padding: 0 10px;
     font-size: 12px;
     line-height: 13px;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.025em;
 }
 
 .subtitle > *:first-child {
@@ -80,4 +81,16 @@
     font-size: 13px;
     font-family: fontFamilyNarrow;
     color: background;
+}
+
+.validity {
+    position: absolute;
+    top: 30px;
+    right: 20px;
+    font-family: fontFamily;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: -0.025em;
+    color: background;
+    text-align: right;
 }
