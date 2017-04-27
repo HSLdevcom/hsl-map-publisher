@@ -47,6 +47,7 @@ class App extends Component {
             rowFactoriesByType,
             selectedRowFactory: Object.values(rowFactoriesByType)[0],
             selectedDate: new Date(),
+            isSummerTimetable: false,
         };
     }
 
@@ -65,7 +66,17 @@ class App extends Component {
         const props = this.state.rows
             .filter(({ isChecked }) => isChecked)
             .reduce((prev, { stopIds }) => [...prev, ...stopIds], [])
-            .map(stopId => ({ stopId, date: this.state.selectedDate }));
+            .map(stopId => ({
+                stopId,
+                date: this.state.selectedDate.toISOString().substring(0, 10),
+                isSummerTimetable: this.state.isSummerTimetable,
+                dateBegin: this.state.dateBegin
+                    ? this.state.dateBegin.toISOString().substring(0, 10)
+                    : null,
+                dateEnd: this.state.dateEnd
+                    ? this.state.dateEnd.toISOString().substring(0, 10)
+                    : null,
+            }));
 
         generate(component, props)
             .then((url) => {
@@ -151,10 +162,39 @@ class App extends Component {
                         </div>
 
                         <div className={styles.column}>
+                            <h3>Aikataulukausi</h3>
+                            <RadioGroup
+                                valuesByLabel={{ Talvi: false, Kesä: true }}
+                                valueSelected={this.state.isSummerTimetable}
+                                onChange={value => this.setState({ isSummerTimetable: value })}
+                            />
+                        </div>
+
+                        <div className={styles.column}>
                             <h3>Päivämäärä</h3>
                             <DatePicker
                                 value={this.state.selectedDate}
                                 onChange={(event, date) => this.onDateChange(date)}
+                                container="inline"
+                            />
+                        </div>
+
+                        <div className={styles.column}>
+                            <h3>Voimassaolokausi alkaa</h3>
+                            <DatePicker
+                                value={this.state.dateBegin}
+                                onChange={(event, date) => this.setState({ dateBegin: date })}
+                                hintText="oletus"
+                                container="inline"
+                            />
+                        </div>
+
+                        <div className={styles.column}>
+                            <h3>Voimassaolokausi loppuu</h3>
+                            <DatePicker
+                                value={this.state.dateEnd}
+                                onChange={(event, date) => this.setState({ dateEnd: date })}
+                                hintText="oletus"
                                 container="inline"
                             />
                         </div>

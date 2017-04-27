@@ -85,7 +85,7 @@ module.exports = (options) => {
                 {
                     test: /\.json$/,
                     loader: "json-loader",
-                }
+                },
             ],
         },
         postcss: [modulesValues, autoprefixer],

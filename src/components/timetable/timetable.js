@@ -109,6 +109,15 @@ const Timetable = props => (
                 <Table departures={props.sundays}/>
             </div>
         }
+        <div className={`${styles.validity}`}>
+            <div><strong>Aikataulut voimassa</strong></div>
+            <div>Tidtabeller giltiga</div>
+            <div>
+                {new Date(props.dateBegin).toLocaleDateString("fi")}
+                &nbsp;-&nbsp;
+                {new Date(props.dateEnd).toLocaleDateString("fi")}
+            </div>
+        </div>
         <Spacer height={20}/>
         {props.notes.map(note =>
             <div key={note} className={styles.footnote}>
@@ -124,6 +133,8 @@ Timetable.propTypes = {
     sundays: PropTypes.arrayOf(PropTypes.shape(Table.propTypes.departures)),
     notes: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
     isSummerTimetable: PropTypes.bool,
+    dateBegin: PropTypes.string.isRequired,
+    dateEnd: PropTypes.string.isRequired,
 };
 
 Timetable.defaultProps = {
