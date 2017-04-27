@@ -19,27 +19,41 @@ const client = new ApolloClient({
 
 class App extends Component {
     componentDidMount() {
-        if (window.callPhantom) {
-            renderQueue.onEmpty(({ success }) => {
-                if (!success) {
-                    window.callPhantom({ error: "Failed to render component" });
-                    return;
-                }
-                window.callPhantom({
-                    width: this.root.offsetWidth,
-                    height: this.root.offsetHeight,
-                });
+        renderQueue.onEmpty(({ success }) => {
+            if (!success) {
+                handleError(new Error("Failed to render component"));
+                return;
+            }
+            window.callPhantom({
+                width: this.root.offsetWidth,
+                height: this.root.offsetHeight,
             });
+        });
+    }
+
+    handleError(error) {
+        if (window.callPhantom) {
+            window.callPhantom({ error: error.message });
+            return;
         }
+        console.error(error);
     }
 
     render() {
-        const params = queryString.parse(location.hash);
-        const ComponentToRender = components[params.component];
-        const props = JSON.parse(params.props);
+        let ComponentToRender;
+        let props;
+
+        try {
+            const params = queryString.parse(location.hash);
+            ComponentToRender = components[params.component];
+            props = JSON.parse(params.props);
+        } catch (error) {
+            this.handleError(new Error("Failed to parse url fragment"));
+            return null;
+        }
 
         if (!ComponentToRender || !props) {
-            if (window.callPhantom) window.callPhantom({ error: "Invalid component or props" });
+            this.handleError(new Error("Invalid component or props"));
             return null;
         }
 
