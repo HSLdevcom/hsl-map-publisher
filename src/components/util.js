@@ -14,13 +14,18 @@ Row.propTypes = {
 };
 
 const JustifiedRow = props => (
-    <div className={styles.justifiedRow}>
+    <div className={styles.justifiedRow} style={props.style}>
         {props.children}
     </div>
 );
 
 JustifiedRow.propTypes = {
     children: PropTypes.node.isRequired,
+    style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+};
+
+JustifiedRow.defaultProps = {
+    style: {},
 };
 
 const WrappingRow = props => (
@@ -40,6 +45,16 @@ const Column = props => (
 );
 
 Column.propTypes = {
+    children: PropTypes.node.isRequired,
+};
+
+const CenteringColumn = props => (
+    <div className={styles.centeringColumn}>
+        {props.children}
+    </div>
+);
+
+CenteringColumn.propTypes = {
     children: PropTypes.node.isRequired,
 };
 
@@ -78,6 +93,7 @@ export {
     JustifiedRow,
     WrappingRow,
     Column,
+    CenteringColumn,
     JustifiedColumn,
     Spacer,
     FlexSpacer,

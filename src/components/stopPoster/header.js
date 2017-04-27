@@ -1,11 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames";
-import { Row, JustifiedRow, Image } from "components/util";
+import { JustifiedRow, CenteringColumn, Image } from "components/util";
 
 import busIcon from "icons/bus.svg";
-import logoIcon from "icons/logo.svg";
-import noSmokingIcon from "icons/nosmoking.svg";
 
 import styles from "./header.css";
 
@@ -50,33 +48,28 @@ Subtitle.propTypes = {
 };
 
 const Icon = props => (
-    <Image {...props} style={{ height: 160, marginLeft: 15, marginRight: 15 }}/>
+    <Image {...props} style={{ height: 180, marginLeft: 0, marginRight: 30 }}/>
 );
 
 const Header = props => (
-    <JustifiedRow>
-        <Row>
+    <JustifiedRow style={{ margin: "0 10px" }}>
+        <div style={{ display: "flex", flexDirection: "row" }}>
             <Icon src={busIcon}/>
             <Group>
                 <Title>{props.nameFi}</Title>
                 <Subtitle>{props.nameSe}</Subtitle>
             </Group>
-        </Row>
-
-        <Row>
-            <Group>
-                <Title small>Pysäkkinumero</Title>
-                <Subtitle small>Hållplatsnummer</Subtitle>
-                <div className={styles.stop}>{props.shortId}</div>
-            </Group>
-            <Group>
-                <Title small>Lippuvyöhyke</Title>
-                <Subtitle small>Resezone</Subtitle>
-                <div className={styles.zone}>Helsinki</div>
-            </Group>
-            <Icon src={noSmokingIcon}/>
-            <Icon src={logoIcon}/>
-        </Row>
+        </div>
+        <CenteringColumn>
+            <Title small>Lippuvyöhyke</Title>
+            <Subtitle small>Resezon</Subtitle>
+            <div className={styles.zone}>Helsinki</div>
+        </CenteringColumn>
+        <CenteringColumn>
+            <Title small>Pysäkkinumero</Title>
+            <Subtitle small>Hållplatsnummer</Subtitle>
+            <div className={styles.stop}>{props.shortId}</div>
+        </CenteringColumn>
     </JustifiedRow>
 );
 

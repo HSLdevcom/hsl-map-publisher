@@ -26,7 +26,8 @@ module.exports = {
         "react/jsx-tag-spacing": ["error", {"beforeSelfClosing": "never"}],
         "react/jsx-space-before-closing": ["error", "never"],
         "react/no-array-index-key": ["off"],
-        "jsx-a11y/img-has-alt": ["off"]
+        "jsx-a11y/img-has-alt": ["off"],
+        "import/named": ["error"]
     },
     env: {
         "browser": true,

@@ -1,25 +1,33 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Row } from "components/util";
+import { Row, Column } from "components/util";
 import CustomTypes from "util/customTypes";
 
 import styles from "./routes.css";
 
 const Routes = props => (
     <div className={styles.root}>
-        {props.routes.map((route, index) =>
-            <Row key={index}>
-                <div className={styles.identifier}>{route.routeId}</div>
-                <div>
-                    <div className={styles.title}>
-                        {route.destinationFi}
+        <Row>
+            <Column>
+                {props.routes.map((route, index) =>
+                    <div className={`${styles.identifier} ${styles.row}`} key={index}>
+                        {route.routeId}
                     </div>
-                    <div className={styles.subtitle}>
-                        {route.destinationSe}
+                )}
+            </Column>
+            <Column>
+                {props.routes.map((route, index) =>
+                    <div className={styles.row} key={index}>
+                        <div className={styles.title}>
+                            {route.destinationFi}
+                        </div>
+                        <div className={styles.subtitle}>
+                            {route.destinationSe}
+                        </div>
                     </div>
-                </div>
-            </Row>
-        )}
+                )}
+            </Column>
+        </Row>
     </div>
 );
 

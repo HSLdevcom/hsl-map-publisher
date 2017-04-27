@@ -1,7 +1,7 @@
 import { itemsToTree, generalizeTree, sortBranches } from "util/tree";
 
 const MAX_WIDTH = 6;
-const MAX_HEIGHT = 20;
+const MAX_HEIGHT = 25;
 
 function isEqual(stop, other) {
     return ((stop.terminalId !== null) &&

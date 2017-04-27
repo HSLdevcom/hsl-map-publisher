@@ -1,8 +1,8 @@
 import { PerspectiveMercatorViewport } from "viewport-mercator-project";
 
-const MAX_STOPS = 8;
+const MAX_STOPS = 12;
 
-const MAX_ZOOM = 18;
+const MAX_ZOOM = 19;
 export const MIN_ZOOM = 14;
 const STEP_ZOOM = 0.1;
 
