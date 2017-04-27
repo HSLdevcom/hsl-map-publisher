@@ -1,6 +1,7 @@
 @value fontFamily, fontFamilyNarrow, gray, white, background, backgroundLight, borderRadius from "styles/common.css";
 
 .root {
+    position: relative;
     padding: 10px 20px 30px;
     color: gray;
     font-weight: 400;
@@ -69,10 +70,13 @@
 }
 
 .validity {
-    margin: 15px;
+    position: absolute;
+    top: 30px;
+    right: 20px;
     font-family: fontFamily;
     font-size: 12px;
-    line-height: 13px;
+    line-height: 16px;
     letter-spacing: -0.5px;
     color: background;
+    text-align: right;
 }

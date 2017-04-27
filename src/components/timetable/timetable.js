@@ -1,6 +1,6 @@
 import React, { PropTypes } from "react";
 import groupBy from "lodash/groupBy";
-import { Row, WrappingRow } from "components/util";
+import { Row, WrappingRow, Spacer } from "components/util";
 import sortBy from "lodash/sortBy";
 import classNames from "classnames";
 
@@ -107,8 +107,15 @@ const Timetable = props => (
             </div>
         }
         <div className={`${styles.validity}`}>
-          Aikataulut voimassa {props.dateBegin} - {props.dateEnd}
+            <div><strong>Aikataulut voimassa</strong></div>
+            <div>Tidtabeller giltiga</div>
+            <div>
+                {new Date(props.dateBegin).toLocaleDateString("fi")}
+                &nbsp;-&nbsp;
+                {new Date(props.dateEnd).toLocaleDateString("fi")}
+            </div>
         </div>
+        <Spacer height={20}/>
         {props.notes.map(note =>
             <div key={note} className={styles.footnote}>
                 {note}
