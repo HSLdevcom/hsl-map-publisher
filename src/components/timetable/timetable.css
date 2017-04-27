@@ -34,7 +34,7 @@
     padding: 0 10px;
     font-size: 12px;
     line-height: 13px;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.025em;
 }
 
 .subtitle > *:first-child {
@@ -90,7 +90,7 @@
     font-family: fontFamily;
     font-size: 12px;
     line-height: 16px;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.025em;
     color: background;
     text-align: right;
 }
