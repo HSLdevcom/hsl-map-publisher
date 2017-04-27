@@ -1,5 +1,8 @@
+import { PropTypes } from "react";
 import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
+import getContext from "recompose/getContext";
+import compose from "recompose/compose";
 import flatMap from "lodash/flatMap";
 import apolloWrapper from "util/apolloWrapper";
 import { fetchMap } from "util/api";
@@ -49,7 +52,6 @@ const nearbyStopsQuery = gql`
                 }
             }
         }
-        network: networkByDateAsGeojson(date: $date, minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon)
     }
 `;
 
@@ -69,7 +71,13 @@ const stopsMapper = stopGroup => ({
             }))).sort(routeCompare),
 });
 
-const nearbyStopsMapper = mapProps((props) => {
+const getClient = getContext({
+    client: PropTypes.shape({
+        query: PropTypes.func.isRequired,
+    }).isRequired,
+});
+
+const nearbyStopsMapper = compose(getClient, mapProps((props) => {
     const { stops: stopGroups, viewport } = calculateStopsViewport(
         props.stop,
         props.data.stopGroups.nodes
@@ -89,10 +97,31 @@ const nearbyStopsMapper = mapProps((props) => {
         sourcesUrl: "api.digitransit.fi/map/v1/",
     });
 
-    mapStyle.sources.routes = {
-        type: "geojson",
-        data: props.data.network,
-    };
+    const networkQuery = gql`
+        query networkQuery($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $date: Date!) {
+            network: networkByDateAsGeojson(date: $date, minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon)
+        }
+    `;
+
+    const NETWORK_PADDING = 1000; // Padding in pixels
+
+    const [minLon, minLat] = viewport.unproject([-NETWORK_PADDING, -NETWORK_PADDING]);
+    const [maxLon, maxLat] = viewport.unproject([
+        MAP_WIDTH + NETWORK_PADDING,
+        MAP_HEIGHT + NETWORK_PADDING,
+    ]);
+
+    const map = props.client.query({
+        query: networkQuery,
+        variables: { minLat, minLon, maxLat, maxLon, date: props.date },
+    }).then(({ data }) => {
+        mapStyle.sources.routes = {
+            type: "geojson",
+            data: data.network,
+        };
+
+        return fetchMap(mapOptions, mapStyle);
+    });
 
     const miniMapOptions = {
         center: [props.stop.lon, props.stop.lat],
@@ -105,12 +134,12 @@ const nearbyStopsMapper = mapProps((props) => {
         stop: props.stop,
         stops: stopGroups.map(stopsMapper),
         pixelsPerMeter: viewport.getDistanceScales().pixelsPerMeter[0],
-        map: fetchMap(mapOptions, mapStyle),
+        map,
         mapOptions,
         miniMap: fetchMap(miniMapOptions),
         miniMapOptions,
     };
-});
+}));
 
 const MapWithNearbyStopsContainer = apolloWrapper(nearbyStopsMapper)(Map);
 
