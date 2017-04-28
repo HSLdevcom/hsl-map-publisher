@@ -18,10 +18,18 @@ const client = new ApolloClient({
 });
 
 class App extends Component {
+    static handleError(error) {
+        if (window.callPhantom) {
+            window.callPhantom({ error: error.message });
+            return;
+        }
+        console.error(error); // eslint-disable-line no-console
+    }
+
     componentDidMount() {
         renderQueue.onEmpty(({ success }) => {
             if (!success) {
-                handleError(new Error("Failed to render component"));
+                App.handleError(new Error("Failed to render component"));
                 return;
             }
             window.callPhantom({
@@ -29,14 +37,6 @@ class App extends Component {
                 height: this.root.offsetHeight,
             });
         });
-    }
-
-    handleError(error) {
-        if (window.callPhantom) {
-            window.callPhantom({ error: error.message });
-            return;
-        }
-        console.error(error);
     }
 
     render() {
@@ -48,12 +48,12 @@ class App extends Component {
             ComponentToRender = components[params.component];
             props = JSON.parse(params.props);
         } catch (error) {
-            this.handleError(new Error("Failed to parse url fragment"));
+            App.handleError(new Error("Failed to parse url fragment"));
             return null;
         }
 
         if (!ComponentToRender || !props) {
-            this.handleError(new Error("Invalid component or props"));
+            App.handleError(new Error("Invalid component or props"));
             return null;
         }
 
