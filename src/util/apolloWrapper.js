@@ -5,7 +5,7 @@ import lifecycle from "recompose/lifecycle";
 import renderQueue from "util/renderQueue";
 
 const updateQueueOnChange = lifecycle({
-    componentDidMount() {
+    componentWillMount() {
         if (this.props.data.loading) {
             renderQueue.add(this);
         }
@@ -13,15 +13,15 @@ const updateQueueOnChange = lifecycle({
             renderQueue.remove(this, { success: false });
         }
     },
-    componentDidUpdate(prevProps) {
-        if (this.props.data.loading !== prevProps.data.loading) {
-            if (this.props.data.loading) {
+    componentWillUpdate(nextProps) {
+        if (nextProps.data.loading !== this.props.data.loading) {
+            if (nextProps.data.loading) {
                 renderQueue.add(this);
             } else {
                 renderQueue.remove(this, { success: true });
             }
         }
-        if (this.props.data.error && this.props.data.error !== prevProps.data.error) {
+        if (nextProps.data.error && nextProps.data.error !== this.props.data.error) {
             renderQueue.remove(this, { success: false });
         }
     },
