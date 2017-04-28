@@ -29,7 +29,7 @@ class RenderQueue {
 
     onEmpty(callback) {
         if (this.items.length === 0) {
-            callback();
+            callback({ success: true });
         } else {
             this.callback = callback;
         }
