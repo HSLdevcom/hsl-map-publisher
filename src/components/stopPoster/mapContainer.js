@@ -71,6 +71,14 @@ const stopsMapper = stopGroup => ({
             }))).sort(routeCompare),
 });
 
+const stopGroupsToStops = stopGroups => (
+    stopGroups
+        // Merge properties from mode-specific stops
+        .map(stopGroup => stopsMapper(stopGroup))
+        // Filter out stops with no departures
+        .filter(stop => !!stop.routes.length)
+);
+
 const getClient = getContext({
     client: PropTypes.shape({
         query: PropTypes.func.isRequired,
@@ -132,7 +140,7 @@ const nearbyStopsMapper = compose(getClient, mapProps((props) => {
 
     return {
         stop: props.stop,
-        stops: stopGroups.map(stopsMapper),
+        stops: stopGroupsToStops(stopGroups),
         pixelsPerMeter: viewport.getDistanceScales().pixelsPerMeter[0],
         map,
         mapOptions,
