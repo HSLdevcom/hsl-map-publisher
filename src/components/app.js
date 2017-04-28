@@ -32,10 +32,12 @@ class App extends Component {
                 App.handleError(new Error("Failed to render component"));
                 return;
             }
-            window.callPhantom({
-                width: this.root.offsetWidth,
-                height: this.root.offsetHeight,
-            });
+            if (window.callPhantom) {
+                window.callPhantom({
+                    width: this.root.offsetWidth,
+                    height: this.root.offsetHeight,
+                });
+            }
         });
     }
 
