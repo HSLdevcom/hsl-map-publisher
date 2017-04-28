@@ -1,4 +1,5 @@
 
+const TRUNK_ROUTES = ["550", "560"];
 const RAIL_ROUTE_ID_REGEXP = /^300[12]/;
 
 /**
@@ -6,7 +7,7 @@ const RAIL_ROUTE_ID_REGEXP = /^300[12]/;
  * @param {String} id - Route id
  * @returns {String}
  */
-export function isNumberVariant(id) {
+function isNumberVariant(id) {
     return /.{5}[0-9]/.test(id);
 }
 
@@ -20,11 +21,20 @@ function isRailRoute(id) {
 }
 
 /**
+ * Returns whether a route id is belongs to a trunk route
+ * @param {String} routeId - Route id
+ * @returns {String}
+ */
+function isTrunkRoute(routeId) {
+    return TRUNK_ROUTES.includes(routeId);
+}
+
+/**
  * Returns route id without area code or leading zeros
  * @param {String} id - Route id
  * @returns {String}
  */
-export function trimRouteId(id) {
+function trimRouteId(id) {
     if (isRailRoute(id) && isNumberVariant(id)) {
         return id.substring(1, 5).replace(RAIL_ROUTE_ID_REGEXP, "");
     } else if (isRailRoute(id)) {
@@ -37,8 +47,35 @@ export function trimRouteId(id) {
 }
 
 /**
-  * Returns true if the route segment is only for dropping off passengers
-  */
-export function isDropOffOnly({ pickupDropoffType }) {
+ * Returns true if the route segment is only for dropping off passengers
+ */
+function isDropOffOnly({ pickupDropoffType }) {
     return pickupDropoffType === null || pickupDropoffType === 2;
 }
+
+function getStopType(stopId) {
+    return stopId.slice(4, 5);
+}
+
+function isTramStop(stopId) {
+    return getStopType(stopId) === "4";
+}
+
+function isTrainStop(stopId) {
+    return getStopType(stopId) === "5";
+}
+
+function isMetroStop(stopId) {
+    return getStopType(stopId) === "6";
+}
+
+export {
+    isNumberVariant,
+    isRailRoute,
+    isTrunkRoute,
+    trimRouteId,
+    isDropOffOnly,
+    isTramStop,
+    isTrainStop,
+    isMetroStop,
+};

@@ -50,7 +50,7 @@ Scalebar.propTypes = {
 
 const LocationSymbol = props => (
     <div style={{ width: props.size, height: props.size }}>
-        <img src={locationIcon} role="presentation" style={{ width: "100%" }}/>
+        <img src={locationIcon} style={{ width: "100%" }}/>
     </div>
 );
 
@@ -60,13 +60,14 @@ LocationSymbol.propTypes = {
 
 const StopSymbol = props => (
     <div style={{ width: props.size, height: props.size }}>
-        <img src={getSymbol(props.stopIds[0])} role="presentation"/>
+        <img src={getSymbol({ stopIds: props.stopIds, routeIds: props.routeIds })}/>
     </div>
 );
 
 StopSymbol.propTypes = {
     size: PropTypes.number.isRequired,
     stopIds: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+    routeIds: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
 };
 
 const RouteList = (props) => {
@@ -164,7 +165,11 @@ const Map = (props) => {
                             top={stop.y - STOP_RADIUS}
                             left={stop.x - STOP_RADIUS}
                         >
-                            <StopSymbol {...stop} size={STOP_RADIUS * 2}/>
+                            <StopSymbol
+                                stopIds={stop.stopIds}
+                                routeIds={stop.routes.map(({ routeId }) => routeId)}
+                                size={STOP_RADIUS * 2}
+                            />
                         </ItemFixed>
                     ))}
 
