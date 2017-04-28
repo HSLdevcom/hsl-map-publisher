@@ -4,22 +4,21 @@ const RAIL_ROUTE_ID_REGEXP = /^300[12]/;
 
 /**
  * Returns whether a route id is a so called number variant
- * @param {String} id - Route id
- * @returns {String}
+ * @param {String} routeId - Route id
+ * @returns {boolean}
  */
-function isNumberVariant(id) {
-    return /.{5}[0-9]/.test(id);
+function isNumberVariant(routeId) {
+    return /.{5}[0-9]/.test(routeId);
 }
 
 /**
  * Returns whether a route id is belongs to a rail route
- * @param {String} id - Route id
- * @returns {String}
+ * @param {String} routeId - Route id
+ * @returns {boolean}
  */
-function isRailRoute(id) {
-    return RAIL_ROUTE_ID_REGEXP.test(id);
+function isRailRoute(routeId) {
+    return RAIL_ROUTE_ID_REGEXP.test(routeId);
 }
-
 /**
  * Returns whether a route id is belongs to a trunk route
  * @param {String} routeId - Route id
@@ -31,23 +30,24 @@ function isTrunkRoute(routeId) {
 
 /**
  * Returns route id without area code or leading zeros
- * @param {String} id - Route id
+ * @param {String} routeId - Route id
  * @returns {String}
  */
-function trimRouteId(id) {
-    if (isRailRoute(id) && isNumberVariant(id)) {
-        return id.substring(1, 5).replace(RAIL_ROUTE_ID_REGEXP, "");
-    } else if (isRailRoute(id)) {
-        return id.replace(RAIL_ROUTE_ID_REGEXP, "");
-    } else if (isNumberVariant(id)) {
+function trimRouteId(routeId) {
+    if (isRailRoute(routeId) && isNumberVariant(routeId)) {
+        return routeId.substring(1, 5).replace(RAIL_ROUTE_ID_REGEXP, "");
+    } else if (isRailRoute(routeId)) {
+        return routeId.replace(RAIL_ROUTE_ID_REGEXP, "");
+    } else if (isNumberVariant(routeId)) {
         // Do not show number variants
-        return id.substring(1, 5).replace(/^[0]+/g, "");
+        return routeId.substring(1, 5).replace(/^[0]+/g, "");
     }
-    return id.substring(1).replace(/^[0]+/g, "");
+    return routeId.substring(1).replace(/^[0]+/g, "");
 }
 
 /**
  * Returns true if the route segment is only for dropping off passengers
+ * @returns {boolean}
  */
 function isDropOffOnly({ pickupDropoffType }) {
     return pickupDropoffType === null || pickupDropoffType === 2;
