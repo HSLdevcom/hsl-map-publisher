@@ -14,14 +14,14 @@ const updateQueueOnChange = lifecycle({
         }
     },
     componentDidUpdate(prevProps) {
-        if (this.props.loading !== prevProps.data.loading) {
+        if (this.props.data.loading !== prevProps.data.loading) {
             if (this.props.data.loading) {
                 renderQueue.add(this);
             } else {
                 renderQueue.remove(this, { success: true });
             }
         }
-        if (this.props.error && this.props.error !== prevProps.error) {
+        if (this.props.data.error && this.props.data.error !== prevProps.data.error) {
             renderQueue.remove(this, { success: false });
         }
     },
