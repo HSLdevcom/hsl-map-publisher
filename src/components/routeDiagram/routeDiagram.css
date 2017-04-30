@@ -13,20 +13,21 @@
 
 .start {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     color: gray;
     margin-left: leftWidth;
-    margin-bottom: lineWidth;
+    margin-bottom: calc(lineWidth * 2);
 }
 
 .icon {
-    width: 13px;
-    margin-left: -5px;
-    margin-right: 7px;
+    width: 22px;
+    margin-left: -10px;
+    margin-right: 8px;
 }
 
 .title {
     font-size: 18px;
     font-weight: 700;
     font-family: fontFamily;
+    line-height: 22px;
 }
