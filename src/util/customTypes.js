@@ -1,5 +1,4 @@
-import { PropTypes } from "react";
-
+import PropTypes from "prop-types";
 
 const stop = {
     stopId: PropTypes.string.isRequired,

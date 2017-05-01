@@ -1,6 +1,8 @@
-import React, { Component, PropTypes } from "react";
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 import segseg from "segseg";
 import memoize from "util/memoize";
+import renderQueue from "util/renderQueue";
 
 import styles from "./itemContainer.css";
 
@@ -359,6 +361,9 @@ class ItemContainer extends Component {
     }
 
     async updateChildren() {
+        // Add component to queue to let it know we're still updating
+        renderQueue.add(this);
+
         // Get refs to mounted children
         const refs = this.childRefs.filter(ref => !!ref);
 
@@ -388,6 +393,8 @@ class ItemContainer extends Component {
         this.getIntersectionArea.cache.clear();
         this.hasIntersectingLines.cache.clear();
         this.updatePosition.cache.clear();
+
+        renderQueue.remove(this, { success: true });
     }
 
     render() {

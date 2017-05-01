@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from "react";
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 import { JustifiedColumn, Spacer, FlexSpacer } from "components/util";
 import RouteDiagram from "components/routeDiagram/routeDiagramContainer";
 import Timetable from "components/timetable/timetableContainer";

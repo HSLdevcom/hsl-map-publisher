@@ -1,4 +1,5 @@
-import React, { PropTypes } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import ItemContainer from "components/itemContainer";
 import ItemFixed from "components/itemFixed";
 import ItemPositioned from "components/itemPositioned";
@@ -7,6 +8,8 @@ import { getSymbol } from "util/stops";
 import CustomTypes from "util/customTypes";
 
 import locationIcon from "icons/marker.svg";
+
+import MapImage from "./mapImage";
 
 import styles from "./map.css";
 
@@ -133,28 +136,10 @@ const Map = (props) => {
         stop => stop.x < miniMapStyle.left || stop.y < miniMapStyle.top
     );
 
-    // FIXME: Do not call phantom directly, use App -> onReady instead
     return (
         <div className={styles.root} style={mapStyle}>
             <div className={styles.map}>
-                <img
-                    ref={el => el && props.map.then((map) => {
-                        if (window.callPhantom) {
-                            // eslint-disable-next-line no-param-reassign
-                            el.onload = () => {
-                                const root = document.getElementById("app-root");
-                                const options = {
-                                    width: root.offsetWidth,
-                                    height: root.offsetHeight,
-                                };
-                                window.callPhantom(options);
-                            };
-                        }
-                        // eslint-disable-next-line no-param-reassign
-                        el.src = map;
-                    })}
-                    role="presentation"
-                />
+                <MapImage src={props.map}/>
             </div>
 
             <div className={styles.overlays}>
@@ -206,11 +191,7 @@ const Map = (props) => {
             </div>
 
             <div className={styles.miniMap} style={miniMapStyle}>
-                <img
-                    // eslint-disable-next-line no-param-reassign
-                    ref={el => el && props.miniMap.then((miniMap) => { el.src = miniMap; })}
-                    role="presentation"
-                />
+                <MapImage src={props.miniMap}/>
                 <div className={styles.center} style={{ margin: -LOCATION_RADIUS_MINI }}>
                     <LocationSymbol size={LOCATION_RADIUS_MINI * 2}/>
                 </div>
