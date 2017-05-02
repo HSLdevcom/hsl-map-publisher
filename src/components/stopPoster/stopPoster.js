@@ -65,7 +65,11 @@ class StopPoster extends Component {
                     <div className={styles.content} ref={(ref) => { this.content = ref; }}>
                         {this.state.hasRoutesOnTop &&
                             <span>
-                                <Routes stopId={this.props.stopId} date={this.props.date}/>
+                                <Routes
+                                    stopId={this.props.stopId}
+                                    date={this.props.date}
+                                    columns={6}
+                                />
                                 <Spacer height={50}/>
                             </span>
                         }

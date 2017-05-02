@@ -33,6 +33,7 @@ query routesQuery($stopId: String!, $date: Date!) {
 `;
 
 const propsMapper = mapProps(props => ({
+    columns: props.columns,
     routes: flatMap(
         props.data.stop.siblings.nodes,
         node => node.routeSegments.nodes
@@ -40,8 +41,8 @@ const propsMapper = mapProps(props => ({
             .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
             .filter(routeSegment => !isDropOffOnly(routeSegment))
             .map(routeSegment => ({
-                routeId: trimRouteId(routeSegment.routeId),
                 ...routeSegment.route.nodes[0],
+                routeId: trimRouteId(routeSegment.routeId),
             }))
         ).sort(routeCompare),
 }));
