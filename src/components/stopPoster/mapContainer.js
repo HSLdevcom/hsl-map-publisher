@@ -1,4 +1,4 @@
-import { PropTypes } from "react";
+import { PropTypes } from "prop-types";
 import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
 import getContext from "recompose/getContext";
