@@ -9,9 +9,17 @@
 }
 
 .content {
+    padding: 50px 0;
+    overflow: hidden;
+}
+
+.columns {
     display: flex;
     align-items: flex-start;
-    margin: 50px 0;
+}
+
+.left {
+    width: 750px;
 }
 
 .title {
