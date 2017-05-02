@@ -7,10 +7,8 @@ import Timetable from "components/timetable/timetableContainer";
 import Header from "./headerContainer";
 import Footer from "./footer";
 
-import Routes from "./routesContainer";
-import Info from "./info";
-
 import Map from "./mapContainer";
+import Routes from "./routesContainer";
 
 import styles from "./stopPoster.css";
 
@@ -33,7 +31,6 @@ class StopPoster extends Component {
                                 dateBegin={this.props.dateBegin}
                                 dateEnd={this.props.dateEnd}
                             />
-                            <Info/>
                         </div>
 
                         <Spacer width={50}/>
