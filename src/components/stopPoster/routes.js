@@ -1,8 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
-import classNames from "classnames";
 import chunk from "lodash/chunk";
-import { WrappingRow, Row, Column } from "components/util";
+import { Row, Column } from "components/util";
 import CustomTypes from "util/customTypes";
 
 import styles from "./routes.css";
@@ -13,8 +12,8 @@ const Routes = (props) => {
 
     return (
         <div className={styles.root}>
-            {routeColumns.map(routes => (
-                <Row>
+            {routeColumns.map((routes, i) => (
+                <Row key={i}>
                     <Column>
                         {routes.map((route, index) => (
                             <div key={index} className={styles.group}>
