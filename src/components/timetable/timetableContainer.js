@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
 import find from "lodash/find";
@@ -94,8 +95,8 @@ const propsMapper = mapProps((props) => {
     const { weekdays, saturdays, sundays } = groupDepartures(departures);
 
     let notes = flatMap(
-      props.data.stop.siblings.nodes,
-      stop => flatMap(stop.routeSegments.nodes, getNotes(props.isSummerTimetable))
+        props.data.stop.siblings.nodes,
+        stop => flatMap(stop.routeSegments.nodes, getNotes(props.isSummerTimetable))
     );
     // if (props.data.stop.siblings.nodes.some(stop =>
     //   stop.departures.nodes.some(departure => departure.isAccessible === false))
@@ -118,12 +119,26 @@ const propsMapper = mapProps((props) => {
         saturdays,
         sundays,
         notes,
-        isSummerTimetable: props.isSummerTimetable,
         dateBegin,
         dateEnd,
+        isSummerTimetable: props.isSummerTimetable,
     };
 });
 
 const TimetableContainer = apolloWrapper(propsMapper)(Timetable);
+
+TimetableContainer.defaultProps = {
+    dateBegin: null,
+    dateEnd: null,
+    isSummerTimetable: false,
+};
+
+TimetableContainer.propTypes = {
+    stopId: PropTypes.string.isRequired,
+    date: PropTypes.string.isRequired,
+    dateBegin: PropTypes.string,
+    dateEnd: PropTypes.string,
+    isSummerTimetable: PropTypes.bool,
+};
 
 export default graphql(timetableQuery)(TimetableContainer);
