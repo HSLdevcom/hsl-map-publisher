@@ -10,20 +10,19 @@ import { isDropOffOnly } from "util/domain";
 import Timetable from "./timetable";
 
 function filterDepartures(departures, routeSegments) {
-    return departures.filter(
-        departure =>
-            !isDropOffOnly(find(routeSegments, {
-                routeId: departure.routeId,
-                direction: departure.direction,
-            })
-        )
-    );
+    return departures.filter(departure => (
+        !isDropOffOnly(find(routeSegments, {
+            routeId: departure.routeId,
+            direction: departure.direction,
+        }))
+    ));
 }
 
 function groupDepartures(departures) {
     return {
-        weekdays: departures.filter(departure => departure.dayType.some(day =>
-            ["Ma", "Ti", "Ke", "To", "Pe"].indexOf(day) >= 0)),
+        weekdays: departures.filter(departure => (
+            departure.dayType.some(day => ["Ma", "Ti", "Ke", "To", "Pe"].includes(day))
+        )),
         saturdays: departures.filter(departure => departure.dayType.includes("La")),
         sundays: departures.filter(departure => departure.dayType.includes("Su")),
     };
@@ -85,12 +84,15 @@ const timetableQuery = gql`
 `;
 
 const propsMapper = mapProps((props) => {
-    const { weekdays, saturdays, sundays } = groupDepartures(
-        flatMap(props.data.stop.siblings.nodes, stop => filterDepartures(
+    const departures = flatMap(
+        props.data.stop.siblings.nodes,
+        stop => filterDepartures(
             stop.departures.nodes,
             stop.routeSegments.nodes
-        ))
+        )
     );
+    const { weekdays, saturdays, sundays } = groupDepartures(departures);
+
     let notes = flatMap(
       props.data.stop.siblings.nodes,
       stop => flatMap(stop.routeSegments.nodes, getNotes(props.isSummerTimetable))
@@ -102,13 +104,13 @@ const propsMapper = mapProps((props) => {
     // }
     notes = uniq(notes).sort();
 
-    const dateBegin = props.dateBegin ? props.dateBegin : flatMap(
-      props.data.stop.siblings.nodes,
-      stop => stop.departures.nodes.map(departure => departure.dateBegin)
+    const dateBegin = props.dateBegin || flatMap(
+        props.data.stop.siblings.nodes,
+        stop => stop.departures.nodes.map(departure => departure.dateBegin)
     ).sort((a, b) => b.localeCompare(a))[0];
-    const dateEnd = props.dateEnd ? props.dateEnd : flatMap(
-      props.data.stop.siblings.nodes,
-      stop => stop.departures.nodes.map(departure => departure.dateEnd)
+    const dateEnd = props.dateEnd || flatMap(
+        props.data.stop.siblings.nodes,
+        stop => stop.departures.nodes.map(departure => departure.dateEnd)
     ).sort((a, b) => a.localeCompare(b))[0];
 
     return {

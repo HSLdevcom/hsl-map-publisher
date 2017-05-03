@@ -4,10 +4,9 @@ import groupBy from "lodash/groupBy";
 import { Row, WrappingRow, Spacer } from "components/util";
 import sortBy from "lodash/sortBy";
 import classNames from "classnames";
+import { trimRouteId } from "util/domain";
 
 import styles from "./timetable.css";
-
-import { trimRouteId } from "../../util/domain";
 
 const Header = props => (
     <div className={styles.header}>
@@ -57,8 +56,9 @@ const TableRow = props => (
             <strong>{(props.hours % 24) < 10 && "0"}{props.hours % 24}</strong>
         </div>
         <WrappingRow>
-            {sortBy(props.departures, a => a.minutes)
-                .map((departure, index) => <Departure key={index} {...departure}/>)}
+            {sortBy(props.departures, a => a.minutes).map((departure, index) => (
+                <Departure key={index} {...departure}/>
+            ))}
         </WrappingRow>
     </Row>
 );
@@ -70,8 +70,10 @@ TableRow.propTypes = {
 };
 
 const Table = (props) => {
-    const departuresByHour = groupBy(props.departures, departure =>
-        (departure.isNextDay ? 24 : 0) + departure.hours);
+    const departuresByHour = groupBy(
+        props.departures,
+        departure => (departure.isNextDay ? 24 : 0) + departure.hours
+    );
 
     return (
         <div className={styles.table}>
@@ -109,7 +111,7 @@ const Timetable = props => (
                 <Table departures={props.sundays}/>
             </div>
         }
-        <div className={`${styles.validity}`}>
+        <div className={styles.validity}>
             <div><strong>Aikataulut voimassa</strong></div>
             <div>Tidtabeller giltiga</div>
             <div>
@@ -119,11 +121,11 @@ const Timetable = props => (
             </div>
         </div>
         <Spacer height={20}/>
-        {props.notes.map(note =>
+        {props.notes.map(note => (
             <div key={note} className={styles.footnote}>
                 {note}
             </div>
-        )}
+        ))}
     </div>
 );
 
