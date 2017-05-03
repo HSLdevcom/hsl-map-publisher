@@ -13,18 +13,27 @@
     overflow: hidden;
 }
 
-.columns {
-    display: flex;
-    align-items: flex-start;
-}
-
-.left {
-    width: 750px;
-}
-
 .title {
     font-family: fontFamily;
     font-weight: 700;
     font-size: 30px;
     margin: 40px 40px 30px;
+}
+
+.columns {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.timetables {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+}
+
+.timetable {
+    display: flex;
+    align-items: stretch;
+    width: 730px;
 }
