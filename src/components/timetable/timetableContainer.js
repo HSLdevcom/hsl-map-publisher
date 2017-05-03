@@ -4,6 +4,7 @@ import mapProps from "recompose/mapProps";
 import find from "lodash/find";
 import flatMap from "lodash/flatMap";
 import uniq from "lodash/uniq";
+import pick from "lodash/pick";
 
 import apolloWrapper from "util/apolloWrapper";
 import { isDropOffOnly } from "util/domain";
@@ -31,16 +32,19 @@ function groupDepartures(departures) {
 
 function getNotes(isSummerTimetable) {
     return function getNotesInner(routeSegment) {
-        return (routeSegment.hasRegularDayDepartures &&
-            routeSegment.notes.nodes
-                // Y = Yleisöaikataulu
-                .filter(note => note.noteType.includes("Y"))
-                // V = Ympäri vuoden
-                // K = Vain kesäaikataulu
-                // T = Vain talviaikatalu
-                .filter(note => note.noteType.includes("V") ||
-                    note.noteType.includes(isSummerTimetable ? "K" : "T"))
-                .map(note => note.noteText)) || [];
+        if (!routeSegment.hasRegularDayDepartures) {
+            return [];
+        }
+        return routeSegment.notes.nodes
+            // Y = Yleisöaikataulu
+            .filter(({ noteType }) => noteType.includes("Y"))
+            // V = Ympäri vuoden
+            // K = Vain kesäaikataulu
+            // T = Vain talviaikatalu
+            .filter(({ noteType }) => (
+                noteType.includes("V") || noteType.includes(isSummerTimetable ? "K" : "T")
+            ))
+            .map(note => note.noteText);
     };
 }
 
@@ -92,7 +96,8 @@ const propsMapper = mapProps((props) => {
             stop.routeSegments.nodes
         )
     );
-    const { weekdays, saturdays, sundays } = groupDepartures(departures);
+
+    const { weekdays, saturdays, sundays } = pick(groupDepartures(departures), props.segments);
 
     let notes = flatMap(
         props.data.stop.siblings.nodes,
@@ -131,6 +136,7 @@ TimetableContainer.defaultProps = {
     dateBegin: null,
     dateEnd: null,
     isSummerTimetable: false,
+    segments: ["weekdays", "saturdays", "sundays"],
 };
 
 TimetableContainer.propTypes = {
@@ -139,6 +145,7 @@ TimetableContainer.propTypes = {
     dateBegin: PropTypes.string,
     dateEnd: PropTypes.string,
     isSummerTimetable: PropTypes.bool,
+    segments: PropTypes.arrayOf(PropTypes.oneOf(["weekdays", "saturdays", "sundays"])),
 };
 
 export default graphql(timetableQuery)(TimetableContainer);

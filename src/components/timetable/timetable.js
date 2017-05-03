@@ -93,19 +93,19 @@ Table.propTypes = {
 
 const Timetable = props => (
     <div className={classNames(styles.root, { [styles.summer]: props.isSummerTimetable })}>
-        {!!props.weekdays.length &&
+        {props.weekdays &&
             <div>
                 <Header titleFi="Maanantai - Perjantai" titleSe="Måndag - Fredag"/>
                 <Table departures={props.weekdays}/>
             </div>
         }
-        {!!props.saturdays.length &&
+        {props.saturdays &&
             <div>
                 <Header titleFi="Lauantai" titleSe="Lördag"/>
                 <Table departures={props.saturdays}/>
             </div>
         }
-        {!!props.sundays.length &&
+        {props.sundays &&
             <div>
                 <Header titleFi="Sunnuntai" titleSe="Sondag"/>
                 <Table departures={props.sundays}/>
