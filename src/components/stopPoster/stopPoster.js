@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from "react";
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 import { JustifiedColumn, Spacer, FlexSpacer } from "components/util";
 import RouteDiagram from "components/routeDiagram/routeDiagramContainer";
 import Timetable from "components/timetable/timetableContainer";
@@ -31,6 +32,8 @@ class StopPoster extends Component {
                                 stopId={this.props.stopId}
                                 date={this.props.date}
                                 isSummerTimetable={this.props.isSummerTimetable}
+                                dateBegin={this.props.dateBegin}
+                                dateEnd={this.props.dateEnd}
                             />
                         </div>
 
@@ -58,10 +61,14 @@ StopPoster.propTypes = {
     stopId: PropTypes.string.isRequired,
     date: PropTypes.string.isRequired,
     isSummerTimetable: PropTypes.bool,
+    dateBegin: PropTypes.string,
+    dateEnd: PropTypes.string,
 };
 
 StopPoster.defaultProps = {
     isSummerTimetable: false,
+    dateBegin: null,
+    dateEnd: null,
 };
 
 export default StopPoster;

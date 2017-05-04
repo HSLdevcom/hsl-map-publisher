@@ -76,6 +76,7 @@
     "nodemon": "^1.11.0",
     "pdfkit": "^0.8.0",
     "png-stream": "^1.0.5",
+    "prop-types": "^15.5.8",
     "query-string": "^4.3.2",
     "react": "^15.4.2",
     "react-apollo": "^1.0.0-rc.3",
@@ -83,7 +84,7 @@
     "react-hot-loader": "^3.0.0-beta.6",
     "react-tap-event-plugin": "^2.0.1",
     "react-virtualized": "^9.5.0",
-    "recompose": "^0.22.0",
+    "recompose": "^0.23.1",
     "segseg": "^0.2.2",
     "tile-merge-stream": "HSLdevcom/tile-merge-stream",
     "viewport-mercator-project": "^4.0.0"

@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 import styles from "./util.css";
 
@@ -9,7 +10,7 @@ const Row = props => (
 );
 
 Row.propTypes = {
-    children: React.PropTypes.node.isRequired,
+    children: PropTypes.node.isRequired,
 };
 
 const JustifiedRow = props => (
@@ -19,11 +20,13 @@ const JustifiedRow = props => (
 );
 
 JustifiedRow.propTypes = {
-    children: React.PropTypes.node.isRequired,
-    style: React.PropTypes.object, // eslint-disable-line react/forbid-prop-types
+    children: PropTypes.node.isRequired,
+    style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 };
 
-JustifiedRow.defaultProps = { style: {} };
+JustifiedRow.defaultProps = {
+    style: {},
+};
 
 const WrappingRow = props => (
     <div className={styles.wrappingRow}>
@@ -32,7 +35,7 @@ const WrappingRow = props => (
 );
 
 WrappingRow.propTypes = {
-    children: React.PropTypes.node.isRequired,
+    children: PropTypes.node.isRequired,
 };
 
 const Column = props => (
@@ -42,7 +45,7 @@ const Column = props => (
 );
 
 Column.propTypes = {
-    children: React.PropTypes.node.isRequired,
+    children: PropTypes.node.isRequired,
 };
 
 const CenteringColumn = props => (
@@ -52,7 +55,7 @@ const CenteringColumn = props => (
 );
 
 CenteringColumn.propTypes = {
-    children: React.PropTypes.node.isRequired,
+    children: PropTypes.node.isRequired,
 };
 
 const JustifiedColumn = props => (
@@ -62,7 +65,7 @@ const JustifiedColumn = props => (
 );
 
 JustifiedColumn.propTypes = {
-    children: React.PropTypes.node.isRequired,
+    children: PropTypes.node.isRequired,
 };
 
 const Spacer = props => (
@@ -75,8 +78,8 @@ Spacer.defaultProps = {
 };
 
 Spacer.propTypes = {
-    width: React.PropTypes.number,
-    height: React.PropTypes.number,
+    width: PropTypes.number,
+    height: PropTypes.number,
 };
 
 const FlexSpacer = () => <div style={{ flex: "2" }}/>;

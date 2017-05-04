@@ -4,6 +4,7 @@ import { ApolloClient, createNetworkInterface, ApolloProvider } from "react-apol
 
 import StopPoster from "components/stopPoster/stopPoster";
 import Timetable from "components/timetable/timetableContainer";
+import renderQueue from "util/renderQueue";
 
 const components = {
     StopPoster,
@@ -17,66 +18,51 @@ const client = new ApolloClient({
 });
 
 class App extends Component {
-
-    static stateFromQueryString() {
-        const { component, props } = queryString.parse(location.hash);
-        return (component && props) ? { component, props: JSON.parse(props) } : {};
-    }
-
-    constructor() {
-        super();
-        // In development we'll use url hash to set initial state
-        this.state = App.stateFromQueryString();
+    static handleError(error) {
+        if (window.callPhantom) {
+            window.callPhantom({ error: error.message });
+            return;
+        }
+        console.error(error); // eslint-disable-line no-console
     }
 
     componentDidMount() {
-        // Publish method as a global to make it accessible from phantom
-        window.setVisibleComponent = this.setVisibleComponent.bind(this);
-        // Let phantom know app is ready
-        if (window.callPhantom) window.callPhantom();
-    }
-
-    /**
-     * Sets component to render
-     * @param {String} component - Name of component to display
-     * @param {Object} props - Props passed to component
-     */
-    setVisibleComponent(component, props) {
-        this.setState({ component, props });
-    }
-
-    render() {
-        if (!components[this.state.component] || !this.state.props) {
-            if (window.callPhantom) {
-                window.callPhantom({ error: "Invalid component or props" });
+        renderQueue.onEmpty(({ success }) => {
+            if (!success) {
+                App.handleError(new Error("Failed to render component"));
+                return;
             }
-            return null;
-        }
-
-        const ComponentToRender = components[this.state.component];
-
-        const onReady = (error) => {
-            // Let phantom know the component is ready
             if (window.callPhantom) {
-                if (error) {
-                    window.callPhantom({ error: error.message });
-                    return;
-                }
-
                 window.callPhantom({
                     width: this.root.offsetWidth,
                     height: this.root.offsetHeight,
                 });
-            } else if (error) {
-                console.error(error); // eslint-disable-line no-console
             }
-        };
+        });
+    }
 
-        // FIXME: Remove unused id prop when onReady callback is called again
+    render() {
+        let ComponentToRender;
+        let props;
+
+        try {
+            const params = queryString.parse(location.hash);
+            ComponentToRender = components[params.component];
+            props = JSON.parse(params.props);
+        } catch (error) {
+            App.handleError(new Error("Failed to parse url fragment"));
+            return null;
+        }
+
+        if (!ComponentToRender || !props) {
+            App.handleError(new Error("Invalid component or props"));
+            return null;
+        }
+
         return (
-            <div id="app-root" style={{ display: "inline-block" }} ref={(ref) => { this.root = ref; }}>
+            <div style={{ display: "inline-block" }} ref={(ref) => { this.root = ref; }}>
                 <ApolloProvider client={client}>
-                    <ComponentToRender {...this.state.props} onReady={onReady}/>
+                    <ComponentToRender {...props}/>
                 </ApolloProvider>
             </div>
         );
