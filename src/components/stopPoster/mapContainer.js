@@ -144,10 +144,6 @@ const nearbyStopsMapper = compose(getClient, mapProps((props) => {
     };
 }));
 
-const MapWithNearbyStopsContainer = apolloWrapper(nearbyStopsMapper)(Map);
-
-const MapWithNearbyStops = graphql(nearbyStopsQuery)(MapWithNearbyStopsContainer);
-
 const mapPositionQuery = gql`
     query mapPositionQuery($stopId: String!) {
         stop: stopByStopId(stopId: $stopId) {
@@ -173,7 +169,15 @@ const mapPositionMapper = mapProps((props) => {
     return { ...props, longitude, latitude, minLat, minLon, maxLat, maxLon };
 });
 
-const MapContainer = apolloWrapper(mapPositionMapper)(MapWithNearbyStops);
+
+const hoc = compose(
+    graphql(mapPositionQuery),
+    apolloWrapper(mapPositionMapper),
+    graphql(nearbyStopsQuery),
+    apolloWrapper(nearbyStopsMapper)
+);
+
+const MapContainer = hoc(Map);
 
 MapContainer.propTypes = {
     stopId: PropTypes.string.isRequired,
@@ -182,4 +186,4 @@ MapContainer.propTypes = {
     height: PropTypes.number.isRequired,
 };
 
-export default graphql(mapPositionQuery)(MapContainer);
+export default MapContainer;
