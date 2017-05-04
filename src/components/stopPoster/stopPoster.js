@@ -84,6 +84,8 @@ class StopPoster extends Component {
                     isSummerTimetable={this.props.isSummerTimetable}
                     dateBegin={this.props.dateBegin}
                     dateEnd={this.props.dateEnd}
+                    showValidityPeriod={!props.hideDetails}
+                    showNotes={!props.hideDetails}
                     segments={props.segments}
                 />
             </div>
@@ -139,9 +141,9 @@ class StopPoster extends Component {
                                 <span>
                                     <div className={styles.title}>&nbsp;</div>
                                     <div className={styles.timetables}>
-                                        <StopPosterTimetable segments={["saturdays"]}/>
+                                        <StopPosterTimetable segments={["saturdays"]} hideDetails/>
                                         <Spacer width={50}/>
-                                        <StopPosterTimetable segments={["sundays"]}/>
+                                        <StopPosterTimetable segments={["sundays"]} hideDetails/>
                                     </div>
                                 </span>
                                 }

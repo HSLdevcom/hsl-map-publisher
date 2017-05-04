@@ -93,6 +93,17 @@ Table.propTypes = {
 
 const Timetable = props => (
     <div className={classNames(styles.root, { [styles.summer]: props.isSummerTimetable })}>
+        {props.showValidityPeriod &&
+            <div className={styles.validity}>
+                <div><strong>Aikataulut voimassa</strong></div>
+                <div>Tidtabeller giltiga</div>
+                <div>
+                    {new Date(props.dateBegin).toLocaleDateString("fi")}
+                    &nbsp;-&nbsp;
+                    {new Date(props.dateEnd).toLocaleDateString("fi")}
+                </div>
+            </div>
+        }
         {props.weekdays &&
             <div>
                 <Header titleFi="Maanantai - Perjantai" titleSe="Måndag - Fredag"/>
@@ -111,17 +122,8 @@ const Timetable = props => (
                 <Table departures={props.sundays}/>
             </div>
         }
-        <div className={styles.validity}>
-            <div><strong>Aikataulut voimassa</strong></div>
-            <div>Tidtabeller giltiga</div>
-            <div>
-                {new Date(props.dateBegin).toLocaleDateString("fi")}
-                &nbsp;-&nbsp;
-                {new Date(props.dateEnd).toLocaleDateString("fi")}
-            </div>
-        </div>
         <Spacer height={20}/>
-        {props.notes.map(note => (
+        {props.showNotes && props.notes.map(note => (
             <div key={note} className={styles.footnote}>
                 {note}
             </div>
@@ -129,21 +131,25 @@ const Timetable = props => (
     </div>
 );
 
+Timetable.defaultProps = {
+    weekdays: null,
+    saturdays: null,
+    sundays: null,
+    isSummerTimetable: false,
+    showValidityPeriod: true,
+    showNotes: true,
+};
+
 Timetable.propTypes = {
     weekdays: PropTypes.arrayOf(PropTypes.shape(Table.propTypes.departures)),
     saturdays: PropTypes.arrayOf(PropTypes.shape(Table.propTypes.departures)),
     sundays: PropTypes.arrayOf(PropTypes.shape(Table.propTypes.departures)),
     notes: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
     isSummerTimetable: PropTypes.bool,
+    showValidityPeriod: PropTypes.bool,
+    showNotes: PropTypes.bool,
     dateBegin: PropTypes.string.isRequired,
     dateEnd: PropTypes.string.isRequired,
-};
-
-Timetable.defaultProps = {
-    weekdays: null,
-    saturdays: null,
-    sundays: null,
-    isSummerTimetable: false,
 };
 
 export default Timetable;

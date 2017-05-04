@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
+import compose from "recompose/compose";
 import find from "lodash/find";
 import flatMap from "lodash/flatMap";
 import uniq from "lodash/uniq";
@@ -127,15 +128,24 @@ const propsMapper = mapProps((props) => {
         dateBegin,
         dateEnd,
         isSummerTimetable: props.isSummerTimetable,
+        showValidityPeriod: props.showValidityPeriod,
+        showNotes: props.showNotes,
     };
 });
 
-const TimetableContainer = apolloWrapper(propsMapper)(Timetable);
+const hoc = compose(
+    graphql(timetableQuery),
+    apolloWrapper(propsMapper)
+);
+
+const TimetableContainer = hoc(Timetable);
 
 TimetableContainer.defaultProps = {
     dateBegin: null,
     dateEnd: null,
     isSummerTimetable: false,
+    showValidityPeriod: true,
+    showNotes: true,
     segments: ["weekdays", "saturdays", "sundays"],
 };
 
@@ -145,7 +155,9 @@ TimetableContainer.propTypes = {
     dateBegin: PropTypes.string,
     dateEnd: PropTypes.string,
     isSummerTimetable: PropTypes.bool,
+    showValidityPeriod: PropTypes.bool,
+    showNotes: PropTypes.bool,
     segments: PropTypes.arrayOf(PropTypes.oneOf(["weekdays", "saturdays", "sundays"])),
 };
 
-export default graphql(timetableQuery)(TimetableContainer);
+export default TimetableContainer;
