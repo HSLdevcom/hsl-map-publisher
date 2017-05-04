@@ -74,7 +74,7 @@ const stopsMapper = stopGroup => ({
 const stopGroupsToStops = stopGroups => (
     stopGroups
         // Merge properties from mode-specific stops
-        .map(stopGroup => stopsMapper(stopGroup))
+        .map(stopsMapper)
         // Filter out stops with no departures
         .filter(stop => !!stop.routes.length)
 );
