@@ -9,6 +9,9 @@
 }
 
 .content {
+    flex: 1;
+    display: flex;
+    flex-flow: column;
     padding: 50px 0;
     overflow: hidden;
 }
@@ -21,9 +24,16 @@
 }
 
 .columns {
+    flex: 1;
     display: flex;
-    align-items: flex-start;
+    align-items: stretch;
     justify-content: space-between;
+}
+
+.right {
+    display: flex;
+    flex-flow: column;
+    align-items: stretch;
 }
 
 .timetables {
@@ -36,4 +46,8 @@
     display: flex;
     align-items: stretch;
     width: 730px;
+}
+
+.map {
+    flex: 1;
 }

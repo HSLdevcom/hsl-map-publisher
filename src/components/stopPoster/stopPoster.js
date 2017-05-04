@@ -14,6 +14,8 @@ import Routes from "./routesContainer";
 
 import styles from "./stopPoster.css";
 
+const MAP_MIN_HEIGHT = 500;
+
 // eslint-disable-next-line react/prefer-stateless-function
 class StopPoster extends Component {
     constructor(props) {
@@ -21,6 +23,8 @@ class StopPoster extends Component {
         this.state = {
             hasRoutesOnTop: false,
             hasRouteDiagram: true,
+            shouldRenderMap: false,
+            hasMap: true,
         };
     }
 
@@ -44,22 +48,31 @@ class StopPoster extends Component {
     async handleLayout() {
         await (() => new Promise(resolve => renderQueue.onEmpty(resolve, { ignore: this })))();
 
-        if (!this.hasOverflow()) {
-            renderQueue.remove(this, { success: true });
+        if (this.hasOverflow()) {
+            if (!this.state.hasRoutesOnTop) {
+                this.setState({ hasRoutesOnTop: true });
+                return;
+            }
+            if (this.state.hasRouteDiagram) {
+                this.setState({ hasRouteDiagram: false });
+                return;
+            }
+            renderQueue.remove(this, { success: false });
             return;
         }
 
-        if (!this.state.hasRoutesOnTop) {
-            this.setState({ hasRoutesOnTop: true });
-            return;
+        if (this.state.hasMap) {
+            if (this.map.clientHeight < MAP_MIN_HEIGHT) {
+                this.setState({ hasMap: false });
+                return;
+            }
+            if (!this.state.shouldRenderMap) {
+                this.setState({ shouldRenderMap: true });
+                return;
+            }
         }
 
-        if (this.state.hasRouteDiagram) {
-            this.setState({ hasRouteDiagram: false });
-            return;
-        }
-
-        renderQueue.remove(this, { success: false });
+        renderQueue.remove(this, { success: true });
     }
 
     render() {
@@ -105,24 +118,40 @@ class StopPoster extends Component {
 
                             <Spacer width={50}/>
 
-                            <div>
-                                {this.state.hasRoutesOnTop &&
-                                <Spacer height={50}/>
+                            <div className={styles.right}>
+                                {this.state.hasMap && this.state.hasRoutesOnTop &&
+                                <div className={styles.title}>&nbsp;</div>
                                 }
-                                {false &&
-                                <Map stopId={this.props.stopId} date={this.props.date}/>
-                                }
-                                {!this.state.hasRouteDiagram &&
-                                <div className={styles.timetables}>
-                                    <StopPosterTimetable segments={["saturdays"]}/>
-                                    <Spacer width={50}/>
-                                    <StopPosterTimetable segments={["sundays"]}/>
+                                {this.state.hasMap &&
+                                <div className={styles.map} ref={(ref) => { this.map = ref; }}>
+                                    {this.state.shouldRenderMap &&
+                                    <Map
+                                        stopId={this.props.stopId}
+                                        date={this.props.date}
+                                        width={this.map.clientWidth}
+                                        height={this.map.clientHeight}
+                                    />
+                                    }
                                 </div>
+                                }
+
+                                {!this.state.hasRouteDiagram &&
+                                <span>
+                                    <div className={styles.title}>&nbsp;</div>
+                                    <div className={styles.timetables}>
+                                        <StopPosterTimetable segments={["saturdays"]}/>
+                                        <Spacer width={50}/>
+                                        <StopPosterTimetable segments={["sundays"]}/>
+                                    </div>
+                                </span>
                                 }
                                 {this.state.hasRouteDiagram &&
                                 <span>
                                     <div className={styles.title}>Linjojen reitit</div>
-                                    <RouteDiagram stopId={this.props.stopId} date={this.props.date}/>
+                                    <RouteDiagram
+                                        stopId={this.props.stopId}
+                                        date={this.props.date}
+                                    />
                                 </span>
                                 }
                             </div>

@@ -6,31 +6,20 @@ const MAX_ZOOM = 19;
 export const MIN_ZOOM = 14;
 const STEP_ZOOM = 0.1;
 
-export const MAP_WIDTH = 1500;
-export const MAP_HEIGHT = 1200;
-
-export function createViewport(stop, zoom) {
-    return new PerspectiveMercatorViewport({
-        width: MAP_WIDTH,
-        height: MAP_HEIGHT,
-        longitude: stop.lon,
-        latitude: stop.lat,
-        zoom,
-    });
-}
-
 function viewportContains(viewport, stop) {
     const [x, y] = viewport.project([stop.lon, stop.lat], { topLeft: true });
     return x >= 0 && x <= viewport.width && y >= 0 && y <= viewport.height;
 }
 
-export function calculateStopsViewport(centeredStop, stops) {
+export function calculateStopsViewport(options) {
+    const { longitude, latitude, width, height, stops } = options;
+
     let viewport;
-    let visibleStops = stops.filter(({ stopIds }) => !stopIds.includes(centeredStop.stopId));
+    let visibleStops = stops;
 
     // Increase zoom level until only max number of stops visible
     for (let zoom = MIN_ZOOM; zoom <= MAX_ZOOM; zoom += STEP_ZOOM) {
-        viewport = createViewport(centeredStop, zoom);
+        viewport = new PerspectiveMercatorViewport({ longitude, latitude, width, height, zoom });
         visibleStops = visibleStops.filter(stop => viewportContains(viewport, stop)); // eslint-disable-line
         if (visibleStops.length <= MAX_STOPS) break;
     }
@@ -41,5 +30,5 @@ export function calculateStopsViewport(centeredStop, stops) {
         return { ...stop, x, y };
     });
 
-    return { stops: projectedStops, viewport };
+    return { projectedStops, viewport };
 }
