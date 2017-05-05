@@ -1,4 +1,5 @@
-import React, { PropTypes } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import { AutoSizer, List } from "react-virtualized";
 import { ListItem } from "material-ui/List";
 import Checkbox from "material-ui/Checkbox";

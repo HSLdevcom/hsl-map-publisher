@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import classNames from "classnames";
 import { JustifiedRow, CenteringColumn, Image } from "components/util";
 
@@ -13,7 +14,7 @@ const Group = props => (
 );
 
 Group.propTypes = {
-    children: React.PropTypes.node.isRequired,
+    children: PropTypes.node.isRequired,
 };
 
 const Title = props => (
@@ -27,8 +28,8 @@ Title.defaultProps = {
 };
 
 Title.propTypes = {
-    children: React.PropTypes.string.isRequired,
-    small: React.PropTypes.bool,
+    children: PropTypes.string.isRequired,
+    small: PropTypes.bool,
 };
 
 const Subtitle = props => (
@@ -42,8 +43,8 @@ Subtitle.defaultProps = {
 };
 
 Subtitle.propTypes = {
-    children: React.PropTypes.string.isRequired,
-    small: React.PropTypes.bool,
+    children: PropTypes.string.isRequired,
+    small: PropTypes.bool,
 };
 
 const Icon = props => (
@@ -84,15 +85,15 @@ const Header = props => (
         <CenteringColumn>
             <Title small>Pysäkkinumero</Title>
             <Subtitle small>Hållplatsnummer</Subtitle>
-            <div className={styles.stop}>{props.shortId}</div>
+            <div className={styles.stop}>{props.shortId.replace(" ", "")}</div>
         </CenteringColumn>
     </JustifiedRow>
 );
 
 Header.propTypes = {
-    nameFi: React.PropTypes.string.isRequired,
-    nameSe: React.PropTypes.string.isRequired,
-    shortId: React.PropTypes.string.isRequired,
+    nameFi: PropTypes.string.isRequired,
+    nameSe: PropTypes.string.isRequired,
+    shortId: PropTypes.string.isRequired,
 };
 
 export default Header;

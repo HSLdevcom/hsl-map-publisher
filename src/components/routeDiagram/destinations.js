@@ -9,8 +9,9 @@ const Destinations = props => (
             <div className={styles.destinations}>
                 {props.destinations.sort(routeCompare).map((route, index) =>
                     <div key={index} className={styles.destination}>
-                        <div>{route.routeId}</div>
-                        <div>{route.title}</div>
+                        <div className={styles.routeId}>{route.routeId}</div>
+                        <div className={styles.title}>{route.title}</div>
+                        <div className={styles.subtitle}>{route.subtitle}</div>
                     </div>
                 )}
             </div>

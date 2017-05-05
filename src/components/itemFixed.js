@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 
 class ItemFixed extends Component {
     constructor(props) {
@@ -31,9 +32,9 @@ class ItemFixed extends Component {
 }
 
 ItemFixed.propTypes = {
-    top: React.PropTypes.number.isRequired,
-    left: React.PropTypes.number.isRequired,
-    children: React.PropTypes.element.isRequired,
+    top: PropTypes.number.isRequired,
+    left: PropTypes.number.isRequired,
+    children: PropTypes.element.isRequired,
 };
 
 export default ItemFixed;

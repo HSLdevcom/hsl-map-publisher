@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 
 class ItemPositioned extends Component {
     constructor(props) {
@@ -37,11 +38,11 @@ ItemPositioned.defaultProps = {
 };
 
 ItemPositioned.propTypes = {
-    x: React.PropTypes.number.isRequired,
-    y: React.PropTypes.number.isRequired,
-    distance: React.PropTypes.number.isRequired,
-    angle: React.PropTypes.number,
-    children: React.PropTypes.element.isRequired,
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+    distance: PropTypes.number.isRequired,
+    angle: PropTypes.number,
+    children: PropTypes.element.isRequired,
 };
 
 export default ItemPositioned;
