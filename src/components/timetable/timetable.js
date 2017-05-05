@@ -4,10 +4,9 @@ import groupBy from "lodash/groupBy";
 import { Row, WrappingRow, Spacer } from "components/util";
 import sortBy from "lodash/sortBy";
 import classNames from "classnames";
+import { trimRouteId } from "util/domain";
 
 import styles from "./timetable.css";
-
-import { trimRouteId } from "../../util/domain";
 
 const Header = props => (
     <div className={styles.header}>
@@ -57,8 +56,9 @@ const TableRow = props => (
             <strong>{(props.hours % 24) < 10 && "0"}{props.hours % 24}</strong>
         </div>
         <WrappingRow>
-            {sortBy(props.departures, a => a.minutes)
-                .map((departure, index) => <Departure key={index} {...departure}/>)}
+            {sortBy(props.departures, a => a.minutes).map((departure, index) => (
+                <Departure key={index} {...departure}/>
+            ))}
         </WrappingRow>
     </Row>
 );
@@ -70,8 +70,10 @@ TableRow.propTypes = {
 };
 
 const Table = (props) => {
-    const departuresByHour = groupBy(props.departures, departure =>
-        (departure.isNextDay ? 24 : 0) + departure.hours);
+    const departuresByHour = groupBy(
+        props.departures,
+        departure => (departure.isNextDay ? 24 : 0) + departure.hours
+    );
 
     return (
         <div className={styles.table}>
@@ -91,41 +93,52 @@ Table.propTypes = {
 
 const Timetable = props => (
     <div className={classNames(styles.root, { [styles.summer]: props.isSummerTimetable })}>
-        {!!props.weekdays.length &&
+        {props.showValidityPeriod &&
+            <div className={styles.validity}>
+                <div><strong>Aikataulut voimassa</strong></div>
+                <div>Tidtabeller giltiga</div>
+                <div>
+                    {new Date(props.dateBegin).toLocaleDateString("fi")}
+                    &nbsp;-&nbsp;
+                    {new Date(props.dateEnd).toLocaleDateString("fi")}
+                </div>
+            </div>
+        }
+        {props.weekdays && props.weekdays.length &&
             <div>
                 <Header titleFi="Maanantai - Perjantai" titleSe="Måndag - Fredag"/>
                 <Table departures={props.weekdays}/>
             </div>
         }
-        {!!props.saturdays.length &&
+        {props.saturdays && props.saturdays.length &&
             <div>
                 <Header titleFi="Lauantai" titleSe="Lördag"/>
                 <Table departures={props.saturdays}/>
             </div>
         }
-        {!!props.sundays.length &&
+        {props.sundays && props.sundays.length &&
             <div>
                 <Header titleFi="Sunnuntai" titleSe="Söndag"/>
                 <Table departures={props.sundays}/>
             </div>
         }
-        <div className={`${styles.validity}`}>
-            <div><strong>Aikataulut voimassa</strong></div>
-            <div>Tidtabeller giltiga</div>
-            <div>
-                {new Date(props.dateBegin).toLocaleDateString("fi")}
-                &nbsp;-&nbsp;
-                {new Date(props.dateEnd).toLocaleDateString("fi")}
-            </div>
-        </div>
         <Spacer height={20}/>
-        {props.notes.map(note =>
+        {props.showNotes && props.notes.map(note => (
             <div key={note} className={styles.footnote}>
                 {note}
             </div>
-        )}
+        ))}
     </div>
 );
+
+Timetable.defaultProps = {
+    weekdays: null,
+    saturdays: null,
+    sundays: null,
+    isSummerTimetable: false,
+    showValidityPeriod: true,
+    showNotes: true,
+};
 
 Timetable.propTypes = {
     weekdays: PropTypes.arrayOf(PropTypes.shape(Table.propTypes.departures)),
@@ -133,15 +146,10 @@ Timetable.propTypes = {
     sundays: PropTypes.arrayOf(PropTypes.shape(Table.propTypes.departures)),
     notes: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
     isSummerTimetable: PropTypes.bool,
+    showValidityPeriod: PropTypes.bool,
+    showNotes: PropTypes.bool,
     dateBegin: PropTypes.string.isRequired,
     dateEnd: PropTypes.string.isRequired,
-};
-
-Timetable.defaultProps = {
-    weekdays: null,
-    saturdays: null,
-    sundays: null,
-    isSummerTimetable: false,
 };
 
 export default Timetable;

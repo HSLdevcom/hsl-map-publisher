@@ -2,6 +2,7 @@
 
 .root {
     position: relative;
+    width: 100%;
     padding: 10px 20px 30px;
     color: gray;
     font-weight: 300;
