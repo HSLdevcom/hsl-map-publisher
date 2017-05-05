@@ -31,7 +31,7 @@ const mapStyle = hslMapStyle.generateStyle({
 
 const miniMapStyle = hslMapStyle.generateStyle({
     lang: ["fi", "sv"],
-    components: { text: { enabled: false } },
+    components: { text: { enabled: true } },
     glyphsUrl: "http://kartat.hsl.fi/",
     sourcesUrl: "api.digitransit.fi/map/v1/",
 });
