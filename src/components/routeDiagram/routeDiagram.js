@@ -8,7 +8,10 @@ const RouteDiagram = props => (
     <div className={styles.root}>
         <div className={styles.start}>
             <img src={markerIcon} className={styles.icon} role="presentation"/>
-            <div className={styles.title}>Olet tässä</div>
+            <div className={styles.title}>
+              Olet tässä&nbsp;&nbsp;
+              <span className={styles.subtitle}>Du är här</span>
+            </div>
         </div>
         <Path {...props.tree}/>
     </div>

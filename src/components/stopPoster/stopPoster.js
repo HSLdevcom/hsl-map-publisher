@@ -8,7 +8,6 @@ import Header from "./headerContainer";
 import Footer from "./footer";
 
 import Routes from "./routesContainer";
-import Info from "./info";
 
 import Map from "./mapContainer";
 
@@ -23,9 +22,12 @@ class StopPoster extends Component {
                     <Header stopId={this.props.stopId}/>
 
                     <div className={styles.content}>
-                        <div>
+                        <div className={styles.leftColumn}>
                             <Routes stopId={this.props.stopId} date={this.props.date}/>
-                            <div className={styles.title}>Pysäkkiaikataulu</div>
+                            <div className={styles.title}>
+                                Pysäkkiaikataulu&nbsp;&nbsp;
+                                <span className={styles.subtitle}>Hållplatstidtabell</span>
+                            </div>
                             <Timetable
                                 stopId={this.props.stopId}
                                 date={this.props.date}
@@ -33,14 +35,16 @@ class StopPoster extends Component {
                                 dateBegin={this.props.dateBegin}
                                 dateEnd={this.props.dateEnd}
                             />
-                            <Info/>
                         </div>
 
                         <Spacer width={50}/>
 
                         <div>
                             <Map stopId={this.props.stopId} date={this.props.date}/>
-                            <div className={styles.title}>Linjojen reitit</div>
+                            <div className={styles.title}>
+                                Linjojen reitit&nbsp;&nbsp;
+                                <span className={styles.subtitle}>Linjernas rutter</span>
+                            </div>
                             <RouteDiagram stopId={this.props.stopId} date={this.props.date}/>
                         </div>
                     </div>

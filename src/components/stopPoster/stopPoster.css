@@ -14,9 +14,17 @@
     margin: 50px 0;
 }
 
+.leftColumn {
+    flex-grow: 1;
+}
+
 .title {
     font-family: fontFamily;
     font-weight: 700;
     font-size: 30px;
     margin: 40px 40px 30px;
+}
+
+.subtitle {
+    font-weight: 300;
 }
