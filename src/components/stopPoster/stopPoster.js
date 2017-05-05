@@ -33,11 +33,11 @@ class StopPoster extends Component {
     }
 
     componentDidMount() {
-        this.handleLayout();
+        renderQueue.onEmpty(() => this.updateLayout(), { ignore: this });
     }
 
     componentDidUpdate() {
-        this.handleLayout();
+        renderQueue.onEmpty(() => this.updateLayout(), { ignore: this });
     }
 
     hasOverflow() {
@@ -45,9 +45,7 @@ class StopPoster extends Component {
                (this.content.scrollHeight > this.content.clientHeight);
     }
 
-    async handleLayout() {
-        await (() => new Promise(resolve => renderQueue.onEmpty(resolve, { ignore: this })))();
-
+    updateLayout() {
         if (this.hasOverflow()) {
             if (!this.state.hasRoutesOnTop) {
                 this.setState({ hasRoutesOnTop: true });
@@ -121,9 +119,20 @@ class StopPoster extends Component {
                             <Spacer width={50}/>
 
                             <div className={styles.right}>
-                                {this.state.hasMap && this.state.hasRoutesOnTop &&
+                                {this.state.hasRoutesOnTop &&
                                 <div className={styles.title}>&nbsp;</div>
                                 }
+
+                                {!this.state.hasRouteDiagram &&
+                                <div className={styles.timetables}>
+                                    <StopPosterTimetable segments={["saturdays"]} hideDetails/>
+                                    <Spacer width={50}/>
+                                    <StopPosterTimetable segments={["sundays"]} hideDetails/>
+                                </div>
+                                }
+
+                                {!this.state.hasRouteDiagram && <Spacer height={50}/>}
+
                                 {this.state.hasMap &&
                                 <div className={styles.map} ref={(ref) => { this.map = ref; }}>
                                     {this.state.shouldRenderMap &&
@@ -137,16 +146,8 @@ class StopPoster extends Component {
                                 </div>
                                 }
 
-                                {!this.state.hasRouteDiagram &&
-                                <span>
-                                    <div className={styles.title}>&nbsp;</div>
-                                    <div className={styles.timetables}>
-                                        <StopPosterTimetable segments={["saturdays"]} hideDetails/>
-                                        <Spacer width={50}/>
-                                        <StopPosterTimetable segments={["sundays"]} hideDetails/>
-                                    </div>
-                                </span>
-                                }
+                                {!this.state.hasRouteDiagram && <Spacer height={50}/>}
+
                                 {this.state.hasRouteDiagram &&
                                 <span>
                                     <div className={styles.title}>Linjojen reitit</div>
