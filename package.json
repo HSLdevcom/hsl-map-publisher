@@ -61,7 +61,7 @@
     "classnames": "^2.2.5",
     "concat-frames": "^1.0.3",
     "csv": "^1.1.1",
-    "hsl-map-style": "HSLdevcom/hsl-map-style",
+    "hsl-map-style": "HSLdevcom/hsl-map-style#16c19e5047ba793388771ebf1a7a0133626e7f34",
     "iconv-lite": "^0.4.15",
     "json-loader": "^0.5.4",
     "koa": "^2.2.0",

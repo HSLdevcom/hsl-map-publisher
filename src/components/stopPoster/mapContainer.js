@@ -22,6 +22,20 @@ const MINI_MAP_WIDTH = 450;
 const MINI_MAP_HEIGHT = 360;
 const MINI_MAP_ZOOM = 9;
 
+const mapStyle = hslMapStyle.generateStyle({
+    lang: ["fi", "sv"],
+    components: { routes: { enabled: true }, citybikes: { enabled: true } },
+    glyphsUrl: "http://kartat.hsl.fi/",
+    sourcesUrl: "api.digitransit.fi/map/v1/",
+});
+
+const miniMapStyle = hslMapStyle.generateStyle({
+    lang: ["fi", "sv"],
+    components: { text: { enabled: true } },
+    glyphsUrl: "http://kartat.hsl.fi/",
+    sourcesUrl: "api.digitransit.fi/map/v1/",
+});
+
 const nearbyStopsQuery = gql`
     query nearbyStopsQuery($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $date: Date!) {
         stopGroups: stopGroupedByShortIdByBbox(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon) {
@@ -70,6 +84,14 @@ const stopsMapper = stopGroup => ({
             }))).sort(routeCompare),
 });
 
+const routeMapper = route => ({
+    ...route,
+    properties: {
+        ...route.properties,
+        shortName: trimRouteId(route.properties.route_id),
+    },
+});
+
 const getClient = getContext({
     client: PropTypes.shape({
         query: PropTypes.func.isRequired,
@@ -102,13 +124,6 @@ const nearbyStopsMapper = compose(getClient, mapProps((props) => {
         zoom: viewport.zoom,
     };
 
-    const mapStyle = hslMapStyle.generateStyle({
-        lang: ["fi", "sv"],
-        extensions: ["icons", "routes", "citybikes"],
-        glyphsUrl: "http://kartat.hsl.fi/",
-        sourcesUrl: "api.digitransit.fi/map/v1/",
-    });
-
     const networkQuery = gql`
         query networkQuery($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $date: Date!) {
             network: networkByDateAsGeojson(date: $date, minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon)
@@ -129,7 +144,7 @@ const nearbyStopsMapper = compose(getClient, mapProps((props) => {
     }).then(({ data }) => {
         mapStyle.sources.routes = {
             type: "geojson",
-            data: data.network,
+            data: { type: "FeatureCollection", features: data.network.features.map(routeMapper) },
         };
         return fetchMap(mapOptions, mapStyle);
     });
@@ -141,7 +156,7 @@ const nearbyStopsMapper = compose(getClient, mapProps((props) => {
         zoom: MINI_MAP_ZOOM,
     };
 
-    const miniMap = fetchMap(miniMapOptions);
+    const miniMap = fetchMap(miniMapOptions, miniMapStyle);
 
     return {
         stops: projectedStops,
