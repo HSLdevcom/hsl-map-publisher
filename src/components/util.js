@@ -58,6 +58,16 @@ CenteringColumn.propTypes = {
     children: PropTypes.node.isRequired,
 };
 
+const CenteringColumn = props => (
+    <div className={styles.centeringColumn}>
+        {props.children}
+    </div>
+);
+
+CenteringColumn.propTypes = {
+    children: React.PropTypes.node.isRequired,
+};
+
 const JustifiedColumn = props => (
     <div className={styles.justifiedColumn}>
         {props.children}
