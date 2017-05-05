@@ -1,6 +1,7 @@
 import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
 import flatMap from "lodash/flatMap";
+import uniqBy from "lodash/uniqBy";
 
 import { isNumberVariant, trimRouteId, isDropOffOnly } from "util/domain";
 import apolloWrapper from "util/apolloWrapper";
@@ -18,6 +19,11 @@ query routesQuery($stopId: String!, $date: Date!) {
                         routeId
                         hasRegularDayDepartures
                         pickupDropoffType
+                        line {
+                            nodes {
+                                lineId
+                            }
+                        }
                         route {
                             nodes {
                                 destinationFi
@@ -34,17 +40,19 @@ query routesQuery($stopId: String!, $date: Date!) {
 
 const propsMapper = mapProps(props => ({
     columns: props.columns,
-    routes: flatMap(
-        props.data.stop.siblings.nodes,
-        node => node.routeSegments.nodes
-            .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
-            .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
-            .filter(routeSegment => !isDropOffOnly(routeSegment))
-            .map(routeSegment => ({
-                ...routeSegment.route.nodes[0],
-                routeId: trimRouteId(routeSegment.routeId),
-            }))
-        ).sort(routeCompare),
+    routes: uniqBy(
+        flatMap(props.data.stop.siblings.nodes, node =>
+            node.routeSegments.nodes
+                .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
+                .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
+                .filter(routeSegment => !isDropOffOnly(routeSegment))
+                .map(routeSegment => ({
+                    ...routeSegment.route.nodes[0],
+                    ...routeSegment.line.nodes[0],
+                    routeId: trimRouteId(routeSegment.routeId),
+                }))).sort(routeCompare),
+        routeSegment => `${routeSegment.lineId} ${routeSegment.destinationFi}`
+    ),
 }));
 
 const RoutesContainer = apolloWrapper(propsMapper)(Routes);
