@@ -52,7 +52,7 @@ const Icon = props => (
     <Image {...props} style={{ height: 180, marginLeft: 0, marginRight: 30 }}/>
 );
 
-const Header = props => {
+const Header = (props) => {
     const zone = getZoneName(props.shortId);
     return (
         <JustifiedRow style={{ margin: "0 10px" }}>
