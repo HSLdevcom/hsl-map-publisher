@@ -16,7 +16,6 @@ import styles from "./stopPoster.css";
 
 const MAP_MIN_HEIGHT = 500;
 
-// eslint-disable-next-line react/prefer-stateless-function
 class StopPoster extends Component {
     constructor(props) {
         super(props);
@@ -107,7 +106,10 @@ class StopPoster extends Component {
                                 {!this.state.hasRoutesOnTop &&
                                 <Routes stopId={this.props.stopId} date={this.props.date}/>
                                 }
-                                <div className={styles.title}>Pysäkkiaikataulu</div>
+                                <div className={styles.title}>
+                                    Pysäkkiaikataulu&nbsp;&nbsp;
+                                    <span className={styles.subtitle}>Hållplatstidtabell</span>
+                                </div>
                                 {this.state.hasRouteDiagram &&
                                 <StopPosterTimetable/>
                                 }
@@ -150,7 +152,10 @@ class StopPoster extends Component {
 
                                 {this.state.hasRouteDiagram &&
                                 <span>
-                                    <div className={styles.title}>Linjojen reitit</div>
+                                    <div className={styles.title}>
+                                        Linjojen reitit&nbsp;&nbsp;
+                                        <span className={styles.subtitle}>Linjernas rutter</span>
+                                    </div>
                                     <RouteDiagram
                                         stopId={this.props.stopId}
                                         date={this.props.date}

@@ -22,8 +22,8 @@ const routeDiagramQuery = gql`
                                 nodes {
                                     destinationFi
                                     destinationSe
-                                    }
                                 }
+                            }
                             nextStops {
                                 nodes {
                                     stopIndex

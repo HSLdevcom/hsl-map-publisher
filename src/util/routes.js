@@ -59,7 +59,11 @@ function routesToTree(routes) {
         route.stops.map((stop, index, stops) => {
             const item = { ...stop, type: "stop" };
             if (index === stops.length - 1) {
-                item.destinations = [{ routeId: route.routeId, title: route.destinationFi }];
+                item.destinations = [{
+                    routeId: route.routeId,
+                    title: route.destinationFi,
+                    subtitle: route.destinationSe,
+                }];
             }
             return item;
         }));

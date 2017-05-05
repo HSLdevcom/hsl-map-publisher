@@ -23,6 +23,10 @@
     margin: 40px 40px 30px;
 }
 
+.subtitle {
+    font-weight: 300;
+}
+
 .columns {
     flex: 1;
     display: flex;

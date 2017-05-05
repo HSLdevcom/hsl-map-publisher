@@ -118,7 +118,7 @@ const Timetable = props => (
         }
         {props.sundays &&
             <div>
-                <Header titleFi="Sunnuntai" titleSe="Sondag"/>
+                <Header titleFi="Sunnuntai" titleSe="Söndag"/>
                 <Table departures={props.sundays}/>
             </div>
         }
