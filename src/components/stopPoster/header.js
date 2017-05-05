@@ -63,11 +63,13 @@ const Header = props => {
                     <Subtitle>{props.nameSe}</Subtitle>
                 </Group>
             </div>
+            {zone &&
             <CenteringColumn>
                 <Title small>Lippuvyöhyke</Title>
                 <Subtitle small>Resezon</Subtitle>
                 <div className={styles.zone}>{zone}</div>
             </CenteringColumn>
+            }
             <CenteringColumn>
                 <Title small>Pysäkkinumero</Title>
                 <Subtitle small>Hållplatsnummer</Subtitle>
