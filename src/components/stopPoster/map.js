@@ -27,8 +27,8 @@ const MINI_MAP_MARGIN_RIGHT = 60;
 const MINI_MAP_MARGIN_BOTTOM = -40;
 
 // Overlays
-const INFO_POSITION_TOP = 1120;
-const INFO_POSITION_LEFT = 20;
+const INFO_MARGIN_BOTTOM = 78;
+const INFO_MARGIN_LEFT = 20;
 const SCALEBAR_TARGET_WIDTH = 250;
 
 const Attribution = () => (
@@ -177,7 +177,7 @@ const Map = (props) => {
                         </ItemPositioned>
                     ))}
 
-                    <ItemFixed top={INFO_POSITION_TOP} left={INFO_POSITION_LEFT}>
+                    <ItemFixed top={mapStyle.height - INFO_MARGIN_BOTTOM} left={INFO_MARGIN_LEFT}>
                         <div>
                             <Scalebar pixelsPerMeter={props.pixelsPerMeter}/>
                             <Attribution/>
