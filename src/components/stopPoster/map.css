@@ -1,4 +1,4 @@
-@value white, gray, background, fontFamily, fontFamilyNarrow, borderRadius from "styles/common.css";
+@value white, gray, hslBlue, fontFamily, fontFamilyNarrow, borderRadius from "styles/common.css";
 
 .root {
     position: relative;
@@ -22,7 +22,7 @@
 .miniMap {
     composes: mapContainer;
     position: absolute;
-    border: 10px solid background;
+    border: 10px solid hslBlue;
 }
 
 .overlays {
@@ -84,7 +84,7 @@
 .content {
     font-size: 15px;
     line-height: 16px;
-    color: background;
+    color: hslBlue;
     padding: 5px 0 0;
     font-weight: 500;
 }

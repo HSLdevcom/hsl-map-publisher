@@ -1,11 +1,11 @@
-@value white, background, fontFamily from "styles/common.css";
+@value white, hslBlue, fontFamily from "styles/common.css";
 
 .root {
     width: 2296px;
     height: 3430px;
     padding: 50px;
     color: white;
-    background: background;
+    background: hslBlue;
 }
 
 .content {
