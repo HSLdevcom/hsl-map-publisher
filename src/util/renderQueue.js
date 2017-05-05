@@ -2,7 +2,16 @@
 class RenderQueue {
     constructor() {
         this.items = [];
+        this.callbacks = [];
         this.hasErrors = false;
+    }
+
+    isEmpty() {
+        return (this.items.length === 0);
+    }
+
+    containsOnly(item) {
+        return (this.items.length === 1 && this.items[0] === item);
     }
 
     add(item) {
@@ -18,20 +27,24 @@ class RenderQueue {
             this.items.splice(this.items.indexOf(item), 1);
         }
 
-        if (this.items.length === 0) {
-            if (this.callback) {
-                this.callback({ success: !this.hasErrors });
-                this.callback = null;
+        this.callbacks.forEach((callbackOptions) => {
+            const { callback, ignore } = callbackOptions;
+            if (this.isEmpty() || this.containsOnly(ignore)) {
+                this.callbacks.splice(this.callbacks.indexOf(callbackOptions), 1);
+                callback({ success: !this.hasErrors });
             }
+        });
+
+        if (this.isEmpty()) {
             this.hasErrors = false;
         }
     }
 
-    onEmpty(callback) {
-        if (this.items.length === 0) {
-            callback({ success: true });
+    onEmpty(callback, options = {}) {
+        if (this.isEmpty() || this.containsOnly(options.ignore)) {
+            callback({ success: !this.hasErrors });
         } else {
-            this.callback = callback;
+            this.callbacks.push({ ...options, callback });
         }
     }
 }

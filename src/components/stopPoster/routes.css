@@ -1,25 +1,29 @@
 @value white, gray, fontFamily, fontFamilyNarrow, borderRadius, hslBlue from "styles/common.css";
 
 .root {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     color: gray;
     background: white;
     border-radius: borderRadius;
     padding: borderRadius;
+    white-space: nowrap;
 }
 
-.identifier {
-    font-family: fontFamilyNarrow;
-    padding: 0px 10px;
-    font-size: 70px;
-    font-weight: 700;
-    color: hslBlue;
-}
-
-.row {
-    height: 84px;
+.group {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    height: 84px;
+}
+
+.routeId {
+    padding: 0 10px;
+    font-family: fontFamilyNarrow;
+    font-size: 70px;
+    font-weight: 500;
+    color: hslBlue;
 }
 
 .title {
