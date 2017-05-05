@@ -1,8 +1,8 @@
-@value background from "styles/common.css";
+@value hslBlue from "styles/common.css";
 
 @value leftWidth: 10px;
 @value rightWidth: 200px;
 
-@value lineColor: background;
+@value lineColor: hslBlue;
 @value lineWidth: 2px;
 @value lineRadius: 10px;
