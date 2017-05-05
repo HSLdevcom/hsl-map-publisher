@@ -53,6 +53,23 @@ function isDropOffOnly({ pickupDropoffType }) {
     return pickupDropoffType === null || pickupDropoffType === 2;
 }
 
+function getZoneName(shortId) {
+    if (shortId.startsWith("H")) return "Helsinki";
+    if (shortId.startsWith("V")) return "Vantaa";
+    if (shortId.startsWith("Si1403")) return "Vantaa";
+    if (shortId.startsWith("Si1404")) return "Vantaa";
+    if (shortId.startsWith("Nu0029")) return "Vantaa";
+    if (shortId.startsWith("Nu0030")) return "Vantaa";
+    if (shortId.startsWith("E")) return "Espoo-Kauniainen";
+    if (shortId.startsWith("Ka")) return "Espoo-Kauniainen";
+    if (shortId.startsWith("Ke")) return "Kerava-Sipoo";
+    if (shortId.startsWith("Si")) return "Kerava-Sipoo";
+    if (shortId.startsWith("Pn4017")) return "Kerava-Sipoo";
+    if (shortId.startsWith("Pn4018")) return "Kerava-Sipoo";
+    if (shortId.startsWith("Ki")) return "Kirkkonummi";
+    return null;
+}
+
 function getStopType(stopId) {
     return stopId.slice(4, 5);
 }
@@ -75,6 +92,7 @@ export {
     isTrunkRoute,
     trimRouteId,
     isDropOffOnly,
+    getZoneName,
     isTramStop,
     isTrainStop,
     isMetroStop,

@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames";
 import { JustifiedRow, CenteringColumn, Image } from "components/util";
+import { getZoneName } from "util/domain";
 
 import busIcon from "icons/bus.svg";
 
@@ -51,44 +52,30 @@ const Icon = props => (
     <Image {...props} style={{ height: 180, marginLeft: 0, marginRight: 30 }}/>
 );
 
-const getZoneForStop = (shortId) => {
-    if (shortId.startsWith("H")) return "Helsinki";
-    else if (shortId.startsWith("V")) return "Vantaa";
-    else if (shortId.startsWith("Si1403")) return "Vantaa";
-    else if (shortId.startsWith("Si1404")) return "Vantaa";
-    else if (shortId.startsWith("Nu0029")) return "Vantaa";
-    else if (shortId.startsWith("Nu0030")) return "Vantaa";
-    else if (shortId.startsWith("E")) return "Espoo-Kauniainen";
-    else if (shortId.startsWith("Ka")) return "Espoo-Kauniainen";
-    else if (shortId.startsWith("Ke")) return "Kerava-Sipoo";
-    else if (shortId.startsWith("Si")) return "Kerava-Sipoo";
-    else if (shortId.startsWith("Pn4017")) return "Kerava-Sipoo";
-    else if (shortId.startsWith("Pn4018")) return "Kerava-Sipoo";
-    else if (shortId.startsWith("Ki")) return "Kirkkonummi";
-    return null;
+const Header = props => {
+    const zone = getZoneName(props.shortId);
+    return (
+        <JustifiedRow style={{ margin: "0 10px" }}>
+            <div style={{ display: "flex", flexDirection: "row" }}>
+                <Icon src={busIcon}/>
+                <Group>
+                    <Title>{props.nameFi}</Title>
+                    <Subtitle>{props.nameSe}</Subtitle>
+                </Group>
+            </div>
+            <CenteringColumn>
+                <Title small>Lippuvyöhyke</Title>
+                <Subtitle small>Resezon</Subtitle>
+                <div className={styles.zone}>{zone}</div>
+            </CenteringColumn>
+            <CenteringColumn>
+                <Title small>Pysäkkinumero</Title>
+                <Subtitle small>Hållplatsnummer</Subtitle>
+                <div className={styles.stop}>{props.shortId.replace(" ", "")}</div>
+            </CenteringColumn>
+        </JustifiedRow>
+    );
 };
-
-const Header = props => (
-    <JustifiedRow style={{ margin: "0 10px" }}>
-        <div style={{ display: "flex", flexDirection: "row" }}>
-            <Icon src={busIcon}/>
-            <Group>
-                <Title>{props.nameFi}</Title>
-                <Subtitle>{props.nameSe}</Subtitle>
-            </Group>
-        </div>
-        <CenteringColumn>
-            <Title small>Lippuvyöhyke</Title>
-            <Subtitle small>Resezon</Subtitle>
-            <div className={styles.zone}>{getZoneForStop(props.shortId)}</div>
-        </CenteringColumn>
-        <CenteringColumn>
-            <Title small>Pysäkkinumero</Title>
-            <Subtitle small>Hållplatsnummer</Subtitle>
-            <div className={styles.stop}>{props.shortId.replace(" ", "")}</div>
-        </CenteringColumn>
-    </JustifiedRow>
-);
 
 Header.propTypes = {
     nameFi: PropTypes.string.isRequired,
