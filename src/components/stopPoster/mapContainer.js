@@ -78,8 +78,12 @@ const getClient = getContext({
 
 const nearbyStopsMapper = compose(getClient, mapProps((props) => {
     const nearbyStops = props.data.stopGroups.nodes
+        // Do not include current stop
         .filter(({ stopIds }) => !stopIds.includes(props.stopId))
-        .map(stopsMapper);
+        // Merge properties from mode-specific stops
+        .map(stopsMapper)
+        // Filter out stops with no departures
+        .filter(stop => !!stop.routes.length);
 
     const { projectedStops, viewport } = calculateStopsViewport({
         longitude: props.longitude,
