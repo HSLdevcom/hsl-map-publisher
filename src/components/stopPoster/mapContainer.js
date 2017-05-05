@@ -9,11 +9,14 @@ import { PerspectiveMercatorViewport } from "viewport-mercator-project";
 import apolloWrapper from "util/apolloWrapper";
 import { fetchMap } from "util/api";
 import { isNumberVariant, trimRouteId, isDropOffOnly } from "util/domain";
-import { MIN_ZOOM, calculateStopsViewport } from "util/stopPoster";
+import { calculateStopsViewport } from "util/stopPoster";
 import routeCompare from "util/routeCompare";
 import hslMapStyle from "hsl-map-style";
 
 import Map from "./map";
+
+const MAX_ZOOM = 19;
+const MIN_ZOOM = 14;
 
 const MINI_MAP_WIDTH = 450;
 const MINI_MAP_HEIGHT = 360;
@@ -83,6 +86,8 @@ const nearbyStopsMapper = compose(getClient, mapProps((props) => {
         latitude: props.latitude,
         width: props.width,
         height: props.height,
+        minZoom: MIN_ZOOM,
+        maxZoom: MAX_ZOOM,
         stops: nearbyStops,
     });
 
