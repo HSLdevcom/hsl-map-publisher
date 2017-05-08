@@ -27,18 +27,20 @@ class App extends Component {
     }
 
     componentDidMount() {
-        renderQueue.onEmpty(({ success }) => {
-            if (!success) {
-                App.handleError(new Error("Failed to render component"));
-                return;
-            }
-            if (window.callPhantom) {
-                window.callPhantom({
-                    width: this.root.offsetWidth,
-                    height: this.root.offsetHeight,
-                });
-            }
-        });
+        if (this.root) {
+            renderQueue.onEmpty(({ success }) => {
+                if (!success) {
+                    App.handleError(new Error("Failed to render component"));
+                    return;
+                }
+                if (window.callPhantom) {
+                    window.callPhantom({
+                        width: this.root.offsetWidth,
+                        height: this.root.offsetHeight,
+                    });
+                }
+            });
+        }
     }
 
     render() {
