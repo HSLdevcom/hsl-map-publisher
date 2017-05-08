@@ -46,7 +46,7 @@ class App extends Component {
         let props;
 
         try {
-            const params = queryString.parse(location.hash);
+            const params = queryString.parse(location.pathname.substring(1));
             ComponentToRender = components[params.component];
             props = JSON.parse(params.props);
         } catch (error) {
