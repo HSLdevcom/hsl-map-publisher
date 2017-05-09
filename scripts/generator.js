@@ -19,7 +19,7 @@ let previous = Promise.resolve();
 
 async function open(component, props) {
     const fragment = `component=${component}&props=${JSON.stringify(props)}`;
-    const status = await page.open(`http://localhost:${CLIENT_PORT}/#{fragment}`);
+    const status = await page.open(`http://localhost:${CLIENT_PORT}/${fragment}`);
 
     if (status !== "success") {
         throw new Error("Failed to open client app");
@@ -104,7 +104,8 @@ function renderComponent(options) {
                 .then(() => resolve({ width, height }))
                 .catch(error => reject(error));
         };
-        open(component, props);
+        open(component, props)
+            .catch(error => reject(error));
     });
 }
 
