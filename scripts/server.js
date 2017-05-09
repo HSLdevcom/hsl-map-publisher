@@ -3,11 +3,10 @@ const path = require("path");
 
 const Koa = require("koa");
 const Router = require("koa-router");
-const body = require("koa-json-body");
+const jsonBody = require("koa-json-body");
 const serveStatic = require("koa-static");
 
 const moment = require("moment");
-const pick = require("lodash/pick");
 const template = require("lodash/template");
 const iconv = require("iconv-lite");
 const csv = require("csv");
@@ -150,14 +149,14 @@ async function main() {
         }
 
         try {
-            const path = generateFiles(component, props);
-            successResponse(ctx, { path });
+            const filePath = generateFiles(component, props);
+            return successResponse(ctx, { path: filePath });
         } catch (error) {
-            errorResponse(ctx, error);
+            return errorResponse(ctx, error);
         }
     });
 
-    router.get("/:directory", (ctx, next) => {
+    router.get("/:directory", (ctx) => {
         const directory = ctx.params.directory.replace(/(\.|\/|\\)/g, "");
         return new Promise((resolve) => {
             fs.readdir(path.join(OUTPUT_PATH, directory), (err, files) => {
@@ -170,7 +169,7 @@ async function main() {
     });
 
     app
-        .use(body({ fallback: true }))
+        .use(jsonBody({ fallback: true }))
         .use(router.routes())
         .use(router.allowedMethods())
         .use(serveStatic(OUTPUT_PATH))
