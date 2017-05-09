@@ -2,7 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import chunk from "lodash/chunk";
 import { Row, Column } from "components/util";
-import CustomTypes from "util/customTypes";
 
 import styles from "./routes.css";
 
@@ -44,7 +43,11 @@ Routes.defaultProps = {
 };
 
 Routes.propTypes = {
-    routes: PropTypes.arrayOf(PropTypes.shape(CustomTypes.route)).isRequired,
+    routes: PropTypes.arrayOf(PropTypes.shape({
+        routeId: PropTypes.string.isRequired,
+        destinationFi: PropTypes.string.isRequired,
+        destinationSe: PropTypes.string.isRequired,
+    })).isRequired,
     columns: PropTypes.number,
 };
 

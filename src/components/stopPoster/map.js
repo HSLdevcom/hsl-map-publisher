@@ -100,7 +100,11 @@ const RouteList = (props) => {
 };
 
 RouteList.propTypes = {
-    routes: PropTypes.arrayOf(PropTypes.shape(CustomTypes.route)).isRequired,
+    routes: PropTypes.arrayOf(PropTypes.shape({
+        routeId: PropTypes.string.isRequired,
+        destinationFi: PropTypes.string.isRequired,
+        destinationSe: PropTypes.string.isRequired,
+    })).isRequired,
 };
 
 const Label = props => (
@@ -114,9 +118,9 @@ const Label = props => (
 );
 
 Label.propTypes = {
-    ...CustomTypes.stop,
-    x: PropTypes.number.isRequired,
-    y: PropTypes.number.isRequired,
+    routes: RouteList.propTypes.routes,
+    nameFi: PropTypes.string.isRequired,
+    nameSe: PropTypes.string.isRequired,
 };
 
 const Map = (props) => {
@@ -206,9 +210,13 @@ Map.propTypes = {
     miniMap: PropTypes.instanceOf(Promise).isRequired,
     miniMapOptions: PropTypes.shape(CustomTypes.mapOptions).isRequired,
     stops: PropTypes.arrayOf(PropTypes.shape({
-        ...CustomTypes.stop,
         x: PropTypes.number.isRequired,
         y: PropTypes.number.isRequired,
+        routes: PropTypes.arrayOf(PropTypes.shape({
+            routeId: PropTypes.string.isRequired,
+        }).isRequired).isRequired,
+        stopIds: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+        calculatedHeading: PropTypes.number.isRequired,
     })).isRequired,
     pixelsPerMeter: PropTypes.number.isRequired,
 };
