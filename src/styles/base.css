@@ -5,6 +5,6 @@ body {
 
 body, body * {
     user-select: none;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: unset;
+    -webkit-font-smoothing: none;
 }
