@@ -38,15 +38,15 @@ function logError(error) {
     if (stream) stream.write(`${content}\n`);
 }
 
-function flushBuffer(buffer, stream) {
+function flushBuffer(buffer, innerStream) {
     return new Promise((resolve, reject) => {
         const decoder = new PNGDecoder();
 
         decoder.on("error", error => reject(error));
         decoder.pipe(
             concat(([{ width, height, pixels }]) => {
-                if (!stream.write({ width, height, data: pixels })) {
-                    stream.once("drain", () => resolve());
+                if (!innerStream.write({ width, height, data: pixels })) {
+                    innerStream.once("drain", () => resolve());
                 } else {
                     process.nextTick(() => resolve());
                 }
@@ -66,22 +66,24 @@ async function captureScreenshot(totalWidth, totalHeight, filename) {
     let top = 0;
     while (top < totalHeight) {
         let left = 0;
-        let height = Math.min(TILE_SIZE, totalHeight - top);
+        const height = Math.min(TILE_SIZE, totalHeight - top);
         while (left < totalWidth) {
-            let width = Math.min(TILE_SIZE, totalWidth - left);
-            await page.set("clipRect", {top, left, width, height });
+            /* eslint-disable no-await-in-loop */
+            const width = Math.min(TILE_SIZE, totalWidth - left);
+            await page.set("clipRect", { top, left, width, height });
             const base64 = await page.renderBase64({ format: "png" });
             await flushBuffer(Buffer.from(base64, "base64"), tileStream);
             left += width;
+            /* eslint-enable no-await-in-loop */
         }
         top += height;
     }
 
     tileStream.end();
 
-    return new Promise((resolve, error) => {
-        outStream.on("finish", () => resolve());
-        outStream.on("error", () => reject(error));
+    return new Promise((resolve, reject) => {
+        outStream.on("finish", resolve);
+        outStream.on("error", error => reject(error));
     });
 }
 
@@ -102,7 +104,7 @@ function renderComponent(options) {
             }
             captureScreenshot(width, height, path.join(directory, filename))
                 .then(() => resolve({ width, height }))
-                .catch(error => reject(error));
+                .catch(e => reject(e));
         };
         open(component, props)
             .catch(error => reject(error));
@@ -122,10 +124,10 @@ function renderComponent(options) {
 function generate(options) {
     previous = previous
         .then(() => {
-           stream = options.stream;
-           logInfo(`Rendering ${options.component} to ${options.filename}`);
-           logInfo(`Using props ${JSON.stringify(options.props)}`);
-           return renderComponent(options);
+            stream = options.stream;
+            logInfo(`Rendering ${options.component} to ${options.filename}`);
+            logInfo(`Using props ${JSON.stringify(options.props)}`);
+            return renderComponent(options);
         })
         .catch((error) => {
             logError(error);
