@@ -16,8 +16,8 @@ const fetch = require("node-fetch");
 
 const generator = require("./generator");
 
-const IMAGE_PPI = 300;
-const PDF_PPI = 72;
+// 5 * 72 = 360 dpi
+const SCALE = 5;
 
 const PORT = 4000;
 
@@ -71,8 +71,8 @@ function generatePdf(directory, filenames, dimensions) {
         if (!dimensions[index]) return;
 
         // Dimensions in PDF points
-        const width = dimensions[index].width * (PDF_PPI / IMAGE_PPI);
-        const height = dimensions[index].height * (PDF_PPI / IMAGE_PPI);
+        const width = dimensions[index].width * SCALE;
+        const height = dimensions[index].height * SCALE;
 
         doc.addPage({ size: [width, height] });
         doc.image(path.join(directory, filename), 0, 0, { width });
@@ -97,6 +97,7 @@ function generateFiles(component, props) {
             directory,
             component,
             props: props[i],
+            scale: SCALE,
         };
         filenames.push(filename);
         promises.push(generator.generate(options));
