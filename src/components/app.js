@@ -57,7 +57,7 @@ class App extends Component {
             props = JSON.parse(params.props);
             if (params.scale) {
                 scale = params.scale;
-                setScale(Number(scale));
+                setMapScale(Number(scale));
             }
         } catch (error) {
             App.handleError(new Error("Failed to parse url fragment"));
