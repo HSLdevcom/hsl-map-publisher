@@ -17,8 +17,8 @@ let page;
 let stream;
 let previous = Promise.resolve();
 
-async function open(component, props) {
-    const fragment = `component=${component}&props=${JSON.stringify(props)}`;
+async function open(component, props, scale = 1) {
+    const fragment = `component=${component}&props=${JSON.stringify(props)}&scale=${scale}`;
     const status = await page.open(`http://localhost:${CLIENT_PORT}/${fragment}`);
 
     if (status !== "success") {
@@ -92,7 +92,7 @@ async function captureScreenshot(totalWidth, totalHeight, filename) {
  * @returns {Promise}
  */
 function renderComponent(options) {
-    const { component, props, directory, filename } = options;
+    const { component, props, directory, filename, scale } = options;
 
     return new Promise((resolve, reject) => {
         // Set callback called by client app when component is ready
@@ -106,7 +106,7 @@ function renderComponent(options) {
                 .then(() => resolve({ width, height }))
                 .catch(e => reject(e));
         };
-        open(component, props)
+        open(component, props, scale)
             .catch(error => reject(error));
     });
 }
