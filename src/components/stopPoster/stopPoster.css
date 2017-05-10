@@ -1,8 +1,9 @@
 @value white, hslBlue, fontFamily from "styles/common.css";
 
 .root {
-    width: 2296px;
-    height: 3430px;
+    box-sizing: border-box;
+    width: 2268px;
+    height: 3402px;
     padding: 50px;
     color: white;
     background: hslBlue;
@@ -50,7 +51,7 @@
 .timetable {
     display: flex;
     align-items: stretch;
-    width: 730px;
+    width: 689px;
 }
 
 .map {

@@ -6,7 +6,7 @@ import getContext from "recompose/getContext";
 
 import hslMapStyle from "hsl-map-style";
 
-import { fetchMap } from "util/api";
+import { fetchMap } from "util/map";
 import promiseWrapper from "util/promiseWrapper";
 import { addRoutesToStyle } from "util/routeNetwork";
 
