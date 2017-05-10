@@ -31,6 +31,15 @@ const routeDiagramQuery = gql`
                                         nameFi
                                         nameSe
                                         terminalId
+                                        terminalByTerminalId {
+                                            siblings {
+                                                nodes {
+                                                    modes(date: $date) {
+                                                        nodes
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }

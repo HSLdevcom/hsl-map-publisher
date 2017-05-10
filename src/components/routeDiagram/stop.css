@@ -14,10 +14,16 @@
 }
 
 .right {
+    display: flex;
     padding-top: 6px;
     padding-left: 10px;
     width: rightWidth;
     box-sizing: border-box;
+}
+
+.iconContainer {
+    display: flex;
+    align-items: center;
 }
 
 .title {
