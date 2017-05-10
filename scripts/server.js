@@ -70,8 +70,8 @@ function generatePdf(directory, filenames, dimensions) {
         if (!dimensions[index]) return;
 
         // Dimensions in PDF points
-        const width = dimensions[index].width * SCALE;
-        const height = dimensions[index].height * SCALE;
+        const width = dimensions[index].width / SCALE;
+        const height = dimensions[index].height / SCALE;
 
         doc.addPage({ size: [width, height] });
         doc.image(path.join(directory, filename), 0, 0, { width });
