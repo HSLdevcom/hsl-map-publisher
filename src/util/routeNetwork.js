@@ -11,6 +11,10 @@ const routeMapper = route => ({
     },
 });
 
+const ferryFilter = route =>
+    route.properties.mode !== "FERRY"
+    || route.properties.direction === "1";
+
 const networkQuery = gql`
     query networkQuery($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $date: Date!) {
         network: networkByDateAsGeojson(date: $date, minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon)
@@ -43,7 +47,10 @@ export function addRoutesToStyle(options, mapStyle, query, date) {
         // eslint-disable-next-line no-param-reassign
         mapStyle.sources.routes = {
             type: "geojson",
-            data: { type: "FeatureCollection", features: data.network.features.map(routeMapper) },
+            data: {
+                type: "FeatureCollection",
+                features: data.network.features.filter(ferryFilter).map(routeMapper),
+            },
         };
         return mapStyle;
     });

@@ -67,7 +67,6 @@ const stopsMapper = stopGroup => ({
             }))).sort(routeCompare),
 });
 
-
 const nearbyStopsMapper = mapProps((props) => {
     const nearbyStops = props.data.stopGroups.nodes
         // Do not include current stop

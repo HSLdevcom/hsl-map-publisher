@@ -145,7 +145,11 @@ const Map = (props) => {
             <div className={styles.map}>
                 <MapImageContainer
                     options={props.mapOptions}
-                    components={{ routes: { enabled: true }, citybikes: { enabled: true } }}
+                    components={{
+                        routes: { enabled: true },
+                        citybikes: { enabled: true },
+                        print: { enabled: true },
+                    }}
                     date={props.date}
                 />
             </div>
@@ -201,7 +205,7 @@ const Map = (props) => {
             <div className={styles.miniMap} style={miniMapStyle}>
                 <MapImageContainer
                     options={props.miniMapOptions}
-                    components={{ text: { enabled: true } }}
+                    components={{ text: { enabled: true }, print: { enabled: true } }}
                 />
                 <div className={styles.center} style={{ margin: -LOCATION_RADIUS_MINI }}>
                     <LocationSymbol size={LOCATION_RADIUS_MINI * 2}/>
