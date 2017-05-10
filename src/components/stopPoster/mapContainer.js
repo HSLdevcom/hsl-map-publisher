@@ -24,14 +24,18 @@ const MINI_MAP_ZOOM = 9;
 
 const mapStyle = hslMapStyle.generateStyle({
     lang: ["fi", "sv"],
-    components: { routes: { enabled: true }, citybikes: { enabled: true } },
+    components: {
+        routes: { enabled: true },
+        citybikes: { enabled: true },
+        print: { enabled: true },
+    },
     glyphsUrl: "http://kartat.hsl.fi/",
     sourcesUrl: "api.digitransit.fi/map/v1/",
 });
 
 const miniMapStyle = hslMapStyle.generateStyle({
     lang: ["fi", "sv"],
-    components: { text: { enabled: true } },
+    components: { text: { enabled: true }, print: { enabled: true } },
     glyphsUrl: "http://kartat.hsl.fi/",
     sourcesUrl: "api.digitransit.fi/map/v1/",
 });
