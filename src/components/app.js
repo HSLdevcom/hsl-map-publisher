@@ -5,7 +5,7 @@ import { ApolloClient, createNetworkInterface, ApolloProvider } from "react-apol
 import StopPoster from "components/stopPoster/stopPoster";
 import Timetable from "components/timetable/timetableContainer";
 import renderQueue from "util/renderQueue";
-import { setScale } from "util/api";
+import { setMapScale } from "util/map";
 
 const components = {
     StopPoster,

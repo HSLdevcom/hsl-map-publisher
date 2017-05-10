@@ -7,7 +7,7 @@ import flatMap from "lodash/flatMap";
 import { PerspectiveMercatorViewport } from "viewport-mercator-project";
 
 import apolloWrapper from "util/apolloWrapper";
-import { fetchMap } from "util/api";
+import { fetchMap } from "util/map";
 import { isNumberVariant, trimRouteId, isDropOffOnly } from "util/domain";
 import { calculateStopsViewport } from "util/stopPoster";
 import routeCompare from "util/routeCompare";

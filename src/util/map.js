@@ -4,7 +4,7 @@ const API_URL = "http://kartat.hsl.fi";
 // This enables us to set a global scale from app.js
 let scale = 1;
 
-export function setScale(newScale) {
+export function setMapScale(newScale) {
     scale = newScale;
 }
 
