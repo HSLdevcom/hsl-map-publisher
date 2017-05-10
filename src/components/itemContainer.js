@@ -204,14 +204,22 @@ class ItemContainer extends Component {
 
     componentDidMount() {
         this.updateBoundingBox();
-        this.updateChildren();
+        this.previousUpdate = this.updateChildren();
     }
 
     componentDidUpdate(prevProps) {
         if (prevProps.children !== this.props.children) {
-            this.updateBoundingBox();
-            this.updateChildren();
+            this.shouldStopUpdating = true;
+            this.previousUpdate = this.previousUpdate.then(() => {
+                this.shouldStopUpdating = false;
+                this.updateBoundingBox();
+                return this.updateChildren();
+            });
         }
+    }
+
+    componentWillUnmount() {
+        this.shouldStopUpdating = true;
     }
 
     getOverlappingComponent(positions, indexToOverlap) {
@@ -379,6 +387,7 @@ class ItemContainer extends Component {
                 const previousPlacement = placement;
                 for (let i = 0; i < placement.positions.length; i++) {
                     placement = await this.getNextPlacement(placement, i); // eslint-disable-line
+                    if (this.shouldStopUpdating) return;
                 }
                 if (placement === previousPlacement) break;
             }
