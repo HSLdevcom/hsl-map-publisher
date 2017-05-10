@@ -88,6 +88,8 @@ const stopsMapper = stopGroup => ({
             }))).sort(routeCompare),
 });
 
+const ferryFilter = route => route.properties.mode !== "FERRY" || route.properties.direction === "1";
+
 const routeMapper = route => ({
     ...route,
     properties: {
@@ -148,7 +150,10 @@ const nearbyStopsMapper = compose(getClient, mapProps((props) => {
     }).then(({ data }) => {
         mapStyle.sources.routes = {
             type: "geojson",
-            data: { type: "FeatureCollection", features: data.network.features.map(routeMapper) },
+            data: {
+                type: "FeatureCollection",
+                features: data.network.features.filter(ferryFilter).map(routeMapper),
+            },
         };
         return fetchMap(mapOptions, mapStyle);
     });
