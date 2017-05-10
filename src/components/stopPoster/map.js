@@ -9,7 +9,7 @@ import CustomTypes from "util/customTypes";
 
 import locationIcon from "icons/marker.svg";
 
-import MapImage from "./mapImage";
+import MapImageContainer from "./mapImageContainer";
 
 import styles from "./map.css";
 
@@ -143,7 +143,15 @@ const Map = (props) => {
     return (
         <div className={styles.root} style={mapStyle}>
             <div className={styles.map}>
-                <MapImage src={props.map}/>
+                <MapImageContainer
+                    options={props.mapOptions}
+                    components={{
+                        routes: { enabled: true },
+                        citybikes: { enabled: true },
+                        print: { enabled: true },
+                    }}
+                    date={props.date}
+                />
             </div>
 
             <div className={styles.overlays}>
@@ -195,7 +203,10 @@ const Map = (props) => {
             </div>
 
             <div className={styles.miniMap} style={miniMapStyle}>
-                <MapImage src={props.miniMap}/>
+                <MapImageContainer
+                    options={props.miniMapOptions}
+                    components={{ text: { enabled: true }, print: { enabled: true } }}
+                />
                 <div className={styles.center} style={{ margin: -LOCATION_RADIUS_MINI }}>
                     <LocationSymbol size={LOCATION_RADIUS_MINI * 2}/>
                 </div>
@@ -205,9 +216,7 @@ const Map = (props) => {
 };
 
 Map.propTypes = {
-    map: PropTypes.instanceOf(Promise).isRequired,
     mapOptions: PropTypes.shape(CustomTypes.mapOptions).isRequired,
-    miniMap: PropTypes.instanceOf(Promise).isRequired,
     miniMapOptions: PropTypes.shape(CustomTypes.mapOptions).isRequired,
     stops: PropTypes.arrayOf(PropTypes.shape({
         x: PropTypes.number.isRequired,
@@ -219,6 +228,7 @@ Map.propTypes = {
         calculatedHeading: PropTypes.number.isRequired,
     })).isRequired,
     pixelsPerMeter: PropTypes.number.isRequired,
+    date: PropTypes.string.isRequired,
 };
 
 export default Map;

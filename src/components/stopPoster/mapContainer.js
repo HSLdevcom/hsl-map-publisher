@@ -1,17 +1,14 @@
-import { PropTypes } from "prop-types";
+import PropTypes from "prop-types";
 import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
-import getContext from "recompose/getContext";
 import compose from "recompose/compose";
 import flatMap from "lodash/flatMap";
 import { PerspectiveMercatorViewport } from "viewport-mercator-project";
 
 import apolloWrapper from "util/apolloWrapper";
-import { fetchMap } from "util/map";
 import { isNumberVariant, trimRouteId, isDropOffOnly } from "util/domain";
 import { calculateStopsViewport } from "util/stopPoster";
 import routeCompare from "util/routeCompare";
-import hslMapStyle from "hsl-map-style";
 
 import Map from "./map";
 
@@ -21,20 +18,6 @@ const MIN_ZOOM = 14;
 const MINI_MAP_WIDTH = 450;
 const MINI_MAP_HEIGHT = 360;
 const MINI_MAP_ZOOM = 9;
-
-const mapStyle = hslMapStyle.generateStyle({
-    lang: ["fi", "sv"],
-    components: { routes: { enabled: true }, citybikes: { enabled: true } },
-    glyphsUrl: "http://kartat.hsl.fi/",
-    sourcesUrl: "api.digitransit.fi/map/v1/",
-});
-
-const miniMapStyle = hslMapStyle.generateStyle({
-    lang: ["fi", "sv"],
-    components: { text: { enabled: true } },
-    glyphsUrl: "http://kartat.hsl.fi/",
-    sourcesUrl: "api.digitransit.fi/map/v1/",
-});
 
 const nearbyStopsQuery = gql`
     query nearbyStopsQuery($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $date: Date!) {
@@ -84,21 +67,7 @@ const stopsMapper = stopGroup => ({
             }))).sort(routeCompare),
 });
 
-const routeMapper = route => ({
-    ...route,
-    properties: {
-        ...route.properties,
-        shortName: trimRouteId(route.properties.route_id),
-    },
-});
-
-const getClient = getContext({
-    client: PropTypes.shape({
-        query: PropTypes.func.isRequired,
-    }).isRequired,
-});
-
-const nearbyStopsMapper = compose(getClient, mapProps((props) => {
+const nearbyStopsMapper = mapProps((props) => {
     const nearbyStops = props.data.stopGroups.nodes
         // Do not include current stop
         .filter(({ stopIds }) => !stopIds.includes(props.stopId))
@@ -124,31 +93,6 @@ const nearbyStopsMapper = compose(getClient, mapProps((props) => {
         zoom: viewport.zoom,
     };
 
-    const networkQuery = gql`
-        query networkQuery($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $date: Date!) {
-            network: networkByDateAsGeojson(date: $date, minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon)
-        }
-    `;
-
-    const NETWORK_PADDING = 1000; // Padding in pixels
-
-    const [minLon, minLat] = viewport.unproject([-NETWORK_PADDING, -NETWORK_PADDING]);
-    const [maxLon, maxLat] = viewport.unproject([
-        props.width + NETWORK_PADDING,
-        props.height + NETWORK_PADDING,
-    ]);
-
-    const map = props.client.query({
-        query: networkQuery,
-        variables: { minLat, minLon, maxLat, maxLon, date: props.date },
-    }).then(({ data }) => {
-        mapStyle.sources.routes = {
-            type: "geojson",
-            data: { type: "FeatureCollection", features: data.network.features.map(routeMapper) },
-        };
-        return fetchMap(mapOptions, mapStyle);
-    });
-
     const miniMapOptions = {
         center: [props.longitude, props.latitude],
         width: MINI_MAP_WIDTH,
@@ -156,17 +100,14 @@ const nearbyStopsMapper = compose(getClient, mapProps((props) => {
         zoom: MINI_MAP_ZOOM,
     };
 
-    const miniMap = fetchMap(miniMapOptions, miniMapStyle);
-
     return {
         stops: projectedStops,
         pixelsPerMeter: viewport.getDistanceScales().pixelsPerMeter[0],
-        map,
         mapOptions,
-        miniMap,
         miniMapOptions,
+        date: props.date,
     };
-}));
+});
 
 const mapPositionQuery = gql`
     query mapPositionQuery($stopId: String!) {
