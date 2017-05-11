@@ -70,22 +70,6 @@ function getZoneName(shortId) {
     return null;
 }
 
-function getStopType(stopId) {
-    return stopId.slice(4, 5);
-}
-
-function isTramStop(stopId) {
-    return getStopType(stopId) === "4";
-}
-
-function isTrainStop(stopId) {
-    return getStopType(stopId) === "5";
-}
-
-function isMetroStop(stopId) {
-    return getStopType(stopId) === "6";
-}
-
 export {
     isNumberVariant,
     isRailRoute,
@@ -93,7 +77,4 @@ export {
     trimRouteId,
     isDropOffOnly,
     getZoneName,
-    isTramStop,
-    isTrainStop,
-    isMetroStop,
 };
