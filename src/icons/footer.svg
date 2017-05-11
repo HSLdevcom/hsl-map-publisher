@@ -15,9 +15,9 @@
 	 style="enable-background:new 0 0 2296.1 467.7;" xml:space="preserve">
 <style type="text/css">
 	.st0{fill:#FFFFFF;}
-	.st1{font-family:'GothamRounded-Medium';}
+	.st1{font-family: 'Gotham Rounded', sans-serif; font-weight: 500;}
 	.st2{font-size:24px;}
-	.st3{font-family:'GothamRounded-Book';}
+	.st3{font-family: 'Gotham Rounded', sans-serif; font-weight: 300;}
 	.st4{font-size:18px;}
 	.st5{fill:none;stroke:#FFFFFF;stroke-width:4.994;stroke-linecap:round;stroke-miterlimit:10;}
 	.st6{fill:none;stroke:#FFFFFF;stroke-width:4.994;stroke-linecap:round;stroke-miterlimit:10;stroke-dasharray:0,9.9955;}
