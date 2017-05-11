@@ -127,7 +127,10 @@
 						c0-13.7,11.2-24.9,24.9-24.9h409.5c13.7,0,24.9,11.2,24.9,24.9V372z"/>
 				</g>
 				<rect x="873.9" y="53.8" class="st10" width="437.8" height="34.6"/>
-				<text transform="matrix(1 0 0 1 873.9286 72.4593)"><tspan x="0" y="0" class="st0 st1 st11">Osallistu tutkimukseen </tspan><tspan x="252.7" y="0" class="st0 st3 st11">Delta i enkäten </tspan></text>
+				<text transform="matrix(1 0 0 1 873.9286 72.4593)">
+                  <tspan x="0" y="0" class="st0 st1 st11" xml:space="preserve">Osallistu tutkimukseen  </tspan>
+                  <tspan x="262.7" y="0" class="st0 st3 st11">Delta i enkäten </tspan>
+                </text>
 
 					<image style="overflow:visible;" width="432" height="414" xlink:href="data:image/jpeg;base64,/9j/4AAQSkZJRgABAgEA+QD5AAD/7AARRHVja3kAAQAEAAAAHgAA/+4AIUFkb2JlAGTAAAAAAQMA
 EAMCAwYAAAyGAAAsugAAilT/2wCEABALCwsMCxAMDBAXDw0PFxsUEBAUGx8XFxcXFx8eFxoaGhoX
@@ -1005,7 +1008,7 @@ YkLIpUkb9otUWSuXMzQuHCkJYlTfm7MmBM7RpIVJdLavJIbl7lfGT95PFXxk/eTxV8ZP3k8VSyY8
 					</g>
 				</g>
 				<rect x="1356.8" y="53.8" class="st10" width="381.3" height="32.6"/>
-				<text transform="matrix(1 0 0 1 1356.8431 72.4594)"><tspan x="0" y="0" class="st0 st1 st11">Lippuvöhykkeet </tspan><tspan x="181.4" y="0" class="st0 st3 st11">Biljett zoner</tspan></text>
+				<text transform="matrix(1 0 0 1 1356.8431 72.4594)"><tspan x="0" y="0" class="st0 st1 st11">Lippuvyöhykkeet</tspan><tspan x="201.4" y="0" class="st0 st3 st11">Biljett zoner</tspan></text>
 			</g>
 		</g>
 		<g id="Guide">
