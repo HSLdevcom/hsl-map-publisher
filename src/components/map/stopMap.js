@@ -12,7 +12,7 @@ import MapImage from "./mapImageContainer";
 import Scalebar from "./scalebar";
 import StopLabel from "./stopLabel";
 
-import styles from "./map.css";
+import styles from "./stopMap.css";
 
 // Map symbol size
 const STOP_RADIUS = 15;
@@ -55,7 +55,7 @@ StopSymbol.propTypes = {
     routeIds: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
 };
 
-const Map = (props) => {
+const StopMap = (props) => {
     const mapStyle = {
         width: props.mapOptions.width,
         height: props.mapOptions.height,
@@ -135,7 +135,7 @@ const Map = (props) => {
             </div>
 
             <div className={styles.miniMap} style={miniMapStyle}>
-                <MapImageContainer
+                <MapImage
                     options={props.miniMapOptions}
                     components={{ text: { enabled: true }, print: { enabled: true } }}
                 />
@@ -147,7 +147,7 @@ const Map = (props) => {
     );
 };
 
-Map.propTypes = {
+StopMap.propTypes = {
     mapOptions: PropTypes.shape(CustomTypes.mapOptions).isRequired,
     miniMapOptions: PropTypes.shape(CustomTypes.mapOptions).isRequired,
     stops: PropTypes.arrayOf(PropTypes.shape({
@@ -163,4 +163,4 @@ Map.propTypes = {
     date: PropTypes.string.isRequired,
 };
 
-export default Map;
+export default StopMap;
