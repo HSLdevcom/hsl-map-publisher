@@ -8,7 +8,7 @@ import CustomTypes from "util/customTypes";
 
 import locationIcon from "icons/marker.svg";
 
-import MapImageContainer from "./mapImageContainer";
+import MapImage from "./mapImageContainer";
 import Scalebar from "./scalebar";
 import StopLabel from "./stopLabel";
 
@@ -75,7 +75,7 @@ const Map = (props) => {
     return (
         <div className={styles.root} style={mapStyle}>
             <div className={styles.map}>
-                <MapImageContainer
+                <MapImage
                     options={props.mapOptions}
                     components={{
                         routes: { enabled: true },
