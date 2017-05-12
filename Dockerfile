@@ -25,6 +25,9 @@ COPY . ${WORK}
 EXPOSE 5000
 
 CMD \
+  mkdir -p /usr/share/fonts/opentype && \
+  cp /fonts/* /usr/share/fonts/opentype 2>/dev/null || : && \
+  fc-cache -f -v && \
   cd ${WORK} && \
   Xorg -dpi 96 -nolisten tcp -noreset +extension GLX +extension RANDR +extension RENDER -logfile ./10.log -config ./xorg.conf :10 & \
   sleep 15 && \
