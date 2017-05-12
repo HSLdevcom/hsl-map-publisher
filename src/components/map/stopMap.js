@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import ItemContainer from "components/itemContainer";
 import ItemFixed from "components/itemFixed";
 import ItemPositioned from "components/itemPositioned";
+import { Row } from "components/util";
 import { getSymbol } from "util/stops";
 import CustomTypes from "util/customTypes";
 
@@ -106,7 +107,11 @@ const StopMap = (props) => {
                         top={(mapStyle.height / 2) - LOCATION_RADIUS}
                         left={(mapStyle.width / 2) - LOCATION_RADIUS}
                     >
-                        <LocationSymbol size={LOCATION_RADIUS * 2}/>
+                        <Row>
+                            <LocationSymbol size={LOCATION_RADIUS * 2}/>
+                            <div className={styles.title}>Olet tässä</div>
+                            <div className={styles.subtitle}>Du är här</div>
+                        </Row>
                     </ItemFixed>
 
                     {stops.map((stop, index) => (

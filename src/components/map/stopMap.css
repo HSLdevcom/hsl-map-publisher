@@ -40,6 +40,20 @@
     color: gray;
 }
 
+.title {
+    margin: 3px 8px;
+    font-size: 18px;
+    font-weight: 500;
+    font-family: fontFamily;
+    color: gray;
+}
+
+.subtitle {
+    composes: title;
+    margin-left: 0;
+    font-weight: 300;
+}
+
 .center {
     position: absolute;
     top: 50%;
