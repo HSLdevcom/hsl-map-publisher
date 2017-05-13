@@ -5,11 +5,11 @@ import renderQueue from "util/renderQueue";
 
 import RouteDiagram from "components/routeDiagram/routeDiagramContainer";
 import Timetable from "components/timetable/timetableContainer";
+import StopMap from "components/map/stopMapContainer";
 
 import Header from "./headerContainer";
 import Footer from "./footer";
 
-import Map from "./mapContainer";
 import Routes from "./routesContainer";
 
 import styles from "./stopPoster.css";
@@ -138,7 +138,7 @@ class StopPoster extends Component {
                                 {this.state.hasMap &&
                                 <div className={styles.map} ref={(ref) => { this.map = ref; }}>
                                     {this.state.shouldRenderMap &&
-                                    <Map
+                                    <StopMap
                                         stopId={this.props.stopId}
                                         date={this.props.date}
                                         width={this.map.clientWidth}

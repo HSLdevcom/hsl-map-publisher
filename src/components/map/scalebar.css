@@ -1,0 +1,21 @@
+@value fontFamily from "styles/common.css";
+
+.root {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+}
+
+.root > *:first-child {
+    margin: 5px 0;
+    font-family: fontFamily;
+    font-weight: 500;
+    color: gray;
+}
+
+.root > *:last-child {
+    height: 10px;
+    background: repeating-linear-gradient(90deg, gray, gray 25%, white 25%, white 50%);
+    border: 1px solid white;
+    box-sizing: border-box;
+}
