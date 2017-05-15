@@ -5,7 +5,6 @@ import ItemFixed from "components/itemFixed";
 import ItemPositioned from "components/itemPositioned";
 import { Row } from "components/util";
 import { getSymbol } from "util/stops";
-import CustomTypes from "util/customTypes";
 
 import locationIcon from "icons/marker.svg";
 
@@ -154,8 +153,8 @@ const StopMap = (props) => {
 };
 
 StopMap.propTypes = {
-    mapOptions: PropTypes.shape(CustomTypes.mapOptions).isRequired,
-    miniMapOptions: PropTypes.shape(CustomTypes.mapOptions).isRequired,
+    mapOptions: MapImage.propTypes.options,
+    miniMapOptions: MapImage.propTypes.options,
     stops: PropTypes.arrayOf(PropTypes.shape({
         x: PropTypes.number.isRequired,
         y: PropTypes.number.isRequired,
