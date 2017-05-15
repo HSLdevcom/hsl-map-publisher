@@ -79,6 +79,7 @@ const StopMap = (props) => {
                 <MapImage
                     options={props.mapOptions}
                     components={{
+                        text_fisv: { enabled: true },
                         routes: { enabled: true },
                         citybikes: { enabled: true },
                         print: { enabled: true },
@@ -142,7 +143,7 @@ const StopMap = (props) => {
             <div className={styles.miniMap} style={miniMapStyle}>
                 <MapImage
                     options={props.miniMapOptions}
-                    components={{ text: { enabled: true }, print: { enabled: true } }}
+                    components={{ text_fisv: { enabled: true }, print: { enabled: true } }}
                 />
                 <div className={styles.center} style={{ margin: -LOCATION_RADIUS_MINI }}>
                     <LocationSymbol size={LOCATION_RADIUS_MINI * 2}/>

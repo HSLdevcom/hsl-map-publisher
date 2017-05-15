@@ -14,7 +14,6 @@ import MapImage from "./mapImage";
 
 function getMapStyle(components) {
     return hslMapStyle.generateStyle({
-        lang: ["fi", "sv"],
         components,
         glyphsUrl: "http://kartat.hsl.fi/",
         sourcesUrl: "api.digitransit.fi/map/v1/",
