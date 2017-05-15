@@ -5,7 +5,6 @@ import ItemFixed from "components/itemFixed";
 import ItemPositioned from "components/itemPositioned";
 import { Row } from "components/util";
 import { getSymbol } from "util/stops";
-import CustomTypes from "util/customTypes";
 
 import locationIcon from "icons/marker.svg";
 
@@ -79,6 +78,7 @@ const StopMap = (props) => {
                 <MapImage
                     options={props.mapOptions}
                     components={{
+                        text_fisv: { enabled: true },
                         routes: { enabled: true },
                         citybikes: { enabled: true },
                         print: { enabled: true },
@@ -142,7 +142,7 @@ const StopMap = (props) => {
             <div className={styles.miniMap} style={miniMapStyle}>
                 <MapImage
                     options={props.miniMapOptions}
-                    components={{ text: { enabled: true }, print: { enabled: true } }}
+                    components={{ text_fisv: { enabled: true }, print: { enabled: true } }}
                 />
                 <div className={styles.center} style={{ margin: -LOCATION_RADIUS_MINI }}>
                     <LocationSymbol size={LOCATION_RADIUS_MINI * 2}/>
@@ -153,8 +153,8 @@ const StopMap = (props) => {
 };
 
 StopMap.propTypes = {
-    mapOptions: PropTypes.shape(CustomTypes.mapOptions).isRequired,
-    miniMapOptions: PropTypes.shape(CustomTypes.mapOptions).isRequired,
+    mapOptions: MapImage.propTypes.options,
+    miniMapOptions: MapImage.propTypes.options,
     stops: PropTypes.arrayOf(PropTypes.shape({
         x: PropTypes.number.isRequired,
         y: PropTypes.number.isRequired,

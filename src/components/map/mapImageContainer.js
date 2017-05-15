@@ -14,7 +14,6 @@ import MapImage from "./mapImage";
 
 function getMapStyle(components) {
     return hslMapStyle.generateStyle({
-        lang: ["fi", "sv"],
         components,
         glyphsUrl: "http://kartat.hsl.fi/",
         sourcesUrl: "api.digitransit.fi/map/v1/",
@@ -31,16 +30,38 @@ const propsMapper = mapProps(({ options, components, date, client: { query } }) 
     const mapStyle = getMapStyle(components);
 
     if (components.routes && components.routes.enabled) {
-        return {
-            src: addRoutesToStyle(options, mapStyle, query, date).then(newMapStyle =>
-                fetchMap(options, newMapStyle)),
-        };
+        const src = addRoutesToStyle(options, mapStyle, query, date)
+            .then(styleWithRoutes => fetchMap(options, styleWithRoutes));
+        return { src };
     }
     return { src: fetchMap(options, mapStyle) };
 });
 
-export default compose(
+const hoc = compose(
     getClient,
     propsMapper,
     promiseWrapper("src")
-)(MapImage);
+);
+
+const MapImageContainer = hoc(MapImage);
+
+MapImageContainer.defaultProps = {
+    // Used only when routes component is enabled
+    date: new Date().toISOString().substring(0, 10),
+};
+
+MapImageContainer.propTypes = {
+    options: PropTypes.shape({
+        center: PropTypes.arrayOf(PropTypes.number).isRequired,
+        zoom: PropTypes.number.isRequired,
+        width: PropTypes.number.isRequired,
+        height: PropTypes.number.isRequired,
+        scale: PropTypes.number,
+    }).isRequired,
+    components: PropTypes.objectOf(PropTypes.shape({
+        enabled: PropTypes.bool.isRequired,
+    })).isRequired,
+    date: PropTypes.string,
+};
+
+export default MapImageContainer;
