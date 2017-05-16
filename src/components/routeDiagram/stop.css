@@ -43,8 +43,8 @@
 }
 
 .separatorTop {
-     width: lineWidth;
-     height: 8px;
+    width: lineWidth;
+    height: 8px;
     border-left: lineWidth solid lineColor;
  }
 
@@ -53,7 +53,7 @@
     border-left: lineWidth solid lineColor;
 }
 
-.separatorSymbol {
+.separatorStop {
     width: calc(4 * lineWidth);
     height: calc(4 * lineWidth);
     border: lineWidth solid lineColor;
@@ -61,4 +61,10 @@
     margin-top: calc(lineWidth / -2);
     margin-bottom: calc(lineWidth / -2);
     margin-left: calc(-2.5 * lineWidth);
+}
+
+.separatorLastStop {
+    composes: separatorStop;
+    background: lineColor;
+    border-radius: 0;
 }
