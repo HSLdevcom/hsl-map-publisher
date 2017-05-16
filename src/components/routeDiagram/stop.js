@@ -19,7 +19,7 @@ const ICONS = {
 };
 
 const Icon = props => (
-    <Image {...props} style={{ height: "20px", marginLeft: "2px" }}/>
+    <Image {...props} className={styles.icon}/>
 );
 
 const Stop = props => (

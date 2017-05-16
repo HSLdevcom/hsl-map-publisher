@@ -21,11 +21,6 @@
     box-sizing: border-box;
 }
 
-.iconContainer {
-    display: flex;
-    align-items: center;
-}
-
 .title {
     font-weight: 500;
     font-size: 11px;
@@ -34,6 +29,17 @@
 .subtitle {
     font-weight: 300;
     font-size: 11px;
+}
+
+.iconContainer {
+    display: flex;
+    align-items: center;
+    margin-left: 6px;
+}
+
+.icon {
+    height: 20px;
+    margin-left: 2px;
 }
 
 .separator {
