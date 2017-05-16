@@ -1,4 +1,4 @@
-@value fontFamily from "styles/common.css";
+@value white, gray, fontFamily from "styles/common.css";
 
 .root {
     display: flex;
