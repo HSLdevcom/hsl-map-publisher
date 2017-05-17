@@ -77,6 +77,7 @@
     "pdfkit": "^0.8.0",
     "png-stream": "^1.0.5",
     "prop-types": "^15.5.8",
+    "qrcode": "^0.8.1",
     "query-string": "^4.3.2",
     "react": "^15.4.2",
     "react-apollo": "^1.0.0-rc.3",
