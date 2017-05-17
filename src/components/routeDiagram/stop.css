@@ -49,12 +49,16 @@
 }
 
 .separatorTop {
-    width: lineWidth;
     height: 8px;
     border-left: lineWidth solid lineColor;
  }
 
 .separatorBottom {
+    height: 16px;
+    border-left: lineWidth solid lineColor;
+}
+
+.separatorBottomDashed {
     height: 16px;
     border-left: lineWidth solid lineColor;
 }

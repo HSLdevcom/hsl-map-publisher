@@ -30,7 +30,7 @@ const Stop = props => (
             <div className={props.isLast ? styles.separatorLastStop : styles.separatorStop}/>
             <div
                 className={styles.separatorBottom}
-                style={{ visibility: props.isLast ? "hidden" : "visible" }}
+                style={{ visibility: props.isConnected ? "visible" : "hidden" }}
             />
         </div>
         <div className={styles.right}>
@@ -40,12 +40,12 @@ const Stop = props => (
             </div>
             {props.terminalByTerminalId && (
                 <div className={styles.iconContainer}>
-                    {props.terminalByTerminalId.siblings.nodes.map(sibling =>
+                    {props.terminalByTerminalId.siblings.nodes.map(sibling => (
                       sibling.modes.nodes
                           // Filter out bus terminals, until we have more specs how to handle those.
                           .filter(mode => mode !== "BUS")
                           .map(mode => <Icon src={ICONS[mode]}/>)
-                    )}
+                    ))}
                 </div>
             )}
         </div>

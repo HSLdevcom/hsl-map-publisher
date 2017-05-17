@@ -1,7 +1,8 @@
 @value leftWidth, rightWidth, lineColor, lineWidth from "./values.css";
 
 .root {
-    height: 20px;
+    margin-top: -14px;
+    height: calc(16px + 14px);
     margin-left: leftWidth;
     border-left: lineWidth dotted lineColor;
 }
