@@ -37,7 +37,11 @@ const Path = props => (
         {props.items && props.items.map((item, index) => (
             <div key={index}>
                 {item.type === "stop" &&
-                <Stop {...item} isLast={isLast(props, index)} isConnected={isConnected(props, index)}/>
+                <Stop
+                    {...item}
+                    isLast={isLast(props, index)}
+                    isConnected={isConnected(props, index)}
+                />
                 }
                 {item.type === "gap" && <Gap/>}
                 {item.destinations && <Destinations destinations={item.destinations}/>}
