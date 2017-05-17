@@ -14,7 +14,7 @@ class QrCode extends Component {
 
     updateCode() {
         renderQueue.add(this);
-        QRCodeLib.toCanvas(this.canvas, this.props.url, function (error) {
+        QRCodeLib.toCanvas(this.canvas, this.props.url, (error) => {
             if (error) {
                 console.error(error); // eslint-disable-line no-console
             }
@@ -30,7 +30,7 @@ class QrCode extends Component {
 }
 
 QrCode.propTypes = {
-    url: PropTypes.string.isRequired
+    url: PropTypes.string.isRequired,
 };
 
 export default QrCode;

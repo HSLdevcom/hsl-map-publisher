@@ -8,7 +8,7 @@ import Timetable from "components/timetable/timetableContainer";
 import StopMap from "components/map/stopMapContainer";
 
 import Header from "./headerContainer";
-import Footer from "./footer";
+import Footer from "./footerContainer";
 
 import Routes from "./routesContainer";
 
@@ -166,7 +166,7 @@ class StopPoster extends Component {
                         </div>
                     </div>
 
-                    <Footer/>
+                    <Footer stopId={this.props.stopId}/>
                 </JustifiedColumn>
             </div>
         );
