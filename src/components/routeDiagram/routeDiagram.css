@@ -1,4 +1,4 @@
-@value white, gray, fontFamily, borderRadius from "styles/common.css";
+@value fontFamily, borderRadius from "styles/common.css";
 @value leftWidth, rightWidth, lineWidth from "./values.css";
 
 .root {
@@ -13,7 +13,7 @@
 .start {
     display: flex;
     align-items: flex-start;
-    color: gray;
+    color: black;
     margin-left: leftWidth;
     margin-bottom: calc(lineWidth * 2);
 }
