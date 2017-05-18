@@ -1,4 +1,4 @@
-@value hslBlue, gray, fontFamily, fontFamilyNarrow from "styles/common.css";
+@value hslBlue, fontFamily, fontFamilyNarrow from "styles/common.css";
 
 .label {
     padding: 10px 7px 7px 10px;
@@ -9,14 +9,14 @@
 }
 
 .title {
-    color: gray;
+    color: black;
     font-size: 16px;
     font-weight: 500;
     line-height: 16px;
 }
 
 .subtitle {
-    color: gray;
+    color: black;
     font-size: 16px;
     font-weight: 300;
 }

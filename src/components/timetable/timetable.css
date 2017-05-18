@@ -1,10 +1,10 @@
-@value fontFamily, fontFamilyNarrow, gray, white, hslBlue, hslBlueLight, borderRadius from "styles/common.css";
+@value hslBlue, hslBlueLight, fontFamily, fontFamilyNarrow, borderRadius from "styles/common.css";
 
 .root {
     position: relative;
     width: 100%;
     padding: 10px 20px 30px;
-    color: gray;
+    color: black;
     font-weight: 300;
     font-family: fontFamilyNarrow;
     background: hslBlueLight;

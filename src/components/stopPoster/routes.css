@@ -1,10 +1,10 @@
-@value white, gray, fontFamily, fontFamilyNarrow, borderRadius, hslBlue from "styles/common.css";
+@value fontFamily, fontFamilyNarrow, borderRadius, hslBlue from "styles/common.css";
 
 .root {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    color: gray;
+    color: black;
     background: white;
     border-radius: borderRadius;
     padding: borderRadius;

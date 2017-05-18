@@ -1,4 +1,4 @@
-@value white, gray, hslBlue, fontFamily, borderRadius from "styles/common.css";
+@value hslBlue, fontFamily, borderRadius from "styles/common.css";
 
 .root {
     position: relative;
@@ -37,7 +37,7 @@
 .attribution {
     margin: 8px 0;
     font-family: fontFamily;
-    color: gray;
+    color: black;
 }
 
 .title {
@@ -45,7 +45,7 @@
     font-size: 18px;
     font-weight: 500;
     font-family: fontFamily;
-    color: gray;
+    color: black;
 }
 
 .subtitle {
