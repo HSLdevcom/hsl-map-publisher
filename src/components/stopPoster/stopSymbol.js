@@ -17,9 +17,6 @@ const StopSymbol = (props) => {
     const modes = [...new Set(props.routes.map(({ mode }) => mode))];
     const colors = [];
 
-    if (props.routes.some(({ routeId }) => isTrunkRoute(routeId))) {
-        colors.push(colorsByMode.TRUNK);
-    }
     if (modes.includes("BUS") && props.routes.some(({ routeId }) => !isTrunkRoute(routeId))) {
         colors.push(colorsByMode.BUS);
     }
@@ -32,19 +29,22 @@ const StopSymbol = (props) => {
     if (modes.includes("METRO")) {
         colors.push(colorsByMode.SUBWAY);
     }
+    if (props.routes.some(({ routeId }) => isTrunkRoute(routeId))) {
+        colors.push(colorsByMode.TRUNK);
+    }
 
-    const innerSize = props.size - 2 - (Math.min(colors.length, 2) * outlineWidth);
-    const outerSize = props.size + ((colors.length - 1) * outlineWidth);
+    const innerSize = props.size - (Math.min(colors.length, 2) * outlineWidth);
+    const outerSize = props.size + ((colors.length - 1) * (outlineWidth + 1));
     const center = Math.floor(outerSize / 2);
 
     const outlines = colors.map((color, index) => ({
         color,
-        radius: (innerSize / 2) + (index * outlineWidth) + (index + 1 < colors.length ? 1 : 0),
-        width: outlineWidth + (index + 1 < colors.length ? 1 : 0),
+        radius: (innerSize / 2) + (index * (outlineWidth + 1)),
+        width: outlineWidth,
     }));
     return (
         <svg width={outerSize} height={outerSize} style={{ display: "block" }}>
-            <circle cx={center} cy={center} r={innerSize / 2} fill="#fff"/>
+            <circle cx={center} cy={center} r={(outerSize / 2) - 2} fill="#fff"/>
             {outlines.map(({ radius, color, width }, index) => (
                 <circle
                     key={index}
