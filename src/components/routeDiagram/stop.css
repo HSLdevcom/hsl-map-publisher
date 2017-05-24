@@ -21,11 +21,6 @@
     box-sizing: border-box;
 }
 
-.iconContainer {
-    display: flex;
-    align-items: center;
-}
-
 .title {
     font-weight: 500;
     font-size: 11px;
@@ -36,6 +31,17 @@
     font-size: 11px;
 }
 
+.iconContainer {
+    display: flex;
+    align-items: center;
+    margin-left: 6px;
+}
+
+.icon {
+    height: 20px;
+    margin-left: 2px;
+}
+
 .separator {
     display: flex;
     flex-flow: column;
@@ -43,8 +49,7 @@
 }
 
 .separatorTop {
-     width: lineWidth;
-     height: 8px;
+    height: 8px;
     border-left: lineWidth solid lineColor;
  }
 
@@ -53,7 +58,12 @@
     border-left: lineWidth solid lineColor;
 }
 
-.separatorSymbol {
+.separatorBottomDashed {
+    height: 16px;
+    border-left: lineWidth solid lineColor;
+}
+
+.separatorStop {
     width: calc(4 * lineWidth);
     height: calc(4 * lineWidth);
     border: lineWidth solid lineColor;
@@ -61,4 +71,10 @@
     margin-top: calc(lineWidth / -2);
     margin-bottom: calc(lineWidth / -2);
     margin-left: calc(-2.5 * lineWidth);
+}
+
+.separatorLastStop {
+    composes: separatorStop;
+    background: lineColor;
+    border-radius: 0;
 }

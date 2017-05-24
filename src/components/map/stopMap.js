@@ -4,18 +4,15 @@ import ItemContainer from "components/itemContainer";
 import ItemFixed from "components/itemFixed";
 import ItemPositioned from "components/itemPositioned";
 import { Row } from "components/util";
-import CustomTypes from "util/customTypes";
 
 import locationIcon from "icons/marker.svg";
 
-import MapImageContainer from "./mapImageContainer";
+import MapImage from "./mapImageContainer";
+import Scalebar from "./scalebar";
 import StopSymbol from "./stopSymbol";
+import StopLabel from "./stopLabel";
 
-import styles from "./map.css";
-
-// Max rows in label
-const MAX_LABEL_ROWS = 6;
-const MAX_LABEL_CHARS = 36;
+import styles from "./stopMap.css";
 
 // Map symbol size
 const STOP_RADIUS = 15;
@@ -29,27 +26,12 @@ const MINI_MAP_MARGIN_BOTTOM = -40;
 // Overlays
 const INFO_MARGIN_BOTTOM = 78;
 const INFO_MARGIN_LEFT = 20;
-const SCALEBAR_TARGET_WIDTH = 250;
 
 const Attribution = () => (
     <div className={styles.attribution}>
         &copy; OpenStreetMap
     </div>
 );
-
-const Scalebar = (props) => {
-    const meters = Math.ceil((SCALEBAR_TARGET_WIDTH / props.pixelsPerMeter) / 100) * 100;
-    return (
-        <div className={styles.scalebar}>
-            <div>{meters} m</div>
-            <div style={{ width: props.pixelsPerMeter * meters }}/>
-        </div>
-    );
-};
-
-Scalebar.propTypes = {
-    pixelsPerMeter: PropTypes.number.isRequired,
-};
 
 const LocationSymbol = props => (
     <div style={{ width: props.size, height: props.size }}>
@@ -61,57 +43,7 @@ LocationSymbol.propTypes = {
     size: PropTypes.number.isRequired,
 };
 
-const RouteList = (props) => {
-    if (props.routes.length > MAX_LABEL_ROWS) {
-        let rowLength = 0;
-        const components = props.routes.map(({ routeId }, index, routes) => {
-            const content = `${routeId}${(index < routes.length - 1) ? ", " : ""}`;
-            const isNewLine = rowLength + content.length > MAX_LABEL_CHARS;
-            rowLength = isNewLine ? content.length : rowLength + content.length;
-            return <span className={styles.route} key={index}>{isNewLine && <br/>}{content}</span>;
-        });
-        return <div>{components}</div>;
-    }
-    return (
-        <div>
-            {props.routes.map((route, index) => (
-                <Row key={index}>
-                    <span className={styles.route} style={{ width: "2em" }}>{route.routeId}</span>
-                    {"\xa0"}
-                    {route.destinationFi}
-                    {"\xa0"}
-                    <span style={{ fontWeight: 300 }}>{route.destinationSe}</span>
-                </Row>
-            ))}
-        </div>
-    );
-};
-
-RouteList.propTypes = {
-    routes: PropTypes.arrayOf(PropTypes.shape({
-        routeId: PropTypes.string.isRequired,
-        destinationFi: PropTypes.string.isRequired,
-        destinationSe: PropTypes.string.isRequired,
-    })).isRequired,
-};
-
-const Label = props => (
-    <div className={styles.label}>
-        <div className={styles.title}>{props.nameFi}</div>
-        <div className={styles.subtitle}>{props.nameSe}</div>
-        <div className={styles.content}>
-            <RouteList routes={props.routes}/>
-        </div>
-    </div>
-);
-
-Label.propTypes = {
-    routes: RouteList.propTypes.routes,
-    nameFi: PropTypes.string.isRequired,
-    nameSe: PropTypes.string.isRequired,
-};
-
-const Map = (props) => {
+const StopMap = (props) => {
     const mapStyle = {
         width: props.mapOptions.width,
         height: props.mapOptions.height,
@@ -131,9 +63,10 @@ const Map = (props) => {
     return (
         <div className={styles.root} style={mapStyle}>
             <div className={styles.map}>
-                <MapImageContainer
+                <MapImage
                     options={props.mapOptions}
                     components={{
+                        text_fisv: { enabled: true },
                         routes: { enabled: true },
                         citybikes: { enabled: true },
                         print: { enabled: true },
@@ -158,7 +91,11 @@ const Map = (props) => {
                         top={(mapStyle.height / 2) - LOCATION_RADIUS}
                         left={(mapStyle.width / 2) - LOCATION_RADIUS}
                     >
-                        <LocationSymbol size={LOCATION_RADIUS * 2}/>
+                        <Row>
+                            <LocationSymbol size={LOCATION_RADIUS * 2}/>
+                            <div className={styles.title}>Olet tässä</div>
+                            <div className={styles.subtitle}>Du är här</div>
+                        </Row>
                     </ItemFixed>
 
                     {stops.map((stop, index) => (
@@ -169,13 +106,13 @@ const Map = (props) => {
                             distance={25}
                             angle={stop.calculatedHeading}
                         >
-                            <Label {...stop}/>
+                            <StopLabel {...stop}/>
                         </ItemPositioned>
                     ))}
 
                     <ItemFixed top={mapStyle.height - INFO_MARGIN_BOTTOM} left={INFO_MARGIN_LEFT}>
                         <div>
-                            <Scalebar pixelsPerMeter={props.pixelsPerMeter}/>
+                            <Scalebar targetWidth={250} pixelsPerMeter={props.pixelsPerMeter}/>
                             <Attribution/>
                         </div>
                     </ItemFixed>
@@ -187,9 +124,9 @@ const Map = (props) => {
             </div>
 
             <div className={styles.miniMap} style={miniMapStyle}>
-                <MapImageContainer
+                <MapImage
                     options={props.miniMapOptions}
-                    components={{ text: { enabled: true }, print: { enabled: true } }}
+                    components={{ text_fisv: { enabled: true }, print: { enabled: true } }}
                 />
                 <div className={styles.center} style={{ margin: -LOCATION_RADIUS_MINI }}>
                     <LocationSymbol size={LOCATION_RADIUS_MINI * 2}/>
@@ -199,9 +136,9 @@ const Map = (props) => {
     );
 };
 
-Map.propTypes = {
-    mapOptions: PropTypes.shape(CustomTypes.mapOptions).isRequired,
-    miniMapOptions: PropTypes.shape(CustomTypes.mapOptions).isRequired,
+StopMap.propTypes = {
+    mapOptions: MapImage.propTypes.options,
+    miniMapOptions: MapImage.propTypes.options,
     stops: PropTypes.arrayOf(PropTypes.shape({
         x: PropTypes.number.isRequired,
         y: PropTypes.number.isRequired,
@@ -215,4 +152,4 @@ Map.propTypes = {
     date: PropTypes.string.isRequired,
 };
 
-export default Map;
+export default StopMap;

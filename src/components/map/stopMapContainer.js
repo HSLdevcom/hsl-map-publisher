@@ -10,7 +10,7 @@ import { isNumberVariant, trimRouteId, isDropOffOnly } from "util/domain";
 import { calculateStopsViewport } from "util/stopPoster";
 import routeCompare from "util/routeCompare";
 
-import Map from "./map";
+import StopMap from "./stopMap";
 
 const MAX_ZOOM = 19;
 const MIN_ZOOM = 14;
@@ -144,13 +144,13 @@ const hoc = compose(
     apolloWrapper(nearbyStopsMapper)
 );
 
-const MapContainer = hoc(Map);
+const StopMapContainer = hoc(StopMap);
 
-MapContainer.propTypes = {
+StopMapContainer.propTypes = {
     stopId: PropTypes.string.isRequired,
     date: PropTypes.string.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
 };
 
-export default MapContainer;
+export default StopMapContainer;

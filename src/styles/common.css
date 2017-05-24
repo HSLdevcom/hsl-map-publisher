@@ -4,8 +4,5 @@
 
 @value borderRadius: 25px;
 
-@value white: rgb(255, 255, 255);
-@value gray: rgb(87, 89, 91);
-
 @value hslBlue: rgb(0, 122, 201);
 @value hslBlueLight: rgb(213, 232, 250);

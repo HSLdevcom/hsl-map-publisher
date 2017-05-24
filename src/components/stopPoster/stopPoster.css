@@ -1,4 +1,4 @@
-@value white, hslBlue, fontFamily from "styles/common.css";
+@value hslBlue, fontFamily from "styles/common.css";
 
 .root {
     box-sizing: border-box;
