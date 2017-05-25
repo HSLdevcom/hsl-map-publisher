@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import { isTrunkRoute } from "util/domain";
 
-const outlineWidth = 5;
+const strokeWidth = 5;
 
 const colorsByMode = {
     TRUNK: "#f25d21",
@@ -17,8 +17,8 @@ const StopSymbol = (props) => {
     const modes = [...new Set(props.routes.map(({ mode }) => mode))];
     const colors = [];
 
-    if (modes.includes("BUS") && props.routes.some(({ routeId }) => !isTrunkRoute(routeId))) {
-        colors.push(colorsByMode.BUS);
+    if (props.routes.some(({ routeId }) => isTrunkRoute(routeId))) {
+        colors.push(colorsByMode.TRUNK);
     }
     if (modes.includes("TRAM")) {
         colors.push(colorsByMode.TRAM);
@@ -29,30 +29,32 @@ const StopSymbol = (props) => {
     if (modes.includes("SUBWAY")) {
         colors.push(colorsByMode.SUBWAY);
     }
-    if (props.routes.some(({ routeId }) => isTrunkRoute(routeId))) {
-        colors.push(colorsByMode.TRUNK);
+    if (modes.includes("BUS") && props.routes.some(({ routeId }) => !isTrunkRoute(routeId))) {
+        colors.push(colorsByMode.BUS);
     }
 
-    const innerSize = props.size - (Math.min(colors.length, 2) * outlineWidth);
-    const outerSize = props.size + ((colors.length - 1) * (outlineWidth + 1));
-    const center = Math.floor(outerSize / 2);
+    const outlines = colors.map((color, index) => {
+        const maxRadius = (props.size / 2) - ((strokeWidth / 2) * (4 - colors.length));
+        const radius = maxRadius - (index * (strokeWidth + 1));
+        return { color, radius };
+    });
 
-    const outlines = colors.map((color, index) => ({
-        color,
-        radius: (innerSize / 2) + (index * (outlineWidth + 1)),
-        width: outlineWidth,
-    }));
     return (
-        <svg width={outerSize} height={outerSize} style={{ display: "block" }}>
-            <circle cx={center} cy={center} r={(outerSize / 2) - 2} fill="#fff"/>
-            {outlines.map(({ radius, color, width }, index) => (
+        <svg width={props.size} height={props.size} style={{ display: "block" }}>
+            <circle
+                cx={props.size / 2}
+                cy={props.size / 2}
+                r={outlines[0].radius}
+                fill="#fff"
+            />
+            {outlines.map(({ radius, color }, index) => (
                 <circle
                     key={index}
-                    cx={center}
-                    cy={center}
+                    cx={props.size / 2}
+                    cy={props.size / 2}
                     r={radius}
                     stroke={color}
-                    strokeWidth={width}
+                    strokeWidth={strokeWidth}
                     fill="none"
                 />
             ))}

@@ -15,7 +15,7 @@ import StopLabel from "./stopLabel";
 import styles from "./stopMap.css";
 
 // Map symbol size
-const STOP_RADIUS = 15;
+const STOP_RADIUS = 20;
 const LOCATION_RADIUS = 22;
 const LOCATION_RADIUS_MINI = 5;
 
