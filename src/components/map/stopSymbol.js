@@ -26,7 +26,7 @@ const StopSymbol = (props) => {
     if (modes.includes("RAIL")) {
         colors.push(colorsByMode.RAIL);
     }
-    if (modes.includes("METRO")) {
+    if (modes.includes("SUBWAY")) {
         colors.push(colorsByMode.SUBWAY);
     }
     if (props.routes.some(({ routeId }) => isTrunkRoute(routeId))) {
