@@ -7,7 +7,7 @@ import Gap from "./gap";
 import styles from "./path.css";
 
 // Must match width and radius values in CSS
-const PATH_WIDTH = 216;
+const PATH_WIDTH = 217;
 const LINE_RADIUS = 10;
 
 function getWidth(nodes, isRoot = true) {
