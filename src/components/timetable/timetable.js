@@ -104,19 +104,19 @@ const Timetable = props => (
                 </div>
             </div>
         }
-        {props.weekdays && props.weekdays.length &&
+        {props.weekdays && props.weekdays.length > 0 &&
             <div>
                 <Header titleFi="Maanantai - Perjantai" titleSe="Måndag - Fredag"/>
                 <Table departures={props.weekdays}/>
             </div>
         }
-        {props.saturdays && props.saturdays.length &&
+        {props.saturdays && props.saturdays.length > 0 &&
             <div>
                 <Header titleFi="Lauantai" titleSe="Lördag"/>
                 <Table departures={props.saturdays}/>
             </div>
         }
-        {props.sundays && props.sundays.length &&
+        {props.sundays && props.sundays.length > 0 &&
             <div>
                 <Header titleFi="Sunnuntai" titleSe="Söndag"/>
                 <Table departures={props.sundays}/>
