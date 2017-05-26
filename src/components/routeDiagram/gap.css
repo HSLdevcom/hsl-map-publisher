@@ -1,8 +1,8 @@
-@value leftWidth, rightWidth, lineColor, lineWidth from "./values.css";
+@value leftWidth from "./values.css";
 
 .root {
-    margin-top: -14px;
-    height: calc(16px + 14px);
+    display: flex;
+    flex-flow: column;
     margin-left: leftWidth;
-    border-left: lineWidth dotted lineColor;
 }
+

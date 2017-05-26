@@ -7,7 +7,7 @@ import Gap from "./gap";
 import styles from "./path.css";
 
 // Must match width and radius values in CSS
-const PATH_WIDTH = 216;
+const PATH_WIDTH = 217;
 const LINE_RADIUS = 10;
 
 function getWidth(nodes, isRoot = true) {
@@ -26,23 +26,12 @@ function isLast(props, index) {
     return !props.children && index === props.items.length - 1;
 }
 
-function isConnected(props, index) {
-    return (index < props.items.length - 1 && props.items[index + 1].type === "stop") ||
-        props.children;
-}
-
 const Path = props => (
     <div className={styles.root}>
         <div className={styles.header}/>
         {props.items && props.items.map((item, index) => (
             <div key={index}>
-                {item.type === "stop" &&
-                <Stop
-                    {...item}
-                    isLast={isLast(props, index)}
-                    isConnected={isConnected(props, index)}
-                />
-                }
+                {item.type === "stop" && <Stop {...item} isLast={isLast(props, index)}/>}
                 {item.type === "gap" && <Gap/>}
                 {item.destinations && <Destinations destinations={item.destinations}/>}
             </div>

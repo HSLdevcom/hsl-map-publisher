@@ -54,8 +54,7 @@ function truncate(node) {
  * @returns {Object}
  */
 function routesToTree(routes) {
-    // Get stops after given stop
-    const itemLists = routes.map(route =>
+    const itemLists = routes.map(route => (
         route.stops.map((stop, index, stops) => {
             const item = { ...stop, type: "stop" };
             if (index === stops.length - 1) {
@@ -66,7 +65,8 @@ function routesToTree(routes) {
                 }];
             }
             return item;
-        }));
+        })
+    ));
 
     const root = itemsToTree(itemLists, { isEqual, merge });
     generalizeTree(root, { width: MAX_WIDTH, height: MAX_HEIGHT, prune, truncate });

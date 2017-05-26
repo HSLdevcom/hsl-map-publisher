@@ -28,10 +28,7 @@ const Stop = props => (
         <div className={styles.separator}>
             <div className={styles.separatorTop}/>
             <div className={props.isLast ? styles.separatorLastStop : styles.separatorStop}/>
-            <div
-                className={styles.separatorBottom}
-                style={{ visibility: props.isConnected ? "visible" : "hidden" }}
-            />
+            {!props.isLast && <div className={styles.separatorBottom}/>}
         </div>
         <div className={styles.right}>
             <div>
