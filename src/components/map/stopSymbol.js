@@ -6,7 +6,7 @@ import { isTrunkRoute } from "util/domain";
 const strokeWidth = 5;
 
 const colorsByMode = {
-    TRUNK: "#f25d21",
+    TRUNK: "#ff6319",
     TRAM: "#00985f",
     RAIL: "#8c4799",
     SUBWAY: "#ff6319",
