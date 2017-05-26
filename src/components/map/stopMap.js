@@ -4,18 +4,18 @@ import ItemContainer from "components/itemContainer";
 import ItemFixed from "components/itemFixed";
 import ItemPositioned from "components/itemPositioned";
 import { Row } from "components/util";
-import { getSymbol } from "util/stops";
 
 import locationIcon from "icons/marker.svg";
 
 import MapImage from "./mapImageContainer";
 import Scalebar from "./scalebar";
+import StopSymbol from "./stopSymbol";
 import StopLabel from "./stopLabel";
 
 import styles from "./stopMap.css";
 
 // Map symbol size
-const STOP_RADIUS = 15;
+const STOP_RADIUS = 20;
 const LOCATION_RADIUS = 22;
 const LOCATION_RADIUS_MINI = 5;
 
@@ -41,18 +41,6 @@ const LocationSymbol = props => (
 
 LocationSymbol.propTypes = {
     size: PropTypes.number.isRequired,
-};
-
-const StopSymbol = props => (
-    <div style={{ width: props.size, height: props.size }}>
-        <img src={getSymbol({ stopIds: props.stopIds, routeIds: props.routeIds })}/>
-    </div>
-);
-
-StopSymbol.propTypes = {
-    size: PropTypes.number.isRequired,
-    stopIds: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
-    routeIds: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
 };
 
 const StopMap = (props) => {
@@ -95,11 +83,7 @@ const StopMap = (props) => {
                             top={stop.y - STOP_RADIUS}
                             left={stop.x - STOP_RADIUS}
                         >
-                            <StopSymbol
-                                stopIds={stop.stopIds}
-                                routeIds={stop.routes.map(({ routeId }) => routeId)}
-                                size={STOP_RADIUS * 2}
-                            />
+                            <StopSymbol routes={stop.routes} size={STOP_RADIUS * 2}/>
                         </ItemFixed>
                     ))}
 
