@@ -22,7 +22,7 @@
 
 .footer {
     position: relative;
-    height: 20px;
+    height: 14px;
     margin-left: leftWidth;
     margin-right: calc(rightWidth + lineRadius + 2 * lineWidth);
     border-bottom: lineWidth solid lineColor;

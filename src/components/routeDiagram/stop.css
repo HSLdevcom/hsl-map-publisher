@@ -58,11 +58,6 @@
     border-left: lineWidth solid lineColor;
 }
 
-.separatorBottomDashed {
-    height: 16px;
-    border-left: lineWidth solid lineColor;
-}
-
 .separatorStop {
     width: calc(4 * lineWidth);
     height: calc(4 * lineWidth);
