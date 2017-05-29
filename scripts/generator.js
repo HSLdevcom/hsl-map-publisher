@@ -17,15 +17,6 @@ let page;
 let stream;
 let previous = Promise.resolve();
 
-async function open(component, props, scale = 1) {
-    const fragment = `component=${component}&props=${JSON.stringify(props)}&scale=${scale}`;
-    const status = await page.open(`http://localhost:${CLIENT_PORT}/${fragment}`);
-
-    if (status !== "success") {
-        throw new Error("Failed to open client app");
-    }
-}
-
 function logInfo(message) {
     const content = `INFO: ${message}`;
     console.log(content); // eslint-disable-line no-console
@@ -36,6 +27,30 @@ function logError(error) {
     const content = `ERROR: ${error.message}`;
     console.error(error); // eslint-disable-line no-console
     if (stream) stream.write(`${content}\n`);
+}
+
+function isInitialized() {
+    if (!browser || !page) {
+        return Promise.reject();
+    }
+    return page.evaluate(() => null);
+}
+
+async function initialize() {
+    browser = await driver.create({ path: slimerPath });
+    page = await browser.createPage();
+
+    page.onError = error => logError(error);
+    page.onConsoleMessage = message => logInfo(message);
+}
+
+async function open(component, props, scale = 1) {
+    const fragment = `component=${component}&props=${JSON.stringify(props)}&scale=${scale}`;
+    const status = await page.open(`http://localhost:${CLIENT_PORT}/${fragment}`);
+
+    if (status !== "success") {
+        throw new Error("Failed to open client app");
+    }
 }
 
 function flushBuffer(buffer, innerStream) {
@@ -57,6 +72,7 @@ function flushBuffer(buffer, innerStream) {
 }
 
 async function captureScreenshot(totalWidth, totalHeight, filename) {
+
     const tileStream = new TileMergeStream({ width: totalWidth, height: totalHeight, channels: 4 });
 
     const outStream = tileStream
@@ -82,7 +98,7 @@ async function captureScreenshot(totalWidth, totalHeight, filename) {
     tileStream.end();
 
     return new Promise((resolve, reject) => {
-        outStream.on("finish", resolve);
+        outStream.on("finish", () => resolve());
         outStream.on("error", error => reject(error));
     });
 }
@@ -125,6 +141,13 @@ function generate(options) {
     previous = previous
         .then(() => {
             stream = options.stream;
+            return isInitialized();
+        })
+        .catch(() => {
+            logInfo("Browser not ready. Initializing.");
+            return initialize();
+        })
+        .then(() => {
             logInfo(`Rendering ${options.component} to ${options.filename}`);
             logInfo(`Using props ${JSON.stringify(options.props)}`);
             return renderComponent(options);
@@ -139,12 +162,5 @@ function generate(options) {
     return previous;
 }
 
-async function initialize() {
-    browser = await driver.create({ path: slimerPath });
-    page = await browser.createPage();
+module.exports = { generate };
 
-    page.onError = error => logError(error);
-    page.onConsoleMessage = message => logInfo(message);
-}
-
-module.exports = { initialize, generate };
