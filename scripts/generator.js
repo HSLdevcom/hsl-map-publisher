@@ -39,6 +39,7 @@ function isInitialized() {
 }
 
 async function initialize() {
+    if (browser) await browser.exit();
     browser = await driver.create({ path: slimerPath });
     page = await browser.createPage();
 
