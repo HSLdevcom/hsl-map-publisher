@@ -17,9 +17,9 @@
 	.st0{display:none;}
 	.st1{display:inline;fill:#007DC3;}
 	.st2{fill:#FFFFFF;}
-	.st3{font-family:'GothamRounded-Medium';}
+	.st3{font-family: 'Gotham Rounded', sans-serif; font-weight: 500;}
 	.st4{font-size:24px;}
-	.st5{font-family:'GothamRounded-Book';}
+	.st5{font-family: 'Gotham Rounded', sans-serif; font-weight: 300;}
 	.st6{font-size:18px;}
 	.st7{fill-rule:evenodd;clip-rule:evenodd;fill:#FFFFFF;}
 	.st8{fill:none;stroke:#FFFFFF;stroke-width:4.994;stroke-linecap:round;stroke-miterlimit:10;}
@@ -45,9 +45,9 @@
 	.st28{fill:#9AC4EB;stroke:#007DC3;stroke-width:1.0206;stroke-miterlimit:10;}
 	.st29{fill:#007DC3;stroke:#007DC3;stroke-width:1.0206;stroke-miterlimit:10;}
 	.st30{letter-spacing:1;}
-	.st31{font-family:'GothamXNarrow-Medium';}
+	.st31{font-family: 'Gotham XNarrow', sans-serif; font-weight: 500;}
 	.st32{font-size:27px;}
-	.st33{font-family:'GothamXNarrow-Book';}
+	.st33{font-family: 'Gotham XNarrow', sans-serif; font-weight: 300;}
 	.st34{font-size:21px;}
 	.st35{font-size:35px;}
 	.st36{font-size:43px;}
@@ -154,7 +154,7 @@
 						h728.3c18,0,32.7,14.7,32.7,32.7V364.1z"/>
 				</g>
 				<rect x="556.1" y="53.8" class="st13" width="437.8" height="34.6"/>
-				<text transform="matrix(1 0 0 1 556.1384 72.4593)"><tspan x="0" y="0" class="st2 st3 st14">Osallistu tutkimukseen</tspan><tspan x="246.3" y="0" class="st2 st3 st14"> </tspan><tspan x="253.5" y="0" class="st2 st5 st14">Delta</tspan><tspan x="310.1" y="0" class="st2 st5 st14 st15"> </tspan><tspan x="315.1" y="0" class="st2 st5 st14">i</tspan><tspan x="320.3" y="0" class="st2 st5 st14 st15"> </tspan><tspan x="324.9" y="0" class="st2 st5 st14">enkäten </tspan></text>
+				<text transform="matrix(1 0 0 1 556.1384 72.4593)"><tspan x="0" y="0" class="st2 st3 st14">Osallistu tutkimukseen</tspan><tspan x="246.3" y="0" class="st2 st3 st14"> </tspan><tspan x="258.5" y="0" class="st2 st5 st14">Delta</tspan><tspan x="314.1" y="0" class="st2 st5 st14 st15"> </tspan><tspan x="318.1" y="0" class="st2 st5 st14">i</tspan><tspan x="322.3" y="0" class="st2 st5 st14 st15"> </tspan><tspan x="326.9" y="0" class="st2 st5 st14">enkäten </tspan></text>
 			</g>
 			<g id="Lippuvyöhykkeet_1_">
 				<g>
