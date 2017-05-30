@@ -11,6 +11,7 @@ const slimerPath = path.join(__dirname, "..", "node_modules", ".bin", slimerjs);
 
 const CLIENT_PORT = 3000;
 const TILE_SIZE = 3000;
+const RENDER_TIMEOUT = 5 * 60000;
 
 let browser;
 let page;
@@ -111,6 +112,7 @@ function renderComponent(options) {
     const { component, props, directory, filename, scale } = options;
 
     return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error("Render timeout")), RENDER_TIMEOUT);
         // Set callback called by client app when component is ready
         page.onCallback = ({ error, width, height }) => {
             page.onCallback = null;
@@ -120,7 +122,8 @@ function renderComponent(options) {
             }
             captureScreenshot(width, height, path.join(directory, filename))
                 .then(() => resolve({ width, height }))
-                .catch(e => reject(e));
+                .catch(error => reject(error))
+                .then(() => clearTimeout(timer));
         };
         open(component, props, scale)
             .catch(error => reject(error));
