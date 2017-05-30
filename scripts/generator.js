@@ -12,6 +12,7 @@ const slimerPath = path.join(__dirname, "..", "node_modules", ".bin", slimerjs);
 const CLIENT_PORT = 3000;
 const TILE_SIZE = 3000;
 const RENDER_TIMEOUT = 5 * 60000;
+const MAX_RENDER_ATTEMPTS = 3;
 
 let browser;
 let page;
@@ -73,7 +74,6 @@ function flushBuffer(buffer, innerStream) {
 }
 
 async function captureScreenshot(totalWidth, totalHeight, filename) {
-
     const tileStream = new TileMergeStream({ width: totalWidth, height: totalHeight, channels: 4 });
 
     const outStream = tileStream
@@ -130,6 +130,24 @@ function renderComponent(options) {
     });
 }
 
+async function renderComponentRetry(options) {
+    for (let i = 1; i < MAX_RENDER_ATTEMPTS; i++) {
+        try {
+            /* eslint-disable no-await-in-loop */
+            const dimensions = await renderComponent(options);
+            /* eslint-enable no-await-in-loop */
+            logInfo(`Successfully rendered ${options.filename}`);
+            return dimensions;
+        } catch (error) {
+            logError(error);
+            logInfo("Retrying");
+        }
+    }
+
+    logError(new Error(`Failed to render ${options.filename}.`));
+    return null;
+}
+
 /**
  * Adds component to render queue
  * @param {Object} options
@@ -153,10 +171,7 @@ function generate(options) {
         .then(() => {
             logInfo(`Rendering ${options.component} to ${options.filename}`);
             logInfo(`Using props ${JSON.stringify(options.props)}`);
-            return renderComponent(options);
-        })
-        .catch((error) => {
-            logError(error);
+            return renderComponentRetry(options);
         })
         .then((dimensions) => {
             stream = null;
