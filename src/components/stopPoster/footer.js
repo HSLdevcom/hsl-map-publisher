@@ -6,21 +6,28 @@ import feedbackCodes from "data/feedbackCodes.json";
 
 import footerIcon from "icons/footer.svg";
 
+import styles from "./footer.css";
+
 const Footer = (props) => {
     const feedbackCode = feedbackCodes.find(({ shortId }) => shortId === props.shortId);
 
-    if (!feedbackCode || !feedbackCode.qr) {
+    if (!feedbackCode || !feedbackCode.code || !feedbackCode.url) {
         console.warn("Could not find feedback code"); // eslint-disable-line no-console
     }
 
     return (
         <div style={{ position: "relative" }}>
-            {feedbackCode && feedbackCode.qr &&
-            <div style={{ position: "absolute", left: 1090, top: 210 }}>
-                <QrCode url={feedbackCode.qr}/>
+            <Image src={footerIcon}/>
+            {feedbackCode && feedbackCode.code &&
+            <div className={styles.shortCode}>
+                {feedbackCode.code}
             </div>
             }
-            <Image src={footerIcon}/>
+            {feedbackCode && feedbackCode.url &&
+            <div className={styles.qrCode}>
+                <QrCode url={feedbackCode.url}/>
+            </div>
+            }
         </div>
     );
 };
