@@ -2,8 +2,16 @@ import React from "react";
 import PropTypes from "prop-types";
 import chunk from "lodash/chunk";
 import { Row, Column } from "components/util";
+import { isTrunkRoute, colorsByMode } from "util/domain";
 
 import styles from "./routes.css";
+
+function getColor(route) {
+    if (isTrunkRoute(route.routeId)) {
+        return colorsByMode.TRUNK;
+    }
+    return colorsByMode[route.mode];
+}
 
 const Routes = (props) => {
     const routesPerColumn = Math.ceil(props.routes.length / props.columns);
@@ -16,7 +24,9 @@ const Routes = (props) => {
                     <Column>
                         {routes.map((route, index) => (
                             <div key={index} className={styles.group}>
-                                <div className={styles.routeId}>{route.routeId}</div>
+                                <div className={styles.routeId} style={{ color: getColor(route) }}>
+                                    {route.routeId}
+                                </div>
                             </div>
                         ))}
                     </Column>
