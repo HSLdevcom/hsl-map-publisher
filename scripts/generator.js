@@ -33,9 +33,13 @@ function logError(error) {
 
 function isInitialized() {
     if (!browser || !page) {
-        return Promise.reject();
+        return Promise.resolve(false);
     }
-    return page.evaluate(() => null);
+    return new Promise((resolve) => {
+        page.evaluate(() => true)
+            .then(status => resolve(!!status))
+            .catch(() => resolve(false));
+    });
 }
 
 async function initialize() {
@@ -132,17 +136,24 @@ function renderComponent(options) {
 }
 
 async function renderComponentRetry(options) {
+    logInfo(`Rendering ${options.component} to ${options.filename}`);
+    logInfo(`Using props ${JSON.stringify(options.props)}`);
+
     for (let i = 1; i < MAX_RENDER_ATTEMPTS; i++) {
+        /* eslint-disable no-await-in-loop */
         try {
-            /* eslint-disable no-await-in-loop */
+            if (!(await isInitialized())) {
+                logInfo("Creating new browser instance");
+                await initialize();
+            }
             const dimensions = await renderComponent(options);
-            /* eslint-enable no-await-in-loop */
             logInfo(`Successfully rendered ${options.filename}`);
             return dimensions;
         } catch (error) {
             logError(error);
             logInfo("Retrying");
         }
+        /* eslint-enable no-await-in-loop */
     }
 
     logError(new Error(`Failed to render ${options.filename}.`));
@@ -163,15 +174,6 @@ function generate(options) {
     previous = previous
         .then(() => {
             stream = options.stream;
-            return isInitialized();
-        })
-        .catch(() => {
-            logInfo("Browser not ready. Initializing.");
-            return initialize();
-        })
-        .then(() => {
-            logInfo(`Rendering ${options.component} to ${options.filename}`);
-            logInfo(`Using props ${JSON.stringify(options.props)}`);
             return renderComponentRetry(options);
         })
         .then((dimensions) => {
