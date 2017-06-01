@@ -1,17 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import { isTrunkRoute } from "util/domain";
+import { isTrunkRoute, colorsByMode } from "util/domain";
 
 const strokeWidth = 5;
-
-const colorsByMode = {
-    TRUNK: "#ff6319",
-    TRAM: "#00985f",
-    RAIL: "#8c4799",
-    SUBWAY: "#ff6319",
-    BUS: "#007AC9",
-};
 
 const StopSymbol = (props) => {
     const modes = [...new Set(props.routes.map(({ mode }) => mode))];

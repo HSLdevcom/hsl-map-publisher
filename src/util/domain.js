@@ -70,6 +70,15 @@ function getZoneName(shortId) {
     return null;
 }
 
+const colorsByMode = {
+    TRUNK: "#ff6319",
+    TRAM: "#00985f",
+    RAIL: "#8c4799",
+    SUBWAY: "#ff6319",
+    BUS: "#007AC9",
+    FERRY: "#00B9E4",
+};
+
 export {
     isNumberVariant,
     isRailRoute,
@@ -77,4 +86,5 @@ export {
     trimRouteId,
     isDropOffOnly,
     getZoneName,
+    colorsByMode,
 };
