@@ -11,7 +11,8 @@ const slimerPath = path.join(__dirname, "..", "node_modules", ".bin", slimerjs);
 
 const CLIENT_PORT = 3000;
 const TILE_SIZE = 3000;
-const RENDER_TIMEOUT = 5 * 60000;
+const RENDER_TIMEOUT = 5 * 60 * 1000;
+const SLIMER_TIMEOUT = 10 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
 
 let browser;
@@ -36,6 +37,7 @@ function isInitialized() {
         return Promise.resolve(false);
     }
     return new Promise((resolve) => {
+        const timer = setTimeout(() => resolve(false), SLIMER_TIMEOUT);
         page.evaluate(() => true)
             .then(status => resolve(!!status))
             .catch(() => resolve(false));
@@ -43,7 +45,6 @@ function isInitialized() {
 }
 
 async function initialize() {
-    if (browser) await browser.exit();
     browser = await driver.create({ path: slimerPath });
     page = await browser.createPage();
 
