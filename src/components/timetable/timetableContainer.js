@@ -4,11 +4,12 @@ import mapProps from "recompose/mapProps";
 import compose from "recompose/compose";
 import find from "lodash/find";
 import flatMap from "lodash/flatMap";
+import groupBy from "lodash/groupBy";
 import uniq from "lodash/uniq";
 import pick from "lodash/pick";
 
 import apolloWrapper from "util/apolloWrapper";
-import { isDropOffOnly } from "util/domain";
+import { isDropOffOnly, trimRouteId } from "util/domain";
 
 import Timetable from "./timetable";
 
@@ -60,6 +61,12 @@ const timetableQuery = gql`
                             direction
                             hasRegularDayDepartures
                             pickupDropoffType
+                            route {
+                                nodes {
+                                    destinationFi
+                                    destinationSe
+                                }
+                            }
                             notes {
                                 nodes {
                                     noteText
@@ -98,8 +105,6 @@ const propsMapper = mapProps((props) => {
         )
     );
 
-    const { weekdays, saturdays, sundays } = pick(groupDepartures(departures), props.segments);
-
     let notes = flatMap(
         props.data.stop.siblings.nodes,
         stop => flatMap(stop.routeSegments.nodes, getNotes(props.isSummerTimetable))
@@ -110,6 +115,32 @@ const propsMapper = mapProps((props) => {
     //     notes.push("e) ei matalalattiavaunu / ej låggolvsvagn");
     // }
     notes = uniq(notes).sort();
+
+    // Search for routes with two different destinations from the same stop and add notes for them
+    Object.values(
+        groupBy(
+            flatMap(props.data.stop.siblings.nodes, stop => stop.routeSegments.nodes),
+            route => route.routeId
+        ))
+        .filter(routes => routes.length > 1)
+        .forEach(directions =>
+            directions.forEach((direction) => {
+                notes.push(`${trimRouteId(direction.routeId)}${"*".repeat(direction.direction)} ${direction.route.nodes[0].destinationFi} / ${direction.route.nodes[0].destinationSe}`);
+                departures
+                    .filter(
+                        departure =>
+                            departure.routeId === direction.routeId &&
+                            departure.direction === direction.direction
+                    )
+                    .forEach((departure) => {
+                        // eslint-disable-next-line no-param-reassign
+                        departure.note = [departure.note, "*".repeat(direction.direction)].join("");
+                    });
+            })
+        );
+
+
+    const { weekdays, saturdays, sundays } = pick(groupDepartures(departures), props.segments);
 
     const dateBegin = props.dateBegin || flatMap(
         props.data.stop.siblings.nodes,
