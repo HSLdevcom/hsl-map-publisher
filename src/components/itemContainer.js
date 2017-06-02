@@ -29,7 +29,7 @@ const Connector = props => (
     <path
         d={`M${props.x} ${props.y} L${props.x + props.cx} ${props.y + props.cy}`}
         fill="none"
-        stroke="#007AC9"
+        stroke="#333333"
         strokeWidth="2"
     />
 );

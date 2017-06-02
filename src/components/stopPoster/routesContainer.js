@@ -22,6 +22,7 @@ query routesQuery($stopId: String!, $date: Date!) {
                             nodes {
                                 destinationFi
                                 destinationSe
+                                mode
                                 }
                             }
                         }

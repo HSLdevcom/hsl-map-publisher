@@ -1,4 +1,4 @@
-@value fontFamily, fontFamilyNarrow, borderRadius, hslBlue from "styles/common.css";
+@value fontFamily, fontFamilyNarrow, borderRadius from "styles/common.css";
 
 .root {
     display: flex;
@@ -23,7 +23,6 @@
     font-family: fontFamilyNarrow;
     font-size: 70px;
     font-weight: 500;
-    color: hslBlue;
 }
 
 .title {

@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Row } from "components/util";
+import { isTrunkRoute, colorsByMode } from "util/domain";
 
 import styles from "./stopLabel.css";
 
@@ -8,14 +9,25 @@ import styles from "./stopLabel.css";
 const MAX_LABEL_ROWS = 6;
 const MAX_LABEL_CHARS = 36;
 
+function getColor(route) {
+    if (isTrunkRoute(route.routeId)) {
+        return colorsByMode.TRUNK;
+    }
+    return colorsByMode[route.mode];
+}
+
 const RouteList = (props) => {
     if (props.routes.length > MAX_LABEL_ROWS) {
         let rowLength = 0;
-        const components = props.routes.map(({ routeId }, index, routes) => {
-            const content = `${routeId}${(index < routes.length - 1) ? ", " : ""}`;
+        const components = props.routes.map((route, index, routes) => {
+            const content = `${route.routeId}${(index < routes.length - 1) ? ", " : ""}`;
             const isNewLine = rowLength + content.length > MAX_LABEL_CHARS;
             rowLength = isNewLine ? content.length : rowLength + content.length;
-            return <span className={styles.route} key={index}>{isNewLine && <br/>}{content}</span>;
+            return (
+                <span className={styles.route} key={index} style={{ color: getColor(route) }}>
+                    {isNewLine && <br/>}{content}
+                </span>
+            );
         });
         return <div>{components}</div>;
     }
@@ -23,7 +35,12 @@ const RouteList = (props) => {
         <div>
             {props.routes.map((route, index) => (
                 <Row key={index}>
-                    <span className={styles.route} style={{ width: "2em" }}>{route.routeId}</span>
+                    <span
+                        className={styles.route}
+                        style={{ width: "2em", color: getColor(route) }}
+                    >
+                        {route.routeId}
+                    </span>
                     {"\xa0"}
                     {route.destinationFi}
                     {"\xa0"}
