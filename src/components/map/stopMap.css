@@ -34,13 +34,21 @@
     overflow: hidden;
 }
 
+.outline {
+    text-shadow: 0px 0px 1px rgba(255, 255, 255, 1),
+                 0px 0px 1px rgba(255, 255, 255, 1),
+                 0px 0px 1px rgba(255, 255, 255, 1);
+}
+
 .attribution {
+    composes: outline;
     margin: 8px 0;
     font-family: fontFamily;
     color: black;
 }
 
 .title {
+    composes: outline;
     margin: 3px 8px;
     font-size: 18px;
     font-weight: 500;
