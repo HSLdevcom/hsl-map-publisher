@@ -5,6 +5,7 @@ const PNGEncoder = require("png-stream").Encoder;
 const PNGDecoder = require("png-stream").Decoder;
 const concat = require("concat-frames");
 const TileMergeStream = require("tile-merge-stream");
+const moment = require("moment");
 
 const slimerjs = /^win/.test(process.platform) ? "slimerjs.cmd" : "slimerjs";
 const slimerPath = path.join(__dirname, "..", "node_modules", ".bin", slimerjs);
@@ -21,13 +22,15 @@ let stream;
 let previous = Promise.resolve();
 
 function logInfo(message) {
-    const content = `INFO: ${message}`;
+    const timestamp = moment().format("YYYY-MM-DD HH:mm:ss");
+    const content = `${timestamp} INFO: ${message}`;
     console.log(content); // eslint-disable-line no-console
     if (stream) stream.write(`${content}\n`);
 }
 
 function logError(error) {
-    const content = `ERROR: ${error.message}`;
+    const timestamp = moment().format("YYYY-MM-DD HH:mm:ss");
+    const content = `${timestamp} ERROR: ${error.message}`;
     console.error(error); // eslint-disable-line no-console
     if (stream) stream.write(`${content}\n`);
 }
