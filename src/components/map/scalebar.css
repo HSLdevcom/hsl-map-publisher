@@ -11,6 +11,9 @@
     font-family: fontFamily;
     font-weight: 500;
     color: black;
+    text-shadow: 0px 0px 1px rgba(255, 255, 255, 1),
+                 0px 0px 1px rgba(255, 255, 255, 1),
+                 0px 0px 1px rgba(255, 255, 255, 1);
 }
 
 .root > *:last-child {
