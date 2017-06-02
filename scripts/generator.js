@@ -143,9 +143,12 @@ async function renderComponentRetry(options) {
     logInfo(`Rendering ${options.component} to ${options.filename}`);
     logInfo(`Using props ${JSON.stringify(options.props)}`);
 
-    for (let i = 1; i < MAX_RENDER_ATTEMPTS; i++) {
+    for (let i = 0; i < MAX_RENDER_ATTEMPTS; i++) {
         /* eslint-disable no-await-in-loop */
         try {
+            if (i > 0) {
+                logInfo("Retrying");
+            }
             if (!(await isInitialized())) {
                 logInfo("Creating new browser instance");
                 await initialize();
@@ -155,7 +158,6 @@ async function renderComponentRetry(options) {
             return dimensions;
         } catch (error) {
             logError(error);
-            logInfo("Retrying");
         }
         /* eslint-enable no-await-in-loop */
     }
