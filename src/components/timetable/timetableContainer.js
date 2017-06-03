@@ -97,7 +97,7 @@ const timetableQuery = gql`
 `;
 
 const propsMapper = mapProps((props) => {
-    const departures = flatMap(
+    let departures = flatMap(
         props.data.stop.siblings.nodes,
         stop => filterDepartures(
             stop.departures.nodes,
@@ -116,28 +116,29 @@ const propsMapper = mapProps((props) => {
     // }
     notes = uniq(notes).sort();
 
+    const duplicateRoutes = [];
+
     // Search for routes with two different destinations from the same stop and add notes for them
     Object.values(
         groupBy(
-            flatMap(props.data.stop.siblings.nodes, stop => stop.routeSegments.nodes),
+            flatMap(props.data.stop.siblings.nodes, stop => stop.routeSegments.nodes)
+                .filter(route => route.hasRegularDayDepartures && !isDropOffOnly(route)),
             route => route.routeId
         ))
         .filter(routes => routes.length > 1)
         .forEach(directions =>
             directions.forEach((direction) => {
                 notes.push(`${trimRouteId(direction.routeId)}${"*".repeat(direction.direction)} ${direction.route.nodes[0].destinationFi} / ${direction.route.nodes[0].destinationSe}`);
-                departures
-                    .filter(
-                        departure =>
-                            departure.routeId === direction.routeId &&
-                            departure.direction === direction.direction
-                    )
-                    .forEach((departure) => {
-                        // eslint-disable-next-line no-param-reassign
-                        departure.note = [departure.note, "*".repeat(direction.direction)].join("");
-                    });
+                duplicateRoutes.push(direction.routeId);
             })
         );
+
+    departures = departures.map(departure => ({
+        ...departure,
+        note: duplicateRoutes.includes(departure.routeId)
+            ? [departure.note, "*".repeat(departure.direction)].join("")
+            : departure.note,
+    }));
 
 
     const { weekdays, saturdays, sundays } = pick(groupDepartures(departures), props.segments);
