@@ -35,4 +35,5 @@ CMD \
   node_modules/.bin/forever start -c "npm start" ./ && \
   node_modules/.bin/forever start -c "npm run ui" ./ && \
   DISPLAY=":10" node_modules/.bin/forever start -c "npm run serve" ./ && \
+  sleep 5 && \
   node_modules/.bin/forever --fifo logs 2

@@ -5,6 +5,7 @@ const defaultOptions = {
     hot: process.env.NODE_ENV === "development",
     historyApiFallback: true,
     stats: { colors: true },
+    disableHostCheck: process.env.NODE_ENV === "production",
 };
 
 module.exports = (config, port, options = {}) => {

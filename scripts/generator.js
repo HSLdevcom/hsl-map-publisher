@@ -5,17 +5,55 @@ const PNGEncoder = require("png-stream").Encoder;
 const PNGDecoder = require("png-stream").Decoder;
 const concat = require("concat-frames");
 const TileMergeStream = require("tile-merge-stream");
+const moment = require("moment");
 
 const slimerjs = /^win/.test(process.platform) ? "slimerjs.cmd" : "slimerjs";
 const slimerPath = path.join(__dirname, "..", "node_modules", ".bin", slimerjs);
 
 const CLIENT_PORT = 3000;
 const TILE_SIZE = 3000;
+const RENDER_TIMEOUT = 5 * 60 * 1000;
+const SLIMER_TIMEOUT = 10 * 1000;
+const MAX_RENDER_ATTEMPTS = 3;
 
 let browser;
 let page;
 let stream;
 let previous = Promise.resolve();
+
+function logInfo(message) {
+    const timestamp = moment().format("YYYY-MM-DD HH:mm:ss");
+    const content = `${timestamp} INFO: ${message}`;
+    console.log(content); // eslint-disable-line no-console
+    if (stream) stream.write(`${content}\n`);
+}
+
+function logError(error) {
+    const timestamp = moment().format("YYYY-MM-DD HH:mm:ss");
+    const content = `${timestamp} ERROR: ${error.message}`;
+    console.error(error); // eslint-disable-line no-console
+    if (stream) stream.write(`${content}\n`);
+}
+
+function isInitialized() {
+    if (!browser || !page) {
+        return Promise.resolve(false);
+    }
+    return new Promise((resolve) => {
+        const timer = setTimeout(() => resolve(false), SLIMER_TIMEOUT);
+        page.evaluate(() => true)
+            .then(status => resolve(!!status))
+            .catch(() => resolve(false));
+    });
+}
+
+async function initialize() {
+    browser = await driver.create({ path: slimerPath });
+    page = await browser.createPage();
+
+    page.onError = error => logError(error);
+    page.onConsoleMessage = message => logInfo(message);
+}
 
 async function open(component, props, scale = 1) {
     const fragment = `component=${component}&props=${JSON.stringify(props)}&scale=${scale}`;
@@ -24,18 +62,6 @@ async function open(component, props, scale = 1) {
     if (status !== "success") {
         throw new Error("Failed to open client app");
     }
-}
-
-function logInfo(message) {
-    const content = `INFO: ${message}`;
-    console.log(content); // eslint-disable-line no-console
-    if (stream) stream.write(`${content}\n`);
-}
-
-function logError(error) {
-    const content = `ERROR: ${error.message}`;
-    console.error(error); // eslint-disable-line no-console
-    if (stream) stream.write(`${content}\n`);
 }
 
 function flushBuffer(buffer, innerStream) {
@@ -82,7 +108,7 @@ async function captureScreenshot(totalWidth, totalHeight, filename) {
     tileStream.end();
 
     return new Promise((resolve, reject) => {
-        outStream.on("finish", resolve);
+        outStream.on("finish", () => resolve());
         outStream.on("error", error => reject(error));
     });
 }
@@ -95,6 +121,7 @@ function renderComponent(options) {
     const { component, props, directory, filename, scale } = options;
 
     return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error("Render timeout")), RENDER_TIMEOUT);
         // Set callback called by client app when component is ready
         page.onCallback = ({ error, width, height }) => {
             page.onCallback = null;
@@ -104,11 +131,39 @@ function renderComponent(options) {
             }
             captureScreenshot(width, height, path.join(directory, filename))
                 .then(() => resolve({ width, height }))
-                .catch(e => reject(e));
+                .catch(error => reject(error))
+                .then(() => clearTimeout(timer));
         };
         open(component, props, scale)
             .catch(error => reject(error));
     });
+}
+
+async function renderComponentRetry(options) {
+    logInfo(`Rendering ${options.component} to ${options.filename}`);
+    logInfo(`Using props ${JSON.stringify(options.props)}`);
+
+    for (let i = 0; i < MAX_RENDER_ATTEMPTS; i++) {
+        /* eslint-disable no-await-in-loop */
+        try {
+            if (i > 0) {
+                logInfo("Retrying");
+            }
+            if (!(await isInitialized())) {
+                logInfo("Creating new browser instance");
+                await initialize();
+            }
+            const dimensions = await renderComponent(options);
+            logInfo(`Successfully rendered ${options.filename}`);
+            return dimensions;
+        } catch (error) {
+            logError(error);
+        }
+        /* eslint-enable no-await-in-loop */
+    }
+
+    logError(new Error(`Failed to render ${options.filename}.`));
+    return null;
 }
 
 /**
@@ -125,12 +180,7 @@ function generate(options) {
     previous = previous
         .then(() => {
             stream = options.stream;
-            logInfo(`Rendering ${options.component} to ${options.filename}`);
-            logInfo(`Using props ${JSON.stringify(options.props)}`);
-            return renderComponent(options);
-        })
-        .catch((error) => {
-            logError(error);
+            return renderComponentRetry(options);
         })
         .then((dimensions) => {
             stream = null;
@@ -139,12 +189,5 @@ function generate(options) {
     return previous;
 }
 
-async function initialize() {
-    browser = await driver.create({ path: slimerPath });
-    page = await browser.createPage();
+module.exports = { generate };
 
-    page.onError = error => logError(error);
-    page.onConsoleMessage = message => logInfo(message);
-}
-
-module.exports = { initialize, generate };

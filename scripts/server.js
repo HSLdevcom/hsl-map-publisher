@@ -132,7 +132,6 @@ async function main() {
     let stops = await fetchStops();
     const stopIds = await fetchStopIds();
     stops = stops.filter(stop => stopIds.includes(stop.stopId));
-    await generator.initialize();
 
     const app = new Koa();
     const router = new Router();
