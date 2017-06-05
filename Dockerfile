@@ -25,6 +25,7 @@ COPY . ${WORK}
 EXPOSE 5000
 
 CMD \
+  cp policy.xml /etc/ImageMagick-6/policy.xml && \
   cp fonts.conf /etc/fonts/local.conf && \
   mkdir -p /usr/share/fonts/opentype && \
   cp /fonts/* /usr/share/fonts/opentype 2>/dev/null || : && \
