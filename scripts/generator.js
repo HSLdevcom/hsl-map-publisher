@@ -5,7 +5,6 @@ const sharp = require("sharp");
 const PNGDecoder = require("png-stream").Decoder;
 const concat = require("concat-frames");
 const TileMergeStream = require("tile-merge-stream");
-const moment = require("moment");
 
 const slimerjs = /^win/.test(process.platform) ? "slimerjs.cmd" : "slimerjs";
 const slimerPath = path.join(__dirname, "..", "node_modules", ".bin", slimerjs);
@@ -18,41 +17,26 @@ const MAX_RENDER_ATTEMPTS = 3;
 
 let browser;
 let page;
-let stream;
 let previous = Promise.resolve();
-
-function logInfo(message) {
-    const timestamp = moment().format("YYYY-MM-DD HH:mm:ss");
-    const content = `${timestamp} INFO: ${message}`;
-    console.log(content); // eslint-disable-line no-console
-    if (stream) stream.write(`${content}\n`);
-}
-
-function logError(error) {
-    const timestamp = moment().format("YYYY-MM-DD HH:mm:ss");
-    const content = `${timestamp} ERROR: ${error.message}`;
-    console.error(error); // eslint-disable-line no-console
-    if (stream) stream.write(`${content}\n`);
-}
 
 function isInitialized() {
     if (!browser || !page) {
         return Promise.resolve(false);
     }
     return new Promise((resolve) => {
-        const timer = setTimeout(() => resolve(false), SLIMER_TIMEOUT);
+        setTimeout(() => resolve(false), SLIMER_TIMEOUT);
         page.evaluate(() => true)
             .then(status => resolve(!!status))
             .catch(() => resolve(false));
     });
 }
 
-async function initialize() {
+async function initialize(logger) {
     browser = await driver.create({ path: slimerPath });
     page = await browser.createPage();
 
-    page.onError = error => logError(error);
-    page.onConsoleMessage = message => logInfo(message);
+    page.onError = error => logger.logError(error);
+    page.onConsoleMessage = message => logger.logInfo(message);
 }
 
 async function open(component, props, scale = 1) {
@@ -130,7 +114,7 @@ function renderComponent(options) {
     const { component, props, directory, filename, scale } = options;
 
     return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => reject(new Error("Render timeout")), RENDER_TIMEOUT);
+        setTimeout(() => reject(new Error("Render timeout")), RENDER_TIMEOUT);
         // Set callback called by client app when component is ready
         page.onCallback = ({ error, width, height }) => {
             page.onCallback = null;
@@ -140,8 +124,7 @@ function renderComponent(options) {
             }
             captureScreenshot(width, height, path.join(directory, filename))
                 .then(() => resolve({ width, height }))
-                .catch(error => reject(error))
-                .then(() => clearTimeout(timer));
+                .catch(screenshotError => reject(screenshotError));
         };
         open(component, props, scale)
             .catch(error => reject(error));
@@ -149,36 +132,36 @@ function renderComponent(options) {
 }
 
 async function renderComponentRetry(options) {
-    logInfo(`Rendering ${options.component} to ${options.filename}`);
-    logInfo(`Using props ${JSON.stringify(options.props)}`);
+    options.logger.logInfo(`Rendering ${options.component} to ${options.filename}`);
+    options.logger.logInfo(`Using props ${JSON.stringify(options.props)}`);
 
     for (let i = 0; i < MAX_RENDER_ATTEMPTS; i++) {
         /* eslint-disable no-await-in-loop */
         try {
             if (i > 0) {
-                logInfo("Retrying");
+                options.logger.logInfo("Retrying");
             }
             if (!(await isInitialized())) {
-                logInfo("Creating new browser instance");
-                await initialize();
+                options.logger.logInfo("Creating new browser instance");
+                await initialize(options.logger);
             }
             const dimensions = await renderComponent(options);
-            logInfo(`Successfully rendered ${options.filename}`);
+            options.logger.logInfo(`Successfully rendered ${options.filename}`);
             return dimensions;
         } catch (error) {
-            logError(error);
+            options.logger.logError(error);
         }
         /* eslint-enable no-await-in-loop */
     }
 
-    logError(new Error(`Failed to render ${options.filename}.`));
+    options.logger.logError(new Error(`Failed to render ${options.filename}.`));
     return null;
 }
 
 /**
  * Adds component to render queue
  * @param {Object} options
- * @param {Writable} options.stream - Writable stream for log messages
+ * @param {Logger} options.logger - Logger instance
  * @param {string} options.component - React component to render
  * @param {Object} options.props - Props to pass to component
  * @param {string} options.directory - Output directory
@@ -186,15 +169,7 @@ async function renderComponentRetry(options) {
  * @returns {Promise}
  */
 function generate(options) {
-    previous = previous
-        .then(() => {
-            stream = options.stream;
-            return renderComponentRetry(options);
-        })
-        .then((dimensions) => {
-            stream = null;
-            return dimensions;
-        });
+    previous = previous.then(() => renderComponentRetry(options));
     return previous;
 }
 

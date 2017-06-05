@@ -24,6 +24,9 @@
     "url": "https://github.com/HSLdevcom/hsl-map-publisher/issues"
   },
   "homepage": "https://github.com/HSLdevcom/hsl-map-publisher#readme",
+  "engines" : {
+    "node" : ">=8.0.0"
+  },
   "devDependencies": {
     "autoprefixer": "^6.7.6",
     "babel-core": "^6.23.1",

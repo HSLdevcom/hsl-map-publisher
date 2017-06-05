@@ -12,8 +12,12 @@ const iconv = require("iconv-lite");
 const csv = require("csv");
 const fetch = require("node-fetch");
 const spawn = require("child_process").spawn;
+const promisify = require("util").promisify;
 
 const generator = require("./generator");
+const Logger = require("./logger");
+
+const unlinkAsync = promisify(fs.unlink);
 
 // 5 * 72 = 360 dpi
 const SCALE = 5;
@@ -63,24 +67,34 @@ function fetchStops() {
 }
 
 function generatePdf(directory, filenames) {
-    const process = spawn("convert", [
-        "-density",
-        SCALE * PDF_PPI,
-        ...filenames,
-        path.join(directory, "rgb.pdf"),
-    ]);
-    process.stderr.on("data", data => console.log(data.toString()));
+    return new Promise((resolve, reject) => {
+        const pdftk = spawn("pdftk", [
+            ...filenames,
+            "cat",
+            "output",
+            path.join(directory, "output.pdf"),
+        ]);
+        pdftk.stderr.on("data", data => reject(data.toString()));
+        pdftk.on("close", resolve);
+    });
 }
 
-function convertToCmyk(filename) {
-    const newFilename = filename.replace(".tiff", ".cmyk.tiff");
-    return new Promise((resolve) => {
-        const process = spawn("cctiff", ["rgb_test_out.icc", filename, newFilename]);
-        process.stderr.on("data", data => console.log(data.toString()));
-        process.on("close", () => {
-            fs.unlink(filename);
-            resolve(newFilename);
-        });
+function convertToCmykPdf(filename) {
+    const cmykFilename = filename.replace(".tiff", ".cmyk.tiff");
+    return new Promise((resolve, reject) => {
+        const cctiff = spawn("cctiff", ["rgb_test_out.icc", filename, cmykFilename]);
+        cctiff.stderr.on("data", data => reject(data.toString()));
+        cctiff.on("close", () => unlinkAsync(filename).then(() => {
+            const pdfFilename = filename.replace(".tiff", ".pdf");
+            const convert = spawn("convert", [
+                "-density",
+                SCALE * PDF_PPI,
+                cmykFilename,
+                pdfFilename,
+            ]);
+            convert.stderr.on("data", data => reject(data.toString()));
+            convert.on("close", () => unlinkAsync(cmykFilename).then(() => resolve(pdfFilename)));
+        }));
     }
   );
 }
@@ -90,13 +104,13 @@ function generateFiles(component, props) {
     const directory = path.join(OUTPUT_PATH, identifier);
 
     fs.mkdirSync(directory);
-    const stream = fs.createWriteStream(path.join(directory, "build.log"));
+    const logger = new Logger(path.join(directory, "build.log"));
 
     const promises = [];
     for (let i = 0; i < props.length; i++) {
         const filename = `${i + 1}.tiff`;
         const options = {
-            stream,
+            logger,
             filename,
             directory,
             component,
@@ -108,19 +122,18 @@ function generateFiles(component, props) {
             generator
                 .generate(options)
                 .then(dimensions => (
-                    dimensions ? convertToCmyk(path.join(directory, filename)) : ""
+                    dimensions ? convertToCmykPdf(path.join(directory, filename)) : ""
                 ))
         );
     }
 
     Promise.all(promises)
         .then((filenames) => {
-            generatePdf(directory, filenames);
-            stream.end("DONE");
+            generatePdf(directory, filenames).then(() => logger.end("DONE"));
         })
         .catch((error) => {
-            console.error(error); // eslint-disable-line no-console
-            stream.end(`ERROR: ${error.message}`);
+            logger.logError(error.message);
+            logger.end();
         });
 
     return identifier;
