@@ -10,13 +10,14 @@ const moment = require("moment");
 const template = require("lodash/template");
 const iconv = require("iconv-lite");
 const csv = require("csv");
-const PDFDocument = require("pdfkit");
 const fetch = require("node-fetch");
+const spawn = require("child_process").spawn;
 
 const generator = require("./generator");
 
 // 5 * 72 = 360 dpi
 const SCALE = 5;
+const PDF_PPI = 72;
 
 const PORT = 4000;
 
@@ -61,22 +62,27 @@ function fetchStops() {
     });
 }
 
-function generatePdf(directory, filenames, dimensions) {
-    const doc = new PDFDocument({ autoFirstPage: false });
-    doc.pipe(fs.createWriteStream(path.join(directory, "rgb.pdf")));
+function generatePdf(directory, filenames) {
+    const process = spawn("convert", [
+        "-density",
+        SCALE * PDF_PPI,
+        ...filenames,
+        path.join(directory, "rgb.pdf"),
+    ]);
+    process.stderr.on("data", data => console.log(data.toString()));
+}
 
-    filenames.forEach((filename, index) => {
-        // Skip failed pages
-        if (!dimensions[index]) return;
-
-        // Dimensions in PDF points
-        const width = dimensions[index].width / SCALE;
-        const height = dimensions[index].height / SCALE;
-
-        doc.addPage({ size: [width, height] });
-        doc.image(path.join(directory, filename), 0, 0, { width });
-    });
-    doc.end();
+function convertToCmyk(filename) {
+    const newFilename = filename.replace(".tiff", ".cmyk.tiff");
+    return new Promise((resolve) => {
+        const process = spawn("cctiff", ["rgb_test_out.icc", filename, newFilename]);
+        process.stderr.on("data", data => console.log(data.toString()));
+        process.on("close", () => {
+            fs.unlink(filename);
+            resolve(newFilename);
+        });
+    }
+  );
 }
 
 function generateFiles(component, props) {
@@ -87,9 +93,8 @@ function generateFiles(component, props) {
     const stream = fs.createWriteStream(path.join(directory, "build.log"));
 
     const promises = [];
-    const filenames = [];
     for (let i = 0; i < props.length; i++) {
-        const filename = `${i + 1}.png`;
+        const filename = `${i + 1}.tiff`;
         const options = {
             stream,
             filename,
@@ -98,13 +103,19 @@ function generateFiles(component, props) {
             props: props[i],
             scale: SCALE,
         };
-        filenames.push(filename);
-        promises.push(generator.generate(options));
+
+        promises.push(
+            generator
+                .generate(options)
+                .then(dimensions => (
+                    dimensions ? convertToCmyk(path.join(directory, filename)) : ""
+                ))
+        );
     }
 
     Promise.all(promises)
-        .then((dimensions) => {
-            generatePdf(directory, filenames, dimensions);
+        .then((filenames) => {
+            generatePdf(directory, filenames);
             stream.end("DONE");
         })
         .catch((error) => {

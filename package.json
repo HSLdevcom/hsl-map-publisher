@@ -74,7 +74,6 @@
     "node-fetch": "^1.6.3",
     "node-phantom-promise": "^1.0.3",
     "nodemon": "^1.11.0",
-    "pdfkit": "^0.8.0",
     "png-stream": "^1.0.5",
     "prop-types": "^15.5.8",
     "qrcode": "^0.8.1",
@@ -87,6 +86,7 @@
     "react-virtualized": "^9.5.0",
     "recompose": "^0.23.1",
     "segseg": "^0.2.2",
+    "sharp": "^0.18.1",
     "tile-merge-stream": "HSLdevcom/tile-merge-stream",
     "viewport-mercator-project": "^4.0.0"
   }

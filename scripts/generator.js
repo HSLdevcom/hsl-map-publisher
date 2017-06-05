@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const driver = require("node-phantom-promise");
-const PNGEncoder = require("png-stream").Encoder;
+const sharp = require("sharp");
 const PNGDecoder = require("png-stream").Decoder;
 const concat = require("concat-frames");
 const TileMergeStream = require("tile-merge-stream");
@@ -86,7 +86,16 @@ async function captureScreenshot(totalWidth, totalHeight, filename) {
     const tileStream = new TileMergeStream({ width: totalWidth, height: totalHeight, channels: 4 });
 
     const outStream = tileStream
-        .pipe(new PNGEncoder(totalWidth, totalHeight, { colorSpace: "rgba" }))
+        .pipe(
+            sharp(undefined, {
+                raw: {
+                    width: totalWidth,
+                    height: totalHeight,
+                    channels: 4,
+                },
+            }).tiff({
+                compression: "lzw",
+            }))
         .pipe(fs.createWriteStream(filename));
 
     let top = 0;
@@ -190,4 +199,3 @@ function generate(options) {
 }
 
 module.exports = { generate };
-
