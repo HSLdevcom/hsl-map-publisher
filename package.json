@@ -11,8 +11,8 @@
     "ui:hot": "cross-env NODE_ENV=development node server.ui",
     "start": "cross-env NODE_ENV=production node server.src",
     "start:hot": "cross-env NODE_ENV=development node server.src",
-    "serve": "cross-env NODE_ENV=production node --harmony-async-await scripts/server",
-    "serve:hot": "cross-env NODE_ENV=development nodemon --harmony-async-await scripts/server"
+    "serve": "cross-env NODE_ENV=production node scripts/server",
+    "serve:hot": "cross-env NODE_ENV=development nodemon scripts/server"
   },
   "repository": {
     "type": "git",
