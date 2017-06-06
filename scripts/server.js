@@ -89,6 +89,8 @@ function convertToCmykPdf(filename) {
             const convert = spawn("convert", [
                 "-density",
                 SCALE * PDF_PPI,
+                "-units",
+                "PixelsPerInch",
                 cmykFilename,
                 pdfFilename,
             ]);
