@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { JustifiedColumn, Spacer } from "components/util";
 import renderQueue from "util/renderQueue";
 
+import CropMarks from "components/cropMarks";
 import RouteDiagram from "components/routeDiagram/routeDiagramContainer";
 import Timetable from "components/timetable/timetableContainer";
 import StopMap from "components/map/stopMapContainer";
@@ -89,86 +90,90 @@ class StopPoster extends Component {
         );
 
         return (
-            <div className={styles.root}>
-                <JustifiedColumn>
-                    <Header stopId={this.props.stopId}/>
+            <CropMarks>
+                <div className={styles.root}>
+                    <JustifiedColumn>
+                        <Header stopId={this.props.stopId}/>
 
-                    <div className={styles.content} ref={(ref) => { this.content = ref; }}>
-                        {this.state.hasRoutesOnTop &&
-                        <Routes
-                            stopId={this.props.stopId}
-                            date={this.props.date}
-                            columns={6}
-                        />
-                        }
-                        <div className={styles.columns}>
-                            <div>
-                                {!this.state.hasRoutesOnTop &&
-                                <Routes stopId={this.props.stopId} date={this.props.date}/>
-                                }
-                                <div className={styles.title}>
-                                    Pysäkkiaikataulu&nbsp;&nbsp;
-                                    <span className={styles.subtitle}>Hållplatstidtabell</span>
-                                </div>
-                                {this.state.hasRouteDiagram &&
-                                <StopPosterTimetable/>
-                                }
-                                {!this.state.hasRouteDiagram &&
-                                <StopPosterTimetable segments={["weekdays"]}/>
-                                }
-                            </div>
-
-                            <Spacer width={50}/>
-
-                            <div className={styles.right}>
-                                {this.state.hasRoutesOnTop &&
-                                <div className={styles.title}>&nbsp;</div>
-                                }
-
-                                {!this.state.hasRouteDiagram &&
-                                <div className={styles.timetables}>
-                                    <StopPosterTimetable segments={["saturdays"]} hideDetails/>
-                                    <Spacer width={50}/>
-                                    <StopPosterTimetable segments={["sundays"]} hideDetails/>
-                                </div>
-                                }
-
-                                {!this.state.hasRouteDiagram && <Spacer height={50}/>}
-
-                                {this.state.hasMap &&
-                                <div className={styles.map} ref={(ref) => { this.map = ref; }}>
-                                    {this.state.shouldRenderMap &&
-                                    <StopMap
-                                        stopId={this.props.stopId}
-                                        date={this.props.date}
-                                        width={this.map.clientWidth}
-                                        height={this.map.clientHeight}
-                                    />
+                        <div className={styles.content} ref={(ref) => { this.content = ref; }}>
+                            {this.state.hasRoutesOnTop &&
+                            <Routes
+                                stopId={this.props.stopId}
+                                date={this.props.date}
+                                columns={6}
+                            />
+                            }
+                            <div className={styles.columns}>
+                                <div>
+                                    {!this.state.hasRoutesOnTop &&
+                                    <Routes stopId={this.props.stopId} date={this.props.date}/>
+                                    }
+                                    <div className={styles.title}>
+                                        Pysäkkiaikataulu&nbsp;&nbsp;
+                                        <span className={styles.subtitle}>Hållplatstidtabell</span>
+                                    </div>
+                                    {this.state.hasRouteDiagram &&
+                                    <StopPosterTimetable/>
+                                    }
+                                    {!this.state.hasRouteDiagram &&
+                                    <StopPosterTimetable segments={["weekdays"]}/>
                                     }
                                 </div>
-                                }
 
-                                {!this.state.hasRouteDiagram && <Spacer height={50}/>}
+                                <Spacer width={50}/>
 
-                                {this.state.hasRouteDiagram &&
-                                <span>
-                                    <div className={styles.title}>
-                                        Linjojen reitit&nbsp;&nbsp;
-                                        <span className={styles.subtitle}>Linjernas rutter</span>
+                                <div className={styles.right}>
+                                    {this.state.hasRoutesOnTop &&
+                                    <div className={styles.title}>&nbsp;</div>
+                                    }
+
+                                    {!this.state.hasRouteDiagram &&
+                                    <div className={styles.timetables}>
+                                        <StopPosterTimetable segments={["saturdays"]} hideDetails/>
+                                        <Spacer width={50}/>
+                                        <StopPosterTimetable segments={["sundays"]} hideDetails/>
                                     </div>
-                                    <RouteDiagram
-                                        stopId={this.props.stopId}
-                                        date={this.props.date}
-                                    />
-                                </span>
-                                }
+                                    }
+
+                                    {!this.state.hasRouteDiagram && <Spacer height={50}/>}
+
+                                    {this.state.hasMap &&
+                                    <div className={styles.map} ref={(ref) => { this.map = ref; }}>
+                                        {this.state.shouldRenderMap &&
+                                        <StopMap
+                                            stopId={this.props.stopId}
+                                            date={this.props.date}
+                                            width={this.map.clientWidth}
+                                            height={this.map.clientHeight}
+                                        />
+                                        }
+                                    </div>
+                                    }
+
+                                    {!this.state.hasRouteDiagram && <Spacer height={50}/>}
+
+                                    {this.state.hasRouteDiagram &&
+                                    <span>
+                                        <div className={styles.title}>
+                                            Linjojen reitit&nbsp;&nbsp;
+                                            <span className={styles.subtitle}>
+                                                Linjernas rutter
+                                            </span>
+                                        </div>
+                                        <RouteDiagram
+                                            stopId={this.props.stopId}
+                                            date={this.props.date}
+                                        />
+                                    </span>
+                                    }
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <Footer stopId={this.props.stopId}/>
-                </JustifiedColumn>
-            </div>
+                        <Footer stopId={this.props.stopId}/>
+                    </JustifiedColumn>
+                </div>
+            </CropMarks>
         );
     }
 }
