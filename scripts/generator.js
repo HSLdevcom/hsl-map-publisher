@@ -31,12 +31,14 @@ function isInitialized() {
     });
 }
 
-async function initialize(logger) {
-    browser = await driver.create({ path: slimerPath });
-    page = await browser.createPage();
-
+function setCallbacks(logger) {
     page.onError = error => logger.logError(error);
     page.onConsoleMessage = message => logger.logInfo(message);
+}
+
+async function initialize() {
+    browser = await driver.create({ path: slimerPath });
+    page = await browser.createPage();
 }
 
 async function open(component, props, scale = 1) {
@@ -143,8 +145,9 @@ async function renderComponentRetry(options) {
             }
             if (!(await isInitialized())) {
                 options.logger.logInfo("Creating new browser instance");
-                await initialize(options.logger);
+                await initialize();
             }
+            setCallbacks(options.logger);
             const dimensions = await renderComponent(options);
             options.logger.logInfo(`Successfully rendered ${options.filename}`);
             return dimensions;
