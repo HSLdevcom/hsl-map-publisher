@@ -1,3 +1,9 @@
+import busIcon from "icons/icon_bus.svg";
+import tramIcon from "icons/icon_tram.svg";
+import railIcon from "icons/icon_rail.svg";
+import subwayIcon from "icons/icon_subway.svg";
+import ferryIcon from "icons/icon_ferry.svg";
+import trunkIcon from "icons/icon_trunk.svg";
 
 const TRUNK_ROUTES = ["550", "560"];
 const RAIL_ROUTE_ID_REGEXP = /^300[12]/;
@@ -79,6 +85,16 @@ const colorsByMode = {
     FERRY: "#00B9E4",
 };
 
+const iconsByMode = {
+    BUS: busIcon,
+    TRAM: tramIcon,
+    RAIL: railIcon,
+    SUBWAY: subwayIcon,
+    FERRY: ferryIcon,
+    TRUNK: trunkIcon,
+};
+
+
 export {
     isNumberVariant,
     isRailRoute,
@@ -87,4 +103,5 @@ export {
     isDropOffOnly,
     getZoneName,
     colorsByMode,
+    iconsByMode,
 };
