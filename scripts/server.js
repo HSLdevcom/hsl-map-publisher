@@ -132,7 +132,7 @@ function generateFiles(component, props) {
         .then(() => logger.end("DONE"))
         .catch((error) => {
             logger.logError(error);
-            logger.end();
+            logger.end("FAIL");
         });
 
     return identifier;
