@@ -123,16 +123,13 @@ function generateFiles(component, props) {
         promises.push(
             generator
                 .generate(options)
-                .then(dimensions => (
-                    dimensions ? convertToCmykPdf(path.join(directory, filename)) : ""
-                ))
+                .then(success => success && convertToCmykPdf(path.join(directory, filename)))
         );
     }
 
     Promise.all(promises)
-        .then((filenames) => {
-            generatePdf(directory, filenames).then(() => logger.end("DONE"));
-        })
+        .then(filenames => generatePdf(directory, filenames.filter(name => !!name)))
+        .then(() => logger.end("DONE"))
         .catch((error) => {
             logger.logError(error.message);
             logger.end();
