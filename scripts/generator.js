@@ -125,7 +125,7 @@ function renderComponent(options) {
                 return;
             }
             captureScreenshot(width, height, path.join(directory, filename))
-                .then(() => resolve({ width, height }))
+                .then(() => resolve())
                 .catch(screenshotError => reject(screenshotError));
         };
         open(component, props, scale)
@@ -148,9 +148,9 @@ async function renderComponentRetry(options) {
                 await initialize();
             }
             setCallbacks(options.logger);
-            const dimensions = await renderComponent(options);
+            await renderComponent(options);
             options.logger.logInfo(`Successfully rendered ${options.filename}`);
-            return dimensions;
+            return true;
         } catch (error) {
             options.logger.logError(error);
         }
@@ -158,7 +158,7 @@ async function renderComponentRetry(options) {
     }
 
     options.logger.logError(new Error(`Failed to render ${options.filename}.`));
-    return null;
+    return false;
 }
 
 /**
