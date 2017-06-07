@@ -55,7 +55,11 @@ const Header = (props) => {
     return (
         <JustifiedRow style={{ margin: "0 10px" }}>
             <div style={{ display: "flex", flexDirection: "row" }}>
-                {props.modes.map(mode => <Icon src={iconsByMode[mode]}/>)}
+                {props.modes
+                    .filter(mode => mode !== "BUS")
+                    .map(mode => <Icon src={iconsByMode[mode]}/>)
+                }
+                {props.modes.includes("BUS") && <Icon src={iconsByMode.BUS}/>}
                 <Group>
                     <Title>{props.nameFi}</Title>
                     <Subtitle>{props.nameSe}</Subtitle>
