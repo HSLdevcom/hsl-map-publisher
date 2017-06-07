@@ -74,7 +74,7 @@ function generatePdf(directory, filenames) {
             "output",
             path.join(directory, "output.pdf"),
         ]);
-        pdftk.stderr.on("data", data => reject(data.toString()));
+        pdftk.stderr.on("data", data => reject(new Error(data.toString())));
         pdftk.on("close", resolve);
     });
 }
@@ -83,7 +83,7 @@ function convertToCmykPdf(filename) {
     const cmykFilename = filename.replace(".tiff", ".cmyk.tiff");
     return new Promise((resolve, reject) => {
         const cctiff = spawn("cctiff", ["rgb_test_out.icc", filename, cmykFilename]);
-        cctiff.stderr.on("data", data => reject(data.toString()));
+        cctiff.stderr.on("data", data => reject(new Error(data.toString())));
         cctiff.on("close", () => unlinkAsync(filename).then(() => {
             const pdfFilename = filename.replace(".tiff", ".pdf");
             const convert = spawn("convert", [
@@ -94,7 +94,7 @@ function convertToCmykPdf(filename) {
                 cmykFilename,
                 pdfFilename,
             ]);
-            convert.stderr.on("data", data => reject(data.toString()));
+            convert.stderr.on("data", data => reject(new Error(data.toString())));
             convert.on("close", () => unlinkAsync(cmykFilename).then(() => resolve(pdfFilename)));
         }));
     }
@@ -131,7 +131,7 @@ function generateFiles(component, props) {
         .then(filenames => generatePdf(directory, filenames.filter(name => !!name)))
         .then(() => logger.end("DONE"))
         .catch((error) => {
-            logger.logError(error.message);
+            logger.logError(error);
             logger.end();
         });
 
