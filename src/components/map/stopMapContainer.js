@@ -12,8 +12,8 @@ import routeCompare from "util/routeCompare";
 
 import StopMap from "./stopMap";
 
-const MAX_ZOOM = 19;
-const MIN_ZOOM = 14;
+const MAX_ZOOM = 18.5;
+const MIN_ZOOM = 14.5;
 
 const MINI_MAP_WIDTH = 450;
 const MINI_MAP_HEIGHT = 360;
