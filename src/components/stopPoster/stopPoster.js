@@ -93,7 +93,7 @@ class StopPoster extends Component {
             <CropMarks>
                 <div className={styles.root}>
                     <JustifiedColumn>
-                        <Header stopId={this.props.stopId}/>
+                        <Header stopId={this.props.stopId} date={this.props.date}/>
 
                         <div className={styles.content} ref={(ref) => { this.content = ref; }}>
                             {this.state.hasRoutesOnTop &&
