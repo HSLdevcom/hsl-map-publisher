@@ -1,12 +1,17 @@
 @value hslBlue, fontFamily from "styles/common.css";
 
+/*
+ Poster 810mm x 1210mm / 31.89in x 47.64in / 2296px x 3430px @ 72 ppi
+ Bleed 5mm / 15 px @ 72 ppi
+*/
 .root {
-    box-sizing: border-box;
-    width: 2268px;
-    height: 3402px;
-    padding: 50px;
+    width: calc(2296px + 30px);
+    height: calc(3430px + 30px);
+    padding: 64px;
+    margin: -15px;
     color: white;
     background: hslBlue;
+    box-sizing: border-box;
 }
 
 .content {
