@@ -8,7 +8,7 @@
 
 .routeId {
     width: calc(72px + leftWidth);
-    margin-left: -80px;
+    margin-left: -65px;
     font-family: fontFamilyNarrow;
     font-size: 30px;
     font-weight: 500;

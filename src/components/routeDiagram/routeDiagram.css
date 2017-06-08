@@ -5,7 +5,7 @@
     display: flex;
     flex-flow: column nowrap;
     align-items: flex-start;
-    padding: 35px;
+    padding: 42px;
     background: white;
     border-radius: borderRadius;
 }
