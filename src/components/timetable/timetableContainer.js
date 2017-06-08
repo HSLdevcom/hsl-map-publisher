@@ -59,7 +59,7 @@ const timetableQuery = gql`
                         nodes {
                             routeId
                             direction
-                            hasRegularDayDepartures
+                            hasRegularDayDepartures(date: $date)
                             pickupDropoffType
                             route {
                                 nodes {

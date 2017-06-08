@@ -16,7 +16,7 @@ function merge(stop, other) {
 }
 
 function prune(branch) {
-    const destinations = [...branch.children, branch]
+    const destinations = [...branch.children]
         .reduce((prev, node) => [...prev, ...node.items], [])
         .reduce((prev, stop) => [...prev, ...(stop.destinations || [])], []);
 

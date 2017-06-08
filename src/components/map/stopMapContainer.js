@@ -34,7 +34,7 @@ const nearbyStopsQuery = gql`
                         routeSegments: routeSegmentsForDate(date: $date) {
                             nodes {
                                 routeId
-                                hasRegularDayDepartures
+                                hasRegularDayDepartures(date: $date)
                                 pickupDropoffType
                                 route {
                                     nodes {
