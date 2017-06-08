@@ -11,8 +11,8 @@
     "ui:hot": "cross-env NODE_ENV=development node server.ui",
     "start": "cross-env NODE_ENV=production node server.src",
     "start:hot": "cross-env NODE_ENV=development node server.src",
-    "serve": "cross-env NODE_ENV=production node --harmony-async-await scripts/server",
-    "serve:hot": "cross-env NODE_ENV=development nodemon --harmony-async-await scripts/server"
+    "serve": "cross-env NODE_ENV=production node scripts/server",
+    "serve:hot": "cross-env NODE_ENV=development nodemon scripts/server"
   },
   "repository": {
     "type": "git",
@@ -24,6 +24,9 @@
     "url": "https://github.com/HSLdevcom/hsl-map-publisher/issues"
   },
   "homepage": "https://github.com/HSLdevcom/hsl-map-publisher#readme",
+  "engines" : {
+    "node" : ">=8.0.0"
+  },
   "devDependencies": {
     "autoprefixer": "^6.7.6",
     "babel-core": "^6.23.1",
@@ -74,7 +77,6 @@
     "node-fetch": "^1.6.3",
     "node-phantom-promise": "^1.0.3",
     "nodemon": "^1.11.0",
-    "pdfkit": "^0.8.0",
     "png-stream": "^1.0.5",
     "prop-types": "^15.5.8",
     "qrcode": "^0.8.1",
@@ -87,6 +89,7 @@
     "react-virtualized": "^9.5.0",
     "recompose": "^0.23.1",
     "segseg": "^0.2.2",
+    "sharp": "^0.18.1",
     "tile-merge-stream": "HSLdevcom/tile-merge-stream",
     "viewport-mercator-project": "^4.0.0"
   }

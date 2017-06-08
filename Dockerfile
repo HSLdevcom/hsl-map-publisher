@@ -1,4 +1,4 @@
-FROM node:7.8
+FROM node:8
 
 RUN echo "deb http://http.debian.net/debian jessie-backports main" >> /etc/apt/sources.list
 RUN echo "deb http://http.debian.net/debian unstable main" >> /etc/apt/sources.list
@@ -6,7 +6,7 @@ RUN echo "deb http://http.debian.net/debian unstable main" >> /etc/apt/sources.l
 RUN \
   apt-get update && \
   DEBIAN_FRONTEND=noninteractive apt-get install -yq -t jessie-backports libgl1-mesa-glx libgl1-mesa-dri xserver-xorg-video-dummy xserver-xorg-input-mouse xserver-xorg-input-kbd && \
-  DEBIAN_FRONTEND=noninteractive apt-get install -yq -t unstable firefox
+  DEBIAN_FRONTEND=noninteractive apt-get install -yq -t unstable firefox imagemagick argyll pdftk
 
 ENV WORK /opt/publisher
 
@@ -25,6 +25,7 @@ COPY . ${WORK}
 EXPOSE 5000
 
 CMD \
+  cp policy.xml /etc/ImageMagick-6/policy.xml && \
   cp fonts.conf /etc/fonts/local.conf && \
   mkdir -p /usr/share/fonts/opentype && \
   cp /fonts/* /usr/share/fonts/opentype 2>/dev/null || : && \

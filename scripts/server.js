@@ -10,13 +10,18 @@ const moment = require("moment");
 const template = require("lodash/template");
 const iconv = require("iconv-lite");
 const csv = require("csv");
-const PDFDocument = require("pdfkit");
 const fetch = require("node-fetch");
+const spawn = require("child_process").spawn;
+const promisify = require("util").promisify;
 
 const generator = require("./generator");
+const Logger = require("./logger");
+
+const unlinkAsync = promisify(fs.unlink);
 
 // 5 * 72 = 360 dpi
 const SCALE = 5;
+const PDF_PPI = 72;
 
 const PORT = 4000;
 
@@ -61,22 +66,39 @@ function fetchStops() {
     });
 }
 
-function generatePdf(directory, filenames, dimensions) {
-    const doc = new PDFDocument({ autoFirstPage: false });
-    doc.pipe(fs.createWriteStream(path.join(directory, "rgb.pdf")));
-
-    filenames.forEach((filename, index) => {
-        // Skip failed pages
-        if (!dimensions[index]) return;
-
-        // Dimensions in PDF points
-        const width = dimensions[index].width / SCALE;
-        const height = dimensions[index].height / SCALE;
-
-        doc.addPage({ size: [width, height] });
-        doc.image(path.join(directory, filename), 0, 0, { width });
+function generatePdf(directory, filenames) {
+    return new Promise((resolve, reject) => {
+        const pdftk = spawn("pdftk", [
+            ...filenames,
+            "cat",
+            "output",
+            path.join(directory, "output.pdf"),
+        ]);
+        pdftk.stderr.on("data", data => reject(new Error(data.toString())));
+        pdftk.on("close", resolve);
     });
-    doc.end();
+}
+
+function convertToCmykPdf(filename) {
+    const cmykFilename = filename.replace(".tiff", ".cmyk.tiff");
+    return new Promise((resolve, reject) => {
+        const cctiff = spawn("cctiff", ["rgb_test_out.icc", filename, cmykFilename]);
+        cctiff.stderr.on("data", data => reject(new Error(data.toString())));
+        cctiff.on("close", () => unlinkAsync(filename).then(() => {
+            const pdfFilename = filename.replace(".tiff", ".pdf");
+            const convert = spawn("convert", [
+                "-density",
+                SCALE * PDF_PPI,
+                "-units",
+                "PixelsPerInch",
+                cmykFilename,
+                pdfFilename,
+            ]);
+            convert.stderr.on("data", data => reject(new Error(data.toString())));
+            convert.on("close", () => unlinkAsync(cmykFilename).then(() => resolve(pdfFilename)));
+        }));
+    }
+  );
 }
 
 function generateFiles(component, props) {
@@ -84,32 +106,33 @@ function generateFiles(component, props) {
     const directory = path.join(OUTPUT_PATH, identifier);
 
     fs.mkdirSync(directory);
-    const stream = fs.createWriteStream(path.join(directory, "build.log"));
+    const logger = new Logger(path.join(directory, "build.log"));
 
     const promises = [];
-    const filenames = [];
     for (let i = 0; i < props.length; i++) {
-        const filename = `${i + 1}.png`;
+        const filename = `${i + 1}.tiff`;
         const options = {
-            stream,
+            logger,
             filename,
             directory,
             component,
             props: props[i],
             scale: SCALE,
         };
-        filenames.push(filename);
-        promises.push(generator.generate(options));
+
+        promises.push(
+            generator
+                .generate(options)
+                .then(success => success && convertToCmykPdf(path.join(directory, filename)))
+        );
     }
 
     Promise.all(promises)
-        .then((dimensions) => {
-            generatePdf(directory, filenames, dimensions);
-            stream.end("DONE");
-        })
+        .then(filenames => generatePdf(directory, filenames.filter(name => !!name)))
+        .then(() => logger.end("DONE"))
         .catch((error) => {
-            console.error(error); // eslint-disable-line no-console
-            stream.end(`ERROR: ${error.message}`);
+            logger.logError(error);
+            logger.end("FAIL");
         });
 
     return identifier;
