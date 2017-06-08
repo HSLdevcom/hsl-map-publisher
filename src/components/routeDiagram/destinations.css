@@ -1,23 +1,22 @@
 @value fontFamily, fontFamilyNarrow from "styles/common.css";
-@value leftWidth from "./values.css";
+@value leftWidth, lineColor, lineWidth from "./values.css";
 
 .destinations {
-    max-width: 170px;
-    margin: 10px 20px 0;
+    width: 220px;
+    margin: 5px -20px;
 }
 
 .routeId {
-    width: calc(72px + leftWidth);
-    margin-left: -65px;
     font-family: fontFamilyNarrow;
-    font-size: 30px;
+    font-size: 28px;
     font-weight: 500;
-    text-align: right;
+    margin-right: 5px;
 }
 
 .title {
+    margin-right: 5px;
     font-family: fontFamily;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
 }
 

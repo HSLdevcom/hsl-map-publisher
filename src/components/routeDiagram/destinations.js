@@ -1,5 +1,6 @@
 import React from "react";
-import { Row, Column, Spacer } from "components/util";
+import groupBy from "lodash/groupBy";
+import { WrappingRow, Column } from "components/util";
 import routeCompare from "util/routeCompare";
 
 import styles from "./destinations.css";
@@ -9,19 +10,22 @@ const Destinations = (props) => {
         return null;
     }
 
-    const destinations = props.destinations.sort(routeCompare);
+    const destinations = groupBy(props.destinations.sort(routeCompare), "title");
 
     return (
         <div className={styles.destinations}>
-            {destinations.map((route, index) => (
-                <Row key={index}>
-                    <div className={styles.routeId}>{route.routeId}</div>
-                    <Spacer width={5}/>
+            {Object.values(destinations).map((routes, index) => (
+                <WrappingRow key={index}>
+                    {routes.map(({ routeId }) => (
+                        <div className={styles.routeId}>
+                            {routeId}
+                        </div>
+                    ))}
                     <Column>
-                        <div className={styles.title}>{route.title}</div>
-                        <div className={styles.subtitle}>{route.subtitle}</div>
+                        <div className={styles.title}>{routes[0].title}</div>
+                        <div className={styles.subtitle}>{routes[0].subtitle}</div>
                     </Column>
-                </Row>
+                </WrappingRow>
             ))}
         </div>
     );
