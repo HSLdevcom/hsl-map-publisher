@@ -9,6 +9,8 @@ import FlatButton from "material-ui/FlatButton";
 import DatePicker from "material-ui/DatePicker";
 import RadioGroup from "components/radioGroup";
 
+import moment from "moment";
+
 import StopList from "components/stopList";
 
 import { fetchStops, generate } from "util/api";
@@ -68,13 +70,13 @@ class App extends Component {
             .reduce((prev, { stopIds }) => [...prev, ...stopIds], [])
             .map(stopId => ({
                 stopId,
-                date: this.state.selectedDate.toISOString().substring(0, 10),
+                date: moment(this.state.selectedDate).format("YYYY-MM-DD"),
                 isSummerTimetable: this.state.isSummerTimetable,
                 dateBegin: this.state.dateBegin
-                    ? this.state.dateBegin.toISOString().substring(0, 10)
+                    ? moment(this.state.dateBegin).format("YYYY-MM-DD")
                     : null,
                 dateEnd: this.state.dateEnd
-                    ? this.state.dateEnd.toISOString().substring(0, 10)
+                    ? moment(this.state.dateEnd).format("YYYY-MM-DD")
                     : null,
             }));
 
