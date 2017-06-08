@@ -2,7 +2,7 @@
 
 .shortCode {
     position: absolute;
-    left: 900px;
+    left: 915px;
     top: 325px;
     font-family: fontFamilyNarrow;
     font-size: 35px;
@@ -12,6 +12,6 @@
 
 .qrCode {
     position: absolute;
-    left: 1089px;
+    left: 1100px;
     top: 226px;
 }

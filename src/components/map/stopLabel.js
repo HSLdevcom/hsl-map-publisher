@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Row } from "components/util";
+import { Row, Column, Spacer } from "components/util";
 import { isTrunkRoute, colorsByMode } from "util/domain";
 
 import styles from "./stopLabel.css";
@@ -32,22 +32,25 @@ const RouteList = (props) => {
         return <div>{components}</div>;
     }
     return (
-        <div>
-            {props.routes.map((route, index) => (
-                <Row key={index}>
-                    <span
-                        className={styles.route}
-                        style={{ width: "2em", color: getColor(route) }}
-                    >
+        <Row>
+            <Column>
+                {props.routes.map((route, index) => (
+                    <div key={index} className={styles.route} style={{ color: getColor(route) }}>
                         {route.routeId}
-                    </span>
-                    {"\xa0"}
-                    {route.destinationFi}
-                    {"\xa0"}
-                    <span style={{ fontWeight: 300 }}>{route.destinationSe}</span>
-                </Row>
-            ))}
-        </div>
+                    </div>
+                ))}
+            </Column>
+            <Spacer width={6}/>
+            <Column>
+                {props.routes.map((route, index) => (
+                    <div key={index}>
+                        {route.destinationFi}
+                        {"\xa0"}
+                        <span className={styles.light}>{route.destinationSe}</span>
+                    </div>
+                ))}
+            </Column>
+        </Row>
     );
 };
 
