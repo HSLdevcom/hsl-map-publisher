@@ -16,7 +16,7 @@ query routesQuery($stopId: String!, $date: Date!) {
                 routeSegments: routeSegmentsForDate(date: $date) {
                     nodes {
                         routeId
-                        hasRegularDayDepartures
+                        hasRegularDayDepartures(date: $date)
                         pickupDropoffType
                         route {
                             nodes {
