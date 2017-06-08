@@ -14,8 +14,8 @@ const Destinations = (props) => {
 
     return (
         <div className={styles.destinations}>
-            {Object.values(destinationsByTitle).map((destinations, index) => (
-                <WrappingRow key={index}>
+            {Object.values(destinationsByTitle).map((destinations, groupIndex) => (
+                <WrappingRow key={groupIndex}>
                     {destinations.map((destination, index) => (
                         <Row key={index}>
                             <div className={styles.routeId}>{destination.routeId}</div>

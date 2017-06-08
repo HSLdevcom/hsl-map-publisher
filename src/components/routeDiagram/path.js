@@ -22,8 +22,8 @@ function getWidth(nodes, isRoot = true) {
     return isRoot ? (width - PATH_WIDTH - LINE_RADIUS) : width;
 }
 
-function isLast(props, index) {
-    return !props.children && index === props.items.length - 1;
+function isLastStop(item) {
+    return item.destinations && item.destinations.length;
 }
 
 const Path = props => (
@@ -31,7 +31,7 @@ const Path = props => (
         <div className={styles.header}/>
         {props.items && props.items.map((item, index) => (
             <div key={index}>
-                {item.type === "stop" && <Stop {...item} isLast={isLast(props, index)}/>}
+                {item.type === "stop" && <Stop {...item} isLast={isLastStop(item)}/>}
                 {item.type === "gap" && <Gap/>}
                 {item.destinations && <Destinations destinations={item.destinations}/>}
             </div>
