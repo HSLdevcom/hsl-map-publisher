@@ -21,7 +21,7 @@ const Destinations = (props) => {
                             <div className={styles.routeId}>{destination.routeId}</div>
                         </Row>
                     ))}
-                    <Column style={destinations.length > 1 ? { flexBasis: "100%" } : {}}>
+                    <Column style={{ flexBasis: "100%" }}>
                         <div className={styles.title}>{destinations[0].title}</div>
                         <div className={styles.subtitle}>{destinations[0].subtitle}</div>
                     </Column>
