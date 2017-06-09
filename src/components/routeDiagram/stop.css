@@ -3,7 +3,7 @@
 
 .stop {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     box-sizing: border-box;
     font-family: fontFamily;
     white-space: nowrap;
@@ -15,7 +15,6 @@
 
 .right {
     display: flex;
-    padding-top: 6px;
     padding-left: 10px;
     width: rightWidth;
     box-sizing: border-box;
@@ -49,12 +48,12 @@
 }
 
 .separatorTop {
-    height: 8px;
+    height: 12px;
     border-left: lineWidth solid lineColor;
- }
+}
 
 .separatorBottom {
-    height: 16px;
+    height: 12px;
     border-left: lineWidth solid lineColor;
 }
 
