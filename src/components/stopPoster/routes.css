@@ -20,7 +20,7 @@
 }
 
 .id {
-    padding: 0 10px;
+    padding: 0 12px;
     font-family: fontFamilyNarrow;
     font-size: 70px;
     font-weight: 500;
@@ -30,6 +30,7 @@
     font-family: fontFamily;
     font-size: 28px;
     font-weight: 500;
+    padding-right: 25px;
 }
 
 .subtitle {
