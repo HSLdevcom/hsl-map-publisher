@@ -40,6 +40,10 @@
     justify-content: space-between;
 }
 
+.left {
+    width: 689px;
+}
+
 .right {
     flex: 1;
     display: flex;
@@ -56,7 +60,6 @@
 .timetable {
     display: flex;
     align-items: stretch;
-    width: 689px;
 }
 
 .map {

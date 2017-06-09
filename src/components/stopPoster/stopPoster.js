@@ -97,14 +97,10 @@ class StopPoster extends Component {
 
                         <div className={styles.content} ref={(ref) => { this.content = ref; }}>
                             {this.state.hasRoutesOnTop &&
-                            <Routes
-                                stopId={this.props.stopId}
-                                date={this.props.date}
-                                columns={6}
-                            />
+                            <Routes stopId={this.props.stopId} date={this.props.date}/>
                             }
                             <div className={styles.columns}>
-                                <div>
+                                <div className={styles.left}>
                                     {!this.state.hasRoutesOnTop &&
                                     <Routes stopId={this.props.stopId} date={this.props.date}/>
                                     }

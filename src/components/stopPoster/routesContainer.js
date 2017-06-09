@@ -36,7 +36,6 @@ query routesQuery($stopId: String!, $date: Date!) {
 `;
 
 const propsMapper = mapProps(props => ({
-    columns: props.columns,
     routes: flatMap(
         props.data.stop.siblings.nodes,
         node => node.routeSegments.nodes
@@ -57,14 +56,9 @@ const hoc = compose(
 
 const RoutesContainer = hoc(Routes);
 
-RoutesContainer.defaultProps = {
-    columns: 1,
-};
-
 RoutesContainer.propTypes = {
     stopId: PropTypes.string.isRequired,
     date: PropTypes.string.isRequired,
-    columns: PropTypes.number.isRequired,
 };
 
 export default RoutesContainer;
