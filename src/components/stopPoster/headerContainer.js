@@ -1,4 +1,6 @@
+import PropTypes from "prop-types";
 import { gql, graphql } from "react-apollo";
+import compose from "recompose/compose";
 import mapProps from "recompose/mapProps";
 import apolloWrapper from "util/apolloWrapper";
 
@@ -16,6 +18,15 @@ const headerQuery = gql`
 
 const propsMapper = mapProps(props => props.data.stop);
 
-const HeaderContainer = apolloWrapper(propsMapper)(Header);
+const hoc = compose(
+    graphql(headerQuery),
+    apolloWrapper(propsMapper)
+);
 
-export default graphql(headerQuery)(HeaderContainer);
+const HeaderContainer = hoc(Header);
+
+HeaderContainer.propTypes = {
+    stopId: PropTypes.string.isRequired,
+};
+
+export default HeaderContainer;
