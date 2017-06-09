@@ -2,8 +2,8 @@
 @value leftWidth, lineColor, lineWidth from "./values.css";
 
 .destinations {
-    width: 220px;
-    margin: 5px -20px;
+    width: 216px;
+    margin: 5px -4px;
 }
 
 .routeId {

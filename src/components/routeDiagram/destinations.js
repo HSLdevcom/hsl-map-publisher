@@ -15,18 +15,16 @@ const Destinations = (props) => {
     return (
         <div className={styles.destinations}>
             {Object.values(destinationsByTitle).map((destinations, groupIndex) => (
-                <WrappingRow key={groupIndex}>
+                <WrappingRow key={groupIndex} style={{ marginBottom: 5 }}>
                     {destinations.map((destination, index) => (
                         <Row key={index}>
                             <div className={styles.routeId}>{destination.routeId}</div>
-                            {(index === destinations.length - 1) &&
-                                <Column>
-                                    <div className={styles.title}>{destination.title}</div>
-                                    <div className={styles.subtitle}>{destination.subtitle}</div>
-                                </Column>
-                            }
                         </Row>
                     ))}
+                    <Column style={destinations.length > 1 ? { flexBasis: "100%" } : {}}>
+                        <div className={styles.title}>{destinations[0].title}</div>
+                        <div className={styles.subtitle}>{destinations[0].subtitle}</div>
+                    </Column>
                 </WrappingRow>
             ))}
         </div>
