@@ -1,6 +1,6 @@
 import { PerspectiveMercatorViewport } from "viewport-mercator-project";
 
-const STOPS_PER_PIXEL = 0.000005;
+const STOPS_PER_PIXEL = 0.000006;
 
 function viewportContains(viewport, stop) {
     const [x, y] = viewport.project([stop.lon, stop.lat], { topLeft: true });

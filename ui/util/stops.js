@@ -36,10 +36,11 @@ function stopsToGroupRows(stops) {
 
     return Object.keys(stopsByGroup).map((group) => {
         const stopsInGroup = stopsByGroup[group];
+        const shortIds = stopsInGroup.map(stop => stop.shortId).sort();
         return {
             isChecked: false,
             title: group,
-            subtitle: `${stopsInGroup[0].shortId} - ${stopsInGroup[stopsInGroup.length - 1].shortId} (${stopsInGroup.length} pysäkkiä)`,
+            subtitle: `${shortIds[0]} - ${shortIds[shortIds.length - 1]} (${stopsInGroup.length} pysäkkiä)`,
             stopIds: stopsInGroup.map(({ stopId }) => stopId),
         };
     });
