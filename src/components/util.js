@@ -4,13 +4,18 @@ import PropTypes from "prop-types";
 import styles from "./util.css";
 
 const Row = props => (
-    <div className={styles.row}>
+    <div className={styles.row} style={props.style}>
         {props.children}
     </div>
 );
 
+Row.defaultProps = {
+    style: {},
+};
+
 Row.propTypes = {
     children: PropTypes.node.isRequired,
+    style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 };
 
 const JustifiedRow = props => (
@@ -19,53 +24,73 @@ const JustifiedRow = props => (
     </div>
 );
 
+JustifiedRow.defaultProps = {
+    style: {},
+};
+
 JustifiedRow.propTypes = {
     children: PropTypes.node.isRequired,
     style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 };
 
-JustifiedRow.defaultProps = {
+const WrappingRow = props => (
+    <div className={styles.wrappingRow} style={props.style}>
+        {props.children}
+    </div>
+);
+
+WrappingRow.defaultProps = {
     style: {},
 };
 
-const WrappingRow = props => (
-    <div className={styles.wrappingRow}>
-        {props.children}
-    </div>
-);
-
 WrappingRow.propTypes = {
     children: PropTypes.node.isRequired,
+    style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 };
 
 const Column = props => (
-    <div className={styles.column}>
+    <div className={styles.column} style={props.style}>
         {props.children}
     </div>
 );
+
+Column.defaultProps = {
+    style: {},
+};
 
 Column.propTypes = {
     children: PropTypes.node.isRequired,
+    style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 };
 
 const CenteringColumn = props => (
-    <div className={styles.centeringColumn}>
+    <div className={styles.centeringColumn} style={props.style}>
         {props.children}
     </div>
 );
+
+CenteringColumn.defaultProps = {
+    style: {},
+};
 
 CenteringColumn.propTypes = {
     children: PropTypes.node.isRequired,
+    style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 };
 
 const JustifiedColumn = props => (
-    <div className={styles.justifiedColumn}>
+    <div className={styles.justifiedColumn} style={props.style}>
         {props.children}
     </div>
 );
 
+JustifiedColumn.defaultProps = {
+    style: {},
+};
+
 JustifiedColumn.propTypes = {
     children: PropTypes.node.isRequired,
+    style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 };
 
 const Spacer = props => (

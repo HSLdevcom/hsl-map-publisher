@@ -1,34 +1,26 @@
-@value fontFamilyNarrow from "styles/common.css";
-@value leftWidth from "./values.css";
+@value fontFamily, fontFamilyNarrow from "styles/common.css";
+@value leftWidth, lineColor, lineWidth from "./values.css";
 
 .destinations {
-    margin: 10px 20px 0;
-    font-family: fontFamilyNarrow;
-    letter-spacing: -0.025em;
-}
-
-.destination {
-    display: flex;
-    align-items: baseline;
-    font-weight: 500;
-    flex-wrap: wrap;
-    max-width: 170px;
+    width: 216px;
+    margin: 5px -4px;
 }
 
 .routeId {
-    width: calc(72px + leftWidth);
-    margin-left: -80px;
+    font-family: fontFamilyNarrow;
     font-size: 28px;
-    text-align: right;
+    font-weight: 500;
+    margin-right: 5px;
 }
 
 .title {
-    padding-left: 5px;
-    font-size: 20px;
+    margin-right: 5px;
+    font-family: fontFamily;
+    font-size: 13px;
+    font-weight: 500;
 }
 
 .subtitle {
-    padding-left: 7px;
-    font-size: 20px;
+    composes: title;
     font-weight: 300;
 }
