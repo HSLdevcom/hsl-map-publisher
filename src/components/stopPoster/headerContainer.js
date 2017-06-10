@@ -1,4 +1,6 @@
+import PropTypes from "prop-types";
 import { gql, graphql } from "react-apollo";
+import compose from "recompose/compose";
 import mapProps from "recompose/mapProps";
 import apolloWrapper from "util/apolloWrapper";
 import flatMap from "lodash/flatMap";
@@ -45,6 +47,15 @@ const propsMapper = mapProps(props => ({
     ),
 }));
 
-const HeaderContainer = apolloWrapper(propsMapper)(Header);
+const hoc = compose(
+    graphql(headerQuery),
+    apolloWrapper(propsMapper)
+);
 
-export default graphql(headerQuery)(HeaderContainer);
+const HeaderContainer = hoc(Header);
+
+HeaderContainer.propTypes = {
+    stopId: PropTypes.string.isRequired,
+};
+
+export default HeaderContainer;

@@ -1,10 +1,14 @@
-import React from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import chunk from "lodash/chunk";
 import { Row, Column } from "components/util";
+
+import renderQueue from "util/renderQueue";
 import { isTrunkRoute, colorsByMode } from "util/domain";
 
 import styles from "./routes.css";
+
+const MAX_COLUMNS = 6;
 
 function getColor(route) {
     if (isTrunkRoute(route.routeId)) {
@@ -13,44 +17,80 @@ function getColor(route) {
     return colorsByMode[route.mode];
 }
 
-const Routes = (props) => {
-    const routesPerColumn = Math.ceil(props.routes.length / props.columns);
-    const routeColumns = chunk(props.routes, routesPerColumn);
+class Routes extends Component {
+    constructor(props) {
+        super(props);
+        this.state = { columns: MAX_COLUMNS };
+    }
 
-    return (
-        <div className={styles.root}>
-            {routeColumns.map((routes, i) => (
-                <Row key={i}>
-                    <Column>
-                        {routes.map((route, index) => (
-                            <div key={index} className={styles.group}>
-                                <div className={styles.routeId} style={{ color: getColor(route) }}>
-                                    {route.routeId}
-                                </div>
-                            </div>
-                        ))}
-                    </Column>
-                    <Column>
-                        {routes.map((route, index) => (
-                            <div key={index} className={styles.group}>
-                                <div className={styles.title}>
-                                    {route.destinationFi}
-                                </div>
-                                <div className={styles.subtitle}>
-                                    {route.destinationSe}
-                                </div>
-                            </div>
-                        ))}
-                    </Column>
-                </Row>
-            ))}
-        </div>
-    );
-};
+    componentDidMount() {
+        this.updateLayout();
+    }
 
-Routes.defaultProps = {
-    columns: 1,
-};
+    componentWillReceiveProps() {
+        this.setState({ columns: MAX_COLUMNS });
+    }
+
+    componentDidUpdate() {
+        this.updateLayout();
+    }
+
+    componentWillUnmount() {
+        renderQueue.remove(this, { success: true });
+    }
+
+    hasOverflow() {
+        return (this.root.scrollWidth > this.root.clientWidth);
+    }
+
+    updateLayout() {
+        if (this.hasOverflow()) {
+            if (this.state.columns > 1) {
+                renderQueue.add(this);
+                this.setState({ columns: this.state.columns - 1 });
+                return;
+            }
+            renderQueue.remove(this, { success: false });
+            return;
+        }
+        renderQueue.remove(this, { success: true });
+    }
+
+    render() {
+        const routesPerColumn = Math.ceil(this.props.routes.length / this.state.columns);
+        const routeColumns = chunk(this.props.routes, routesPerColumn);
+
+        return (
+            <div className={styles.root} ref={(ref) => { this.root = ref; }}>
+                {routeColumns.map((routes, i) => (
+                    <Row key={i}>
+                        <Column>
+                            {routes.map((route, index) => (
+                                <div key={index} className={styles.group}>
+                                    <div className={styles.id} style={{ color: getColor(route) }}>
+                                        {route.routeId}
+                                    </div>
+                                </div>
+                            ))}
+                        </Column>
+                        <Column>
+                            {routes.map((route, index) => (
+                                <div key={index} className={styles.group}>
+                                    <div className={styles.title}>
+                                        {route.destinationFi}
+                                    </div>
+                                    <div className={styles.subtitle}>
+                                        {route.destinationSe}
+                                    </div>
+                                </div>
+                            ))}
+                        </Column>
+                    </Row>
+                ))}
+            </div>
+        );
+    }
+}
 
 Routes.propTypes = {
     routes: PropTypes.arrayOf(PropTypes.shape({
@@ -58,7 +98,6 @@ Routes.propTypes = {
         destinationFi: PropTypes.string.isRequired,
         destinationSe: PropTypes.string.isRequired,
     })).isRequired,
-    columns: PropTypes.number,
 };
 
 export default Routes;

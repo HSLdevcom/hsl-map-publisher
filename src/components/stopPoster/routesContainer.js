@@ -1,4 +1,6 @@
+import PropTypes from "prop-types";
 import { gql, graphql } from "react-apollo";
+import compose from "recompose/compose";
 import mapProps from "recompose/mapProps";
 import flatMap from "lodash/flatMap";
 
@@ -34,7 +36,6 @@ query routesQuery($stopId: String!, $date: Date!) {
 `;
 
 const propsMapper = mapProps(props => ({
-    columns: props.columns,
     routes: flatMap(
         props.data.stop.siblings.nodes,
         node => node.routeSegments.nodes
@@ -48,6 +49,16 @@ const propsMapper = mapProps(props => ({
         ).sort(routeCompare),
 }));
 
-const RoutesContainer = apolloWrapper(propsMapper)(Routes);
+const hoc = compose(
+    graphql(routesQuery),
+    apolloWrapper(propsMapper)
+);
 
-export default graphql(routesQuery)(RoutesContainer);
+const RoutesContainer = hoc(Routes);
+
+RoutesContainer.propTypes = {
+    stopId: PropTypes.string.isRequired,
+    date: PropTypes.string.isRequired,
+};
+
+export default RoutesContainer;

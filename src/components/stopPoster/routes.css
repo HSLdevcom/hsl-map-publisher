@@ -9,6 +9,7 @@
     border-radius: borderRadius;
     padding: borderRadius;
     white-space: nowrap;
+    overflow: hidden;
 }
 
 .group {
@@ -18,8 +19,8 @@
     height: 84px;
 }
 
-.routeId {
-    padding: 0 10px;
+.id {
+    padding: 0 12px;
     font-family: fontFamilyNarrow;
     font-size: 70px;
     font-weight: 500;
@@ -29,6 +30,7 @@
     font-family: fontFamily;
     font-size: 28px;
     font-weight: 500;
+    padding-right: 25px;
 }
 
 .subtitle {
