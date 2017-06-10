@@ -31,12 +31,20 @@ const addItems = (nodes, items, options) => {
         const count = getCommonItemCount(node, items, isEqual);
 
         if (count) {
-            const itemsToRemove = node.items.slice(Math.min(node.items.length, count));
-            const remainingItems = items.slice(Math.min(items.length, count));
             const commonItems = node.items.slice(0, count).map((item, i) => merge(item, items[i]));
+            // Remaining items to add to node or children
+            const itemsToAdd = items.slice(Math.min(items.length, count));
+            // Items to remove from node if adding new items
+            const itemsToRemove = node.items.slice(Math.min(node.items.length, count));
 
-            if (!node.children && (!itemsToRemove.length || !remainingItems.length)) {
-                node.items = [...commonItems, ...itemsToRemove, ...remainingItems];
+            // Node already contains equivalent items
+            if (!itemsToAdd.length) {
+                node.items = [...commonItems, ...itemsToRemove];
+                return;
+            }
+            // No children, append new items to node
+            if (!node.children && !itemsToRemove.length) {
+                node.items = [...commonItems, ...itemsToAdd];
                 return;
             }
 
@@ -50,11 +58,11 @@ const addItems = (nodes, items, options) => {
                 }
             }
 
-            if (remainingItems.length) {
+            if (itemsToAdd.length) {
                 if (!node.children) {
-                    node.children = [{ items: remainingItems }];
+                    node.children = [{ items: itemsToAdd }];
                 } else {
-                    addItems(node.children, remainingItems, options);
+                    addItems(node.children, itemsToAdd, options);
                 }
             }
 
@@ -93,7 +101,7 @@ function getHeight(node) {
 function itemsToTree(itemLists, options) {
     const nodes = [];
 
-    itemLists.forEach(item => addItems(nodes, item, options));
+    itemLists.forEach(items => addItems(nodes, items, options));
     const root = (nodes.length > 1) ? { items: [], children: nodes } : nodes[0];
 
     return root;
