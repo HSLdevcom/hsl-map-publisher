@@ -1,8 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames";
-import { JustifiedRow, CenteringColumn, Image } from "components/util";
-import { getZoneName, iconsByMode } from "util/domain";
+import { JustifiedRow, CenteringColumn } from "components/util";
+import { getZoneName } from "util/domain";
 
 import styles from "./header.css";
 
@@ -46,25 +46,14 @@ Subtitle.propTypes = {
     small: PropTypes.bool,
 };
 
-const Icon = props => (
-    <Image {...props} style={{ height: 180, marginLeft: 0, marginRight: 10 }}/>
-);
-
 const Header = (props) => {
     const zone = getZoneName(props.shortId);
     return (
         <JustifiedRow style={{ margin: "0 10px" }}>
-            <div style={{ display: "flex", flexDirection: "row" }}>
-                {props.modes
-                    .filter(mode => mode !== "BUS")
-                    .map(mode => <Icon src={iconsByMode[mode]}/>)
-                }
-                {props.modes.includes("BUS") && <Icon src={iconsByMode.BUS}/>}
-                <Group>
-                    <Title>{props.nameFi}</Title>
-                    <Subtitle>{props.nameSe}</Subtitle>
-                </Group>
-            </div>
+            <Group>
+                <Title>{props.nameFi}</Title>
+                <Subtitle>{props.nameSe}</Subtitle>
+            </Group>
             {zone &&
             <CenteringColumn>
                 <Title small>Lippuvyöhyke</Title>
@@ -85,7 +74,6 @@ Header.propTypes = {
     nameFi: PropTypes.string.isRequired,
     nameSe: PropTypes.string.isRequired,
     shortId: PropTypes.string.isRequired,
-    modes: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
 };
 
 export default Header;
