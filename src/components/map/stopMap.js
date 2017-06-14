@@ -16,8 +16,8 @@ import styles from "./stopMap.css";
 
 // Map symbol size
 const STOP_RADIUS = 20;
-const LOCATION_RADIUS = 22;
-const LOCATION_RADIUS_MINI = 5;
+const LOCATION_RADIUS = 30;
+const LOCATION_RADIUS_MINI = 10;
 
 // Mini map position
 const MINI_MAP_MARGIN_RIGHT = 60;
@@ -95,10 +95,10 @@ const StopMap = (props) => {
                     </ItemFixed>
 
                     <ItemFixed
-                        top={(mapStyle.height / 2) - LOCATION_RADIUS}
+                        top={(mapStyle.height / 2) - (2 * LOCATION_RADIUS)}
                         left={(mapStyle.width / 2) - LOCATION_RADIUS}
                     >
-                        <Row>
+                        <Row style={{ height: LOCATION_RADIUS * 2 }}>
                             <LocationSymbol size={LOCATION_RADIUS * 2}/>
                             <div className={styles.title}>Olet tässä</div>
                             <div className={styles.subtitle}>Du är här</div>
@@ -135,7 +135,13 @@ const StopMap = (props) => {
                     options={props.miniMapOptions}
                     components={{ text_fisv: { enabled: true }, print: { enabled: true } }}
                 />
-                <div className={styles.center} style={{ margin: -LOCATION_RADIUS_MINI }}>
+                <div
+                    className={styles.center}
+                    style={{
+                        marginLeft: -LOCATION_RADIUS_MINI,
+                        marginTop: -2 * LOCATION_RADIUS_MINI,
+                    }}
+                >
                     <LocationSymbol size={LOCATION_RADIUS_MINI * 2}/>
                 </div>
             </div>
