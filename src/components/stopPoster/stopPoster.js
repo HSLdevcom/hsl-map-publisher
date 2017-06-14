@@ -22,6 +22,7 @@ class StopPoster extends Component {
         super(props);
         this.state = {
             hasRoutesOnTop: false,
+            hasRoutes: true,
             hasRouteDiagram: true,
             shouldRenderMap: false,
             hasMap: true,
@@ -53,6 +54,10 @@ class StopPoster extends Component {
             }
             if (this.state.hasRouteDiagram) {
                 this.setState({ hasRouteDiagram: false });
+                return;
+            }
+            if (this.state.hasRoutes) {
+                this.setState({ hasRoutes: false });
                 return;
             }
             renderQueue.remove(this, { success: false });
@@ -96,39 +101,43 @@ class StopPoster extends Component {
                         <Header stopId={this.props.stopId} date={this.props.date}/>
 
                         <div className={styles.content} ref={(ref) => { this.content = ref; }}>
-                            {this.state.hasRoutesOnTop &&
+                            {this.state.hasRoutes && this.state.hasRoutesOnTop &&
                             <Routes stopId={this.props.stopId} date={this.props.date}/>
                             }
                             <div className={styles.columns}>
                                 <div className={styles.left}>
-                                    {!this.state.hasRoutesOnTop &&
-                                    <Routes stopId={this.props.stopId} date={this.props.date}/>
+                                    {this.state.hasRoutes && !this.state.hasRoutesOnTop &&
+                                        <Routes stopId={this.props.stopId} date={this.props.date}/>
                                     }
-                                    <div className={styles.title}>
-                                        Pysäkkiaikataulu&nbsp;&nbsp;
-                                        <span className={styles.subtitle}>Hållplatstidtabell</span>
-                                    </div>
+                                    {this.state.hasRoutes &&
+                                        <div className={styles.title}>
+                                            Pysäkkiaikataulu&nbsp;&nbsp;
+                                            <span className={styles.subtitle}>
+                                                Hållplatstidtabell
+                                            </span>
+                                        </div>
+                                    }
                                     {this.state.hasRouteDiagram &&
-                                    <StopPosterTimetable/>
+                                        <StopPosterTimetable/>
                                     }
                                     {!this.state.hasRouteDiagram &&
-                                    <StopPosterTimetable segments={["weekdays"]}/>
+                                        <StopPosterTimetable segments={["weekdays"]}/>
                                     }
                                 </div>
 
                                 <Spacer width={50}/>
 
                                 <div className={styles.right}>
-                                    {this.state.hasRoutesOnTop &&
-                                    <div className={styles.title}>&nbsp;</div>
+                                    {this.state.hasRoutes && this.state.hasRoutesOnTop &&
+                                        <div className={styles.title}>&nbsp;</div>
                                     }
 
                                     {!this.state.hasRouteDiagram &&
-                                    <div className={styles.timetables}>
-                                        <StopPosterTimetable segments={["saturdays"]} hideDetails/>
-                                        <Spacer width={50}/>
-                                        <StopPosterTimetable segments={["sundays"]} hideDetails/>
-                                    </div>
+                                        <div className={styles.timetables}>
+                                            <StopPosterTimetable segments={["saturdays"]} hideDetails/>
+                                            <Spacer width={50}/>
+                                            <StopPosterTimetable segments={["sundays"]} hideDetails/>
+                                        </div>
                                     }
 
                                     {!this.state.hasRouteDiagram && <Spacer height={50}/>}
