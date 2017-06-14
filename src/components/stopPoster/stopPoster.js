@@ -145,33 +145,28 @@ class StopPoster extends Component {
                                     {!this.state.hasRouteDiagram && <Spacer height={10}/>}
 
                                     {this.state.hasMap &&
-                                    <div className={styles.map} ref={(ref) => { this.map = ref; }}>
-                                        {this.state.shouldRenderMap &&
-                                        <StopMap
-                                            stopId={this.props.stopId}
-                                            date={this.props.date}
-                                            width={this.map.clientWidth}
-                                            height={this.map.clientHeight}
-                                        />
-                                        }
-                                    </div>
+                                        <div
+                                            className={styles.map}
+                                            ref={(ref) => { this.map = ref; }}
+                                        >
+                                            {this.state.shouldRenderMap &&
+                                                <StopMap
+                                                    stopId={this.props.stopId}
+                                                    date={this.props.date}
+                                                    width={this.map.clientWidth}
+                                                    height={this.map.clientHeight}
+                                                />
+                                            }
+                                        </div>
                                     }
 
-                                    {!this.state.hasRouteDiagram && <Spacer height={10}/>}
+                                    <Spacer height={10}/>
 
                                     {this.state.hasRouteDiagram &&
-                                    <span>
-                                        <div className={styles.title}>
-                                            Linjojen reitit&nbsp;&nbsp;
-                                            <span className={styles.subtitle}>
-                                                Linjernas rutter
-                                            </span>
-                                        </div>
                                         <RouteDiagram
                                             stopId={this.props.stopId}
                                             date={this.props.date}
                                         />
-                                    </span>
                                     }
                                 </div>
                             </div>
