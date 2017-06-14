@@ -27,7 +27,7 @@
 }
 
 .title {
-    font-family: fontFamily;
+    font-family: fontFamilyNarrow;
     font-size: 28px;
     font-weight: 500;
     padding-right: 25px;
@@ -36,4 +36,10 @@
 .subtitle {
     composes: title;
     font-weight: 300;
+}
+
+.icon {
+  height: 1em;
+  width: 1em;
+  font-size: 60px;
 }

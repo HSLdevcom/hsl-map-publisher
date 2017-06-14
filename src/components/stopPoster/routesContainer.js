@@ -25,7 +25,6 @@ query routesQuery($stopId: String!, $date: Date!) {
                                 destinationFi
                                 destinationSe
                                 mode
-                                }
                             }
                         }
                     }
@@ -33,6 +32,7 @@ query routesQuery($stopId: String!, $date: Date!) {
             }
         }
     }
+}
 `;
 
 const propsMapper = mapProps(props => ({
