@@ -5,25 +5,11 @@ import sortBy from "lodash/sortBy";
 import { Row, Column, Image } from "components/util";
 
 import renderQueue from "util/renderQueue";
-import { isTrunkRoute, colorsByMode, iconsByMode } from "util/domain";
+import { isTrunkRoute, getColor, getIcon } from "util/domain";
 
 import styles from "./routes.css";
 
 const MAX_COLUMNS = 6;
-
-function getColor(route) {
-    if (isTrunkRoute(route.routeId)) {
-        return colorsByMode.TRUNK;
-    }
-    return colorsByMode[route.mode];
-}
-
-function getIcon(route) {
-    if (isTrunkRoute(route.routeId)) {
-        return iconsByMode.TRUNK;
-    }
-    return iconsByMode[route.mode];
-}
 
 const Icon = props => <Image {...props} className={styles.icon}/>;
 

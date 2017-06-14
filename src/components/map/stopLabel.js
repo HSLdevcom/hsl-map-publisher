@@ -1,20 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Row, Column, Spacer } from "components/util";
-import { isTrunkRoute, colorsByMode } from "util/domain";
+import { getColor } from "util/domain";
 
 import styles from "./stopLabel.css";
 
 // Max rows in label
 const MAX_LABEL_ROWS = 6;
 const MAX_LABEL_CHARS = 36;
-
-function getColor(route) {
-    if (isTrunkRoute(route.routeId)) {
-        return colorsByMode.TRUNK;
-    }
-    return colorsByMode[route.mode];
-}
 
 const RouteList = (props) => {
     if (props.routes.length > MAX_LABEL_ROWS) {
