@@ -67,7 +67,7 @@ const timetableQuery = gql`
                                     destinationSe
                                 }
                             }
-                            notes {
+                            notes(date: $date) {
                                 nodes {
                                     noteText
                                     noteType
