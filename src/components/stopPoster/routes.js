@@ -5,7 +5,7 @@ import sortBy from "lodash/sortBy";
 import { Row, Column, Image } from "components/util";
 
 import renderQueue from "util/renderQueue";
-import { isTrunkRoute, getColor, getIcon } from "util/domain";
+import { isTrunkRoute, getColor, getIcon, colorsByMode } from "util/domain";
 
 import styles from "./routes.css";
 
@@ -58,6 +58,11 @@ class Routes extends Component {
             sortBy(this.props.routes, route => !isTrunkRoute(route.routeId)),
             routesPerColumn
         );
+
+        if (this.props.routes.some(route => isTrunkRoute(route.routeId))) {
+            // TODO: This is a hack to set the background color for stops with trunk routes
+            document.documentElement.style.setProperty("--background", colorsByMode.TRUNK);
+        }
 
         return (
             <div className={styles.root} ref={(ref) => { this.root = ref; }}>

@@ -8,3 +8,9 @@ body, body * {
     -moz-osx-font-smoothing: unset;
     -webkit-font-smoothing: none;
 }
+
+:root {
+    --hsl-blue: rgb(0, 122, 201);
+    --hsl-blue-light: rgb(213, 232, 250);
+    --background: var(--hsl-blue);
+}

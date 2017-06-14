@@ -1,4 +1,4 @@
-@value hslBlue, fontFamily from "styles/common.css";
+@value fontFamily from "styles/common.css";
 
 .title {
     font-family: fontFamily;
@@ -38,7 +38,7 @@
     font-size: 42px;
     letter-spacing: -1px;
     text-transform: uppercase;
-    color: hslBlue;
+    color: var(--background);
     background: white;
     border-radius: 1000px;
 }

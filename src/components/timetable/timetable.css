@@ -1,4 +1,4 @@
-@value hslBlue, hslBlueLight, fontFamily, fontFamilyNarrow, borderRadius from "styles/common.css";
+@value fontFamily, fontFamilyNarrow, borderRadius from "styles/common.css";
 
 .root {
     position: relative;
@@ -7,7 +7,7 @@
     color: black;
     font-weight: 300;
     font-family: fontFamilyNarrow;
-    background: hslBlueLight;
+    background: var(--hsl-blue-light);
     border-radius: borderRadius;
 }
 
@@ -22,7 +22,7 @@
 .header {
     margin: 15px 0;
     font-family: fontFamily;
-    color: hslBlue;
+    color: var(--hsl-blue);
 }
 
 .title {
@@ -47,7 +47,7 @@
 }
 
 .root.summer .table > *:nth-child(odd) {
-  background-color: hslBlueLight;
+  background-color: var(--hsl-blue-light);
 }
 
 .table > * {
@@ -81,7 +81,7 @@
     padding: 2px 10px;
     font-size: 13px;
     font-family: fontFamilyNarrow;
-    color: hslBlue;
+    color: var(--hsl-blue);
 }
 
 .validity {
@@ -92,6 +92,6 @@
     font-size: 12px;
     line-height: 16px;
     letter-spacing: -0.025em;
-    color: hslBlue;
+    color: var(--hsl-blue);
     text-align: right;
 }

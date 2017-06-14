@@ -1,4 +1,4 @@
-@value hslBlue, fontFamily, fontFamilyNarrow from "styles/common.css";
+@value fontFamily, fontFamilyNarrow from "styles/common.css";
 
 .label {
     padding: 10px 7px 7px 10px;

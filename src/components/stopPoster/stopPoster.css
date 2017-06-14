@@ -1,4 +1,4 @@
-@value hslBlue, fontFamily from "styles/common.css";
+@value fontFamily from "styles/common.css";
 
 /*
  Poster 810mm x 1210mm / 31.89in x 47.64in / 2296px x 3430px @ 72 ppi
@@ -10,7 +10,7 @@
     padding: 64px;
     margin: -15px;
     color: white;
-    background: hslBlue;
+    background: var(--background);
     box-sizing: border-box;
 }
 
