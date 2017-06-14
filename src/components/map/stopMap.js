@@ -67,7 +67,7 @@ const StopMap = (props) => {
                     options={props.mapOptions}
                     components={{
                         text_fisv: { enabled: true },
-                        routes: { enabled: true },
+                        routes: { enabled: true, fetchRoutes: true },
                         citybikes: { enabled: true },
                         print: { enabled: true },
                     }}
@@ -133,7 +133,11 @@ const StopMap = (props) => {
             <div className={styles.miniMap} style={miniMapStyle}>
                 <MapImage
                     options={props.miniMapOptions}
-                    components={{ text_fisv: { enabled: true }, print: { enabled: true } }}
+                    components={{
+                        text_fisv: { enabled: true },
+                        print: { enabled: true },
+                        routes: { enabled: true, removeSource: true },
+                    }}
                 />
                 <div
                     className={styles.center}

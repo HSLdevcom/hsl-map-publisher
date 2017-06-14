@@ -29,10 +29,20 @@ const getClient = getContext({
 const propsMapper = mapProps(({ options, components, date, client: { query } }) => {
     const mapStyle = getMapStyle(components);
 
-    if (components.routes && components.routes.enabled) {
+    if (components.routes && components.routes.enabled && components.routes.fetchRoutes) {
         const src = addRoutesToStyle(options, mapStyle, query, date)
             .then(styleWithRoutes => fetchMap(options, styleWithRoutes));
         return { src };
+    }
+
+    if (components.routes && components.routes.enabled && components.routes.removeSource) {
+        mapStyle.sources.routes = {
+            type: "geojson",
+            data: {
+                type: "FeatureCollection",
+                features: [],
+            },
+        };
     }
     return { src: fetchMap(options, mapStyle) };
 });
@@ -60,6 +70,8 @@ MapImageContainer.propTypes = {
     }).isRequired,
     components: PropTypes.objectOf(PropTypes.shape({
         enabled: PropTypes.bool.isRequired,
+        fetchRoutes: PropTypes.bool,
+        removeSource: PropTypes.bool,
     })).isRequired,
     date: PropTypes.string,
 };
