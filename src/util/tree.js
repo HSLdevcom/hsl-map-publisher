@@ -104,7 +104,7 @@ function itemsToTree(itemLists, options) {
     itemLists.forEach(items => addItems(nodes, items, options));
     const root = (nodes.length > 1) ? { items: [], children: nodes } : nodes[0];
 
-    return root;
+    return root || [];
 }
 
 /**
