@@ -13,6 +13,7 @@
 .start {
     display: flex;
     align-items: flex-start;
+    flex-shrink: 0;
     color: black;
     margin-left: leftWidth;
     margin-bottom: calc(lineWidth * 2);
