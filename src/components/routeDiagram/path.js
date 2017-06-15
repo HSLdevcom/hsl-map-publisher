@@ -3,6 +3,7 @@ import React from "react";
 import Destinations from "./destinations";
 import Stop from "./stop";
 import Gap from "./gap";
+import Zone from "./zone";
 
 import styles from "./path.css";
 
@@ -33,6 +34,7 @@ const Path = props => (
             <div key={index}>
                 {item.type === "stop" && <Stop {...item} isLast={isLastStop(item)}/>}
                 {item.type === "gap" && <Gap/>}
+                {item.type === "zone" && <Zone {...item}/>}
                 {item.destinations && <Destinations destinations={item.destinations}/>}
             </div>
         ))}

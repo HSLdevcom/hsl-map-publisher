@@ -1,9 +1,14 @@
 import { itemsToTree, generalizeTree, sortBranches } from "util/tree";
+import { getZoneName } from "./domain";
 
 const MAX_WIDTH = 6;
 const MAX_HEIGHT = 25;
 
 function isEqual(stop, other) {
+    if (stop.type !== other.type) return false;
+    if (stop.type === "zone") {
+        return (stop.from === other.from && stop.to === other.to);
+    }
     return ((stop.terminalId !== null) &&
            (stop.terminalId === other.terminalId)) ||
            ((stop.nameFi === other.nameFi) &&
@@ -53,10 +58,12 @@ function truncate(node) {
  * @param {Array} routes
  * @returns {Object}
  */
-function routesToTree(routes) {
+function routesToTree(routes, shortId) {
+    const currentZone = getZoneName(shortId);
+
     const itemLists = routes.map(route => (
         route.stops.map((stop, index, stops) => {
-            const item = { ...stop, type: "stop" };
+            const item = { ...stop, type: "stop", zone: getZoneName(stop.shortId) };
             if (index === stops.length - 1) {
                 item.destinations = [{
                     routeId: route.routeId,
@@ -68,7 +75,28 @@ function routesToTree(routes) {
         })
     ));
 
-    const root = itemsToTree(itemLists, { isEqual, merge });
+    const itemsListWithZoneBorders = itemLists.map(items => items.reduce((prev, item) => {
+        if (prev.length === 0
+            && currentZone !== item.zone
+        ) {
+            return [
+               { type: "zone", from: currentZone, to: item.zone },
+                item,
+            ];
+        } else if (prev.length > 0
+            && prev[prev.length - 1].type === "stop"
+            && prev[prev.length - 1].zone !== item.zone
+        ) {
+            return [
+                ...prev,
+                 { type: "zone", from: prev[prev.length - 1].zone, to: item.zone },
+                item,
+            ];
+        }
+        return [...prev, item];
+    }, []));
+
+    const root = itemsToTree(itemsListWithZoneBorders, { isEqual, merge });
     generalizeTree(root, { width: MAX_WIDTH, height: MAX_HEIGHT, prune, truncate });
     sortBranches(root);
     return root;
