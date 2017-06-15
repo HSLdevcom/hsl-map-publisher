@@ -30,6 +30,8 @@ const TEMPLATE = template(fs.readFileSync(path.join(__dirname, "index.html")));
 
 const API_URL = "http://kartat.hsl.fi/jore/graphql";
 
+let queueLength = 0;
+
 function fetchStopIds() {
     const options = {
         method: "POST",
@@ -120,10 +122,16 @@ function generateFiles(component, props) {
             scale: SCALE,
         };
 
+        queueLength++;
+
         promises.push(
             generator
                 .generate(options)
-                .then(success => success && convertToCmykPdf(path.join(directory, filename)))
+                // eslint-disable-next-line no-loop-func
+                .then((success) => {
+                    queueLength--;
+                    return success && convertToCmykPdf(path.join(directory, filename));
+                })
         );
     }
 
@@ -163,6 +171,10 @@ async function main() {
         successResponse(ctx, stops);
     });
 
+    router.get("/queueInfo", (ctx) => {
+        successResponse(ctx, { queueLength });
+    });
+
     router.post("/generate", (ctx) => {
         const { component, props } = ctx.request.body;
 
@@ -189,6 +201,7 @@ async function main() {
             });
         });
     });
+
 
     app
         .use(jsonBody({ fallback: true }))

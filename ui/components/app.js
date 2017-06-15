@@ -8,6 +8,7 @@ import RaisedButton from "material-ui/RaisedButton";
 import FlatButton from "material-ui/FlatButton";
 import DatePicker from "material-ui/DatePicker";
 import RadioGroup from "components/radioGroup";
+import QueueLength from "components/queueLength";
 
 import moment from "moment";
 
@@ -214,9 +215,10 @@ class App extends Component {
                             disabled={!stopCount}
                             onTouchTap={() => this.onGenerate()}
                             label={`Generoi (${stopCount})`}
-                            style={{ height: 45 }}
+                            style={{ height: 45, flexGrow: 1 }}
                             primary
                         />
+                        <QueueLength/>
                     </div>
                 </div>
             </MuiThemeProvider>

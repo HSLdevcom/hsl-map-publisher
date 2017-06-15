@@ -29,7 +29,7 @@
 
 .footer {
     display: flex;
-    flex-flow: column;
-    justify-content: center;
+    flex-flow: row;
+    justify-content: space-between;
     margin: 30px 0;
 }
