@@ -6,9 +6,24 @@ import { iconsByMode } from "util/domain";
 
 import styles from "./stop.css";
 
-const Icon = props => (
-    <Image {...props} className={styles.icon}/>
-);
+const Icon = props => <Image {...props} className={styles.icon}/>;
+
+const metroRegexp = / ?\(M\)$/;
+
+const getTransferModes = (terminal, nameFi) => {
+    const modes = new Set();
+
+    if (metroRegexp.test(nameFi)) { modes.add("SUBWAY"); }
+
+    // Filter out bus terminals, until we have more specs how to handle those.
+    if (terminal) {
+        terminal.siblings.nodes.map(sibling =>
+            sibling.modes.nodes.filter(mode => mode !== "BUS").forEach(mode => modes.add(mode))
+        );
+    }
+
+    return Array.from(modes);
+};
 
 const Stop = props => (
     <div className={styles.stop}>
@@ -23,19 +38,14 @@ const Stop = props => (
         </div>
         <div className={styles.right}>
             <div>
-                <div className={styles.title}>{props.nameFi}</div>
-                <div className={styles.subtitle}>{props.nameSe}</div>
+                <div className={styles.title}>{props.nameFi.replace(metroRegexp, "")}</div>
+                <div className={styles.subtitle}>{props.nameSe.replace(metroRegexp, "")}</div>
             </div>
-            {props.terminalByTerminalId && (
-                <div className={styles.iconContainer}>
-                    {props.terminalByTerminalId.siblings.nodes.map(sibling => (
-                      sibling.modes.nodes
-                          // Filter out bus terminals, until we have more specs how to handle those.
-                          .filter(mode => mode !== "BUS")
-                          .map(mode => <Icon src={iconsByMode[mode]}/>)
-                    ))}
-                </div>
-            )}
+            <div className={styles.iconContainer}>
+                {getTransferModes(props.terminalByTerminalId, props.nameFi).map(mode => (
+                    <Icon src={iconsByMode[mode]}/>
+                ))}
+            </div>
         </div>
     </div>
 );
