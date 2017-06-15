@@ -70,6 +70,7 @@ const StopMap = (props) => {
                         routes: { enabled: true, fetchRoutes: true },
                         citybikes: { enabled: true },
                         print: { enabled: true },
+                        municipal_borders: { enabled: true },
                     }}
                     date={props.date}
                 />
@@ -137,6 +138,7 @@ const StopMap = (props) => {
                         text_fisv: { enabled: true },
                         print: { enabled: true },
                         routes: { enabled: true, removeSource: true },
+                        municipal_borders: { enabled: true },
                     }}
                 />
                 <div
