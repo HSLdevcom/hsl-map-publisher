@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { JustifiedColumn, Spacer, Image } from "components/util";
+import { JustifiedColumn, Spacer } from "components/util";
 import renderQueue from "util/renderQueue";
 import { colorsByMode } from "util/domain";
 
@@ -10,6 +10,7 @@ import Timetable from "components/timetable/timetableContainer";
 import StopMap from "components/map/stopMapContainer";
 
 import mobileAd from "icons/mobile_ad.svg";
+import mobileAdTrunk from "icons/mobile_ad_trunk.svg";
 
 import Header from "./headerContainer";
 import Footer from "./footer";
@@ -138,7 +139,10 @@ class StopPoster extends Component {
                                         <StopPosterTimetable segments={["weekdays"]}/>
                                     }
                                     {this.state.hasAd &&
-                                        <Image src={mobileAd}/>
+                                        <Image
+                                            src={this.props.isTrunkRouteStop
+                                              ? mobileAdTrunk : mobileAd}
+                                        />
                                     }
                                 </div>
 
