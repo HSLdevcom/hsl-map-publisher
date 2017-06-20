@@ -41,7 +41,7 @@ function truncate(node) {
         const removedNode = items.splice(index + ((index > items.length / 2) ? -1 : 1), 1);
         if (removedNode[0].destinations) {
             if (!gap.destinations) gap.destinations = [];
-            gap.destinations.push(removedNode[0].destinations);
+            gap.destinations = gap.destinations.concat(removedNode[0].destinations);
         }
     } else {
         const index = items.length - 1;
