@@ -96,6 +96,21 @@ const timetableQuery = gql`
     }
 `;
 
+function getDuplicateRouteNote(duplicateRoutes, departure) {
+    return duplicateRoutes.includes(departure.routeId)
+        ? [departure.note, "*".repeat(departure.direction)].join("")
+        : departure.note;
+}
+
+function addMissingFridayNote(departure) {
+    return (
+        departure.dayType.length === 1 &&
+        departure.dayType.includes("Pe") &&
+        (!departure.note || !departure.note.includes("p"))
+        ? "p" : null
+    );
+}
+
 const propsMapper = mapProps((props) => {
     let departures = flatMap(
         props.data.stop.siblings.nodes,
@@ -135,9 +150,7 @@ const propsMapper = mapProps((props) => {
 
     departures = departures.map(departure => ({
         ...departure,
-        note: duplicateRoutes.includes(departure.routeId)
-            ? [departure.note, "*".repeat(departure.direction)].join("")
-            : departure.note,
+        note: [getDuplicateRouteNote(duplicateRoutes, departure), addMissingFridayNote(departure)].join(""),
     }));
 
 
