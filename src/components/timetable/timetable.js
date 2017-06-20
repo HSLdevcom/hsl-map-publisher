@@ -132,7 +132,7 @@ const Timetable = props => (
                 <Table departures={props.sundays}/>
             </div>
         }
-        <Spacer height={20}/>
+        {props.showNotes && props.notes.length !== 0 && <Spacer height={20}/>}
         {props.showNotes && props.notes.map(note => (
             <div key={note} className={styles.footnote}>
                 {note}

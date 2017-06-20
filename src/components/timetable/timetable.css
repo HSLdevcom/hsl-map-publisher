@@ -4,6 +4,7 @@
     position: relative;
     width: 100%;
     padding: borderRadius;
+    padding-top: calc(borderRadius - 15px);
     color: black;
     font-weight: 300;
     font-family: fontFamilyNarrow;
@@ -102,7 +103,7 @@
 
 .validity {
     position: absolute;
-    top: borderRadius;
+    top: calc(borderRadius - 15px);
     right: borderRadius;
     font-family: fontFamily;
     font-size: 12px;
