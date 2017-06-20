@@ -62,6 +62,7 @@ class Routes extends Component {
         if (this.props.routes.some(route => isTrunkRoute(route.routeId))) {
             // TODO: This is a hack to set the background color for stops with trunk routes
             document.documentElement.style.setProperty("--background", colorsByMode.TRUNK);
+            document.documentElement.style.setProperty("--light-background", "#FFE0D1");
         }
 
         return (

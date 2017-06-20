@@ -13,4 +13,6 @@ body, body * {
     --hsl-blue: rgb(0, 122, 201);
     --hsl-blue-light: rgb(213, 232, 250);
     --background: var(--hsl-blue);
+    --light-background: var(--hsl-blue-light);
+    --timetable-text-color: var(--hsl-blue);
 }
