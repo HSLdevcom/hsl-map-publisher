@@ -39,7 +39,7 @@ const Stop = props => (
         <div className={styles.right}>
             <div>
                 <div className={styles.title}>{props.nameFi.replace(metroRegexp, "")}</div>
-                <div className={styles.subtitle}>{props.nameSe.replace(metroRegexp, "")}</div>
+                <div className={styles.subtitle}>{props.nameSe && props.nameSe.replace(metroRegexp, "")}</div>
             </div>
             <div className={styles.iconContainer}>
                 {getTransferModes(props.terminalByTerminalId, props.nameFi).map(mode => (
