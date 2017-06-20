@@ -26,7 +26,7 @@ const getClient = getContext({
     }).isRequired,
 });
 
-const propsMapper = mapProps(({ options, components, date, client: { query } }) => {
+const propsMapper = mapProps(({ options, components, date, client: { query }, extraLayers }) => {
     const mapStyle = getMapStyle(components);
 
     if (components.routes && components.routes.enabled && components.routes.fetchRoutes) {
@@ -44,6 +44,11 @@ const propsMapper = mapProps(({ options, components, date, client: { query } }) 
             },
         };
     }
+
+    if (extraLayers) {
+        mapStyle.layers = [...mapStyle.layers, ...extraLayers];
+    }
+
     return { src: fetchMap(options, mapStyle) };
 });
 
@@ -74,6 +79,9 @@ MapImageContainer.propTypes = {
         removeSource: PropTypes.bool,
     })).isRequired,
     date: PropTypes.string,
+    extraLayers: PropTypes.arrayOf(PropTypes.shape({
+        id: PropTypes.string.isRequired,
+    })),
 };
 
 export default MapImageContainer;
