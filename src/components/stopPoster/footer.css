@@ -2,16 +2,16 @@
 
 .shortCode {
     position: absolute;
-    left: 915px;
-    top: 325px;
+    left: 500px;
+    top: 332px;
     font-family: fontFamilyNarrow;
-    font-size: 35px;
+    font-size: 20px;
     font-weight: 500;
-    color: rgb(0, 125, 195);
+    color: black;
 }
 
 .qrCode {
     position: absolute;
-    left: 1100px;
-    top: 226px;
+    left: 800px;
+    top: 124px;
 }

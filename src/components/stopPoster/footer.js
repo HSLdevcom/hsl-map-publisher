@@ -2,38 +2,32 @@ import React from "react";
 import PropTypes from "prop-types";
 import QrCode from "components/qrCode";
 import { Image } from "components/util";
-import feedbackCodes from "data/feedbackCodes.json";
 
 import footerIcon from "icons/footer.svg";
+import trunkRouteFooterIcon from "icons/footer_trunk.svg";
 
 import styles from "./footer.css";
 
 const Footer = (props) => {
-    const feedbackCode = feedbackCodes.find(({ shortId }) => shortId === props.shortId);
+    const feedbackUrl = `http://hsl.fi/pysakit/${props.shortId.replace(" ", "")}`;
 
-    if (!feedbackCode || !feedbackCode.code || !feedbackCode.url) {
-        console.warn("Could not find feedback code"); // eslint-disable-line no-console
-    }
 
     return (
         <div style={{ position: "relative" }}>
-            <Image src={footerIcon}/>
-            {feedbackCode && feedbackCode.code &&
+            <Image src={props.isTrunkStop ? trunkRouteFooterIcon : footerIcon}/>
             <div className={styles.shortCode}>
-                {feedbackCode.code}
+                {feedbackUrl}
             </div>
-            }
-            {feedbackCode && feedbackCode.url &&
             <div className={styles.qrCode}>
-                <QrCode url={feedbackCode.url}/>
+                <QrCode url={feedbackUrl}/>
             </div>
-            }
         </div>
     );
 };
 
 Footer.propTypes = {
     shortId: PropTypes.string.isRequired,
+    isTrunkStop: PropTypes.bool.isRequired,
 };
 
 export default Footer;
