@@ -59,7 +59,9 @@ function fetchStops() {
                         nameFi: stop.nimi_suomi,
                         group: `${stop.aikataulutyyppi_hsl}${stop.aikataulutyyppi_hkl}`,
                         index: stop.ajojarjestys,
-                        hasShelter: stop.pysakkityyppi.includes("katos"),
+                        hasShelter: stop.pysakkityyppi.includes("katos") &&
+                            !(stop.lyhyt_nro.startsWith("Ki")
+                                && stop.pysakkityyppi.includes("teräskatos")),
                     }))
                     .sort((a, b) => a.shortId.localeCompare(b.shortId));
                 resolve(stops);
