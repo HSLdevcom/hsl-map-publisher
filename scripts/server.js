@@ -68,13 +68,13 @@ function fetchStops() {
     });
 }
 
-function generatePdf(directory, filenames) {
+function generatePdf(directory, filenames, outputFilename = "output.pdf") {
     return new Promise((resolve, reject) => {
         const pdftk = spawn("pdftk", [
             ...filenames,
             "cat",
             "output",
-            path.join(directory, "output.pdf"),
+            path.join(directory, outputFilename),
         ]);
         pdftk.stderr.on("data", data => reject(new Error(data.toString())));
         pdftk.on("close", resolve);
@@ -103,7 +103,7 @@ function convertToCmykPdf(filename) {
   );
 }
 
-function generateFiles(component, props) {
+function generateFiles(component, props, outputFilename) {
     const identifier = moment().format("YYYY-MM-DD-HHmm-sSSSSS");
     const directory = path.join(OUTPUT_PATH, identifier);
 
@@ -136,7 +136,7 @@ function generateFiles(component, props) {
     }
 
     Promise.all(promises)
-        .then(filenames => generatePdf(directory, filenames.filter(name => !!name)))
+        .then(filenames => generatePdf(directory, filenames.filter(name => !!name), outputFilename))
         .then(() => logger.end("DONE"))
         .catch((error) => {
             logger.logError(error);
@@ -176,14 +176,14 @@ async function main() {
     });
 
     router.post("/generate", (ctx) => {
-        const { component, props } = ctx.request.body;
+        const { component, props, filename } = ctx.request.body;
 
         if (typeof component !== "string" || !(props instanceof Array) || !props.length) {
             return errorResponse(ctx, new Error("Invalid request body"));
         }
 
         try {
-            const filePath = generateFiles(component, props);
+            const filePath = generateFiles(component, props, filename);
             return successResponse(ctx, { path: filePath });
         } catch (error) {
             return errorResponse(ctx, error);

@@ -66,8 +66,11 @@ class App extends Component {
 
     onGenerate() {
         const component = this.state.selectedComponent.name;
-        const props = this.state.rows
-            .filter(({ isChecked }) => isChecked)
+
+        const checkedRows = this.state.rows
+            .filter(({ isChecked }) => isChecked);
+
+        const props = checkedRows
             .reduce((prev, { stopIds }) => [...prev, ...stopIds], [])
             .map(stopId => ({
                 stopId,
@@ -81,7 +84,10 @@ class App extends Component {
                     : null,
             }));
 
-        generate(component, props)
+
+        const filename = checkedRows.length === 1 ? `${checkedRows[0].title}.pdf` : "output.pdf";
+
+        generate(component, props, filename)
             .then((url) => {
                 this.resetRows();
                 window.open(url);

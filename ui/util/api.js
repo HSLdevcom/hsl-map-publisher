@@ -13,8 +13,8 @@ async function fetchStops() {
     return response.json();
 }
 
-async function generate(component, props) {
-    const options = { method: "POST", body: JSON.stringify({ component, props }) };
+async function generate(component, props, filename) {
+    const options = { method: "POST", body: JSON.stringify({ component, props, filename }) };
 
     const response = await fetch(`${API_URL}/generate`, options);
     if (!response.ok) throw new Error(response.statusText);
