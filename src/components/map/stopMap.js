@@ -25,7 +25,7 @@ const MINI_MAP_MARGIN_BOTTOM = -40;
 
 // Overlays
 const INFO_MARGIN_BOTTOM = 78;
-const INFO_MARGIN_LEFT = 20;
+const INFO_MARGIN_LEFT = 44;
 
 const Attribution = () => (
     <div className={styles.attribution}>
