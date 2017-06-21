@@ -9,8 +9,7 @@ import trunkRouteFooterIcon from "icons/footer_trunk.svg";
 import styles from "./footer.css";
 
 const Footer = (props) => {
-    const feedbackUrl = `http://hsl.fi/pysakit/${props.shortId.replace(" ", "")}`;
-
+    const feedbackUrl = `hsl.fi/pysakit/${props.shortId.replace(" ", "")}`;
 
     return (
         <div style={{ position: "relative" }}>
@@ -19,8 +18,8 @@ const Footer = (props) => {
                 {feedbackUrl}
             </div>
             <div className={styles.qrCode}>
-                <QrCode url={feedbackUrl}/>
             </div>
+            <QrCode url={`http://${feedbackUrl}`} className={styles.qrCode}/>
         </div>
     );
 };
