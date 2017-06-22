@@ -14,4 +14,5 @@
     position: absolute;
     left: 800px;
     top: 124px;
+    transform-origin: top left;
 }

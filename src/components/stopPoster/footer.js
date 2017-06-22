@@ -17,8 +17,6 @@ const Footer = (props) => {
             <div className={styles.shortCode}>
                 {feedbackUrl}
             </div>
-            <div className={styles.qrCode}>
-            </div>
             <QrCode url={`http://${feedbackUrl}`} className={styles.qrCode}/>
         </div>
     );
