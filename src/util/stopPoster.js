@@ -9,7 +9,8 @@ function viewportContains(viewport, stop) {
 
 function calculateStopsViewport(options) {
     const { longitude, latitude, width, height, minZoom, maxZoom, stops } = options;
-    const maxStops = width * height * STOPS_PER_PIXEL;
+    // Nearby stops with labels plus current stop (no label)
+    const maxStops = width * height * STOPS_PER_PIXEL + 1;
 
     let viewport;
     let visibleStops = stops;

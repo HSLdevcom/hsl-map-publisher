@@ -70,9 +70,7 @@ const stopsMapper = stopGroup => ({
 });
 
 const nearbyStopsMapper = mapProps((props) => {
-    const nearbyStops = props.data.stopGroups.nodes
-        // Do not include current stop
-        .filter(({ stopIds }) => !stopIds.includes(props.stopId))
+    const stops = props.data.stopGroups.nodes
         // Merge properties from mode-specific stops
         .map(stopsMapper)
         // Filter out stops with no departures
@@ -85,8 +83,11 @@ const nearbyStopsMapper = mapProps((props) => {
         height: props.height,
         minZoom: MIN_ZOOM,
         maxZoom: MAX_ZOOM,
-        stops: nearbyStops,
+        stops,
     });
+
+    const currentStop = projectedStops.find(({ stopIds }) => stopIds.includes(props.stopId));
+    const nearbyStops = projectedStops.filter(({ stopIds }) => !stopIds.includes(props.stopId));
 
     const mapOptions = {
         center: [props.longitude, props.latitude],
@@ -103,7 +104,8 @@ const nearbyStopsMapper = mapProps((props) => {
     };
 
     return {
-        stops: projectedStops,
+        currentStop,
+        nearbyStops,
         pixelsPerMeter: viewport.getDistanceScales().pixelsPerMeter[0],
         mapOptions,
         miniMapOptions,

@@ -56,7 +56,7 @@ const StopMap = (props) => {
     };
 
     // Filter out stops that are behind the mini map
-    const stops = props.stops.filter(
+    const stops = props.nearbyStops.filter(
         stop => stop.x < miniMapStyle.left || stop.y < miniMapStyle.top
     );
 
@@ -86,6 +86,13 @@ const StopMap = (props) => {
                             <StopSymbol routes={stop.routes} size={STOP_RADIUS * 2}/>
                         </ItemFixed>
                     ))}
+
+                    <ItemFixed
+                        top={props.currentStop.y - STOP_RADIUS}
+                        left={props.currentStop.x - STOP_RADIUS}
+                    >
+                        <StopSymbol routes={props.currentStop.routes} size={STOP_RADIUS * 2}/>
+                    </ItemFixed>
 
                     <ItemFixed
                         top={(mapStyle.height / 2) - LOCATION_RADIUS}
@@ -136,18 +143,21 @@ const StopMap = (props) => {
     );
 };
 
+const StopType = PropTypes.shape({
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+    routes: PropTypes.arrayOf(PropTypes.shape({
+        routeId: PropTypes.string.isRequired,
+    }).isRequired).isRequired,
+    stopIds: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+    calculatedHeading: PropTypes.number.isRequired,
+});
+
 StopMap.propTypes = {
     mapOptions: MapImage.propTypes.options,
     miniMapOptions: MapImage.propTypes.options,
-    stops: PropTypes.arrayOf(PropTypes.shape({
-        x: PropTypes.number.isRequired,
-        y: PropTypes.number.isRequired,
-        routes: PropTypes.arrayOf(PropTypes.shape({
-            routeId: PropTypes.string.isRequired,
-        }).isRequired).isRequired,
-        stopIds: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
-        calculatedHeading: PropTypes.number.isRequired,
-    })).isRequired,
+    currentStop: StopType.isRequired,
+    nearbyStops: PropTypes.arrayOf(StopType).isRequired,
     pixelsPerMeter: PropTypes.number.isRequired,
     date: PropTypes.string.isRequired,
 };
