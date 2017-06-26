@@ -3,12 +3,18 @@ import PropTypes from "prop-types";
 
 import styles from "./scalebar.css";
 
+const values = [1, 2, 4, 8];
+const factors = [1, 10, 100, 1000, 10000];
+const scales = factors.reduce((prev, cur) => [...prev, ...values.map(val => val * cur)], []);
+
 const Scalebar = (props) => {
-    const meters = Math.ceil((props.targetWidth / props.pixelsPerMeter) / 100) * 100;
+    const meters = props.targetWidth / props.pixelsPerMeter;
+    const scale = scales.reduce((prev, cur) =>
+        (Math.abs(cur - meters) < Math.abs(prev - meters) ? cur : prev), 0);
     return (
         <div className={styles.root}>
-            <div>{meters} m</div>
-            <div style={{ width: props.pixelsPerMeter * meters }}/>
+            <div>{scale} m</div>
+            <div style={{ width: props.pixelsPerMeter * scale }}/>
         </div>
     );
 };
