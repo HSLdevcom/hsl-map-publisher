@@ -1,13 +1,29 @@
 @value fontFamilyNarrow from "styles/common.css";
 
-.shortCode {
+.text {
     position: absolute;
-    left: 500px;
-    top: 332px;
     font-family: fontFamilyNarrow;
     font-size: 20px;
     font-weight: 500;
     color: black;
+}
+
+.url {
+    composes: text;
+    left: 500px;
+    top: 332px;
+}
+
+.urlTram {
+    composes: text;
+    top: 346px;
+    left: 500px;
+}
+
+.urlFeedback {
+    composes: text;
+    top: 346px;
+    left: 936px;
 }
 
 .qrCode {
@@ -15,4 +31,16 @@
     left: 800px;
     top: 124px;
     transform-origin: top left;
+}
+
+.qrCodeTram {
+    composes: qrCode;
+    top: 128px;
+    left: 732px;
+}
+
+.qrCodeFeedback {
+    composes: qrCode;
+    top: 128px;
+    left: 1146px;
 }
