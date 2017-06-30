@@ -71,12 +71,13 @@ function fetchStops() {
 }
 
 function generatePdf(directory, filenames, outputFilename = "output.pdf") {
+    const outputPath = path.join(directory, outputFilename.replace(/(\/|\\)/g, ""));
     return new Promise((resolve, reject) => {
         const pdftk = spawn("pdftk", [
             ...filenames,
             "cat",
             "output",
-            path.join(directory, outputFilename),
+            outputPath,
         ]);
         pdftk.stderr.on("data", data => reject(new Error(data.toString())));
         pdftk.on("close", resolve);
