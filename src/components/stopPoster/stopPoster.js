@@ -25,12 +25,13 @@ class StopPoster extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            hasAd: true,
             hasRoutesOnTop: false,
-            hasRoutes: true,
             hasRouteDiagram: true,
+            hasRoutes: true,
+            hasStretchedLeftColumn: false,
             shouldRenderMap: false,
             hasMap: true,
-            hasAd: true,
         };
     }
 
@@ -67,6 +68,10 @@ class StopPoster extends Component {
             }
             if (this.state.hasRoutes) {
                 this.setState({ hasRoutes: false });
+                return;
+            }
+            if (!this.state.hasStretchedLeftColumn) {
+                this.setState({ hasStretchedLeftColumn: true });
                 return;
             }
             renderQueue.remove(this, { success: false });
@@ -124,7 +129,10 @@ class StopPoster extends Component {
                             <Spacer height={10}/>
                             }
                             <div className={styles.columns}>
-                                <div className={styles.left}>
+                                <div
+                                    className={this.state.hasStretchedLeftColumn ?
+                                               styles.leftStretched : styles.left}
+                                >
                                     {this.state.hasRoutes && !this.state.hasRoutesOnTop &&
                                         <Routes stopId={this.props.stopId} date={this.props.date}/>
                                     }
