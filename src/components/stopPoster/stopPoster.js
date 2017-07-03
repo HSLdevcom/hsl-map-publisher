@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { JustifiedColumn, Spacer } from "components/util";
+import { JustifiedColumn, Spacer, Image } from "components/util";
 import renderQueue from "util/renderQueue";
 import { colorsByMode } from "util/domain";
 
