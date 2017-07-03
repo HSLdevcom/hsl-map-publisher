@@ -14,6 +14,8 @@ import StopLabel from "./stopLabel";
 
 import styles from "./stopMap.css";
 
+import placeLabelCity from "./city-layer.json";
+
 // Map symbol size
 const STOP_RADIUS = 20;
 const LOCATION_RADIUS = 30;
@@ -140,67 +142,7 @@ const StopMap = (props) => {
                         routes: { enabled: true, removeSource: true },
                         municipal_borders: { enabled: true },
                     }}
-                    extraLayers={[{
-                        id: "place_label_city",
-                        type: "symbol",
-                        source: "vector",
-                        "source-layer": "place_label",
-                        maxzoom: 13,
-                        filter: [
-                            "all",
-                            [
-                                "==",
-                                "$type",
-                                "Point",
-                            ],
-                            [
-                                "==",
-                                "type",
-                                "city",
-                            ],
-                        ],
-                        layout: {
-                            "text-field": "{name}\n{name_sv}",
-                            "text-font": [
-                                "Gotham Rounded Medium",
-                            ],
-                            "text-max-width": 10,
-                            "text-size": {
-                                stops: [
-                                    [
-                                        6,
-                                        10,
-                                    ],
-                                    [
-                                        10,
-                                        16,
-                                    ],
-                                ],
-                                base: 1.4,
-                            },
-                            "text-transform": "uppercase",
-                            "text-letter-spacing": 0.125,
-                        },
-                        paint: {
-                            "text-color": "#777",
-                            "text-halo-color": "rgba(255,255,255,1.0)",
-                            "text-halo-width": 1.5,
-                            "text-halo-blur": 0,
-                            "text-opacity": {
-                                base: 1,
-                                stops: [
-                                    [
-                                        12,
-                                        1,
-                                    ],
-                                    [
-                                        13,
-                                        0,
-                                    ],
-                                ],
-                            },
-                        },
-                    }]}
+                    extraLayers={[placeLabelCity]}
                 />
                 <div
                     className={styles.center}
