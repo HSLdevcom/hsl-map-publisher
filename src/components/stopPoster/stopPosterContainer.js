@@ -10,7 +10,7 @@ import { isNumberVariant, trimRouteId, isTrunkRoute, isDropOffOnly } from "util/
 import StopPoster from "./stopPoster";
 
 const stopPosterQuery = gql`
-    query stopPosterQuery($stopId: String!) {
+    query stopPosterQuery($stopId: String!, $date: Date!) {
         stop: stopByStopId(stopId: $stopId) {
             shortId
             siblings {
