@@ -1,21 +1,17 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import chunk from "lodash/chunk";
-import { Row, Column } from "components/util";
+import sortBy from "lodash/sortBy";
+import { Row, Column, Image } from "components/util";
 
 import renderQueue from "util/renderQueue";
-import { isTrunkRoute, colorsByMode } from "util/domain";
+import { isTrunkRoute, getColor, getIcon } from "util/domain";
 
 import styles from "./routes.css";
 
 const MAX_COLUMNS = 6;
 
-function getColor(route) {
-    if (isTrunkRoute(route.routeId)) {
-        return colorsByMode.TRUNK;
-    }
-    return colorsByMode[route.mode];
-}
+const Icon = props => <Image {...props} className={styles.icon}/>;
 
 class Routes extends Component {
     constructor(props) {
@@ -58,12 +54,22 @@ class Routes extends Component {
 
     render() {
         const routesPerColumn = Math.ceil(this.props.routes.length / this.state.columns);
-        const routeColumns = chunk(this.props.routes, routesPerColumn);
+        const routeColumns = chunk(
+            sortBy(this.props.routes, route => !isTrunkRoute(route.routeId)),
+            routesPerColumn
+        );
 
         return (
             <div className={styles.root} ref={(ref) => { this.root = ref; }}>
                 {routeColumns.map((routes, i) => (
                     <Row key={i}>
+                        <Column>
+                            {routes.map((route, index) => (
+                                <div key={index} className={styles.group}>
+                                    <Icon src={getIcon(route)}/>
+                                </div>
+                            ))}
+                        </Column>
                         <Column>
                             {routes.map((route, index) => (
                                 <div key={index} className={styles.group}>
@@ -75,7 +81,11 @@ class Routes extends Component {
                         </Column>
                         <Column>
                             {routes.map((route, index) => (
-                                <div key={index} className={styles.group}>
+                                <div
+                                    key={index}
+                                    className={styles.group}
+                                    style={{ color: getColor(route) }}
+                                >
                                     <div className={styles.title}>
                                         {route.destinationFi}
                                     </div>
@@ -93,11 +103,13 @@ class Routes extends Component {
 }
 
 Routes.propTypes = {
-    routes: PropTypes.arrayOf(PropTypes.shape({
-        routeId: PropTypes.string.isRequired,
-        destinationFi: PropTypes.string.isRequired,
-        destinationSe: PropTypes.string.isRequired,
-    })).isRequired,
+    routes: PropTypes.arrayOf(
+        PropTypes.shape({
+            routeId: PropTypes.string.isRequired,
+            destinationFi: PropTypes.string.isRequired,
+            destinationSe: PropTypes.string.isRequired,
+        })
+    ).isRequired,
 };
 
 export default Routes;

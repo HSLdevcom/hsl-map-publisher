@@ -109,6 +109,20 @@ const iconsByMode = {
     TRUNK: trunkIcon,
 };
 
+function getColor(route) {
+    if (isTrunkRoute(route.routeId)) {
+        return colorsByMode.TRUNK;
+    }
+    return colorsByMode[route.mode];
+}
+
+function getIcon(route) {
+    if (isTrunkRoute(route.routeId)) {
+        return iconsByMode.TRUNK;
+    }
+    return iconsByMode[route.mode];
+}
+
 
 export {
     isNumberVariant,
@@ -120,4 +134,6 @@ export {
     getZoneName,
     colorsByMode,
     iconsByMode,
+    getColor,
+    getIcon,
 };
