@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import queryString from "query-string";
 import { ApolloClient, createNetworkInterface, ApolloProvider } from "react-apollo";
 
-import StopPoster from "components/stopPoster/stopPoster";
+import StopPoster from "components/stopPoster/stopPosterContainer";
 import Timetable from "components/timetable/timetableContainer";
 import renderQueue from "util/renderQueue";
 import { setMapScale } from "util/map";
