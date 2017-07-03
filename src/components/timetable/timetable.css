@@ -9,6 +9,7 @@
     font-family: fontFamilyNarrow;
     background: var(--light-background);
     border-radius: borderRadius;
+    --timetable-text-color: var(--hsl-blue);
 }
 
 .root.summer {
