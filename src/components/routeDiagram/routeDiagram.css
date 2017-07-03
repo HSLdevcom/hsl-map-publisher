@@ -12,16 +12,17 @@
 
 .start {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
+    flex-shrink: 0;
     color: black;
     margin-left: leftWidth;
     margin-bottom: calc(lineWidth * 2);
 }
 
 .icon {
-    width: 22px;
-    margin-left: -10px;
-    margin-right: 8px;
+    width: 30px;
+    margin-left: -14px;
+    margin-right: 5px;
 }
 
 .title {
