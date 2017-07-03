@@ -80,7 +80,7 @@ class StopPoster extends Component {
     }
 
     render() {
-        if (this.props.isTrunkRouteStop) {
+        if (this.props.isTrunkStop) {
             // TODO: This is a hack to set the background color for stops with trunk routes
             document.documentElement.style.setProperty("--background", colorsByMode.TRUNK);
             document.documentElement.style.setProperty("--light-background", "#FFE0D1");
@@ -196,7 +196,7 @@ StopPoster.propTypes = {
     isSummerTimetable: PropTypes.bool,
     dateBegin: PropTypes.string,
     dateEnd: PropTypes.string,
-    isTrunkRouteStop: PropTypes.bool.isRequired,
+    isTrunkStop: PropTypes.bool.isRequired,
     shortId: PropTypes.string.isRequired,
 };
 
