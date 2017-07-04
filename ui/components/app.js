@@ -64,6 +64,9 @@ class App extends Component {
     }
 
     onGenerate() {
+        this.resetRows();
+
+        const popup = window.open();
         const component = this.state.selectedComponent.name;
         const props = this.state.rows
             .filter(({ isChecked }) => isChecked)
@@ -82,10 +85,15 @@ class App extends Component {
 
         generate(component, props)
             .then((url) => {
-                this.resetRows();
-                window.open(url);
+                if (popup) {
+                    popup.location = url;
+                } else {
+                    const message = `Ponnahdusikkunan avaaminen epäonnistui. Tulosteet tehdään osoitteeseen ${window.location}${url}`;
+                    this.setState({ message });
+                }
             })
             .catch((error) => {
+                if (popup) popup.close();
                 this.setState({ message: `Generointi epäonnistui: ${error.message}` });
                 console.error(error); // eslint-disable-line no-console
             });
