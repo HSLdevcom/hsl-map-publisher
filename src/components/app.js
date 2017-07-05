@@ -6,6 +6,7 @@ import StopPoster from "components/stopPoster/stopPosterContainer";
 import Timetable from "components/timetable/timetableContainer";
 import renderQueue from "util/renderQueue";
 import { setMapScale } from "util/map";
+import { setQrCodeScale } from "components/qrCode";
 
 const components = {
     StopPoster,
@@ -58,6 +59,7 @@ class App extends Component {
             if (params.scale) {
                 scale = params.scale;
                 setMapScale(Number(scale));
+                setQrCodeScale(Number(scale));
             }
         } catch (error) {
             App.handleError(new Error("Failed to parse url fragment"));

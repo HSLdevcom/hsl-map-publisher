@@ -2,31 +2,47 @@ import React from "react";
 import PropTypes from "prop-types";
 import QrCode from "components/qrCode";
 import { Image } from "components/util";
+
 import feedbackCodes from "data/feedbackCodes.json";
 
 import footerIcon from "icons/footer.svg";
+import tramFooterIcon from "icons/footer_tram.svg";
+import trunkRouteFooterIcon from "icons/footer_trunk.svg";
 
 import styles from "./footer.css";
 
 const Footer = (props) => {
-    const feedbackCode = feedbackCodes.find(({ shortId }) => shortId === props.shortId);
+    const stopInfoUrl = `hsl.fi/pysakit/${props.shortId.replace(" ", "")}`;
+    const feedbackUrl = `hsl.fi/fixit/${props.shortId.substring(3)}`;
+    // Feedback for tram stops
+    const hasFeedbackCode = props.shortId.startsWith("H 0") &&
+                           feedbackCodes.some(({ code }) => code === props.shortId.substring(3));
 
-    if (!feedbackCode || !feedbackCode.code || !feedbackCode.url) {
-        console.warn("Could not find feedback code"); // eslint-disable-line no-console
+    let src;
+    if (hasFeedbackCode) {
+        src = tramFooterIcon;
+    } else {
+        src = props.isTrunkStop ? trunkRouteFooterIcon : footerIcon;
     }
 
     return (
         <div style={{ position: "relative" }}>
-            <Image src={footerIcon}/>
-            {feedbackCode && feedbackCode.code &&
-            <div className={styles.shortCode}>
-                {feedbackCode.code}
-            </div>
+            <Image src={src}/>
+
+            {!hasFeedbackCode &&
+                <span>
+                    <div className={styles.url}>{stopInfoUrl}</div>
+                    <QrCode className={styles.qrCode} url={`http://${stopInfoUrl}`}/>
+                </span>
             }
-            {feedbackCode && feedbackCode.url &&
-            <div className={styles.qrCode}>
-                <QrCode url={feedbackCode.url}/>
-            </div>
+
+            {hasFeedbackCode &&
+                <span>
+                    <div className={styles.urlTram}>{stopInfoUrl}</div>
+                    <QrCode className={styles.qrCodeTram} url={`http://${stopInfoUrl}`}/>
+                    <div className={styles.urlFeedback}>{feedbackUrl}</div>
+                    <QrCode className={styles.qrCodeFeedback} url={`http://${feedbackUrl}`}/>
+                </span>
             }
         </div>
     );
@@ -34,6 +50,7 @@ const Footer = (props) => {
 
 Footer.propTypes = {
     shortId: PropTypes.string.isRequired,
+    isTrunkStop: PropTypes.bool.isRequired,
 };
 
 export default Footer;
