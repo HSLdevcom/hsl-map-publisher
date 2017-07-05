@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { JustifiedColumn, Spacer } from "components/util";
 import renderQueue from "util/renderQueue";
+import { colorsByMode } from "util/domain";
 
 import CropMarks from "components/cropMarks";
 import RouteDiagram from "components/routeDiagram/routeDiagramContainer";
@@ -9,7 +10,7 @@ import Timetable from "components/timetable/timetableContainer";
 import StopMap from "components/map/stopMapContainer";
 
 import Header from "./headerContainer";
-import Footer from "./footerContainer";
+import Footer from "./footer";
 
 import Routes from "./routesContainer";
 
@@ -79,6 +80,12 @@ class StopPoster extends Component {
     }
 
     render() {
+        if (this.props.isTrunkStop) {
+            // TODO: This is a hack to set the background color for stops with trunk routes
+            document.documentElement.style.setProperty("--background", colorsByMode.TRUNK);
+            document.documentElement.style.setProperty("--light-background", "#FFE0D1");
+        }
+
         const StopPosterTimetable = props => (
             <div className={styles.timetable}>
                 <Timetable
@@ -175,7 +182,7 @@ class StopPoster extends Component {
                             </div>
                         </div>
 
-                        <Footer stopId={this.props.stopId}/>
+                        <Footer shortId={this.props.shortId}/>
                     </JustifiedColumn>
                 </div>
             </CropMarks>
@@ -189,6 +196,8 @@ StopPoster.propTypes = {
     isSummerTimetable: PropTypes.bool,
     dateBegin: PropTypes.string,
     dateEnd: PropTypes.string,
+    isTrunkStop: PropTypes.bool.isRequired,
+    shortId: PropTypes.string.isRequired,
 };
 
 StopPoster.defaultProps = {
