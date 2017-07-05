@@ -25,29 +25,37 @@ const getTransferModes = (terminal, nameFi) => {
     return Array.from(modes);
 };
 
-const Stop = props => (
-    <div className={styles.stop}>
-        <div className={styles.left}/>
-        <div className={styles.separator}>
-            <div className={styles.separatorTop}/>
-            <div className={props.isLast ? styles.separatorLastStop : styles.separatorStop}/>
-            <div
-                className={styles.separatorBottom}
-                style={{ visibility: props.isLast ? "hidden" : "visible" }}
-            />
-        </div>
-        <div className={styles.right}>
-            <div>
-                <div className={styles.title}>{props.nameFi.replace(metroRegexp, "")}</div>
-                <div className={styles.subtitle}>{props.nameSe && props.nameSe.replace(metroRegexp, "")}</div>
+const Stop = (props) => {
+    const transferModes = getTransferModes(props.terminalByTerminalId, props.nameFi);
+
+    return (
+        <div className={styles.stop}>
+            <div className={styles.left}/>
+            <div className={styles.separator}>
+                <div className={styles.separatorTop}/>
+                <div className={props.isLast ? styles.separatorLastStop : styles.separatorStop}/>
+                <div
+                    className={styles.separatorBottom}
+                    style={{ visibility: props.isLast ? "hidden" : "visible" }}
+                />
             </div>
-            <div className={styles.iconContainer}>
-                {getTransferModes(props.terminalByTerminalId, props.nameFi).map(mode => (
-                    <Icon src={iconsByMode[mode]}/>
-                ))}
+            <div className={styles.right}>
+                <div>
+                    <div className={styles.title}>
+                        {props.nameFi.replace(metroRegexp, "")}
+                    </div>
+                    <div className={styles.subtitle}>
+                        {props.nameSe && props.nameSe.replace(metroRegexp, "")}
+                    </div>
+                </div>
+                <div className={styles.iconContainer}>
+                    {transferModes.map((mode, index) => (
+                        <Icon key={index} src={iconsByMode[mode]}/>
+                    ))}
+                </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 export default Stop;
