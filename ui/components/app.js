@@ -8,6 +8,7 @@ import RaisedButton from "material-ui/RaisedButton";
 import FlatButton from "material-ui/FlatButton";
 import DatePicker from "material-ui/DatePicker";
 import RadioGroup from "components/radioGroup";
+import QueueLength from "components/queueLength";
 
 import moment from "moment";
 
@@ -68,8 +69,11 @@ class App extends Component {
 
         const popup = window.open();
         const component = this.state.selectedComponent.name;
-        const props = this.state.rows
-            .filter(({ isChecked }) => isChecked)
+
+        const checkedRows = this.state.rows
+            .filter(({ isChecked }) => isChecked);
+
+        const props = checkedRows
             .reduce((prev, { stopIds }) => [...prev, ...stopIds], [])
             .map(stopId => ({
                 stopId,
@@ -83,7 +87,10 @@ class App extends Component {
                     : null,
             }));
 
-        generate(component, props)
+
+        const filename = checkedRows.length === 1 ? `${checkedRows[0].title}.pdf` : "output.pdf";
+
+        generate(component, props, filename)
             .then((url) => {
                 if (popup) {
                     popup.location = url;
@@ -222,9 +229,10 @@ class App extends Component {
                             disabled={!stopCount}
                             onTouchTap={() => this.onGenerate()}
                             label={`Generoi (${stopCount})`}
-                            style={{ height: 45 }}
+                            style={{ height: 45, flexGrow: 1 }}
                             primary
                         />
+                        <QueueLength/>
                     </div>
                 </div>
             </MuiThemeProvider>

@@ -30,6 +30,8 @@ const TEMPLATE = template(fs.readFileSync(path.join(__dirname, "index.html")));
 
 const API_URL = "http://kartat.hsl.fi/jore/graphql";
 
+let queueLength = 0;
+
 function fetchStopIds() {
     const options = {
         method: "POST",
@@ -57,7 +59,9 @@ function fetchStops() {
                         nameFi: stop.nimi_suomi,
                         group: `${stop.aikataulutyyppi_hsl}${stop.aikataulutyyppi_hkl}`,
                         index: stop.ajojarjestys,
-                        hasShelter: stop.pysakkityyppi.includes("katos"),
+                        hasShelter: stop.pysakkityyppi.includes("katos") &&
+                            !(stop.lyhyt_nro.startsWith("Ki")
+                                && stop.pysakkityyppi.includes("teräskatos")),
                     }))
                     .sort((a, b) => a.shortId.localeCompare(b.shortId));
                 resolve(stops);
@@ -66,13 +70,14 @@ function fetchStops() {
     });
 }
 
-function generatePdf(directory, filenames) {
+function generatePdf(directory, filenames, outputFilename = "output.pdf") {
+    const outputPath = path.join(directory, outputFilename.replace(/(\/|\\)/g, ""));
     return new Promise((resolve, reject) => {
         const pdftk = spawn("pdftk", [
             ...filenames,
             "cat",
             "output",
-            path.join(directory, "output.pdf"),
+            outputPath,
         ]);
         pdftk.stderr.on("data", data => reject(new Error(data.toString())));
         pdftk.on("close", resolve);
@@ -101,7 +106,7 @@ function convertToCmykPdf(filename) {
   );
 }
 
-function generateFiles(component, props) {
+function generateFiles(component, props, outputFilename) {
     const identifier = moment().format("YYYY-MM-DD-HHmm-sSSSSS");
     const directory = path.join(OUTPUT_PATH, identifier);
 
@@ -120,15 +125,21 @@ function generateFiles(component, props) {
             scale: SCALE,
         };
 
+        queueLength++;
+
         promises.push(
             generator
                 .generate(options)
-                .then(success => success && convertToCmykPdf(path.join(directory, filename)))
+                // eslint-disable-next-line no-loop-func
+                .then((success) => {
+                    queueLength--;
+                    return success && convertToCmykPdf(path.join(directory, filename));
+                })
         );
     }
 
     Promise.all(promises)
-        .then(filenames => generatePdf(directory, filenames.filter(name => !!name)))
+        .then(filenames => generatePdf(directory, filenames.filter(name => !!name), outputFilename))
         .then(() => logger.end("DONE"))
         .catch((error) => {
             logger.logError(error);
@@ -163,15 +174,19 @@ async function main() {
         successResponse(ctx, stops);
     });
 
+    router.get("/queueInfo", (ctx) => {
+        successResponse(ctx, { queueLength });
+    });
+
     router.post("/generate", (ctx) => {
-        const { component, props } = ctx.request.body;
+        const { component, props, filename } = ctx.request.body;
 
         if (typeof component !== "string" || !(props instanceof Array) || !props.length) {
             return errorResponse(ctx, new Error("Invalid request body"));
         }
 
         try {
-            const filePath = generateFiles(component, props);
+            const filePath = generateFiles(component, props, filename);
             return successResponse(ctx, { path: filePath });
         } catch (error) {
             return errorResponse(ctx, error);
@@ -189,6 +204,7 @@ async function main() {
             });
         });
     });
+
 
     app
         .use(jsonBody({ fallback: true }))

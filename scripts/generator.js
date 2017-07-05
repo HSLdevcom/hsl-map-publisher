@@ -32,7 +32,7 @@ function isInitialized() {
 }
 
 function setCallbacks(logger) {
-    page.onError = error => logger.logError(error);
+    page.onError = error => logger.logError({ message: error });
     page.onConsoleMessage = message => logger.logInfo(message);
 }
 
