@@ -37,14 +37,12 @@ const Departure = props => (
     <div className={styles.item}>
         <div className={styles.minutes}>{props.minutes < 10 && "0"}{props.minutes}</div>
         /&#x202F;
-        {trimRouteId(props.routeId)}
-        {!props.isAccessible && "e"}{props.note}
+        {trimRouteId(props.routeId)}{props.note}
     </div>
 );
 
 Departure.propTypes = {
     minutes: PropTypes.number.isRequired,
-    isAccessible: PropTypes.bool.isRequired,
     note: PropTypes.string,
 };
 

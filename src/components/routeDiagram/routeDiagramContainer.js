@@ -11,6 +11,7 @@ import RouteDiagram from "./routeDiagram";
 const routeDiagramQuery = gql`
     query routeDiagramQuery($stopId: String!, $date: Date!) {
         stop: stopByStopId(stopId: $stopId) {
+            shortId
             siblings {
                 nodes {
                     routeSegments: routeSegmentsForDate(date: $date) {
@@ -30,6 +31,7 @@ const routeDiagramQuery = gql`
                                     stopByStopId {
                                         nameFi
                                         nameSe
+                                        shortId
                                         terminalId
                                         terminalByTerminalId {
                                             siblings {
@@ -62,7 +64,7 @@ const propsMapper = mapProps(props => ({
             ...routeSegment.route.nodes[0],
             stops: sortBy(routeSegment.nextStops.nodes, node => node.stopIndex)
                 .map(node => node.stopByStopId),
-        })))),
+        }))), props.data.stop.shortId),
 }));
 
 const RoutesContainer = apolloWrapper(propsMapper)(RouteDiagram);

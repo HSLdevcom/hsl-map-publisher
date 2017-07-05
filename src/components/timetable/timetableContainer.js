@@ -67,7 +67,7 @@ const timetableQuery = gql`
                                     destinationSe
                                 }
                             }
-                            notes {
+                            notes(date: $date) {
                                 nodes {
                                     noteText
                                     noteType
@@ -95,6 +95,29 @@ const timetableQuery = gql`
         }
     }
 `;
+
+function getDuplicateRouteNote(duplicateRoutes, departure) {
+    return duplicateRoutes.includes(departure.routeId)
+        ? "*".repeat(departure.direction) : null;
+}
+
+function addMissingFridayNote(departure) {
+    return (
+        departure.dayType.length === 1 &&
+        departure.dayType.includes("Pe") &&
+        (!departure.note || !departure.note.includes("p"))
+        ? "p" : null
+    );
+}
+
+
+function addMissingNonAccessibleNote(departure) {
+    return (
+        departure.isAccessible === false &&
+        (!departure.note || !departure.note.includes("e"))
+        ? "e" : null
+    );
+}
 
 const propsMapper = mapProps((props) => {
     let departures = flatMap(
@@ -135,9 +158,12 @@ const propsMapper = mapProps((props) => {
 
     departures = departures.map(departure => ({
         ...departure,
-        note: duplicateRoutes.includes(departure.routeId)
-            ? [departure.note, "*".repeat(departure.direction)].join("")
-            : departure.note,
+        note: [
+            departure.note,
+            addMissingNonAccessibleNote(departure),
+            addMissingFridayNote(departure),
+            getDuplicateRouteNote(duplicateRoutes, departure),
+        ].join(""),
     }));
 
 

@@ -8,6 +8,7 @@ import RaisedButton from "material-ui/RaisedButton";
 import FlatButton from "material-ui/FlatButton";
 import DatePicker from "material-ui/DatePicker";
 import RadioGroup from "components/radioGroup";
+import QueueLength from "components/queueLength";
 
 import moment from "moment";
 
@@ -64,9 +65,15 @@ class App extends Component {
     }
 
     onGenerate() {
+        this.resetRows();
+
+        const popup = window.open();
         const component = this.state.selectedComponent.name;
-        const props = this.state.rows
-            .filter(({ isChecked }) => isChecked)
+
+        const checkedRows = this.state.rows
+            .filter(({ isChecked }) => isChecked);
+
+        const props = checkedRows
             .reduce((prev, { stopIds }) => [...prev, ...stopIds], [])
             .map(stopId => ({
                 stopId,
@@ -80,12 +87,20 @@ class App extends Component {
                     : null,
             }));
 
-        generate(component, props)
+
+        const filename = checkedRows.length === 1 ? `${checkedRows[0].title}.pdf` : "output.pdf";
+
+        generate(component, props, filename)
             .then((url) => {
-                this.resetRows();
-                window.open(url);
+                if (popup) {
+                    popup.location = url;
+                } else {
+                    const message = `Ponnahdusikkunan avaaminen epäonnistui. Tulosteet tehdään osoitteeseen ${window.location}${url}`;
+                    this.setState({ message });
+                }
             })
             .catch((error) => {
+                if (popup) popup.close();
                 this.setState({ message: `Generointi epäonnistui: ${error.message}` });
                 console.error(error); // eslint-disable-line no-console
             });
@@ -214,9 +229,10 @@ class App extends Component {
                             disabled={!stopCount}
                             onTouchTap={() => this.onGenerate()}
                             label={`Generoi (${stopCount})`}
-                            style={{ height: 45 }}
+                            style={{ height: 45, flexGrow: 1 }}
                             primary
                         />
+                        <QueueLength/>
                     </div>
                 </div>
             </MuiThemeProvider>

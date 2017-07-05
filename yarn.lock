@@ -2831,9 +2831,9 @@ home-or-tmp@^2.0.0:
     os-homedir "^1.0.0"
     os-tmpdir "^1.0.1"
 
-hsl-map-style@HSLdevcom/hsl-map-style#e1ed3f952907cc12e5be393bc2813caa26049350:
+hsl-map-style@HSLdevcom/hsl-map-style#ecab635d5db4c910fe10578effa4e1b7b2ae0eaa:
   version "1.0.0"
-  resolved "https://codeload.github.com/HSLdevcom/hsl-map-style/tar.gz/e1ed3f952907cc12e5be393bc2813caa26049350"
+  resolved "https://codeload.github.com/HSLdevcom/hsl-map-style/tar.gz/ecab635d5db4c910fe10578effa4e1b7b2ae0eaa"
   dependencies:
     lodash "^4.17.4"
 
