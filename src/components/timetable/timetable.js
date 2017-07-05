@@ -91,6 +91,16 @@ Table.propTypes = {
 
 const Timetable = props => (
     <div className={classNames(styles.root, { [styles.summer]: props.isSummerTimetable })}>
+        {props.showComponentName &&
+            <div className={styles.componentName}>
+                <div className={styles.title}>
+                    Pysäkkiaikataulu&nbsp;&nbsp;
+                </div>
+                <div className={styles.subtitle}>
+                    Hållplatstidtabell
+                </div>
+            </div>
+        }
         {props.showValidityPeriod &&
             <div className={styles.validity}>
                 <div><strong>Aikataulut voimassa</strong></div>
@@ -120,7 +130,7 @@ const Timetable = props => (
                 <Table departures={props.sundays}/>
             </div>
         }
-        <Spacer height={20}/>
+        {props.showNotes && props.notes.length !== 0 && <Spacer height={20}/>}
         {props.showNotes && props.notes.map(note => (
             <div key={note} className={styles.footnote}>
                 {note}
@@ -136,6 +146,7 @@ Timetable.defaultProps = {
     isSummerTimetable: false,
     showValidityPeriod: true,
     showNotes: true,
+    showComponentName: true,
 };
 
 Timetable.propTypes = {
@@ -148,6 +159,7 @@ Timetable.propTypes = {
     showNotes: PropTypes.bool,
     dateBegin: PropTypes.string.isRequired,
     dateEnd: PropTypes.string.isRequired,
+    showComponentName: PropTypes.bool,
 };
 
 export default Timetable;

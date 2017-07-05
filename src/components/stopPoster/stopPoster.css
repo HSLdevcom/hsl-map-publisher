@@ -60,6 +60,7 @@
 .timetable {
     display: flex;
     align-items: stretch;
+    flex: 1 0 0;
 }
 
 .map {

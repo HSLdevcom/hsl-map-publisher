@@ -188,6 +188,7 @@ const propsMapper = mapProps((props) => {
         isSummerTimetable: props.isSummerTimetable,
         showValidityPeriod: props.showValidityPeriod,
         showNotes: props.showNotes,
+        showComponentName: props.showComponentName,
     };
 });
 
@@ -205,6 +206,7 @@ TimetableContainer.defaultProps = {
     showValidityPeriod: true,
     showNotes: true,
     segments: ["weekdays", "saturdays", "sundays"],
+    showComponentName: true,
 };
 
 TimetableContainer.propTypes = {
@@ -216,6 +218,7 @@ TimetableContainer.propTypes = {
     showValidityPeriod: PropTypes.bool,
     showNotes: PropTypes.bool,
     segments: PropTypes.arrayOf(PropTypes.oneOf(["weekdays", "saturdays", "sundays"])),
+    showComponentName: PropTypes.bool,
 };
 
 export default TimetableContainer;

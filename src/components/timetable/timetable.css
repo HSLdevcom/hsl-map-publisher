@@ -3,7 +3,8 @@
 .root {
     position: relative;
     width: 100%;
-    padding: 10px 20px 30px;
+    padding: borderRadius;
+    padding-top: calc(borderRadius - 15px);
     color: black;
     font-weight: 300;
     font-family: fontFamilyNarrow;
@@ -26,12 +27,12 @@
     color: var(--timetable-text-color);
 }
 
-.title {
+.header > .title {
     padding: 5px 10px;
     font-size: 18px;
 }
 
-.subtitle {
+.header > .subtitle {
     display: flex;
     padding: 0 10px;
     font-size: 12px;
@@ -39,7 +40,7 @@
     letter-spacing: -0.025em;
 }
 
-.subtitle > *:first-child {
+.header > .subtitle > *:first-child {
     width: 50px;
 }
 
@@ -67,7 +68,8 @@
 }
 
 .table > * {
-    border-radius: 8px;
+    margin: 0 calc(-1 * borderRadius);
+    padding: 0 borderRadius;
 }
 
 .table strong {
@@ -102,8 +104,8 @@
 
 .validity {
     position: absolute;
-    top: 30px;
-    right: 20px;
+    top: calc(borderRadius - 15px);
+    right: borderRadius;
     font-family: fontFamily;
     font-size: 12px;
     line-height: 16px;

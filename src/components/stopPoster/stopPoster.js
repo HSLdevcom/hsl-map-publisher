@@ -96,6 +96,7 @@ class StopPoster extends Component {
                     dateEnd={this.props.dateEnd}
                     showValidityPeriod={!props.hideDetails}
                     showNotes={!props.hideDetails}
+                    showComponentName={!props.hideDetails}
                     segments={props.segments}
                 />
             </div>
@@ -111,18 +112,16 @@ class StopPoster extends Component {
                             {this.state.hasRoutes && this.state.hasRoutesOnTop &&
                             <Routes stopId={this.props.stopId} date={this.props.date}/>
                             }
+                            {this.state.hasRoutes && this.state.hasRoutesOnTop &&
+                            <Spacer height={10}/>
+                            }
                             <div className={styles.columns}>
                                 <div className={styles.left}>
                                     {this.state.hasRoutes && !this.state.hasRoutesOnTop &&
                                         <Routes stopId={this.props.stopId} date={this.props.date}/>
                                     }
-                                    {this.state.hasRoutes &&
-                                        <div className={styles.title}>
-                                            Pysäkkiaikataulu&nbsp;&nbsp;
-                                            <span className={styles.subtitle}>
-                                                Hållplatstidtabell
-                                            </span>
-                                        </div>
+                                    {this.state.hasRoutes && !this.state.hasRoutesOnTop &&
+                                        <Spacer height={10}/>
                                     }
                                     {this.state.hasRouteDiagram &&
                                         <StopPosterTimetable/>
@@ -132,51 +131,42 @@ class StopPoster extends Component {
                                     }
                                 </div>
 
-                                <Spacer width={50}/>
+                                <Spacer width={10}/>
 
                                 <div className={styles.right}>
-                                    {this.state.hasRoutes && this.state.hasRoutesOnTop &&
-                                        <div className={styles.title}>&nbsp;</div>
-                                    }
-
                                     {!this.state.hasRouteDiagram &&
                                         <div className={styles.timetables}>
                                             <StopPosterTimetable segments={["saturdays"]} hideDetails/>
-                                            <Spacer width={50}/>
+                                            <Spacer width={10}/>
                                             <StopPosterTimetable segments={["sundays"]} hideDetails/>
                                         </div>
                                     }
 
-                                    {!this.state.hasRouteDiagram && <Spacer height={50}/>}
+                                    {!this.state.hasRouteDiagram && <Spacer height={10}/>}
 
                                     {this.state.hasMap &&
-                                    <div className={styles.map} ref={(ref) => { this.map = ref; }}>
-                                        {this.state.shouldRenderMap &&
-                                        <StopMap
-                                            stopId={this.props.stopId}
-                                            date={this.props.date}
-                                            width={this.map.clientWidth}
-                                            height={this.map.clientHeight}
-                                        />
-                                        }
-                                    </div>
+                                        <div
+                                            className={styles.map}
+                                            ref={(ref) => { this.map = ref; }}
+                                        >
+                                            {this.state.shouldRenderMap &&
+                                                <StopMap
+                                                    stopId={this.props.stopId}
+                                                    date={this.props.date}
+                                                    width={this.map.clientWidth}
+                                                    height={this.map.clientHeight}
+                                                />
+                                            }
+                                        </div>
                                     }
 
-                                    {!this.state.hasRouteDiagram && <Spacer height={50}/>}
+                                    <Spacer height={10}/>
 
                                     {this.state.hasRouteDiagram &&
-                                    <span>
-                                        <div className={styles.title}>
-                                            Linjojen reitit&nbsp;&nbsp;
-                                            <span className={styles.subtitle}>
-                                                Linjernas rutter
-                                            </span>
-                                        </div>
                                         <RouteDiagram
                                             stopId={this.props.stopId}
                                             date={this.props.date}
                                         />
-                                    </span>
                                     }
                                 </div>
                             </div>

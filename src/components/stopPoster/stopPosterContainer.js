@@ -49,6 +49,7 @@ const StopPosterContainer = hoc(StopPoster);
 
 StopPosterContainer.propTypes = {
     stopId: PropTypes.string.isRequired,
+    date: PropTypes.string.isRequired,
 };
 
 export default StopPosterContainer;

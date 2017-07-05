@@ -8,7 +8,7 @@
     color: black;
     background: white;
     border-radius: borderRadius;
-    padding: borderRadius;
+    padding: calc(borderRadius - 12px) borderRadius;
     white-space: nowrap;
     overflow: hidden;
 }
