@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { JustifiedColumn, Spacer } from "components/util";
+import { JustifiedColumn, Spacer, Image } from "components/util";
 import renderQueue from "util/renderQueue";
 import { colorsByMode } from "util/domain";
 
@@ -8,6 +8,9 @@ import CropMarks from "components/cropMarks";
 import RouteDiagram from "components/routeDiagram/routeDiagramContainer";
 import Timetable from "components/timetable/timetableContainer";
 import StopMap from "components/map/stopMapContainer";
+
+import mobileAd from "icons/mobile_ad.svg";
+import mobileAdTrunk from "icons/mobile_ad_trunk.svg";
 
 import Header from "./headerContainer";
 import Footer from "./footer";
@@ -27,6 +30,7 @@ class StopPoster extends Component {
             hasRouteDiagram: true,
             shouldRenderMap: false,
             hasMap: true,
+            hasAd: true,
         };
     }
 
@@ -49,12 +53,16 @@ class StopPoster extends Component {
 
     updateLayout() {
         if (this.hasOverflow()) {
+            if (this.state.hasAd) {
+                this.setState({ hasAd: false });
+                return;
+            }
             if (!this.state.hasRoutesOnTop) {
                 this.setState({ hasRoutesOnTop: true });
                 return;
             }
             if (this.state.hasRouteDiagram) {
-                this.setState({ hasRouteDiagram: false });
+                this.setState({ hasRouteDiagram: false, hasAd: true });
                 return;
             }
             if (this.state.hasRoutes) {
@@ -128,6 +136,12 @@ class StopPoster extends Component {
                                     }
                                     {!this.state.hasRouteDiagram &&
                                         <StopPosterTimetable segments={["weekdays"]}/>
+                                    }
+                                    {this.state.hasAd &&
+                                        <Image
+                                            src={this.props.isTrunkRouteStop
+                                              ? mobileAdTrunk : mobileAd}
+                                        />
                                     }
                                 </div>
 
