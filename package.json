@@ -47,7 +47,6 @@
     "file-loader": "^0.9.0",
     "forever": "^0.15.3",
     "html-webpack-plugin": "^2.22.0",
-    "node-phantom-simple": "^2.2.4",
     "path": "^0.12.7",
     "postcss": "^5.2.16",
     "postcss-loader": "^0.13.0",
