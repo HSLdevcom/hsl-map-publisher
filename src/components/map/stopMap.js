@@ -69,7 +69,7 @@ const StopMap = (props) => {
                     options={props.mapOptions}
                     components={{
                         text_fisv: { enabled: true },
-                        routes: { enabled: true, fetchRoutes: true },
+                        routes: { enabled: true, useGraphQL: true },
                         citybikes: { enabled: true },
                         print: { enabled: true },
                         municipal_borders: { enabled: true },
@@ -139,7 +139,7 @@ const StopMap = (props) => {
                     components={{
                         text: { enabled: false },
                         print: { enabled: true },
-                        routes: { enabled: true, removeSource: true },
+                        routes: { enabled: true, hideBusRoutes: true },
                         municipal_borders: { enabled: true },
                     }}
                     extraLayers={[placeLabelCity]}

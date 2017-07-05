@@ -29,13 +29,15 @@ const getClient = getContext({
 const propsMapper = mapProps(({ options, components, date, client: { query }, extraLayers }) => {
     const mapStyle = getMapStyle(components);
 
-    if (components.routes && components.routes.enabled && components.routes.fetchRoutes) {
+    // Fetch routes from GraphQL instead of default vector tiles
+    if (components.routes && components.routes.enabled && components.routes.useGraphQL) {
         const src = addRoutesToStyle(options, mapStyle, query, date)
             .then(styleWithRoutes => fetchMap(options, styleWithRoutes));
         return { src };
     }
 
-    if (components.routes && components.routes.enabled && components.routes.removeSource) {
+    // Remove source containing bus routes (rail and subway routes have separate sources)
+    if (components.routes && components.routes.enabled && components.routes.hideBusRoutes) {
         mapStyle.sources.routes = {
             type: "geojson",
             data: {
@@ -75,8 +77,8 @@ MapImageContainer.propTypes = {
     }).isRequired,
     components: PropTypes.objectOf(PropTypes.shape({
         enabled: PropTypes.bool.isRequired,
-        fetchRoutes: PropTypes.bool,
-        removeSource: PropTypes.bool,
+        useGraphQL: PropTypes.bool,
+        hideBusRoutes: PropTypes.bool,
     })).isRequired,
     date: PropTypes.string,
     extraLayers: PropTypes.arrayOf(PropTypes.shape({
