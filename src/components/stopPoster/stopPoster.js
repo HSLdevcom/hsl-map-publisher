@@ -139,7 +139,7 @@ class StopPoster extends Component {
                                     }
                                     {this.state.hasAd &&
                                         <Image
-                                            src={this.props.isTrunkRouteStop
+                                            src={this.props.isTrunkStop
                                               ? mobileAdTrunk : mobileAd}
                                         />
                                     }
@@ -186,7 +186,7 @@ class StopPoster extends Component {
                             </div>
                         </div>
 
-                        <Footer shortId={this.props.shortId}/>
+                        <Footer shortId={this.props.shortId} isTrunkStop={this.props.isTrunkStop}/>
                     </JustifiedColumn>
                 </div>
             </CropMarks>
