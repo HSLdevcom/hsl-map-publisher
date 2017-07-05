@@ -21,6 +21,11 @@ import styles from "./stopPoster.css";
 
 const MAP_MIN_HEIGHT = 500;
 
+const trunkStopStyle = {
+    "--background": colorsByMode.TRUNK,
+    "--light-background": "#FFE0D1",
+};
+
 class StopPoster extends Component {
     constructor(props) {
         super(props);
@@ -88,12 +93,6 @@ class StopPoster extends Component {
     }
 
     render() {
-        if (this.props.isTrunkStop) {
-            // TODO: This is a hack to set the background color for stops with trunk routes
-            document.documentElement.style.setProperty("--background", colorsByMode.TRUNK);
-            document.documentElement.style.setProperty("--light-background", "#FFE0D1");
-        }
-
         const StopPosterTimetable = props => (
             <div className={styles.timetable}>
                 <Timetable
@@ -112,7 +111,7 @@ class StopPoster extends Component {
 
         return (
             <CropMarks>
-                <div className={styles.root}>
+                <div className={styles.root} style={this.props.isTrunkStop ? trunkStopStyle : null}>
                     <JustifiedColumn>
                         <Header stopId={this.props.stopId}/>
 
