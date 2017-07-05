@@ -14,6 +14,8 @@ import StopLabel from "./stopLabel";
 
 import styles from "./stopMap.css";
 
+import placeLabelCity from "./city-layer.json";
+
 // Map symbol size
 const STOP_RADIUS = 20;
 const LOCATION_RADIUS = 30;
@@ -67,9 +69,10 @@ const StopMap = (props) => {
                     options={props.mapOptions}
                     components={{
                         text_fisv: { enabled: true },
-                        routes: { enabled: true },
+                        routes: { enabled: true, useGraphQL: true },
                         citybikes: { enabled: true },
                         print: { enabled: true },
+                        municipal_borders: { enabled: true },
                     }}
                     date={props.date}
                 />
@@ -133,7 +136,13 @@ const StopMap = (props) => {
             <div className={styles.miniMap} style={miniMapStyle}>
                 <MapImage
                     options={props.miniMapOptions}
-                    components={{ text_fisv: { enabled: true }, print: { enabled: true } }}
+                    components={{
+                        text: { enabled: false },
+                        print: { enabled: true },
+                        routes: { enabled: true, hideBusRoutes: true },
+                        municipal_borders: { enabled: true },
+                    }}
+                    extraLayers={[placeLabelCity]}
                 />
                 <div
                     className={styles.center}
