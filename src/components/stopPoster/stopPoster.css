@@ -44,6 +44,10 @@
     width: 689px;
 }
 
+.leftStretched {
+    width: 820px;
+}
+
 .right {
     flex: 1;
     display: flex;
