@@ -58,6 +58,11 @@ class StopPoster extends Component {
     }
 
     updateLayout() {
+        if (!this.props.hasRoutes) {
+            renderQueue.remove(this, { error: new Error("No valid routes for stop") });
+            return;
+        }
+
         if (this.hasOverflow()) {
             if (this.state.hasAd) {
                 this.setState({ hasAd: false });
@@ -98,6 +103,10 @@ class StopPoster extends Component {
     }
 
     render() {
+        if (!this.props.hasRoutes) {
+            return null;
+        }
+
         const StopPosterTimetable = props => (
             <div className={styles.timetable}>
                 <Timetable
@@ -207,6 +216,7 @@ StopPoster.propTypes = {
     isSummerTimetable: PropTypes.bool,
     dateBegin: PropTypes.string,
     dateEnd: PropTypes.string,
+    hasRoutes: PropTypes.bool.isRequired,
     isTrunkStop: PropTypes.bool.isRequired,
     shortId: PropTypes.string.isRequired,
 };
