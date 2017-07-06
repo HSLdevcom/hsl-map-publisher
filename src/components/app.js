@@ -30,9 +30,9 @@ class App extends Component {
 
     componentDidMount() {
         if (this.root) {
-            renderQueue.onEmpty(({ success }) => {
-                if (!success) {
-                    App.handleError(new Error("Failed to render component"));
+            renderQueue.onEmpty(({ error }) => {
+                if (error) {
+                    App.handleError(error);
                     return;
                 }
                 if (window.callPhantom) {

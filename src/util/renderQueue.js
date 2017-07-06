@@ -21,28 +21,32 @@ class RenderQueue {
     }
 
     remove(item, options = {}) {
-        if (!options.success) this.hasErrors = true;
-
-        if (this.items.includes(item)) {
-            this.items.splice(this.items.indexOf(item), 1);
+        if (options.error) {
+            this.items = [];
+            this.callbacks.forEach(({ callback }) => {
+                callback({ error: options.error });
+            });
+            return;
         }
+
+        if (!this.items.includes(item)) {
+            return;
+        }
+
+        this.items.splice(this.items.indexOf(item), 1);
 
         this.callbacks.forEach((callbackOptions) => {
             const { callback, ignore } = callbackOptions;
             if (this.isEmpty() || this.containsOnly(ignore)) {
                 this.callbacks.splice(this.callbacks.indexOf(callbackOptions), 1);
-                callback({ success: !this.hasErrors });
+                callback({});
             }
         });
-
-        if (this.isEmpty()) {
-            this.hasErrors = false;
-        }
     }
 
     onEmpty(callback, options = {}) {
         if (this.isEmpty() || this.containsOnly(options.ignore)) {
-            callback({ success: !this.hasErrors });
+            callback({});
         } else {
             this.callbacks.push({ ...options, callback });
         }

@@ -32,7 +32,7 @@ class Routes extends Component {
     }
 
     componentWillUnmount() {
-        renderQueue.remove(this, { success: true });
+        renderQueue.remove(this);
     }
 
     hasOverflow() {
@@ -46,10 +46,10 @@ class Routes extends Component {
                 this.setState({ columns: this.state.columns - 1 });
                 return;
             }
-            renderQueue.remove(this, { success: false });
+            renderQueue.remove(this, { error: new Error("Failed to remove routes overflow") });
             return;
         }
-        renderQueue.remove(this, { success: true });
+        renderQueue.remove(this);
     }
 
     render() {

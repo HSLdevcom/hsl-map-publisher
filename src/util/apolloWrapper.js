@@ -10,15 +10,17 @@ const updateQueueOnChange = lifecycle({
             renderQueue.add(this);
         }
         if (this.props.data.error) {
-            renderQueue.remove(this, { success: false });
+            renderQueue.remove(this, { error: this.props.data.error });
         }
     },
     componentDidUpdate(prevProps) {
         if (this.props.data.loading !== prevProps.data.loading) {
             if (this.props.data.loading) {
                 renderQueue.add(this);
+            } else if (this.props.data.error) {
+                renderQueue.remove(this, { error: this.props.data.error });
             } else {
-                renderQueue.remove(this, { success: !this.props.data.error });
+                renderQueue.remove(this);
             }
         }
     },
@@ -29,10 +31,7 @@ const updateQueueOnChange = lifecycle({
 
 const renderNull = branch(
     props => (props.data.error || props.data.loading),
-    () => (props) => {
-        if (props.data.error) console.error(props.data.error); // eslint-disable-line no-console
-        return null;
-    }
+    () => () => null
 );
 
 export default hoc => compose(

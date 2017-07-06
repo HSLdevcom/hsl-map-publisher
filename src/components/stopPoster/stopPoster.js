@@ -79,7 +79,7 @@ class StopPoster extends Component {
                 this.setState({ hasStretchedLeftColumn: true });
                 return;
             }
-            renderQueue.remove(this, { success: false });
+            renderQueue.remove(this, { error: new Error("Failed to remove layout overflow") });
             return;
         }
 
@@ -94,7 +94,7 @@ class StopPoster extends Component {
             }
         }
 
-        renderQueue.remove(this, { success: true });
+        renderQueue.remove(this);
     }
 
     render() {
