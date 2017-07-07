@@ -149,7 +149,7 @@ async function renderComponentRetry(options) {
             }
             setCallbacks(options.logger);
             await renderComponent(options);
-            options.logger.logInfo(`Successfully rendered ${options.filename}`);
+            options.logger.logInfo(`Successfully rendered ${options.filename}\n`);
             return true;
         } catch (error) {
             options.logger.logError(error);
@@ -157,7 +157,7 @@ async function renderComponentRetry(options) {
         /* eslint-enable no-await-in-loop */
     }
 
-    options.logger.logError(new Error(`Failed to render ${options.filename}.`));
+    options.logger.logError(new Error(`Failed to render ${options.filename}\n`));
     return false;
 }
 

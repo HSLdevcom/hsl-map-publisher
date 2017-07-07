@@ -70,7 +70,7 @@ function fetchStops() {
     });
 }
 
-function generatePdf(directory, filenames, outputFilename = "output.pdf") {
+function generatePdf(directory, filenames, outputFilename) {
     const outputPath = path.join(directory, outputFilename.replace(/(\/|\\)/g, ""));
     return new Promise((resolve, reject) => {
         const pdftk = spawn("pdftk", [
@@ -106,7 +106,7 @@ function convertToCmykPdf(filename) {
   );
 }
 
-function generateFiles(component, props, outputFilename) {
+function generateFiles(component, props, outputFilename = "output.pdf") {
     const identifier = moment().format("YYYY-MM-DD-HHmm-sSSSSS");
     const directory = path.join(OUTPUT_PATH, identifier);
 
@@ -128,10 +128,8 @@ function generateFiles(component, props, outputFilename) {
         queueLength++;
 
         promises.push(
-            generator
-                .generate(options)
-                // eslint-disable-next-line no-loop-func
-                .then((success) => {
+            generator.generate(options)
+                .then((success) => { // eslint-disable-line no-loop-func
                     queueLength--;
                     return success && convertToCmykPdf(path.join(directory, filename));
                 })
@@ -139,8 +137,14 @@ function generateFiles(component, props, outputFilename) {
     }
 
     Promise.all(promises)
-        .then(filenames => generatePdf(directory, filenames.filter(name => !!name), outputFilename))
-        .then(() => logger.end("DONE"))
+        .then((filenames) => {
+            const validFilenames = filenames.filter(name => !!name);
+            logger.logInfo(`Successfully rendered ${validFilenames.length} / ${filenames.length} pages\n`);
+            return generatePdf(directory, validFilenames, outputFilename)
+        })
+        .then(() => {
+            logger.end("DONE");
+        })
         .catch((error) => {
             logger.logError(error);
             logger.end("FAIL");
