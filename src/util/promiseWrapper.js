@@ -13,7 +13,7 @@ const hocFactory = propName => WrappedComponent => (
             renderQueue.add(promise);
             promise
                 .then((value) => {
-                    const callback = () => renderQueue.remove(promise, { success: true });
+                    const callback = () => renderQueue.remove(promise);
                     if (this.promise !== promise) {
                         callback();
                     } else {
@@ -21,8 +21,7 @@ const hocFactory = propName => WrappedComponent => (
                     }
                 })
                 .catch((error) => {
-                    console.error(error); // eslint-disable-line no-console
-                    const callback = () => renderQueue.remove(promise, { success: false });
+                    const callback = () => renderQueue.remove(promise, { error });
                     if (this.promise !== promise) {
                         callback();
                     } else {

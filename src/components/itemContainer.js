@@ -403,7 +403,7 @@ class ItemContainer extends Component {
         this.hasIntersectingLines.cache.clear();
         this.updatePosition.cache.clear();
 
-        renderQueue.remove(this, { success: true });
+        renderQueue.remove(this);
     }
 
     render() {

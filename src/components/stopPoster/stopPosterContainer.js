@@ -30,6 +30,9 @@ const stopPosterQuery = gql`
 
 const propsMapper = withProps(props => ({
     shortId: props.data.stop.shortId,
+    hasRoutes: props.data.stop.siblings.nodes.some(
+        ({ routeSegments }) => routeSegments.nodes.some(node => node.hasRegularDayDepartures)
+    ),
     isTrunkStop: flatMap(
          props.data.stop.siblings.nodes,
          node => node.routeSegments.nodes

@@ -29,7 +29,7 @@ class QrCode extends Component {
             if (error) {
                 console.error(error); // eslint-disable-line no-console
             }
-            renderQueue.remove(this, { success: !error });
+            renderQueue.remove(this, { error });
         });
     }
 
