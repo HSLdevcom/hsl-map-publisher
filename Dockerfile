@@ -19,6 +19,9 @@ COPY yarn.lock ${WORK}
 COPY package.json ${WORK}
 RUN yarn
 
+# FIXME: Workaround for Firefox 54. Upgrade to SlimerJS 1.0.0 when released.
+RUN sed -i -e "s#MaxVersion=52#MaxVersion=54#" node_modules/slimerjs/src/application.ini
+
 # Bundle app source
 COPY . ${WORK}
 
@@ -31,6 +34,7 @@ CMD \
   cp /fonts/* /usr/share/fonts/opentype 2>/dev/null || : && \
   fc-cache -f -v && \
   cd ${WORK} && \
+  rm -r output && ln -s /output . && \
   Xorg -dpi 96 -nolisten tcp -noreset +extension GLX +extension RANDR +extension RENDER -logfile ./10.log -config ./xorg.conf :10 & \
   sleep 15 && \
   node_modules/.bin/forever start -c "npm start" ./ && \

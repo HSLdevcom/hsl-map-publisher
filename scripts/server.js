@@ -4,7 +4,6 @@ const path = require("path");
 const Koa = require("koa");
 const Router = require("koa-router");
 const jsonBody = require("koa-json-body");
-const serveStatic = require("koa-static");
 
 const moment = require("moment");
 const template = require("lodash/template");
@@ -197,24 +196,10 @@ async function main() {
         }
     });
 
-    router.get("/:directory", (ctx) => {
-        const directory = ctx.params.directory.replace(/(\.|\/|\\)/g, "");
-        return new Promise((resolve) => {
-            fs.readdir(path.join(OUTPUT_PATH, directory), (err, files) => {
-                if (!err) {
-                    successResponse(ctx, TEMPLATE({ title: directory, items: files }), "text/html");
-                }
-                resolve();
-            });
-        });
-    });
-
-
     app
         .use(jsonBody({ fallback: true }))
         .use(router.routes())
         .use(router.allowedMethods())
-        .use(serveStatic(OUTPUT_PATH))
         .listen(PORT, (err) => {
             if (err) {
                 console.error(err);
