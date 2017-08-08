@@ -15,6 +15,7 @@ const promisify = require("util").promisify;
 
 const generator = require("./generator");
 const Logger = require("./logger");
+const JsonLogger = require("./jsonLogger");
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -111,6 +112,10 @@ function generateFiles(component, props, outputFilename = "output.pdf") {
 
     fs.mkdirSync(directory);
     const logger = new Logger(path.join(directory, "build.log"));
+    const jsonLogger = new JsonLogger({
+        path: path.join(directory, "build.json"),
+        pageCount: props.length,
+    });
 
     const promises = [];
     for (let i = 0; i < props.length; i++) {
@@ -131,6 +136,10 @@ function generateFiles(component, props, outputFilename = "output.pdf") {
                 .then((success) => { // eslint-disable-line no-loop-func
                     queueLength--;
                     return success && convertToCmykPdf(path.join(directory, filename));
+                })
+                .then((pdfFilename) => {
+                    jsonLogger.logPage({ component, props: props[i] });
+                    return pdfFilename;
                 })
         );
     }
