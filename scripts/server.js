@@ -6,7 +6,6 @@ const Router = require("koa-router");
 const jsonBody = require("koa-json-body");
 
 const moment = require("moment");
-const template = require("lodash/template");
 const iconv = require("iconv-lite");
 const csv = require("csv");
 const fetch = require("node-fetch");
@@ -26,8 +25,6 @@ const PDF_PPI = 72;
 const PORT = 4000;
 
 const OUTPUT_PATH = path.join(__dirname, "..", "output");
-const TEMPLATE = template(fs.readFileSync(path.join(__dirname, "index.html")));
-
 const API_URL = "http://kartat.hsl.fi/jore/graphql";
 
 let queueLength = 0;
@@ -148,7 +145,7 @@ function generateFiles(component, props, outputFilename = "output.pdf") {
         .then((filenames) => {
             const validFilenames = filenames.filter(name => !!name);
             logger.logInfo(`Successfully rendered ${validFilenames.length} / ${filenames.length} pages\n`);
-            return generatePdf(directory, validFilenames, outputFilename)
+            return generatePdf(directory, validFilenames, outputFilename);
         })
         .then(() => {
             logger.end("DONE");
@@ -170,8 +167,8 @@ function successResponse(ctx, body, type = "application/json") {
 function errorResponse(ctx, error) {
     ctx.status = 500;
     ctx.body = { error: error.message };
-    console.error(error);
-    console.error(error.stack);
+    console.error(error); // eslint-disable-line no-console
+    console.error(error.stack); // eslint-disable-line no-console
 }
 
 async function main() {
@@ -209,12 +206,11 @@ async function main() {
         .use(jsonBody({ fallback: true }))
         .use(router.routes())
         .use(router.allowedMethods())
-        .listen(PORT, (err) => {
-            if (err) {
-                console.error(err);
-            }
-            console.log(`Listening at port ${PORT}`);
+        .listen(PORT, () => {
+            console.log(`Listening at port ${PORT}`);  // eslint-disable-line no-console
         });
 }
 
-main().catch(console.log.bind(console));
+main().catch((error) => {
+    console.error(error); // eslint-disable-line no-console
+});
