@@ -84,7 +84,7 @@ function generatePdf(directory, filenames, outputFilename) {
 function convertToCmykPdf(filename) {
     const cmykFilename = filename.replace(".tiff", ".cmyk.tiff");
     return new Promise((resolve, reject) => {
-        const cctiff = spawn("cctiff", ["rgb_test_out.icc", filename, cmykFilename]);
+        const cctiff = spawn("cctiff", ["rgb_to_cmyk.icc", filename, cmykFilename]);
         cctiff.stderr.on("data", data => reject(new Error(data.toString())));
         cctiff.on("close", () => unlinkAsync(filename).then(() => {
             const pdfFilename = filename.replace(".tiff", ".pdf");
