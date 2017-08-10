@@ -8,6 +8,7 @@ const TileMergeStream = require("tile-merge-stream");
 
 const slimerjs = /^win/.test(process.platform) ? "slimerjs.cmd" : "slimerjs";
 const slimerPath = path.join(__dirname, "..", "node_modules", ".bin", slimerjs);
+const profilePath = path.join(__dirname, "..", "profile");
 
 const CLIENT_PORT = 3000;
 const TILE_SIZE = 3000;
@@ -37,7 +38,7 @@ function setCallbacks(logger) {
 }
 
 async function initialize() {
-    browser = await driver.create({ path: slimerPath });
+    browser = await driver.create({ path: slimerPath, parameters: ["-profile", profilePath] });
     page = await browser.createPage();
 }
 
