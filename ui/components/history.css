@@ -1,0 +1,17 @@
+
+.root {
+    display: flex;
+    flex-flow: column;
+    width: 100%;
+    padding: 10px 30px;
+    margin: auto;
+    box-sizing: border-box;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 10px 0;
+}
