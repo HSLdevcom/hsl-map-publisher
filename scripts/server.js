@@ -17,6 +17,8 @@ const Logger = require("./logger");
 const JsonLogger = require("./jsonLogger");
 
 const unlinkAsync = promisify(fs.unlink);
+const readDirAsync = promisify(fs.readdir);
+const readFileAsync = promisify(fs.readFile);
 
 // 5 * 72 = 360 dpi
 const SCALE = 5;
@@ -185,6 +187,25 @@ async function main() {
 
     router.get("/queueInfo", (ctx) => {
         successResponse(ctx, { queueLength });
+    });
+
+    router.get("/builds", async (ctx) => {
+        const filenames = await readDirAsync(OUTPUT_PATH);
+        const builds = {};
+
+        for (let i = 0; i < filenames.length; i++) {
+            try {
+                const identifier = filenames[i];
+                // eslint-disable-next-line no-await-in-loop
+                const data = await readFileAsync(path.join(OUTPUT_PATH, identifier, "build.json"));
+                builds[identifier] = JSON.parse(data);
+            } catch (error) {
+                if (!["ENOENT", "ENOTDIR"].includes(error.code)) {
+                    return errorResponse(ctx, error);
+                }
+            }
+        }
+        return successResponse(ctx, builds);
     });
 
     router.post("/generate", (ctx) => {
