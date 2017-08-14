@@ -70,7 +70,8 @@ function fetchStops() {
 }
 
 function generatePdf(directory, filenames, outputFilename) {
-    const outputPath = path.join(directory, outputFilename.replace(/(\/|\\)/g, ""));
+    const outputFilenameSanitized = outputFilename.replace(/(\/|\\)/g, "");
+    const outputPath = path.join(directory, outputFilenameSanitized);
     return new Promise((resolve, reject) => {
         const pdftk = spawn("pdftk", [
             ...filenames,
@@ -79,7 +80,7 @@ function generatePdf(directory, filenames, outputFilename) {
             outputPath,
         ]);
         pdftk.stderr.on("data", data => reject(new Error(data.toString())));
-        pdftk.on("close", resolve);
+        pdftk.on("close", () => resolve(outputFilenameSanitized));
     });
 }
 
@@ -121,9 +122,9 @@ function generateFiles(component, props, outputFilename = "output.pdf") {
         const filename = `${i + 1}.tiff`;
         const options = {
             logger,
-            filename,
-            directory,
             component,
+            directory,
+            filename,
             props: props[i],
             scale: SCALE,
         };
@@ -134,11 +135,16 @@ function generateFiles(component, props, outputFilename = "output.pdf") {
             generator.generate(options)
                 .then((success) => { // eslint-disable-line no-loop-func
                     queueLength--;
-                    return success && convertToCmykPdf(path.join(directory, filename));
+                    if (!success) return null;
+                    return convertToCmykPdf(path.join(directory, filename));
                 })
                 .then((pdfFilename) => {
-                    jsonLogger.logPage({ component, props: props[i] });
+                    jsonLogger.logPage({ component, props: props[i], filename: pdfFilename });
                     return pdfFilename;
+                })
+                .catch((error) => {
+                    logger.logError(error);
+                    jsonLogger.logPage({ component, props: props[i], filename: null });
                 })
         );
     }
@@ -149,10 +155,12 @@ function generateFiles(component, props, outputFilename = "output.pdf") {
             logger.logInfo(`Successfully rendered ${validFilenames.length} / ${filenames.length} pages\n`);
             return generatePdf(directory, validFilenames, outputFilename);
         })
-        .then(() => {
+        .then((filename) => {
+            jsonLogger.logSuccess({ filename });
             logger.end("DONE");
         })
         .catch((error) => {
+            jsonLogger.logError(error);
             logger.logError(error);
             logger.end("FAIL");
         });

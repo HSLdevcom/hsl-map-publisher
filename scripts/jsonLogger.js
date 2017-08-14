@@ -4,24 +4,24 @@ class JsonLogger {
     constructor({ path, pageCount }) {
         this.path = path;
         this.status = {
-            error: null,
             pageCount,
             pages: [],
         };
         this.flush();
     }
 
-    logPage({ component, props }) {
-        this.status.pages.push({
-            date: Date.now(),
-            component,
-            props,
-        });
+    logPage(options) {
+        this.status.pages.push(Object.assign({}, options, { date: Date.now() }));
         this.flush();
     }
 
     logError(error) {
         this.status.error = error.message;
+        this.flush();
+    }
+
+    logSuccess({ filename }) {
+        this.status.filename = filename;
         this.flush();
     }
 

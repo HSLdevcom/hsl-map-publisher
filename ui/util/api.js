@@ -8,6 +8,12 @@ async function fetchQueueInfo() {
     return response.json();
 }
 
+async function fetchBuilds() {
+    const response = await fetch(`${API_URL}/builds`);
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+}
+
 async function fetchStops() {
     const response = await fetch(`${API_URL}/stops`);
     if (!response.ok) throw new Error(response.statusText);
@@ -26,6 +32,7 @@ async function generate(component, props, filename) {
 
 export {
     fetchQueueInfo,
+    fetchBuilds,
     fetchStops,
     generate,
 };

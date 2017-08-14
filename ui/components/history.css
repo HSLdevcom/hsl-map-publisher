@@ -8,10 +8,13 @@
     box-sizing: border-box;
 }
 
+.item {
+    padding-bottom: 15px;
+}
+
 .row {
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
-    padding: 10px 0;
 }
