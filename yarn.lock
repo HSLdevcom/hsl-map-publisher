@@ -2839,9 +2839,9 @@ home-or-tmp@^2.0.0:
     os-homedir "^1.0.0"
     os-tmpdir "^1.0.1"
 
-hsl-map-style@HSLdevcom/hsl-map-style#ecab635d5db4c910fe10578effa4e1b7b2ae0eaa:
+hsl-map-style@HSLdevcom/hsl-map-style#e1ed3f952907cc12e5be393bc2813caa26049350:
   version "1.0.0"
-  resolved "https://codeload.github.com/HSLdevcom/hsl-map-style/tar.gz/ecab635d5db4c910fe10578effa4e1b7b2ae0eaa"
+  resolved "https://codeload.github.com/HSLdevcom/hsl-map-style/tar.gz/e1ed3f952907cc12e5be393bc2813caa26049350"
   dependencies:
     lodash "^4.17.4"
 
@@ -4062,7 +4062,7 @@ node-phantom-promise@^1.0.3:
   dependencies:
     node-phantom-simple "^2.0.4"
 
-node-phantom-simple@^2.0.4, node-phantom-simple@^2.2.4:
+node-phantom-simple@^2.0.4:
   version "2.2.4"
   resolved "https://registry.yarnpkg.com/node-phantom-simple/-/node-phantom-simple-2.2.4.tgz#4fc4effbb02f241fb5082bd4fbab398e4aecb64d"
   dependencies:
@@ -6250,13 +6250,13 @@ wgs84@0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/wgs84/-/wgs84-0.0.0.tgz#34fdc555917b6e57cf2a282ed043710c049cdc76"
 
-whatwg-fetch@>=0.10.0, whatwg-fetch@^1.0.0:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/whatwg-fetch/-/whatwg-fetch-1.1.1.tgz#ac3c9d39f320c6dce5339969d054ef43dd333319"
-
-whatwg-fetch@^2.0.0:
+whatwg-fetch@>=0.10.0, whatwg-fetch@^2.0.0:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/whatwg-fetch/-/whatwg-fetch-2.0.3.tgz#9c84ec2dcf68187ff00bc64e1274b442176e1c84"
+
+whatwg-fetch@^1.0.0:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/whatwg-fetch/-/whatwg-fetch-1.1.1.tgz#ac3c9d39f320c6dce5339969d054ef43dd333319"
 
 whet.extend@~0.9.9:
   version "0.9.9"
