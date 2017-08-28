@@ -51,23 +51,42 @@ HistoryItem.propTypes = {
 };
 
 class History extends Component {
-    constructor() {
-        super();
-        this.state = { builds: {} };
+    constructor(props) {
+        super(props);
+        this.state = {};
     }
 
     componentDidMount() {
-        fetchBuilds()
-            .then(builds => this.setState({ builds }))
-            // FIXME: Show error in modal window
-            .catch(error => console.error(error)); // eslint-disable-line no-console
+        this.intervalId = setInterval(() => this.updateBuilds(), 5000);
+        this.updateBuilds();
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.intervalId);
+        this.intervalId = null;
+    }
+
+    updateBuilds() {
+        if (!this.state.builds || document.visibilityState === "visible") {
+            fetchBuilds()
+                .then((builds) => {
+                    if (this.intervalId) this.setState({ builds });
+                })
+                .catch((error) => {
+                    // FIXME: Show error in modal window
+                    console.error(error); // eslint-disable-line no-console
+                });
+        }
     }
 
     render() {
+        if (!this.state.builds) {
+            return null;
+        }
         return (
             <div className={styles.root}>
                 {Object.keys(this.state.builds).sort((a, b) => a - b).map(
-                    key => <HistoryItem id={key} {...this.state.builds[key]}/>
+                    key => <HistoryItem key={key} id={key} {...this.state.builds[key]}/>
                 )}
             </div>
         );
