@@ -2,12 +2,6 @@
 const API_URL = "api";
 const OUTPUT_URL = `${window.location.protocol}//${window.location.host}/output`;
 
-async function fetchQueueInfo() {
-    const response = await fetch(`${API_URL}/queueInfo`);
-    if (!response.ok) throw new Error(response.statusText);
-    return response.json();
-}
-
 async function fetchBuilds() {
     const response = await fetch(`${API_URL}/builds`);
     if (!response.ok) throw new Error(response.statusText);
@@ -31,7 +25,6 @@ async function generate(component, props, filename) {
 }
 
 export {
-    fetchQueueInfo,
     fetchBuilds,
     fetchStops,
     generate,

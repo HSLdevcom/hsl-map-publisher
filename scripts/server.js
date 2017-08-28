@@ -29,8 +29,6 @@ const PORT = 4000;
 const OUTPUT_PATH = path.join(__dirname, "..", "output");
 const API_URL = "http://kartat.hsl.fi/jore/graphql";
 
-let queueLength = 0;
-
 function fetchStopIds() {
     const options = {
         method: "POST",
@@ -129,12 +127,9 @@ function generateFiles(component, props, outputFilename = "output.pdf") {
             scale: SCALE,
         };
 
-        queueLength++;
-
         promises.push(
             generator.generate(options)
                 .then((success) => { // eslint-disable-line no-loop-func
-                    queueLength--;
                     if (!success) return null;
                     return convertToCmykPdf(path.join(directory, filename));
                 })
@@ -191,10 +186,6 @@ async function main() {
 
     router.get("/stops", (ctx) => {
         successResponse(ctx, stops);
-    });
-
-    router.get("/queueInfo", (ctx) => {
-        successResponse(ctx, { queueLength });
     });
 
     router.get("/builds", async (ctx) => {
