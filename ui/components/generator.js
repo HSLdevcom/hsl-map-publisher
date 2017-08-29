@@ -61,13 +61,10 @@ class Generator extends Component {
     }
 
     onGenerate() {
-        this.resetRows();
-
-        const popup = window.open();
         const component = this.state.selectedComponent.name;
+        const checkedRows = this.state.rows.filter(({ isChecked }) => isChecked);
 
-        const checkedRows = this.state.rows
-            .filter(({ isChecked }) => isChecked);
+        this.resetRows();
 
         const props = checkedRows
             .reduce((prev, { stopIds }) => [...prev, ...stopIds], [])
@@ -83,20 +80,10 @@ class Generator extends Component {
                     : null,
             }));
 
-
         const filename = checkedRows.length === 1 ? `${checkedRows[0].title}.pdf` : "output.pdf";
 
         generate(component, props, filename)
-            .then((url) => {
-                if (popup) {
-                    popup.location = url;
-                } else {
-                    const message = `Ponnahdusikkunan avaaminen epäonnistui. Tulosteet tehdään osoitteeseen ${window.location}${url}`;
-                    this.setState({ message });
-                }
-            })
             .catch((error) => {
-                if (popup) popup.close();
                 this.setState({ message: `Generointi epäonnistui: ${error.message}` });
                 console.error(error); // eslint-disable-line no-console
             });
