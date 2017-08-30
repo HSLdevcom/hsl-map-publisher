@@ -85,7 +85,7 @@ class History extends Component {
         }
         return (
             <div className={styles.root}>
-                {Object.keys(this.state.builds).sort((a, b) => a - b).map(
+                {Object.keys(this.state.builds).sort((a, b) => -a.localeCompare(b)).map(
                     key => <HistoryItem key={key} id={key} {...this.state.builds[key]}/>
                 )}
             </div>
