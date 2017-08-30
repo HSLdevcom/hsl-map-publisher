@@ -24,7 +24,7 @@ const HistoryItem = props => (
             </div>
         </div>
 
-        {props.error && <em>`Generointi epäonnistui: ${props.error}`</em>}
+        {props.error && <em>{`Generointi epäonnistui: ${props.error}`}</em>}
         {!props.error && <StatusBar
             total={props.pageCount}
             failure={props.pages.filter(({ filename }) => !filename).length}
