@@ -1,8 +1,7 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 
-import Dialog from "material-ui/Dialog";
 import RaisedButton from "material-ui/RaisedButton";
-import FlatButton from "material-ui/FlatButton";
 import DatePicker from "material-ui/DatePicker";
 import RadioGroup from "components/radioGroup";
 
@@ -55,7 +54,7 @@ class Generator extends Component {
             .then((stops) => {
                 this.setState({ stops }, () => this.resetRows());
             }).catch((error) => {
-                this.setState({ message: `Pysäkkien hakeminen epäonnistui: ${error.message}` });
+                this.props.onMessage(`Pysäkkien hakeminen epäonnistui: ${error.message}`);
                 console.error(error); // eslint-disable-line no-console
             });
     }
@@ -84,13 +83,9 @@ class Generator extends Component {
 
         generate(component, props, filename)
             .catch((error) => {
-                this.setState({ message: `Generointi epäonnistui: ${error.message}` });
+                this.props.onMessage(`Generointi epäonnistui: ${error.message}`);
                 console.error(error); // eslint-disable-line no-console
             });
-    }
-
-    onDialogClose() {
-        this.setState({ message: null });
     }
 
     onDateChange(date) {
@@ -127,20 +122,6 @@ class Generator extends Component {
 
         return (
             <div className={styles.root}>
-                <Dialog
-                    open={!!this.state.message}
-                    onRequestClose={() => this.onDialogClose()}
-                    actions={[
-                        <FlatButton
-                            onTouchTap={() => this.onDialogClose()}
-                            label="OK"
-                            primary
-                        />,
-                    ]}
-                >
-                    {this.state.message}
-                </Dialog>
-
                 <div className={styles.row}>
                     <div className={styles.column}>
                         <h3>Tuloste</h3>
@@ -219,5 +200,9 @@ class Generator extends Component {
         );
     }
 }
+
+Generator.propTypes = {
+    onMessage: PropTypes.func.isRequired,
+};
 
 export default Generator;
