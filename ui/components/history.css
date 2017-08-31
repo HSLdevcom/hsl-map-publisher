@@ -2,8 +2,9 @@
 .root {
     display: flex;
     flex-flow: column;
-    width: 100%;
+    height: 100%;
     padding: 10px 30px;
     margin: auto;
     box-sizing: border-box;
+    overflow-y: auto;
 }
