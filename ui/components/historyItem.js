@@ -1,13 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
 import FlatButton from "material-ui/FlatButton";
+import Divider from "material-ui/Divider";
 
 import StatusBar from "components/statusBar";
 
 import styles from "./historyItem.css";
 
 const HistoryItem = props => (
-    <div className={styles.root}>
+    <div>
         <div className={styles.row}>
             <h3>{props.id}</h3>
             <div className={styles.row}>
@@ -22,12 +23,13 @@ const HistoryItem = props => (
             </div>
         </div>
 
-        {props.error && <em>{`Generointi epäonnistui: ${props.error}`}</em>}
-        {!props.error && <StatusBar
-            total={props.pageCount}
-            failure={props.pages.filter(({ filename }) => !filename).length}
-            success={props.pages.filter(({ filename }) => filename).length}
-        />}
+        <StatusBar
+            error={props.error}
+            totalCount={props.pageCount}
+            failedCount={props.pages.filter(({ filename }) => !filename).length}
+            successCount={props.pages.filter(({ filename }) => filename).length}
+        />
+        <Divider/>
     </div>
 );
 

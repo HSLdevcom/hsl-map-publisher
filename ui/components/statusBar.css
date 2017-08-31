@@ -1,17 +1,12 @@
 
-.row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.error {
+.root {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     min-height: 30px;
     padding: 0 15px 15px;
-    font-style: italic;
+}
+
+.text {
     opacity: 0.75;
 }

@@ -1,39 +1,35 @@
 import React from "react";
 import PropTypes from "prop-types";
+import CircularProgress from "material-ui/CircularProgress";
 
-import muiThemeable from "material-ui/styles/muiThemeable";
-import { grey200, red500 } from "material-ui/styles/colors";
+import styles from "./statusBar.css";
 
-const StatusBar = (props) => {
-    const rootStyle = {
-        display: "flex",
-        alignItems: "stretch",
-        width: "100%",
-        height: 25,
-        background: grey200,
-    };
-    const failureStyle = {
-        width: `${(props.failure / props.total) * 100}%`,
-        background: red500,
-    };
-    const successStyle = {
-        width: `${(props.success / props.total) * 100}%`,
-        background: props.muiTheme.palette.primary1Color,
-    };
+const StatusBar = props => (
+    <div className={styles.root}>
+        {props.error &&
+            <div className={styles.text}>{`Generointi epäonnistui: ${props.error}`}</div>
+        }
+        {!props.error &&
+            <div className={styles.text}>
+                {`${props.successCount} / ${props.totalCount} sivua generoitu`}
+                {props.failedCount > 0 && ` (${props.failedCount} epäonnistunut)`}
+            </div>
+        }
+        {!props.error && (props.successCount + props.failedCount) < props.totalCount &&
+            <CircularProgress size={30} style={{ marginLeft: 15 }}/>
+        }
+    </div>
+);
 
-    return (
-        <div style={rootStyle}>
-            <div style={failureStyle}/>
-            <div style={successStyle}/>
-        </div>
-    );
+StatusBar.defaultProps = {
+    error: null,
 };
 
 StatusBar.propTypes = {
-    total: PropTypes.number.isRequired,
-    success: PropTypes.number.isRequired,
-    failure: PropTypes.number.isRequired,
-    muiTheme: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+    error: PropTypes.string,
+    totalCount: PropTypes.number.isRequired,
+    successCount: PropTypes.number.isRequired,
+    failedCount: PropTypes.number.isRequired,
 };
 
-export default muiThemeable()(StatusBar);
+export default StatusBar;
