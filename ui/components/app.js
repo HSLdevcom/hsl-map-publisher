@@ -122,10 +122,8 @@ class App extends Component {
         this.setState({ selectedComponent: value }, () => this.resetRows());
     }
 
-    onRowChecked(rowIndex, isChecked) {
-        const rows = this.state.rows.map(
-            (row, index) => ((rowIndex === index) ? { ...row, isChecked } : row)
-        );
+    onRowChecked(checkedRow, isChecked) {
+        const rows = this.state.rows.map(row => (row === checkedRow ? { ...row, isChecked } : row));
         this.setState({ rows });
     }
 
