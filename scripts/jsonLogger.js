@@ -1,17 +1,19 @@
 const fs = require("fs");
 
 class JsonLogger {
-    constructor({ path, pageCount }) {
+    constructor({ title, path, pageCount }) {
         this.path = path;
         this.status = {
+            title,
             pageCount,
             pages: [],
+            date: Date.now(),
         };
         this.flush();
     }
 
     logPage(options) {
-        this.status.pages.push(Object.assign({}, options, { date: Date.now() }));
+        this.status.pages.push(options);
         this.flush();
     }
 

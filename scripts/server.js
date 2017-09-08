@@ -75,13 +75,13 @@ function spawnAsync(cmd, args) {
     });
 }
 
-async function generatePdf(directory, filenames, outputFilename) {
+async function generatePdf(directory, filenames, title) {
     const inputPaths = filenames.map(filename => path.join(directory, filename));
-    const outputFilenameSanitized = outputFilename.replace(/(\/|\\)/g, "");
-    const outputPath = path.join(directory, outputFilenameSanitized);
+    const outputFilename = `${title.replace(/[^a-zA-Z0-9-]/g, "")}.pdf`;
+    const outputPath = path.join(directory, outputFilename);
 
     await spawnAsync("pdftk", [...inputPaths, "cat", "output", outputPath]);
-    return outputFilenameSanitized;
+    return outputFilename;
 }
 
 async function convertToCmykPdf(directory, filename) {
@@ -103,7 +103,7 @@ async function convertToCmykPdf(directory, filename) {
     return pdfFilename;
 }
 
-function generateFiles(component, props, outputFilename = "output.pdf") {
+function generateFiles(component, props, title) {
     const identifier = moment().format("YYYY-MM-DD-HHmm-sSSSSS");
     const directory = path.join(OUTPUT_PATH, identifier);
 
@@ -112,6 +112,7 @@ function generateFiles(component, props, outputFilename = "output.pdf") {
     const jsonLogger = new JsonLogger({
         path: path.join(directory, "build.json"),
         pageCount: props.length,
+        title,
     });
 
     const promises = [];
@@ -147,7 +148,7 @@ function generateFiles(component, props, outputFilename = "output.pdf") {
         .then((filenames) => {
             const validFilenames = filenames.filter(name => !!name);
             logger.logInfo(`Successfully rendered ${validFilenames.length} / ${filenames.length} pages\n`);
-            return generatePdf(directory, validFilenames, outputFilename);
+            return generatePdf(directory, validFilenames, title);
         })
         .then((filename) => {
             jsonLogger.logSuccess({ filename });
@@ -207,14 +208,15 @@ async function main() {
     });
 
     router.post("/generate", (ctx) => {
-        const { component, props, filename } = ctx.request.body;
+        const { component, props, title } = ctx.request.body;
 
-        if (typeof component !== "string" || !(props instanceof Array) || !props.length) {
+        if (typeof component !== "string" || typeof title !== "string" ||
+            !(props instanceof Array) || !props.length) {
             return errorResponse(ctx, new Error("Invalid request body"));
         }
 
         try {
-            const filePath = generateFiles(component, props, filename);
+            const filePath = generateFiles(component, props, title);
             return successResponse(ctx, { path: filePath });
         } catch (error) {
             return errorResponse(ctx, error);

@@ -79,9 +79,14 @@ class Generator extends Component {
                     : null,
             }));
 
-        const filename = checkedRows.length === 1 ? `${checkedRows[0].title}.pdf` : "output.pdf";
+        let title;
+        if (checkedRows.length > 1) {
+            title = `${checkedRows[0].title} - ${checkedRows[checkedRows.length - 1].title}`;
+        } else {
+            title = checkedRows[0].title;
+        }
 
-        generate(component, props, filename)
+        generate(component, props, title)
             .catch((error) => {
                 this.props.onMessage(`Generointi epäonnistui: ${error.message}`);
                 console.error(error); // eslint-disable-line no-console
