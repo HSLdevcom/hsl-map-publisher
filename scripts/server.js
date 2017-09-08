@@ -67,47 +67,40 @@ function fetchStops() {
     });
 }
 
-function generatePdf(directory, filenames, outputFilename) {
+function spawnAsync(cmd, args) {
+    return new Promise((resolve, reject) => {
+        const childProcess = spawn(cmd, args);
+        childProcess.stderr.on("data", data => reject(new Error(data.toString())));
+        childProcess.on("close", () => resolve());
+    });
+}
+
+async function generatePdf(directory, filenames, outputFilename) {
     const inputPaths = filenames.map(filename => path.join(directory, filename));
     const outputFilenameSanitized = outputFilename.replace(/(\/|\\)/g, "");
     const outputPath = path.join(directory, outputFilenameSanitized);
 
-    return new Promise((resolve, reject) => {
-        const pdftk = spawn("pdftk", [
-            ...inputPaths,
-            "cat",
-            "output",
-            outputPath,
-        ]);
-        pdftk.stderr.on("data", data => reject(new Error(data.toString())));
-        pdftk.on("close", () => resolve(outputFilenameSanitized));
-    });
+    await spawnAsync("pdftk", [...inputPaths, "cat", "output", outputPath]);
+    return outputFilenameSanitized;
 }
 
-function convertToCmykPdf(directory, filename) {
+async function convertToCmykPdf(directory, filename) {
     const cmykFilename = filename.replace(".tiff", ".cmyk.tiff");
     const pdfFilename = filename.replace(".tiff", ".pdf");
     const sourcePath = path.join(directory, filename);
     const cmykPath = path.join(directory, cmykFilename);
     const pdfPath = path.join(directory, pdfFilename);
 
-    return new Promise((resolve, reject) => {
-        const cctiff = spawn("cctiff", ["rgb_to_cmyk.icc", sourcePath, cmykPath]);
-        cctiff.stderr.on("data", data => reject(new Error(data.toString())));
-        cctiff.on("close", () => unlinkAsync(sourcePath).then(() => {
-            const convert = spawn("convert", [
-                "-density",
-                SCALE * PDF_PPI,
-                "-units",
-                "PixelsPerInch",
-                cmykPath,
-                pdfPath,
-            ]);
-            convert.stderr.on("data", data => reject(new Error(data.toString())));
-            convert.on("close", () => unlinkAsync(cmykPath).then(() => resolve(pdfFilename)));
-        }));
-    }
-  );
+    await spawnAsync("cctiff", ["rgb_to_cmyk.icc", sourcePath, cmykPath]);
+    await unlinkAsync(sourcePath);
+    await spawnAsync("convert", [
+        "-density", SCALE * PDF_PPI,
+        "-units", "PixelsPerInch",
+        cmykPath, pdfPath,
+    ]);
+    await unlinkAsync(cmykPath);
+
+    return pdfFilename;
 }
 
 function generateFiles(component, props, outputFilename = "output.pdf") {
