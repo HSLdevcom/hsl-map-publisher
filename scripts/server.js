@@ -68,11 +68,13 @@ function fetchStops() {
 }
 
 function generatePdf(directory, filenames, outputFilename) {
+    const inputPaths = filenames.map(filename => path.join(directory, filename));
     const outputFilenameSanitized = outputFilename.replace(/(\/|\\)/g, "");
     const outputPath = path.join(directory, outputFilenameSanitized);
+
     return new Promise((resolve, reject) => {
         const pdftk = spawn("pdftk", [
-            ...filenames,
+            ...inputPaths,
             "cat",
             "output",
             outputPath,
@@ -82,23 +84,27 @@ function generatePdf(directory, filenames, outputFilename) {
     });
 }
 
-function convertToCmykPdf(filename) {
+function convertToCmykPdf(directory, filename) {
     const cmykFilename = filename.replace(".tiff", ".cmyk.tiff");
+    const pdfFilename = filename.replace(".tiff", ".pdf");
+    const sourcePath = path.join(directory, filename);
+    const cmykPath = path.join(directory, cmykFilename);
+    const pdfPath = path.join(directory, pdfFilename);
+
     return new Promise((resolve, reject) => {
-        const cctiff = spawn("cctiff", ["rgb_to_cmyk.icc", filename, cmykFilename]);
+        const cctiff = spawn("cctiff", ["rgb_to_cmyk.icc", sourcePath, cmykPath]);
         cctiff.stderr.on("data", data => reject(new Error(data.toString())));
-        cctiff.on("close", () => unlinkAsync(filename).then(() => {
-            const pdfFilename = filename.replace(".tiff", ".pdf");
+        cctiff.on("close", () => unlinkAsync(sourcePath).then(() => {
             const convert = spawn("convert", [
                 "-density",
                 SCALE * PDF_PPI,
                 "-units",
                 "PixelsPerInch",
-                cmykFilename,
-                pdfFilename,
+                cmykPath,
+                pdfPath,
             ]);
             convert.stderr.on("data", data => reject(new Error(data.toString())));
-            convert.on("close", () => unlinkAsync(cmykFilename).then(() => resolve(pdfFilename)));
+            convert.on("close", () => unlinkAsync(cmykPath).then(() => resolve(pdfFilename)));
         }));
     }
   );
@@ -131,7 +137,7 @@ function generateFiles(component, props, outputFilename = "output.pdf") {
             generator.generate(options)
                 .then((success) => { // eslint-disable-line no-loop-func
                     if (!success) return null;
-                    return convertToCmykPdf(path.join(directory, filename));
+                    return convertToCmykPdf(directory, filename);
                 })
                 .then((pdfFilename) => {
                     jsonLogger.logPage({ component, props: props[i], filename: pdfFilename });
