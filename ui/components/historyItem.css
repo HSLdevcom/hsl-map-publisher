@@ -1,17 +1,31 @@
 
-.row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
+.root {
+    width: calc(100vw - 120px);
+    max-width: 880px;
+    margin-top: 20px;
+    white-space: nowrap;
 }
 
-.error {
+.row {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 10px;
+}
+
+.title {
+    flex: 1;
+    padding-right: 15px;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.buttons {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    min-height: 30px;
-    padding: 0 15px 15px;
-    font-style: italic;
-    opacity: 0.75;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
 }
