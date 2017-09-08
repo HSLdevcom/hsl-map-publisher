@@ -2,7 +2,7 @@ import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
 import flatMap from "lodash/flatMap";
 import sortBy from "lodash/sortBy";
-import { isNumberVariant, trimRouteId, isDropOffOnly } from "util/domain";
+import { isNumberVariant, trimRouteId } from "util/domain";
 import apolloWrapper from "util/apolloWrapper";
 import { routesToTree } from "util/routes";
 
@@ -58,7 +58,6 @@ const propsMapper = mapProps(props => ({
         props.data.stop.siblings.nodes, stop => stop.routeSegments.nodes
         .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
         .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
-        .filter(routeSegment => !isDropOffOnly(routeSegment))
         .map(routeSegment => ({
             routeId: trimRouteId(routeSegment.routeId),
             ...routeSegment.route.nodes[0],
