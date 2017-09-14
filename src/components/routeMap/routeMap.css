@@ -1,0 +1,34 @@
+@value fontFamily, borderRadius from "styles/common.css";
+
+.root {
+    display: flex;
+    flex-flow: column;
+    color: white;
+    background: var(--background);
+    box-sizing: border-box;
+}
+
+.title {
+    font-family: fontFamily;
+    font-size: 80px;
+    font-weight: 500;
+}
+
+.subtitle {
+    composes: title;
+    font-weight: 300;
+}
+
+.content {
+    flex: 1;
+    position: relative;
+    margin: 50px 0;
+    border-radius: borderRadius;
+    overflow: hidden;
+}
+
+.legend {
+    position: absolute;
+    top: 50px;
+    left: 50px;
+}
