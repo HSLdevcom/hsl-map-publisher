@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import { lngLatToMeters } from "global-mercator";
 import moment from "moment";
 import { JustifiedRow } from "components/util";
 import renderQueue from "util/renderQueue";
@@ -28,21 +29,22 @@ const tileset = {
 };
 
 const Tile = (props) => {
-    const { x, y } = props;
     const style = {
         position: "absolute",
-        left: (x - 1) * tileset.tileSize * props.scale,
-        top: (y - 1) * tileset.tileSize * props.scale,
+        left: (((props.x - 1) * tileset.tileSize) - props.offsetX) * props.scale,
+        top: (((props.y - 1) * tileset.tileSize) - props.offsetY) * props.scale,
         width: tileset.tileSize * props.scale,
         height: tileset.tileSize * props.scale,
     };
-    const url = tileset.url.replace("{x}", x).replace("{y}", y);
+    const url = tileset.url.replace("{x}", props.x).replace("{y}", props.y);
     return <img src={url} style={style}/>;
 };
 
 Tile.propTypes = {
     x: PropTypes.number.isRequired,
     y: PropTypes.number.isRequired,
+    offsetX: PropTypes.number.isRequired,
+    offsetY: PropTypes.number.isRequired,
     scale: PropTypes.number.isRequired,
 };
 
@@ -65,14 +67,20 @@ class RouteMap extends Component {
         const width = Math.round((this.props.width / 25.4) * 72);
         const height = Math.round((this.props.height / 25.4) * 72);
 
+        const [left, top] = lngLatToMeters([this.props.lon, this.props.lat]);
+        const offsetX = Math.round((left - tileset.left) / tileset.metersPerPixel);
+        const offsetY = Math.round((tileset.top - top) / tileset.metersPerPixel);
+
         const scale = 72 / tileset.dpi;
         const tileCountX = Math.ceil((width / tileset.tileSize) / scale);
         const tileCountY = Math.ceil((height / tileset.tileSize) / scale);
+        const leftmostTile = Math.floor(Math.max(offsetX / tileset.tileSize, 0));
+        const topmostTile = Math.floor(Math.max(offsetY / tileset.tileSize, 0));
 
         const tiles = [];
-        for (let y = 1; y <= tileCountY; y++) {
-            for (let x = 1; x <= tileCountX; x++) {
-                tiles.push(<Tile x={x} y={y} scale={scale}/>);
+        for (let y = topmostTile + 1; y <= topmostTile + tileCountY; y++) {
+            for (let x = leftmostTile + 1; x <= leftmostTile + tileCountX; x++) {
+                tiles.push(<Tile x={x} y={y} offsetX={offsetX} offsetY={offsetY} scale={scale}/>);
             }
         }
 
@@ -115,6 +123,8 @@ RouteMap.propTypes = {
     subtitle: PropTypes.string.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
+    lon: PropTypes.number.isRequired,
+    lat: PropTypes.number.isRequired,
 };
 
 export default RouteMap;
