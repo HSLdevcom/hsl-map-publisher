@@ -16,7 +16,7 @@ Start development server:
 npm run start:hot
 ```
 
-Open [http://localhost:3000/component=StopPoster&props={"stopId": "1284117", "date": "2017-05-15"}](http://localhost:3000/component%3DStopPoster%26props%3D%7B%22stopId%22%3A%20%221284117%22%2C%20%22date%22%3A%20%222017-05-15%22%7D)
+Open [http://localhost:3000/#component=StopPoster&props={"stopId": "1284117", "date": "2017-05-15"}](http://localhost:3000/component%3DStopPoster%26props%3D%7B%22stopId%22%3A%20%221284117%22%2C%20%22date%22%3A%20%222017-05-15%22%7D)
 
 ### Running in Docker
 

@@ -39,11 +39,9 @@ class App extends Component {
                     return;
                 }
                 if (window.callPhantom) {
-                    const scale = queryString.parse(location.pathname.substring(1)).scale || 1;
-
                     window.callPhantom({
-                        width: this.root.offsetWidth * scale,
-                        height: this.root.offsetHeight * scale,
+                        width: this.root.offsetWidth * this.scale,
+                        height: this.root.offsetHeight * this.scale,
                     });
                 }
             });
@@ -53,16 +51,15 @@ class App extends Component {
     render() {
         let ComponentToRender;
         let props;
-        let scale = 1;
 
         try {
-            const params = queryString.parse(location.pathname.substring(1));
+            const params = queryString.parse(location.hash);
             ComponentToRender = components[params.component];
             props = JSON.parse(params.props);
-            if (params.scale) {
-                scale = params.scale;
-                setMapScale(Number(scale));
-                setQrCodeScale(Number(scale));
+            this.scale = params.scale || 1;
+            if (this.scale > 1) {
+                setMapScale(this.scale);
+                setQrCodeScale(this.scale);
             }
         } catch (error) {
             App.handleError(new Error("Failed to parse url fragment"));
@@ -78,7 +75,7 @@ class App extends Component {
             <div
                 style={{
                     display: "inline-block",
-                    transform: `scale(${scale})`,
+                    transform: `scale(${this.scale})`,
                     transformOrigin: "top left",
                 }}
                 ref={(ref) => { this.root = ref; }}

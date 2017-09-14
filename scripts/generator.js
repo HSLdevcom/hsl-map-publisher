@@ -44,7 +44,7 @@ async function initialize() {
 
 async function open(component, props, scale = 1) {
     const fragment = `component=${component}&props=${JSON.stringify(props)}&scale=${scale}`;
-    const status = await page.open(`http://localhost:${CLIENT_PORT}/${fragment}`);
+    const status = await page.open(`http://localhost:${CLIENT_PORT}/#${fragment}`);
 
     if (status !== "success") {
         throw new Error("Failed to open client app");
