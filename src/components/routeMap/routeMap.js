@@ -25,6 +25,8 @@ const tileset = {
     metersPerPixel: 3.36263561649125,
     url: "http://localhost:8080/35000/{x}_{y}.png",
     tileSize: 1024,
+    rows: 28,
+    columns: 28,
     dpi: 300,
 };
 
@@ -93,6 +95,7 @@ class RouteMap extends Component {
         this.promises = [];
         for (let y = topmostTile + 1; y <= topmostTile + tileCountY; y++) {
             for (let x = leftmostTile + 1; x <= leftmostTile + tileCountX; x++) {
+                if (x > tileset.rows || y > tileset.columns) break;
                 const props = { x, y, offsetX, offsetY, scale, key: `${x}${y}` };
                 const promise = new Promise((resolve, reject) => {
                     tiles.push(<Tile {...props} onLoad={resolve} onError={reject}/>);
