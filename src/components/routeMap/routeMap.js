@@ -37,7 +37,14 @@ const Tile = (props) => {
         height: tileset.tileSize * props.scale,
     };
     const url = tileset.url.replace("{x}", props.x).replace("{y}", props.y);
-    return <img src={url} style={style}/>;
+    return (
+        <img
+            src={url}
+            style={style}
+            onLoad={() => props.onLoad()}
+            onError={() => props.onError(new Error(`Failed to load ${url}`))}
+        />
+    );
 };
 
 Tile.propTypes = {
@@ -46,20 +53,25 @@ Tile.propTypes = {
     offsetX: PropTypes.number.isRequired,
     offsetY: PropTypes.number.isRequired,
     scale: PropTypes.number.isRequired,
+    onLoad: PropTypes.func.isRequired,
+    onError: PropTypes.func.isRequired,
 };
 
 class RouteMap extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {};
-    }
-
-    componentWillMount() {
-        renderQueue.add(this);
+    componentDidMount() {
+        this.updateQueue();
     }
 
     componentDidUpdate() {
-        renderQueue.remove(this);
+        this.updateQueue();
+    }
+
+    updateQueue() {
+        const promises = this.promises;
+        renderQueue.add(promises);
+        Promise.all(promises)
+            .then(() => renderQueue.remove(promises))
+            .catch(error => renderQueue.remove(promises, { error }));
     }
 
     render() {
@@ -78,9 +90,14 @@ class RouteMap extends Component {
         const topmostTile = Math.floor(Math.max(offsetY / tileset.tileSize, 0));
 
         const tiles = [];
+        this.promises = [];
         for (let y = topmostTile + 1; y <= topmostTile + tileCountY; y++) {
             for (let x = leftmostTile + 1; x <= leftmostTile + tileCountX; x++) {
-                tiles.push(<Tile x={x} y={y} offsetX={offsetX} offsetY={offsetY} scale={scale}/>);
+                const props = { x, y, offsetX, offsetY, scale, key: `${x}${y}` };
+                const promise = new Promise((resolve, reject) => {
+                    tiles.push(<Tile {...props} onLoad={resolve} onError={reject}/>);
+                });
+                this.promises.push(promise);
             }
         }
 
