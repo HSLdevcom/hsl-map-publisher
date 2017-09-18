@@ -19,8 +19,8 @@ COPY yarn.lock ${WORK}
 COPY package.json ${WORK}
 RUN yarn
 
-# FIXME: Workaround for Firefox 54. Upgrade to SlimerJS 1.0.0 when released.
-RUN sed -i -e "s#MaxVersion=52#MaxVersion=54#" node_modules/slimerjs/src/application.ini
+# FIXME: Workaround for Firefox >52
+RUN sed -i -e "s#MaxVersion=52#MaxVersion=99#" node_modules/slimerjs/src/application.ini
 
 # Bundle app source
 COPY . ${WORK}
