@@ -80,9 +80,9 @@ async function captureScreenshot(totalWidth, totalHeight, filename) {
                     height: totalHeight,
                     channels: 4,
                 },
-            }).tiff({
-                compression: "lzw",
-            }))
+            })
+            .limitInputPixels(10 ** 9)
+            .tiff({ compression: "lzw" }))
         .pipe(fs.createWriteStream(filename));
 
     let top = 0;
