@@ -1,0 +1,35 @@
+@value borderRadius from "styles/common.css";
+
+.root {
+    color: black;
+}
+
+.root > * {
+    margin: 0 calc(-1 * borderRadius);
+    padding: 0 borderRadius;
+}
+
+.root > *:nth-child(odd) {
+    background-color: var(--timetable-accent-color);
+}
+
+.item {
+    display: flex;
+    min-width: 52px;
+    padding: 4px 0;
+    font-family: GothamXNarrow-Book;
+    font-size: 12px;
+    letter-spacing: -.025em;
+    line-height: 8px;
+}
+
+.minutes {
+    min-width: 12px;
+    font-family: GothamXNarrow-Medium;
+}
+
+.hours {
+    composes: item;
+    padding-left: 15px;
+    font-family: GothamXNarrow-Medium;
+}
