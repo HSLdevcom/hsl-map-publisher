@@ -31,7 +31,7 @@ CMD \
   cp policy.xml /etc/ImageMagick-6/policy.xml && \
   cp fonts.conf /etc/fonts/local.conf && \
   mkdir -p /usr/share/fonts/opentype && \
-  cp /fonts/* /usr/share/fonts/opentype 2>/dev/null || : && \
+  cp /fonts/* /usr/share/fonts/opentype && \
   fc-cache -f -v && \
   cd ${WORK} && \
   rm -r output && ln -s /output . && \

@@ -11,19 +11,19 @@ import styles from "./timetable.css";
 const Header = props => (
     <div className={styles.header}>
         <div className={styles.title}>
-            <strong>{props.titleFi}</strong>
+            <span className={styles.strong}>{props.titleFi}</span>
             &nbsp;&nbsp;
             {props.titleSe}
         </div>
 
         <div className={styles.subtitle}>
-            <div><strong>Tunti</strong></div>
-            <div><strong>min</strong> / linja Arvioidut ohitusajat</div>
+            <div className={styles.strong}>Tunti</div>
+            <div><span className={styles.strong}>min</span> / linja Arvioidut ohitusajat</div>
         </div>
 
         <div className={styles.subtitle}>
-            <div><strong>Timme</strong></div>
-            <div><strong>min</strong> / linje Beräknade passertider</div>
+            <div className={styles.strong}>Timme</div>
+            <div><span className={styles.strong}>min</span> / linje Beräknade passertider</div>
         </div>
     </div>
 );
@@ -41,17 +41,19 @@ const Departure = props => (
     </div>
 );
 
+Departure.defaultProps = {
+    note: null,
+};
+
 Departure.propTypes = {
     minutes: PropTypes.number.isRequired,
     note: PropTypes.string,
 };
 
-Departure.defaultProps = { note: null };
-
 const TableRow = props => (
     <Row>
-        <div className={styles.itemPadded}>
-            <strong>{(props.hours % 24) < 10 && "0"}{props.hours % 24}</strong>
+        <div className={styles.hours}>
+            {(props.hours % 24) < 10 && "0"}{props.hours % 24}
         </div>
         <WrappingRow>
             {sortBy(props.departures, a => a.minutes).map((departure, index) => (
@@ -60,7 +62,6 @@ const TableRow = props => (
         </WrappingRow>
     </Row>
 );
-
 
 TableRow.propTypes = {
     hours: PropTypes.string.isRequired,
@@ -103,7 +104,7 @@ const Timetable = props => (
         }
         {props.showValidityPeriod &&
             <div className={styles.validity}>
-                <div><strong>Aikataulut voimassa</strong></div>
+                <div>Aikataulut voimassa</div>
                 <div>Tidtabeller giltiga</div>
                 <div>
                     {new Date(props.dateBegin).toLocaleDateString("fi")}

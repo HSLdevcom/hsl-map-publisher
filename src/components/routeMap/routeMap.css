@@ -1,4 +1,4 @@
-@value fontFamily, borderRadius from "styles/common.css";
+@value borderRadius from "styles/common.css";
 
 .root {
     display: flex;
@@ -9,14 +9,13 @@
 }
 
 .title {
-    font-family: fontFamily;
+    font-family: GothamRounded-Medium;
     font-size: 80px;
-    font-weight: 500;
 }
 
 .subtitle {
-    composes: title;
-    font-weight: 300;
+    font-family: GothamRounded-Book;
+    font-size: 80px;
 }
 
 .content {

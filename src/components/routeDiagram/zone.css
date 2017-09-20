@@ -1,11 +1,9 @@
-@value fontFamily, fontFamilyNarrow from "styles/common.css";
 @value leftWidth, rightWidth, lineColor, lineWidth from "./values.css";
 
-.zone {
+.root {
     display: flex;
     align-items: center;
     box-sizing: border-box;
-    font-family: fontFamily;
     white-space: nowrap;
 }
 
@@ -43,8 +41,8 @@
 .title {
     height: 12px;
     padding: 0px 6px;
+    font-family: GothamRounded-Medium;
     font-size: 11px;
-    font-weight: 500;
     line-height: 13px;
     letter-spacing: -0.025em;
     text-transform: uppercase;
