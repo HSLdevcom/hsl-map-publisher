@@ -18,7 +18,7 @@ const RouteDiagram = props => (
             </div>
             <div className={styles.start}>
                 <img src={markerIcon} className={styles.icon} role="presentation"/>
-                <div className={styles.myPositionTitle}>
+                <div className={styles.title}>
                     Olet tässä&nbsp;&nbsp;
                     <span className={styles.subtitle}>Du är här</span>
                 </div>

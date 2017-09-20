@@ -1,10 +1,8 @@
-@value fontFamilyNarrow from "styles/common.css";
 
 .text {
     position: absolute;
-    font-family: fontFamilyNarrow;
     font-size: 20px;
-    font-weight: 500;
+    font-family: GothamXNarrow-Medium;
     color: black;
 }
 

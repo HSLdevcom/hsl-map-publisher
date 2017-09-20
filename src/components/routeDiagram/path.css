@@ -1,5 +1,3 @@
-
-@value fontFamilyNarrow from "styles/common.css";
 @value leftWidth, rightWidth, lineColor, lineWidth, lineRadius from "./values.css";
 
 .root {
