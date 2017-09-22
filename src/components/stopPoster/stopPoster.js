@@ -128,8 +128,8 @@ class StopPoster extends Component {
                 <div className={styles.root} style={this.props.isTrunkStop ? trunkStopStyle : null}>
                     <JustifiedColumn>
                         <Header stopId={this.props.stopId}/>
-
                         <div className={styles.content} ref={(ref) => { this.content = ref; }}>
+                            <Spacer width="100%" height={50}/>
                             {this.state.hasRoutes && this.state.hasRoutesOnTop &&
                             <Routes stopId={this.props.stopId} date={this.props.date}/>
                             }
@@ -200,8 +200,8 @@ class StopPoster extends Component {
                                     }
                                 </div>
                             </div>
+                            <Spacer width="100%" height={50}/>
                         </div>
-
                         <Footer shortId={this.props.shortId} isTrunkStop={this.props.isTrunkStop}/>
                     </JustifiedColumn>
                 </div>
