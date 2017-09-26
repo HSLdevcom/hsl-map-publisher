@@ -36,7 +36,6 @@ class StopPoster extends Component {
             hasRoutes: true,
             hasStretchedLeftColumn: false,
             shouldRenderMap: false,
-            hasMap: true,
         };
     }
 
@@ -60,6 +59,11 @@ class StopPoster extends Component {
     updateLayout() {
         if (!this.props.hasRoutes) {
             renderQueue.remove(this, { error: new Error("No valid routes for stop") });
+            return;
+        }
+
+        if (this.hasOverflow() && this.state.shouldRenderMap) {
+            renderQueue.remove(this, { error: new Error("Map render caused layout overflow") });
             return;
         }
 
@@ -88,15 +92,9 @@ class StopPoster extends Component {
             return;
         }
 
-        if (this.state.hasMap) {
-            if (this.map.clientHeight < MAP_MIN_HEIGHT) {
-                this.setState({ hasMap: false });
-                return;
-            }
-            if (!this.state.shouldRenderMap) {
-                this.setState({ shouldRenderMap: true });
-                return;
-            }
+        if (!this.state.shouldRenderMap && this.map.clientHeight >= MAP_MIN_HEIGHT) {
+            this.setState({ shouldRenderMap: true });
+            return;
         }
 
         renderQueue.remove(this);
@@ -128,8 +126,8 @@ class StopPoster extends Component {
                 <div className={styles.root} style={this.props.isTrunkStop ? trunkStopStyle : null}>
                     <JustifiedColumn>
                         <Header stopId={this.props.stopId}/>
-
                         <div className={styles.content} ref={(ref) => { this.content = ref; }}>
+                            <Spacer width="100%" height={50}/>
                             {this.state.hasRoutes && this.state.hasRoutesOnTop &&
                             <Routes stopId={this.props.stopId} date={this.props.date}/>
                             }
@@ -174,21 +172,19 @@ class StopPoster extends Component {
 
                                     {!this.state.hasRouteDiagram && <Spacer height={10}/>}
 
-                                    {this.state.hasMap &&
-                                        <div
-                                            className={styles.map}
-                                            ref={(ref) => { this.map = ref; }}
-                                        >
-                                            {this.state.shouldRenderMap &&
-                                                <StopMap
-                                                    stopId={this.props.stopId}
-                                                    date={this.props.date}
-                                                    width={this.map.clientWidth}
-                                                    height={this.map.clientHeight}
-                                                />
-                                            }
-                                        </div>
-                                    }
+                                    <div
+                                        className={styles.map}
+                                        ref={(ref) => { this.map = ref; }}
+                                    >
+                                        {this.state.shouldRenderMap &&
+                                            <StopMap
+                                                stopId={this.props.stopId}
+                                                date={this.props.date}
+                                                width={this.map.clientWidth}
+                                                height={this.map.clientHeight}
+                                            />
+                                        }
+                                    </div>
 
                                     <Spacer height={10}/>
 
@@ -200,8 +196,8 @@ class StopPoster extends Component {
                                     }
                                 </div>
                             </div>
+                            <Spacer width="100%" height={50}/>
                         </div>
-
                         <Footer shortId={this.props.shortId} isTrunkStop={this.props.isTrunkStop}/>
                     </JustifiedColumn>
                 </div>
