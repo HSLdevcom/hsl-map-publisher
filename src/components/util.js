@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import omit from "lodash/omit";
 
 import styles from "./util.css";
 
@@ -109,9 +110,17 @@ Spacer.propTypes = {
 
 const FlexSpacer = () => <div style={{ flex: "2" }}/>;
 
-const Image = props => (
-    <img className={styles.image} role="presentation" {...props}/>
+const InlineSVG = props => (
+    <div
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: props.src }}
+        {...omit(props, "src")}
+    />
 );
+
+InlineSVG.propTypes = {
+    src: PropTypes.string.isRequired,
+};
 
 export {
     Row,
@@ -122,5 +131,5 @@ export {
     JustifiedColumn,
     Spacer,
     FlexSpacer,
-    Image,
+    InlineSVG,
 };

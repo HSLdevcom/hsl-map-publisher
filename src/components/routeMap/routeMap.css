@@ -1,0 +1,42 @@
+@value borderRadius from "styles/common.css";
+
+.root {
+    display: flex;
+    flex-flow: column;
+    color: white;
+    background: var(--background);
+    box-sizing: border-box;
+}
+
+.title {
+    font-family: GothamRounded-Medium;
+    font-size: 80px;
+}
+
+.subtitle {
+    font-family: GothamRounded-Book;
+    font-size: 80px;
+}
+
+.content {
+    flex: 1;
+    position: relative;
+    margin: 50px 0;
+    border-radius: borderRadius;
+    overflow: hidden;
+}
+
+.legend {
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    width: 284.5px;
+}
+
+.left {
+    width: 359.39999px;
+}
+
+.right {
+    width: 877.3139px;
+}

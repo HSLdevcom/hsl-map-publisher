@@ -44,7 +44,7 @@ async function initialize() {
 
 async function open(component, props, scale = 1) {
     const fragment = `component=${component}&props=${JSON.stringify(props)}&scale=${scale}`;
-    const status = await page.open(`http://localhost:${CLIENT_PORT}/${fragment}`);
+    const status = await page.open(`http://localhost:${CLIENT_PORT}/#${fragment}`);
 
     if (status !== "success") {
         throw new Error("Failed to open client app");
@@ -80,9 +80,9 @@ async function captureScreenshot(totalWidth, totalHeight, filename) {
                     height: totalHeight,
                     channels: 4,
                 },
-            }).tiff({
-                compression: "lzw",
-            }))
+            })
+            .limitInputPixels(10 ** 9)
+            .tiff({ compression: "lzw" }))
         .pipe(fs.createWriteStream(filename));
 
     let top = 0;

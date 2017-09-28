@@ -37,9 +37,9 @@ const RouteList = (props) => {
             <Column>
                 {props.routes.map((route, index) => (
                     <div key={index}>
-                        {route.destinationFi}
+                        <span className={styles.destination}>{route.destinationFi}</span>
                         {"\xa0"}
-                        <span className={styles.light}>{route.destinationSe}</span>
+                        <span className={styles.destinationLight}>{route.destinationSe}</span>
                     </div>
                 ))}
             </Column>

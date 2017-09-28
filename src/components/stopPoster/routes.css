@@ -1,4 +1,4 @@
-@value fontFamily, fontFamilyNarrow, borderRadius from "styles/common.css";
+@value borderRadius from "styles/common.css";
 
 .root {
     display: flex;
@@ -22,21 +22,19 @@
 
 .id {
     padding: 0 12px;
-    font-family: fontFamilyNarrow;
+    font-family: GothamXNarrow-Medium;
     font-size: 70px;
-    font-weight: 500;
 }
 
 .title {
-    font-family: fontFamilyNarrow;
-    font-size: 28px;
-    font-weight: 500;
     padding-right: 25px;
+    font-family: GothamXNarrow-Medium;
+    font-size: 28px;
 }
 
 .subtitle {
     composes: title;
-    font-weight: 300;
+    font-family: GothamXNarrow-Book;
 }
 
 .icon {

@@ -63,6 +63,7 @@
     "classnames": "^2.2.5",
     "concat-frames": "^1.0.3",
     "csv": "^1.1.1",
+    "global-mercator": "^2.8.4",
     "hsl-map-style": "HSLdevcom/hsl-map-style#e1ed3f952907cc12e5be393bc2813caa26049350",
     "iconv-lite": "^0.4.15",
     "json-loader": "^0.5.4",
@@ -88,6 +89,8 @@
     "recompose": "^0.23.1",
     "segseg": "^0.2.2",
     "sharp": "^0.18.1",
+    "svg-inline-loader": "^0.8.0",
+    "svgo-loader": "^1.2.1",
     "tile-merge-stream": "HSLdevcom/tile-merge-stream",
     "viewport-mercator-project": "^4.0.0"
   }

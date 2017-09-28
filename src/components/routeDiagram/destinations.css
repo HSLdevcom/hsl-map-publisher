@@ -1,4 +1,3 @@
-@value fontFamily, fontFamilyNarrow from "styles/common.css";
 @value leftWidth, lineColor, lineWidth from "./values.css";
 
 .destinations {
@@ -7,20 +6,18 @@
 }
 
 .routeId {
-    font-family: fontFamilyNarrow;
+    font-family: GothamXNarrow-Medium;
     font-size: 28px;
-    font-weight: 500;
     margin-right: 5px;
 }
 
 .title {
     margin-right: 5px;
-    font-family: fontFamily;
+    font-family: GothamRounded-Medium;
     font-size: 13px;
-    font-weight: 500;
 }
 
 .subtitle {
     composes: title;
-    font-weight: 300;
+    font-family: GothamRounded-Book;
 }

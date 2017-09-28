@@ -3,7 +3,7 @@ import React from "react";
 import styles from "./zone.css";
 
 const Zone = props => (
-    <div className={styles.zone}>
+    <div className={styles.root}>
         <div className={styles.left}/>
         <div className={styles.separator}>
             <div className={styles.separatorTop}/>
