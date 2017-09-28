@@ -7,9 +7,9 @@
 	.st1{fill:none;stroke:#FFFFFF;stroke-width:2;stroke-miterlimit:10;}
 	.st2{fill:#FFFFFF;}
 	.st3{fill:none;stroke:#FFFFFF;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;}
-	.st4{font-family:'Gotham Rounded', sans-serif; font-weight: 700;}
+	.st4{font-family:'GothamRounded-Bold';}
 	.st5{font-size:30px;}
-	.st6{font-family:'Gotham Rounded', sans-serif; font-weight: 300;}
+	.st6{font-family:'GothamRounded-Book';}
 	.st7{font-size:26px;}
 	.st8{letter-spacing:-1;}
 </style>
