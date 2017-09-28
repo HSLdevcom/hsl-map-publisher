@@ -13,32 +13,15 @@ import footerRightIcon from "./footerRight.svg";
 
 import styles from "./routeMap.css";
 
-/*
-Use ImageMagick to create tilesets:
-convert 35000.png -crop 1024x1024 \
-    -set filename:tile "%[fx:page.x/1024+1]_%[fx:page.y/1024+1]" \
-    +repage +adjoin "35000/%[filename:tile].png"
-*/
-const tileset = {
-    top: 8506226.10604208,
-    left: 2712353.539647764,
-    metersPerPixel: 3.36263561649125,
-    url: "http://localhost:8080/35000/{x}_{y}.png",
-    tileSize: 1024,
-    rows: 28,
-    columns: 28,
-    dpi: 300,
-};
-
 const Tile = (props) => {
     const style = {
         position: "absolute",
-        left: (((props.x - 1) * tileset.tileSize) - props.offsetX) * props.scale,
-        top: (((props.y - 1) * tileset.tileSize) - props.offsetY) * props.scale,
-        width: tileset.tileSize * props.scale,
-        height: tileset.tileSize * props.scale,
+        left: (((props.x - 1) * props.tileSize) - props.offsetX) * props.scale,
+        top: (((props.y - 1) * props.tileSize) - props.offsetY) * props.scale,
+        width: props.tileSize * props.scale,
+        height: props.tileSize * props.scale,
     };
-    const url = tileset.url.replace("{x}", props.x).replace("{y}", props.y);
+    const url = props.url.replace("{x}", props.x).replace("{y}", props.y);
     return (
         <img
             src={url}
@@ -55,6 +38,8 @@ Tile.propTypes = {
     offsetX: PropTypes.number.isRequired,
     offsetY: PropTypes.number.isRequired,
     scale: PropTypes.number.isRequired,
+    url: PropTypes.string.isRequired,
+    tileSize: PropTypes.number.isRequired,
     onLoad: PropTypes.func.isRequired,
     onError: PropTypes.func.isRequired,
 };
@@ -77,6 +62,8 @@ class RouteMap extends Component {
     }
 
     render() {
+        const tileset = this.props.tileset;
+
         // Calculate width and height in pixels
         const width = Math.round((this.props.width / 25.4) * 72);
         const height = Math.round((this.props.height / 25.4) * 72);
@@ -96,7 +83,7 @@ class RouteMap extends Component {
         for (let y = topmostTile; y <= topmostTile + tileCountY; y++) {
             for (let x = leftmostTile; x <= leftmostTile + tileCountX; x++) {
                 if (x > tileset.rows || y > tileset.columns) break;
-                const props = { x, y, offsetX, offsetY, scale, key: `${x}${y}` };
+                const props = { ...tileset, x, y, offsetX, offsetY, scale, key: `${x}${y}` };
                 const promise = new Promise((resolve, reject) => {
                     tiles.push(<Tile {...props} onLoad={resolve} onError={reject}/>);
                 });
@@ -149,6 +136,16 @@ RouteMap.propTypes = {
     height: PropTypes.number.isRequired,
     lon: PropTypes.number.isRequired,
     lat: PropTypes.number.isRequired,
+    tileset: PropTypes.shape({
+        top: PropTypes.number.isRequired,
+        left: PropTypes.number.isRequired,
+        metersPerPixel: PropTypes.number.isRequired,
+        url: PropTypes.string.isRequired,
+        tileSize: PropTypes.number.isRequired,
+        rows: PropTypes.number.isRequired,
+        columns: PropTypes.number.isRequired,
+        dpi: PropTypes.number.isRequired,
+    }).isRequired,
 };
 
 export default RouteMap;
