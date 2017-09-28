@@ -1,4 +1,5 @@
 import React from "react";
+import { InlineSVG } from "components/util";
 import markerIcon from "icons/marker.svg";
 
 import Path from "./path";
@@ -17,7 +18,7 @@ const RouteDiagram = props => (
                 </div>
             </div>
             <div className={styles.start}>
-                <img src={markerIcon} className={styles.icon} role="presentation"/>
+                <InlineSVG src={markerIcon} className={styles.icon}/>
                 <div className={styles.title}>
                     Olet tässä&nbsp;&nbsp;
                     <span className={styles.subtitle}>Du är här</span>
