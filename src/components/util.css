@@ -31,20 +31,10 @@
     max-height: 100%;
 }
 
-
 .justifiedColumn {
     display: flex;
     flex-flow: column nowrap;
     align-items: stretch;
     justify-content: space-between;
     height: 100%;
-}
-
-.image {
-    max-width: 100%;
-}
-
-.error {
-    flex-grow: 1;
-    background: red;
 }

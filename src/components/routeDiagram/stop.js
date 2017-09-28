@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Image } from "components/util";
+import { InlineSVG } from "components/util";
 import { iconsByMode } from "util/domain";
 
 import styles from "./stop.css";
@@ -47,7 +47,7 @@ const Stop = (props) => {
                 </div>
                 <div className={styles.iconContainer}>
                     {transferModes.map((mode, index) => (
-                        <Image key={index} className={styles.icon} src={iconsByMode[mode]}/>
+                        <InlineSVG key={index} className={styles.icon} src={iconsByMode[mode]}/>
                     ))}
                 </div>
             </div>

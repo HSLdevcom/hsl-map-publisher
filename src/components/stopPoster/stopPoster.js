@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { JustifiedColumn, Spacer, Image } from "components/util";
+import { JustifiedColumn, Spacer, InlineSVG } from "components/util";
 import renderQueue from "util/renderQueue";
 import { colorsByMode } from "util/domain";
 
@@ -154,9 +154,8 @@ class StopPoster extends Component {
                                         <StopPosterTimetable segments={["weekdays"]}/>
                                     }
                                     {this.state.hasAd &&
-                                        <Image
-                                            src={this.props.isTrunkStop
-                                              ? mobileAdTrunk : mobileAd}
+                                        <InlineSVG
+                                            src={this.props.isTrunkStop ? mobileAdTrunk : mobileAd}
                                         />
                                     }
                                 </div>

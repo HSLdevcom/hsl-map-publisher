@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { lngLatToMeters } from "global-mercator";
 import moment from "moment";
-import { JustifiedRow } from "components/util";
+import { JustifiedRow, InlineSVG } from "components/util";
 import renderQueue from "util/renderQueue";
 
 import CropMarks from "components/cropMarks";
@@ -125,12 +125,16 @@ class RouteMap extends Component {
                     <div className={styles.content}>
                         {tiles}
                         <div className={styles.legend}>
-                            <img src={legendIcon}/>
+                            <InlineSVG src={legendIcon}/>
                         </div>
                     </div>
                     <JustifiedRow>
-                        <div><img src={footerLeftIcon}/></div>
-                        <div><img src={footerRightIcon}/></div>
+                        <div className={styles.left}>
+                            <InlineSVG src={footerLeftIcon}/>
+                        </div>
+                        <div className={styles.right}>
+                            <InlineSVG src={footerRightIcon}/>
+                        </div>
                     </JustifiedRow>
                 </div>
             </CropMarks>

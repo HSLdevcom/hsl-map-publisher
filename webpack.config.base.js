@@ -60,14 +60,14 @@ module.exports = (options) => {
             preLoaders: [
                 {
                     test: /\.js$/,
-                    loader: "eslint-loader",
+                    loader: "eslint",
                     exclude: /node_modules/,
                 },
             ],
             loaders: [
                 {
                     test: /\.js$/,
-                    loaders: ["babel"],
+                    loader: "babel",
                     exclude: /node_modules/,
                 },
                 {
@@ -80,11 +80,11 @@ module.exports = (options) => {
                 },
                 {
                     test: /\.svg$/,
-                    loader: "url-loader?mimetype=image/svg+xml",
+                    loaders: ["svg-inline?classPrefix&idPrefix", "svgo"], // removeSVGTagAttrs=false
                 },
                 {
                     test: /\.json$/,
-                    loader: "json-loader",
+                    loader: "json",
                 },
             ],
         },

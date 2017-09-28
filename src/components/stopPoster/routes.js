@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import chunk from "lodash/chunk";
 import sortBy from "lodash/sortBy";
-import { Row, Column, Image } from "components/util";
+import { Row, Column, InlineSVG } from "components/util";
 
 import renderQueue from "util/renderQueue";
 import { isTrunkRoute, getColor, getIcon } from "util/domain";
@@ -10,8 +10,6 @@ import { isTrunkRoute, getColor, getIcon } from "util/domain";
 import styles from "./routes.css";
 
 const MAX_COLUMNS = 6;
-
-const Icon = props => <Image {...props} className={styles.icon}/>;
 
 class Routes extends Component {
     constructor(props) {
@@ -66,7 +64,7 @@ class Routes extends Component {
                         <Column>
                             {routes.map((route, index) => (
                                 <div key={index} className={styles.group}>
-                                    <Icon src={getIcon(route)}/>
+                                    <InlineSVG className={styles.icon} src={getIcon(route)}/>
                                 </div>
                             ))}
                         </Column>
