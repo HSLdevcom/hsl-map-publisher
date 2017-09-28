@@ -80,7 +80,7 @@ module.exports = (options) => {
                 },
                 {
                     test: /\.svg$/,
-                    loaders: ["svg-inline?classPrefix&idPrefix", "svgo"], // removeSVGTagAttrs=false
+                    loaders: ["svg-inline?classPrefix&idPrefix", "svgo"],
                 },
                 {
                     test: /\.json$/,
