@@ -12,7 +12,7 @@
     top: 332px;
 }
 
-.urlTram {
+.urlInfo {
     composes: text;
     top: 346px;
     left: 500px;
@@ -31,7 +31,7 @@
     transform-origin: top left;
 }
 
-.qrCodeTram {
+.qrCodeInfo {
     composes: qrCode;
     top: 128px;
     left: 732px;

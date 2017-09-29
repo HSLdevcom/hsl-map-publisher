@@ -6,23 +6,23 @@ import { InlineSVG } from "components/util";
 import feedbackCodes from "data/feedbackCodes.json";
 
 import footerIcon from "icons/footer.svg";
-import tramFooterIcon from "icons/footer_tram.svg";
+import feedbackFooterIcon from "icons/footer_feedback.svg";
 import trunkRouteFooterIcon from "icons/footer_trunk.svg";
 
 import styles from "./footer.css";
 
 const Footer = (props) => {
     const stopInfoUrl = `hsl.fi/pysakit/${props.shortId.replace(" ", "")}`;
-    const feedbackUrl = `hsl.fi/fixit/${props.shortId.substring(3)}`;
-    // Feedback for tram stops
-    const hasFeedbackCode = props.shortId.startsWith("H 0") &&
-                           feedbackCodes.some(({ code }) => code === props.shortId.substring(3));
+    const stopNumber = props.shortId.replace(/[a-zA-Z]+\s?0?/, "");
+    const feedbackUrl = `hsl.fi/fixit/${stopNumber}`;
+    const hasFeedbackCode = feedbackCodes.some(({ code }) => code === stopNumber);
 
-    let src;
+    let src = footerIcon;
+    if (props.isTrunkStop) {
+        src = trunkRouteFooterIcon;
+    }
     if (hasFeedbackCode) {
-        src = tramFooterIcon;
-    } else {
-        src = props.isTrunkStop ? trunkRouteFooterIcon : footerIcon;
+        src = feedbackFooterIcon;
     }
 
     return (
@@ -38,8 +38,8 @@ const Footer = (props) => {
 
             {hasFeedbackCode &&
                 <span>
-                    <div className={styles.urlTram}>{stopInfoUrl}</div>
-                    <QrCode className={styles.qrCodeTram} url={`http://${stopInfoUrl}`}/>
+                    <div className={styles.urlInfo}>{stopInfoUrl}</div>
+                    <QrCode className={styles.qrCodeInfo} url={`http://${stopInfoUrl}`}/>
                     <div className={styles.urlFeedback}>{feedbackUrl}</div>
                     <QrCode className={styles.qrCodeFeedback} url={`http://${feedbackUrl}`}/>
                 </span>
