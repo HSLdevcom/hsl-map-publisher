@@ -4,6 +4,8 @@ import segseg from "segseg";
 import memoize from "util/memoize";
 import renderQueue from "util/renderQueue";
 
+import ItemOverlay from "./itemOverlay";
+
 import styles from "./itemContainer.css";
 
 const ITERATIONS_PER_FACTOR = 10;
@@ -12,8 +14,6 @@ const OVERFLOW_COST = 500000;
 const INTERSECTION_COST = 50;
 const DISTANCE_COST = 1;
 const ANGLE_COST = 0.5;
-
-const MASK_MARGIN = 5;
 
 const ANGLES = [-32, -16, -8, -4, -1, 0, 1, 4, 8, 16, 32];
 const DISTANCES = [-25, -10, -1, 0, 1, 10, 25];
@@ -24,74 +24,6 @@ const diffs = FACTORS.map(f => (
         [...prev, ...DISTANCES.map(distance => ({ angle: angle * f, distance: distance * f }))]
     ), [])
 ));
-
-const Connector = props => (
-    <path
-        d={`M${props.x} ${props.y} L${props.x + props.cx} ${props.y + props.cy}`}
-        fill="none"
-        stroke="#333333"
-        strokeWidth="2"
-    />
-);
-
-Connector.propTypes = {
-    x: PropTypes.number.isRequired,
-    y: PropTypes.number.isRequired,
-    cx: PropTypes.number.isRequired,
-    cy: PropTypes.number.isRequired,
-};
-
-const Mask = props => (
-    <rect
-        x={props.left + MASK_MARGIN}
-        y={props.top + MASK_MARGIN}
-        width={props.width - (MASK_MARGIN * 2)}
-        height={props.height - (MASK_MARGIN * 2)}
-        fill="#000"
-    />
-);
-
-Mask.propTypes = {
-    left: PropTypes.number.isRequired,
-    top: PropTypes.number.isRequired,
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
-};
-
-const Overlays = props => (
-    <svg width={props.width} height={props.height}>
-        <defs>
-            <mask id="label-mask" x="0" y="0" width="1" height="1">
-                <rect width={props.width} height={props.height} fill="#fff"/>
-                {props.positions.map((position, index) => (
-                    !position.isFixed ? <Mask key={index} {...position}/> : null
-                ))}
-            </mask>
-        </defs>
-        <g mask="url(#label-mask)">
-            {props.positions.map((position, index) => (
-                !position.isFixed ? <Connector key={index} {...position}/> : null
-            ))}
-        </g>
-    </svg>
-);
-
-Overlays.propTypes = {
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
-    positions: PropTypes.arrayOf(PropTypes.oneOfType([
-        PropTypes.shape({
-            top: PropTypes.number.isRequired,
-            left: PropTypes.number.isRequired,
-            width: PropTypes.number.isRequired,
-            height: PropTypes.number.isRequired,
-        }),
-        PropTypes.shape({
-            ...Connector.propTypes,
-            ...Mask.propTypes,
-        }),
-    ])).isRequired,
-};
 
 /**
  * Container for items whose position will be adjusted for minimal overlap
@@ -397,7 +329,7 @@ class ItemContainer extends Component {
             ref.setPosition(placement.positions[index].top, placement.positions[index].left);
         });
 
-        this.setState({ positions: placement.positions });
+        this.setState({ items: placement.positions.filter(({ isFixed }) => !isFixed) });
 
         this.getIntersectionArea.cache.clear();
         this.hasIntersectingLines.cache.clear();
@@ -414,10 +346,10 @@ class ItemContainer extends Component {
         });
         return (
             <div className={styles.root} ref={(ref) => { this.root = ref; }}>
-                {this.state.positions && <Overlays
+                {this.state.items && <ItemOverlay
                     width={this.root.offsetWidth}
                     height={this.root.offsetHeight}
-                    positions={this.state.positions}
+                    items={this.state.items}
                 />}
                 {children}
             </div>
