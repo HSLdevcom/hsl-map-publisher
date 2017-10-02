@@ -149,6 +149,7 @@ class StopPoster extends Component {
                                             <AdContainer
                                                 width={this.ad.clientWidth}
                                                 height={this.ad.clientHeight}
+                                                shortId={this.props.shortId}
                                                 isTrunkStop={this.props.isTrunkStop}
                                             />
                                         }

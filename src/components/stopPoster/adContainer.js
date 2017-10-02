@@ -3,9 +3,12 @@ import PropTypes from "prop-types";
 import { InlineSVG } from "components/util";
 import renderQueue from "util/renderQueue";
 
+import { getFeedbackUrl } from "data/feedbackCodes";
+
 import mobileIcon from "icons/mobile_ad.svg";
 import mobileTrunkIcon from "icons/mobile_ad_trunk.svg";
 import feedbackIcon from "icons/feedback_ad.svg";
+
 
 class AdContainer extends Component {
     constructor(props) {
@@ -14,7 +17,7 @@ class AdContainer extends Component {
         const ads = [];
         if (!this.props.isTrunkStop) ads.push(mobileIcon);
         if (this.props.isTrunkStop) ads.push(mobileTrunkIcon);
-        ads.push(feedbackIcon);
+        if (getFeedbackUrl(this.props.shortId)) ads.push(feedbackIcon);
 
         this.state = { ads };
     }
@@ -55,14 +58,11 @@ class AdContainer extends Component {
     }
 }
 
-AdContainer.defaultProps = {
-    isTrunkStop: false,
-};
-
 AdContainer.propTypes = {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
-    isTrunkStop: PropTypes.bool,
+    shortId: PropTypes.string.isRequired,
+    isTrunkStop: PropTypes.bool.isRequired,
 };
 
 export default AdContainer;

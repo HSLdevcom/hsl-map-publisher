@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import QrCode from "components/qrCode";
 import { InlineSVG } from "components/util";
 
-import feedbackCodes from "data/feedbackCodes.json";
+import { getFeedbackUrl } from "data/feedbackCodes";
 
 import footerIcon from "icons/footer.svg";
 import feedbackFooterIcon from "icons/footer_feedback.svg";
@@ -13,15 +13,13 @@ import styles from "./footer.css";
 
 const Footer = (props) => {
     const stopInfoUrl = `hsl.fi/pysakit/${props.shortId.replace(" ", "")}`;
-    const stopNumber = props.shortId.replace(/[a-zA-Z]+\s?0?/, "");
-    const feedbackUrl = `hsl.fi/fixit/${stopNumber}`;
-    const hasFeedbackCode = feedbackCodes.some(({ code }) => code === stopNumber);
+    const feedbackUrl = getFeedbackUrl(props.shortId);
 
     let src = footerIcon;
     if (props.isTrunkStop) {
         src = trunkRouteFooterIcon;
     }
-    if (hasFeedbackCode) {
+    if (feedbackUrl) {
         src = feedbackFooterIcon;
     }
 
@@ -29,14 +27,14 @@ const Footer = (props) => {
         <div style={{ position: "relative" }}>
             <InlineSVG src={src}/>
 
-            {!hasFeedbackCode &&
+            {!feedbackUrl &&
                 <span>
                     <div className={styles.url}>{stopInfoUrl}</div>
                     <QrCode className={styles.qrCode} url={`http://${stopInfoUrl}`}/>
                 </span>
             }
 
-            {hasFeedbackCode &&
+            {feedbackUrl &&
                 <span>
                     <div className={styles.urlInfo}>{stopInfoUrl}</div>
                     <QrCode className={styles.qrCodeInfo} url={`http://${stopInfoUrl}`}/>
