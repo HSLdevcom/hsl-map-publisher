@@ -27,17 +27,13 @@ const Footer = (props) => {
         <div style={{ position: "relative" }}>
             <InlineSVG src={src}/>
 
-            {!feedbackUrl &&
-                <span>
-                    <div className={styles.url}>{stopInfoUrl}</div>
-                    <QrCode className={styles.qrCode} url={`http://${stopInfoUrl}`}/>
-                </span>
-            }
+            <span>
+                <div className={styles.urlInfo}>{stopInfoUrl}</div>
+                <QrCode className={styles.qrCodeInfo} url={`http://${stopInfoUrl}`}/>
+            </span>
 
             {feedbackUrl &&
                 <span>
-                    <div className={styles.urlInfo}>{stopInfoUrl}</div>
-                    <QrCode className={styles.qrCodeInfo} url={`http://${stopInfoUrl}`}/>
                     <div className={styles.urlFeedback}>{feedbackUrl}</div>
                     <QrCode className={styles.qrCodeFeedback} url={`http://${feedbackUrl}`}/>
                 </span>
