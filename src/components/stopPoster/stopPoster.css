@@ -27,19 +27,25 @@
     justify-content: space-between;
 }
 
+.column {
+    display: flex;
+    flex-flow: column;
+    align-items: stretch;
+}
+
 .left {
+    composes: column;
     width: 689px;
 }
 
 .leftStretched {
+    composes: column;
     width: 820px;
 }
 
 .right {
+    composes: column;
     flex: 1;
-    display: flex;
-    flex-flow: column;
-    align-items: stretch;
 }
 
 .timetables {
