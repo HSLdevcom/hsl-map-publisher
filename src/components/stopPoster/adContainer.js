@@ -5,6 +5,7 @@ import renderQueue from "util/renderQueue";
 
 import mobileIcon from "icons/mobile_ad.svg";
 import mobileTrunkIcon from "icons/mobile_ad_trunk.svg";
+import feedbackIcon from "icons/feedback_ad.svg";
 
 class AdContainer extends Component {
     constructor(props) {
@@ -13,6 +14,7 @@ class AdContainer extends Component {
         const ads = [];
         if (!this.props.isTrunkStop) ads.push(mobileIcon);
         if (this.props.isTrunkStop) ads.push(mobileTrunkIcon);
+        ads.push(feedbackIcon);
 
         this.state = { ads };
     }
