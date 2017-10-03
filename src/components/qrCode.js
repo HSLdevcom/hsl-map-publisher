@@ -3,49 +3,61 @@ import PropTypes from "prop-types";
 import QRCodeLib from "qrcode";
 import renderQueue from "util/renderQueue";
 
-
-// This enables us to set a global scale from app.js
-let scale = 1;
-
-export function setQrCodeScale(newScale) {
-    scale = newScale;
-}
-
 class QrCode extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
+
     componentDidMount() {
-        this.updateCode();
+        this.updateCode(this.props.url);
     }
 
-    componentDidUpdate() {
-        this.updateCode();
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.url !== this.props.url) {
+            this.updateCode(nextProps.url);
+        }
     }
 
-    updateCode() {
+    componentWillUnmount() {
+        renderQueue.remove(this);
+    }
+
+    updateCode(url) {
         renderQueue.add(this);
-        QRCodeLib.toCanvas(this.canvas, this.props.url, {
-            scale: 5 * scale,
-            margin: 2,
-        }, (error) => {
+        QRCodeLib.toString(url, { margin: 2 }, (error, src) => {
             if (error) {
-                console.error(error); // eslint-disable-line no-console
+                renderQueue.remove(this, { error });
+                return;
             }
-            renderQueue.remove(this, { error });
+            this.setState({ src: `data:image/svg+xml;base64,${btoa(src)}` });
         });
     }
 
     render() {
         return (
-            <canvas
-                ref={(ref) => { this.canvas = ref; }}
-                style={{ transform: `scale(${1 / scale})` }}
-                className={this.props.className}
-            />
+            <div style={this.props.style} className={this.props.className}>
+                {this.state.src &&
+                    <img
+                        style={{ display: "block", width: "100%" }}
+                        src={this.state.src}
+                        onLoad={() => renderQueue.remove(this)}
+                        onError={() => renderQueue.remove(this, { error: new Error("Failed to render QR code") })}
+                    />
+                }
+            </div>
         );
     }
 }
 
+QrCode.defaultProps = {
+    style: null,
+    className: null,
+};
+
 QrCode.propTypes = {
-    className: PropTypes.string.isRequired,
+    style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+    className: PropTypes.string,
     url: PropTypes.string.isRequired,
 };
 

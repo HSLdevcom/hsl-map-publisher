@@ -20,7 +20,7 @@
 
 .qrCode {
     position: absolute;
-    transform-origin: top left;
+    width: 140px;
 }
 
 .qrCodeInfo {

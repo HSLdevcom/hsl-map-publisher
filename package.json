@@ -77,7 +77,7 @@
     "nodemon": "^1.11.0",
     "png-stream": "^1.0.5",
     "prop-types": "^15.5.8",
-    "qrcode": "^0.8.1",
+    "qrcode": "^0.9.0",
     "query-string": "^4.3.2",
     "react": "^15.6.1",
     "react-apollo": "^1.4.2",
