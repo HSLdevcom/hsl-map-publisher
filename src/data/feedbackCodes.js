@@ -255,7 +255,7 @@ const feedbackCodes = [
 export default feedbackCodes;
 
 export function getFeedbackUrl(shortId) {
-    const stopNumber = shortId.replace(/[a-zA-Z]+\s?0?/, "");
+    const stopNumber = shortId.replace(/H\s?0?/, "");
     if (feedbackCodes.some(({ code }) => code === stopNumber)) {
         return `hsl.fi/fixit/${stopNumber}`;
     }
