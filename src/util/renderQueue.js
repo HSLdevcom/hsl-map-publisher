@@ -3,7 +3,6 @@ class RenderQueue {
     constructor() {
         this.items = [];
         this.callbacks = [];
-        this.hasErrors = false;
     }
 
     isEmpty() {
