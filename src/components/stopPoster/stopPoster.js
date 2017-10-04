@@ -41,11 +41,11 @@ class StopPoster extends Component {
     }
 
     componentDidMount() {
-        renderQueue.onEmpty(() => this.updateLayout(), { ignore: this });
+        renderQueue.onEmpty(error => !error && this.updateLayout(), { ignore: this });
     }
 
     componentDidUpdate() {
-        renderQueue.onEmpty(() => this.updateLayout(), { ignore: this });
+        renderQueue.onEmpty(error => !error && this.updateLayout(), { ignore: this });
     }
 
     hasOverflow() {

@@ -29,7 +29,7 @@ class App extends Component {
 
     componentDidMount() {
         if (this.root) {
-            renderQueue.onEmpty(({ error }) => {
+            renderQueue.onEmpty((error) => {
                 if (error) {
                     App.handleError(error);
                     return;
