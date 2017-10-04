@@ -16,7 +16,6 @@ function getMapStyle(components) {
     return hslMapStyle.generateStyle({
         components,
         glyphsUrl: "http://kartat.hsl.fi/",
-        sourcesUrl: "api.digitransit.fi/map/v1/",
     });
 }
 
