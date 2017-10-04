@@ -104,8 +104,8 @@ Spacer.defaultProps = {
 };
 
 Spacer.propTypes = {
-    width: PropTypes.number,
-    height: PropTypes.number,
+    width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 const FlexSpacer = () => <div style={{ flex: "2" }}/>;
