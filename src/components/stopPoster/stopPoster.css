@@ -49,17 +49,14 @@
 }
 
 .timetables {
+    flex: 0 1 auto;
     display: flex;
     align-items: stretch;
     justify-content: space-between;
 }
 
 .timetable {
+    flex: 0 1 auto;
     display: flex;
     align-items: stretch;
-    flex: 1 0 0;
-}
-
-.map {
-    flex: 1;
 }
