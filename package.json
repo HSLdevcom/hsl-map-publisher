@@ -79,6 +79,7 @@
     "prop-types": "^15.5.8",
     "qrcode": "^0.9.0",
     "query-string": "^4.3.2",
+    "raw-loader": "^0.5.1",
     "react": "^15.6.1",
     "react-apollo": "^1.4.2",
     "react-dom": "^15.6.1",
@@ -88,8 +89,6 @@
     "recompose": "^0.23.1",
     "segseg": "^0.2.2",
     "sharp": "^0.18.1",
-    "svg-inline-loader": "^0.8.0",
-    "svgo-loader": "^1.2.1",
     "tile-merge-stream": "HSLdevcom/tile-merge-stream",
     "viewport-mercator-project": "^4.0.0"
   }
