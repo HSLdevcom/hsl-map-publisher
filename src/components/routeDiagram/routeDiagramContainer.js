@@ -2,7 +2,7 @@ import { gql, graphql } from "react-apollo";
 import mapProps from "recompose/mapProps";
 import flatMap from "lodash/flatMap";
 import sortBy from "lodash/sortBy";
-import { isNumberVariant, trimRouteId } from "util/domain";
+import { isNumberVariant, trimRouteId, isDropOffOnly } from "util/domain";
 import apolloWrapper from "util/apolloWrapper";
 import { routesToTree } from "util/routes";
 
@@ -53,18 +53,25 @@ const routeDiagramQuery = gql`
     }
 `;
 
-const propsMapper = mapProps(props => ({
-    tree: routesToTree(flatMap(
-        props.data.stop.siblings.nodes, stop => stop.routeSegments.nodes
-        .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
-        .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
-        .map(routeSegment => ({
-            routeId: trimRouteId(routeSegment.routeId),
-            ...routeSegment.route.nodes[0],
-            stops: sortBy(routeSegment.nextStops.nodes, node => node.stopIndex)
-                .map(node => node.stopByStopId),
-        }))), props.data.stop.shortId),
-}));
+const propsMapper = mapProps((props) => {
+    const routes = flatMap(
+        props.data.stop.siblings.nodes,
+        stop => stop.routeSegments.nodes
+            // Select regular routes that allow boarding from current stop
+            .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
+            .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
+            .filter(routeSegment => !isDropOffOnly(routeSegment))
+            .map(routeSegment => ({
+                ...routeSegment.route.nodes[0],
+                routeId: trimRouteId(routeSegment.routeId),
+                // List all stops (including drop-off only) for each route
+                stops: sortBy(routeSegment.nextStops.nodes, node => node.stopIndex)
+                    .map(node => node.stopByStopId),
+            }))
+    );
+
+    return { tree: routesToTree(routes, props.data.stop.shortId) };
+});
 
 const RoutesContainer = apolloWrapper(propsMapper)(RouteDiagram);
 
