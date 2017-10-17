@@ -1,15 +1,13 @@
-@value fontFamily from "styles/common.css";
 
 .title {
-    font-family: fontFamily;
     font-size: 80px;
-    font-weight: 500;
+    font-family: GothamRounded-Medium;
     white-space: nowrap;
 }
 
 .subtitle {
     composes: title;
-    font-weight: 300;
+    font-family: GothamRounded-Book;
 }
 
 .small {

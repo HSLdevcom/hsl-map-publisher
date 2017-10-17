@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import QrCode from "components/qrCode";
-import { Image } from "components/util";
+import { InlineSVG } from "components/util";
 
 import feedbackCodes from "data/feedbackCodes.json";
 
@@ -27,7 +27,7 @@ const Footer = (props) => {
 
     return (
         <div style={{ position: "relative" }}>
-            <Image src={src}/>
+            <InlineSVG src={src}/>
 
             {!hasFeedbackCode &&
                 <span>

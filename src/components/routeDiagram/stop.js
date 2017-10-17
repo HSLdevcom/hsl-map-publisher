@@ -1,12 +1,9 @@
 import React from "react";
 
-import { Image } from "components/util";
-
+import { InlineSVG } from "components/util";
 import { iconsByMode } from "util/domain";
 
 import styles from "./stop.css";
-
-const Icon = props => <Image {...props} className={styles.icon}/>;
 
 const metroRegexp = / ?\(M\)$/;
 
@@ -29,7 +26,7 @@ const Stop = (props) => {
     const transferModes = getTransferModes(props.terminalByTerminalId, props.nameFi);
 
     return (
-        <div className={styles.stop}>
+        <div className={styles.root}>
             <div className={styles.left}/>
             <div className={styles.separator}>
                 <div className={styles.separatorTop}/>
@@ -50,7 +47,7 @@ const Stop = (props) => {
                 </div>
                 <div className={styles.iconContainer}>
                     {transferModes.map((mode, index) => (
-                        <Icon key={index} src={iconsByMode[mode]}/>
+                        <InlineSVG key={index} className={styles.icon} src={iconsByMode[mode]}/>
                     ))}
                 </div>
             </div>

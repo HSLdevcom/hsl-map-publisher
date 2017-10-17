@@ -22,15 +22,9 @@ Open [http://localhost:3000/component=StopPoster&props={"stopId": "1284117", "da
 
 ```
 docker build -t hsl-map-publisher .
-docker run -d -p 5000:5000 -v output:/output hsl-map-publisher
+docker run -d -p 5000:5000 -v output:/output -v fonts:/fonts hsl-map-publisher
 ```
+
+where `fonts` is a directory containing `Gotham Rounded` and `Gotham XNarrow` OpenType fonts.
 
 Open [http://localhost:5000](http://localhost:5000)
-
-To use OpenType fonts instead of web fonts:
-
-```
-docker run -d -v -v output:/output ~/fonts/:/fonts -p 5000:5000 hsl-map-publisher
-```
-
-where `~/fonts/` is a directory containing `.otf` files for `Gotham Rounded` and `Gotham Xnarrow` fonts.

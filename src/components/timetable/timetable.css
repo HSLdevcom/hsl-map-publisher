@@ -1,115 +1,51 @@
-@value fontFamily, fontFamilyNarrow, borderRadius from "styles/common.css";
+@value borderRadius from "styles/common.css";
 
 .root {
     position: relative;
     width: 100%;
     padding: borderRadius;
     padding-top: calc(borderRadius - 15px);
-    color: black;
-    font-weight: 300;
-    font-family: fontFamilyNarrow;
-    background: var(--light-background);
     border-radius: borderRadius;
-    --timetable-text-color: var(--hsl-blue);
+    color: var(--hsl-blue);
+    background: var(--light-background);
+    --timetable-accent-color: white;
 }
 
 .root.summer {
-    background-color: white;
-}
-
-.root strong {
-    font-weight: 500;
-}
-
-.header {
-    margin: 15px 0;
-    font-family: fontFamily;
-    color: var(--timetable-text-color);
-}
-
-.header > .title {
-    padding: 5px 10px;
-    font-size: 18px;
-}
-
-.header > .subtitle {
-    display: flex;
-    padding: 0 10px;
-    font-size: 12px;
-    line-height: 13px;
-    letter-spacing: -0.025em;
-}
-
-.header > .subtitle > *:first-child {
-    width: 50px;
+    background: white;
+    --timetable-accent-color: var(--light-background);
 }
 
 .componentName {
     padding: 0px 10px;
-    font-family: fontFamily;
-    color: var(--timetable-text-color);
     font-size: 30px;
 }
 
-.componentName > .title {
-    font-weight: 500;
+.title {
+    font-family: GothamRounded-Medium;
 }
 
-.componentName > .subtitle {
-    font-weight: 300;
-}
-
-.table > *:nth-child(odd) {
-    background-color: white;
-}
-
-.root.summer .table > *:nth-child(odd) {
-  background-color: var(--light-background);
-}
-
-.table > * {
-    margin: 0 calc(-1 * borderRadius);
-    padding: 0 borderRadius;
-}
-
-.table strong {
-    font-weight: 500;
-}
-
-.item {
-    display: flex;
-    min-width: 52px;
-    padding: 4px 0;
-    font-size: 12px;
-    letter-spacing: -.025em;
-    line-height: 8px;
-}
-
-.minutes {
-    font-weight: 500;
-    min-width: 12px;
-}
-
-.itemPadded {
-    composes: item;
-    padding-left: 15px;
+.subtitle {
+    font-family: GothamRounded-Book;
 }
 
 .footnote {
     padding: 2px 10px;
+    font-family: GothamXNarrow-Book;
     font-size: 13px;
-    font-family: fontFamilyNarrow;
-    color: var(--timetable-text-color);
 }
 
 .validity {
     position: absolute;
     top: calc(borderRadius - 15px);
     right: borderRadius;
-    font-family: fontFamily;
+    font-family: GothamRounded-Book;
     font-size: 12px;
     line-height: 16px;
     letter-spacing: -0.025em;
-    color: var(--timetable-text-color);
     text-align: right;
+}
+
+.validity > *:first-child {
+    font-family: GothamRounded-Medium;
 }

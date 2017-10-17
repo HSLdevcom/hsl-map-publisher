@@ -1,4 +1,4 @@
-@value fontFamily, borderRadius from "styles/common.css";
+@value borderRadius from "styles/common.css";
 
 .root {
     position: relative;
@@ -44,7 +44,7 @@
 .attribution {
     composes: outline;
     margin: 8px 0;
-    font-family: fontFamily;
+    font-family: GothamRounded-Medium;
     color: black;
 }
 
@@ -55,15 +55,14 @@
     margin-left: 3px;
     margin-right: 8px;
     font-size: 18px;
-    font-weight: 500;
-    font-family: fontFamily;
+    font-family: GothamRounded-Medium;
     color: black;
 }
 
 .subtitle {
     composes: title;
     margin-left: 0;
-    font-weight: 300;
+    font-family: GothamRounded-Book;
 }
 
 .center {

@@ -1,4 +1,34 @@
 
+@font-face {
+  font-family: GothamRounded-Book;
+  src: local("Gotham Rounded Book"), local("GothamRounded-Book");
+}
+
+@font-face {
+  font-family: GothamRounded-Medium;
+  src: local("Gotham Rounded Medium"), local("GothamRounded-Medium");
+}
+
+@font-face {
+  font-family: GothamRounded-Bold;
+  src: local("Gotham Rounded Bold"), local("GothamRounded-Bold");
+}
+
+@font-face {
+  font-family: GothamXNarrow-Book;
+  src: local("Gotham XNarrow Book"), local("GothamXNarrow-Book");
+}
+
+@font-face {
+  font-family: GothamXNarrow-Medium;
+  src: local("Gotham XNarrow Medium"), local("GothamXNarrow-Medium");
+}
+
+@font-face {
+  font-family: GothamXNarrow-Bold;
+  src: local("Gotham XNarrow Bold"), local("GothamXNarrow-Bold");
+}
+
 body {
     margin: 0;
 }

@@ -1,4 +1,4 @@
-@value fontFamily, borderRadius from "styles/common.css";
+@value borderRadius from "styles/common.css";
 @value leftWidth, rightWidth, lineWidth from "./values.css";
 
 .root {
@@ -11,6 +11,20 @@
     border-radius: borderRadius;
 }
 
+.componentName {
+    padding: 0px 0px 20px;
+    font-size: 30px;
+    color: var(--hsl-blue);
+}
+
+.componentName > .title {
+    font-family: GothamRounded-Medium;
+}
+
+.componentName > .subtitle {
+    font-family: GothamRounded-Book;
+}
+
 .start {
     display: flex;
     align-items: center;
@@ -20,30 +34,18 @@
     margin-bottom: calc(lineWidth * 2);
 }
 
-.icon {
+.start .icon {
     width: 30px;
     margin-left: -14px;
     margin-right: 5px;
 }
 
-.myPositionTitle {
+.start .title {
+    font-family: GothamRounded-Medium;
     font-size: 18px;
-    font-weight: 500;
-    font-family: fontFamily;
     line-height: 22px;
 }
 
-.subtitle {
-    font-weight: 300;
-}
-
-.componentName {
-    padding: 0px 0px 20px;
-    font-family: fontFamily;
-    color: var(--hsl-blue);
-    font-size: 30px;
-}
-
-.componentName > .title {
-    font-weight: 500;
+.start .subtitle {
+    font-family: GothamRounded-Book;
 }

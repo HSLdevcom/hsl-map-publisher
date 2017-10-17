@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import ItemContainer from "components/itemContainer";
 import ItemFixed from "components/itemFixed";
 import ItemPositioned from "components/itemPositioned";
-import { Row } from "components/util";
+import { Row, InlineSVG } from "components/util";
 
 import locationIcon from "icons/marker.svg";
 
@@ -37,7 +37,7 @@ const Attribution = () => (
 
 const LocationSymbol = props => (
     <div style={{ width: props.size, height: props.size }}>
-        <img src={locationIcon} style={{ width: "100%" }}/>
+        <InlineSVG src={locationIcon} style={{ width: "100%" }}/>
     </div>
 );
 

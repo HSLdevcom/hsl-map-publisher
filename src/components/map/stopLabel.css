@@ -1,38 +1,37 @@
-@value fontFamily, fontFamilyNarrow from "styles/common.css";
 
 .label {
     padding: 10px 7px 7px 10px;
     margin: 5px;
-    font-family: fontFamily;
     white-space: nowrap;
+    color: black;
     background: hsla(0, 0%, 100%, 0.8);
 }
 
 .title {
-    color: black;
     font-size: 16px;
-    font-weight: 500;
+    font-family: GothamRounded-Medium;
     line-height: 16px;
 }
 
 .subtitle {
-    color: black;
     font-size: 16px;
-    font-weight: 300;
+    font-family: GothamRounded-Book;
 }
 
 .content {
     font-size: 15px;
     line-height: 16px;
-    color: black;
     padding: 5px 0 0;
-    font-weight: 500;
 }
 
 .route {
-    font-family: fontFamilyNarrow;
+    font-family: GothamXNarrow-Medium;
 }
 
-.light {
-    font-weight: 300;
+.destination {
+    font-family: GothamRounded-Medium;
+}
+
+.destinationLight {
+    font-family: GothamRounded-Book;
 }
