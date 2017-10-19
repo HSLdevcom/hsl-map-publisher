@@ -80,7 +80,7 @@ module.exports = (options) => {
                 },
                 {
                     test: /\.svg$/,
-                    loaders: ["svg-inline?classPrefix&idPrefix", "svgo"],
+                    loaders: ["raw"],
                 },
                 {
                     test: /\.json$/,

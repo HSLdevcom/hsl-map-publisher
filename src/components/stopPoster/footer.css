@@ -1,37 +1,29 @@
 
-.text {
+.url {
     position: absolute;
     font-size: 20px;
     font-family: GothamXNarrow-Medium;
     color: black;
 }
 
-.url {
-    composes: text;
-    left: 500px;
-    top: 332px;
-}
-
-.urlTram {
-    composes: text;
+.urlInfo {
+    composes: url;
     top: 346px;
     left: 500px;
 }
 
 .urlFeedback {
-    composes: text;
+    composes: url;
     top: 346px;
     left: 936px;
 }
 
 .qrCode {
     position: absolute;
-    left: 800px;
-    top: 124px;
-    transform-origin: top left;
+    width: 140px;
 }
 
-.qrCodeTram {
+.qrCodeInfo {
     composes: qrCode;
     top: 128px;
     left: 732px;

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { JustifiedColumn, Spacer, InlineSVG } from "components/util";
+import { JustifiedColumn, Spacer } from "components/util";
 import renderQueue from "util/renderQueue";
 import { colorsByMode } from "util/domain";
 
@@ -9,13 +9,11 @@ import RouteDiagram from "components/routeDiagram/routeDiagramContainer";
 import Timetable from "components/timetable/timetableContainer";
 import StopMap from "components/map/stopMapContainer";
 
-import mobileAd from "icons/mobile_ad.svg";
-import mobileAdTrunk from "icons/mobile_ad_trunk.svg";
-
 import Header from "./headerContainer";
 import Footer from "./footer";
 
 import Routes from "./routesContainer";
+import AdContainer from "./adContainer";
 
 import styles from "./stopPoster.css";
 
@@ -30,12 +28,11 @@ class StopPoster extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            hasAd: true,
             hasRoutesOnTop: false,
             hasRouteDiagram: true,
             hasRoutes: true,
             hasStretchedLeftColumn: false,
-            shouldRenderMap: false,
+            shouldRenderFixedContent: false,
         };
     }
 
@@ -44,11 +41,11 @@ class StopPoster extends Component {
     }
 
     componentDidMount() {
-        renderQueue.onEmpty(() => this.updateLayout(), { ignore: this });
+        renderQueue.onEmpty(error => !error && this.updateLayout(), { ignore: this });
     }
 
     componentDidUpdate() {
-        renderQueue.onEmpty(() => this.updateLayout(), { ignore: this });
+        renderQueue.onEmpty(error => !error && this.updateLayout(), { ignore: this });
     }
 
     hasOverflow() {
@@ -62,22 +59,18 @@ class StopPoster extends Component {
             return;
         }
 
-        if (this.hasOverflow() && this.state.shouldRenderMap) {
-            renderQueue.remove(this, { error: new Error("Map render caused layout overflow") });
+        if (this.hasOverflow() && this.state.shouldRenderFixedContent) {
+            renderQueue.remove(this, { error: new Error("Fixed content caused layout overflow") });
             return;
         }
 
         if (this.hasOverflow()) {
-            if (this.state.hasAd) {
-                this.setState({ hasAd: false });
-                return;
-            }
             if (!this.state.hasRoutesOnTop) {
                 this.setState({ hasRoutesOnTop: true });
                 return;
             }
             if (this.state.hasRouteDiagram) {
-                this.setState({ hasRouteDiagram: false, hasAd: true });
+                this.setState({ hasRouteDiagram: false });
                 return;
             }
             if (this.state.hasRoutes) {
@@ -92,8 +85,8 @@ class StopPoster extends Component {
             return;
         }
 
-        if (!this.state.shouldRenderMap && this.map.clientHeight >= MAP_MIN_HEIGHT) {
-            this.setState({ shouldRenderMap: true });
+        if (!this.state.shouldRenderFixedContent) {
+            this.setState({ shouldRenderFixedContent: true });
             return;
         }
 
@@ -151,11 +144,16 @@ class StopPoster extends Component {
                                     {!this.state.hasRouteDiagram &&
                                         <StopPosterTimetable segments={["weekdays"]}/>
                                     }
-                                    {this.state.hasAd &&
-                                        <InlineSVG
-                                            src={this.props.isTrunkStop ? mobileAdTrunk : mobileAd}
-                                        />
-                                    }
+                                    <div style={{ flex: 1 }} ref={(ref) => { this.ad = ref; }}>
+                                        {this.state.shouldRenderFixedContent &&
+                                            <AdContainer
+                                                width={this.ad.clientWidth}
+                                                height={this.ad.clientHeight}
+                                                shortId={this.props.shortId}
+                                                isTrunkStop={this.props.isTrunkStop}
+                                            />
+                                        }
+                                    </div>
                                 </div>
 
                                 <Spacer width={10}/>
@@ -171,17 +169,15 @@ class StopPoster extends Component {
 
                                     {!this.state.hasRouteDiagram && <Spacer height={10}/>}
 
-                                    <div
-                                        className={styles.map}
-                                        ref={(ref) => { this.map = ref; }}
-                                    >
-                                        {this.state.shouldRenderMap &&
-                                            <StopMap
-                                                stopId={this.props.stopId}
-                                                date={this.props.date}
-                                                width={this.map.clientWidth}
-                                                height={this.map.clientHeight}
-                                            />
+                                    <div style={{ flex: 1 }} ref={(ref) => { this.map = ref; }}>
+                                        {this.state.shouldRenderFixedContent &&
+                                         this.map.clientHeight >= MAP_MIN_HEIGHT &&
+                                             <StopMap
+                                                 stopId={this.props.stopId}
+                                                 date={this.props.date}
+                                                 width={this.map.clientWidth}
+                                                 height={this.map.clientHeight}
+                                             />
                                         }
                                     </div>
 

@@ -3,7 +3,6 @@ class RenderQueue {
     constructor() {
         this.items = [];
         this.callbacks = [];
-        this.hasErrors = false;
     }
 
     isEmpty() {
@@ -24,7 +23,7 @@ class RenderQueue {
         if (options.error) {
             this.items = [];
             this.callbacks.forEach(({ callback }) => {
-                callback({ error: options.error });
+                callback(options.error);
             });
             return;
         }
@@ -39,14 +38,14 @@ class RenderQueue {
             const { callback, ignore } = callbackOptions;
             if (this.isEmpty() || this.containsOnly(ignore)) {
                 this.callbacks.splice(this.callbacks.indexOf(callbackOptions), 1);
-                callback({});
+                callback();
             }
         });
     }
 
     onEmpty(callback, options = {}) {
         if (this.isEmpty() || this.containsOnly(options.ignore)) {
-            callback({});
+            callback();
         } else {
             this.callbacks.push({ ...options, callback });
         }

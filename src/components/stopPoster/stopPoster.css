@@ -27,33 +27,36 @@
     justify-content: space-between;
 }
 
-.left {
-    width: 689px;
-}
-
-.leftStretched {
-    width: 820px;
-}
-
-.right {
-    flex: 1;
+.column {
     display: flex;
     flex-flow: column;
     align-items: stretch;
 }
 
+.left {
+    composes: column;
+    width: 689px;
+}
+
+.leftStretched {
+    composes: column;
+    width: 820px;
+}
+
+.right {
+    composes: column;
+    flex: 1;
+}
+
 .timetables {
+    flex: 0 1 auto;
     display: flex;
     align-items: stretch;
     justify-content: space-between;
 }
 
 .timetable {
+    flex: 0 1 auto;
     display: flex;
     align-items: stretch;
-    flex: 1 0 0;
-}
-
-.map {
-    flex: 1;
 }
