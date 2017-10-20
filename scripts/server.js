@@ -6,7 +6,6 @@ const Router = require("koa-router");
 const jsonBody = require("koa-json-body");
 
 const moment = require("moment");
-const template = require("lodash/template");
 const iconv = require("iconv-lite");
 const csv = require("csv");
 const fetch = require("node-fetch");
@@ -15,8 +14,11 @@ const promisify = require("util").promisify;
 
 const generator = require("./generator");
 const Logger = require("./logger");
+const JsonLogger = require("./jsonLogger");
 
 const unlinkAsync = promisify(fs.unlink);
+const readDirAsync = promisify(fs.readdir);
+const readFileAsync = promisify(fs.readFile);
 
 // 5 * 72 = 360 dpi
 const SCALE = 5;
@@ -25,11 +27,7 @@ const PDF_PPI = 72;
 const PORT = 4000;
 
 const OUTPUT_PATH = path.join(__dirname, "..", "output");
-const TEMPLATE = template(fs.readFileSync(path.join(__dirname, "index.html")));
-
 const API_URL = "http://kartat.hsl.fi/jore/graphql";
-
-let queueLength = 0;
 
 function fetchStopIds() {
     const options = {
@@ -69,68 +67,79 @@ function fetchStops() {
     });
 }
 
-function generatePdf(directory, filenames, outputFilename) {
-    const outputPath = path.join(directory, outputFilename.replace(/(\/|\\)/g, ""));
+function spawnAsync(cmd, args) {
     return new Promise((resolve, reject) => {
-        const pdftk = spawn("pdftk", [
-            ...filenames,
-            "cat",
-            "output",
-            outputPath,
-        ]);
-        pdftk.stderr.on("data", data => reject(new Error(data.toString())));
-        pdftk.on("close", resolve);
+        const childProcess = spawn(cmd, args);
+        childProcess.stderr.on("data", data => reject(new Error(data.toString())));
+        childProcess.on("close", () => resolve());
     });
 }
 
-function convertToCmykPdf(filename) {
-    const cmykFilename = filename.replace(".tiff", ".cmyk.tiff");
-    return new Promise((resolve, reject) => {
-        const cctiff = spawn("cctiff", ["rgb_test_out.icc", filename, cmykFilename]);
-        cctiff.stderr.on("data", data => reject(new Error(data.toString())));
-        cctiff.on("close", () => unlinkAsync(filename).then(() => {
-            const pdfFilename = filename.replace(".tiff", ".pdf");
-            const convert = spawn("convert", [
-                "-density",
-                SCALE * PDF_PPI,
-                "-units",
-                "PixelsPerInch",
-                cmykFilename,
-                pdfFilename,
-            ]);
-            convert.stderr.on("data", data => reject(new Error(data.toString())));
-            convert.on("close", () => unlinkAsync(cmykFilename).then(() => resolve(pdfFilename)));
-        }));
-    }
-  );
+async function generatePdf(directory, filenames, title) {
+    const inputPaths = filenames.map(filename => path.join(directory, filename));
+    const outputFilename = `${title.replace(/[^a-zA-Z0-9-]/g, "")}.pdf`;
+    const outputPath = path.join(directory, outputFilename);
+
+    await spawnAsync("pdftk", [...inputPaths, "cat", "output", outputPath]);
+    return outputFilename;
 }
 
-function generateFiles(component, props, outputFilename = "output.pdf") {
+async function convertToCmykPdf(directory, filename) {
+    const cmykFilename = filename.replace(".tiff", ".cmyk.tiff");
+    const pdfFilename = filename.replace(".tiff", ".pdf");
+    const sourcePath = path.join(directory, filename);
+    const cmykPath = path.join(directory, cmykFilename);
+    const pdfPath = path.join(directory, pdfFilename);
+
+    await spawnAsync("cctiff", ["rgb_to_cmyk.icc", sourcePath, cmykPath]);
+    await unlinkAsync(sourcePath);
+    await spawnAsync("convert", [
+        "-density", SCALE * PDF_PPI,
+        "-units", "PixelsPerInch",
+        cmykPath, pdfPath,
+    ]);
+    await unlinkAsync(cmykPath);
+
+    return pdfFilename;
+}
+
+function generateFiles(component, props, title) {
     const identifier = moment().format("YYYY-MM-DD-HHmm-sSSSSS");
     const directory = path.join(OUTPUT_PATH, identifier);
 
     fs.mkdirSync(directory);
     const logger = new Logger(path.join(directory, "build.log"));
+    const jsonLogger = new JsonLogger({
+        path: path.join(directory, "build.json"),
+        pageCount: props.length,
+        title,
+    });
 
     const promises = [];
     for (let i = 0; i < props.length; i++) {
         const filename = `${i + 1}.tiff`;
         const options = {
             logger,
-            filename,
-            directory,
             component,
+            directory,
+            filename,
             props: props[i],
             scale: SCALE,
         };
 
-        queueLength++;
-
         promises.push(
             generator.generate(options)
                 .then((success) => { // eslint-disable-line no-loop-func
-                    queueLength--;
-                    return success && convertToCmykPdf(path.join(directory, filename));
+                    if (!success) return null;
+                    return convertToCmykPdf(directory, filename);
+                })
+                .then((pdfFilename) => {
+                    jsonLogger.logPage({ component, props: props[i], filename: pdfFilename });
+                    return pdfFilename;
+                })
+                .catch((error) => {
+                    logger.logError(error);
+                    jsonLogger.logPage({ component, props: props[i], filename: null });
                 })
         );
     }
@@ -139,12 +148,14 @@ function generateFiles(component, props, outputFilename = "output.pdf") {
         .then((filenames) => {
             const validFilenames = filenames.filter(name => !!name);
             logger.logInfo(`Successfully rendered ${validFilenames.length} / ${filenames.length} pages\n`);
-            return generatePdf(directory, validFilenames, outputFilename)
+            return generatePdf(directory, validFilenames, title);
         })
-        .then(() => {
+        .then((filename) => {
+            jsonLogger.logSuccess({ filename });
             logger.end("DONE");
         })
         .catch((error) => {
+            jsonLogger.logError(error);
             logger.logError(error);
             logger.end("FAIL");
         });
@@ -161,8 +172,8 @@ function successResponse(ctx, body, type = "application/json") {
 function errorResponse(ctx, error) {
     ctx.status = 500;
     ctx.body = { error: error.message };
-    console.error(error);
-    console.error(error.stack);
+    console.error(error); // eslint-disable-line no-console
+    console.error(error.stack); // eslint-disable-line no-console
 }
 
 async function main() {
@@ -177,19 +188,35 @@ async function main() {
         successResponse(ctx, stops);
     });
 
-    router.get("/queueInfo", (ctx) => {
-        successResponse(ctx, { queueLength });
+    router.get("/builds", async (ctx) => {
+        const filenames = await readDirAsync(OUTPUT_PATH);
+        const builds = {};
+
+        for (let i = 0; i < filenames.length; i++) {
+            try {
+                const identifier = filenames[i];
+                // eslint-disable-next-line no-await-in-loop
+                const data = await readFileAsync(path.join(OUTPUT_PATH, identifier, "build.json"));
+                builds[identifier] = JSON.parse(data);
+            } catch (error) {
+                if (!["ENOENT", "ENOTDIR"].includes(error.code)) {
+                    return errorResponse(ctx, error);
+                }
+            }
+        }
+        return successResponse(ctx, builds);
     });
 
     router.post("/generate", (ctx) => {
-        const { component, props, filename } = ctx.request.body;
+        const { component, props, title } = ctx.request.body;
 
-        if (typeof component !== "string" || !(props instanceof Array) || !props.length) {
+        if (typeof component !== "string" || typeof title !== "string" ||
+            !(props instanceof Array) || !props.length) {
             return errorResponse(ctx, new Error("Invalid request body"));
         }
 
         try {
-            const filePath = generateFiles(component, props, filename);
+            const filePath = generateFiles(component, props, title);
             return successResponse(ctx, { path: filePath });
         } catch (error) {
             return errorResponse(ctx, error);
@@ -200,12 +227,11 @@ async function main() {
         .use(jsonBody({ fallback: true }))
         .use(router.routes())
         .use(router.allowedMethods())
-        .listen(PORT, (err) => {
-            if (err) {
-                console.error(err);
-            }
-            console.log(`Listening at port ${PORT}`);
+        .listen(PORT, () => {
+            console.log(`Listening at port ${PORT}`);  // eslint-disable-line no-console
         });
 }
 
-main().catch(console.log.bind(console));
+main().catch((error) => {
+    console.error(error); // eslint-disable-line no-console
+});

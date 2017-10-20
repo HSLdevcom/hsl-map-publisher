@@ -1,7 +1,6 @@
 
 .root {
     display: flex;
-    flex-flow: column;
     width: 100%;
     max-width: 1000px;
     height: 100vh;
@@ -10,27 +9,6 @@
     box-sizing: border-box;
 }
 
-.row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    justify-content: space-between;
-    padding: 10px 0;
-}
-
-.column {
-    flex: 32%;
-}
-
-.main {
-    flex: 1;
-    display: flex;
-    min-height: 300px;
-}
-
-.footer {
-    display: flex;
-    flex-flow: row;
-    justify-content: space-between;
-    margin: 30px 0;
+.tab {
+    height: calc(100vh - 70px);
 }

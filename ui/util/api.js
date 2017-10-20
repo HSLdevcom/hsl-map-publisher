@@ -2,8 +2,8 @@
 const API_URL = "api";
 const OUTPUT_URL = `${window.location.protocol}//${window.location.host}/output`;
 
-async function fetchQueueInfo() {
-    const response = await fetch(`${API_URL}/queueInfo`);
+async function fetchBuilds() {
+    const response = await fetch(`${API_URL}/builds`);
     if (!response.ok) throw new Error(response.statusText);
     return response.json();
 }
@@ -14,8 +14,8 @@ async function fetchStops() {
     return response.json();
 }
 
-async function generate(component, props, filename) {
-    const options = { method: "POST", body: JSON.stringify({ component, props, filename }) };
+async function generate(component, props, title) {
+    const options = { method: "POST", body: JSON.stringify({ component, props, title }) };
 
     const response = await fetch(`${API_URL}/generate`, options);
     if (!response.ok) throw new Error(response.statusText);
@@ -25,7 +25,7 @@ async function generate(component, props, filename) {
 }
 
 export {
-    fetchQueueInfo,
+    fetchBuilds,
     fetchStops,
     generate,
 };
