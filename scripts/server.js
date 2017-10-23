@@ -7,11 +7,9 @@ const cors = require("@koa/cors");
 const jsonBody = require("koa-json-body");
 
 const moment = require("moment");
-const iconv = require("iconv-lite");
-const csv = require("csv");
-const fetch = require("node-fetch");
 const { spawn } = require("child_process");
 
+const fetchStops = require("./stops");
 const generator = require("./generator");
 const Logger = require("./logger");
 
@@ -22,46 +20,7 @@ const PORT = 4000;
 
 const OUTPUT_PATH = path.join(__dirname, "..", "output");
 
-const API_URL = "http://kartat.hsl.fi/jore/graphql";
-
 let queueLength = 0;
-
-function fetchStopIds() {
-    const options = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: "query AllStops {allStops { nodes { stopId}} }" }),
-    };
-
-    return fetch(API_URL, options)
-        .then(response => response.json())
-        .then(json => json.data.allStops.nodes.map(stop => stop.stopId));
-}
-
-
-// FIXME: Fetch stops from graphql when data available
-function fetchStops() {
-    return new Promise((resolve, reject) => {
-        fs.createReadStream(`${__dirname}/jr_map_pysakit_varustus.txt`)
-            .pipe(iconv.decodeStream("ISO-8859-1"))
-            .pipe(csv.parse({ delimiter: "#", columns: true }, (err, data) => {
-                if (err) reject(err);
-                const stops = data
-                    .map(stop => ({
-                        stopId: stop.tunnus,
-                        shortId: stop.lyhyt_nro,
-                        nameFi: stop.nimi_suomi,
-                        group: `${stop.aikataulutyyppi_hsl}${stop.aikataulutyyppi_hkl}`,
-                        index: stop.ajojarjestys,
-                        hasShelter: stop.pysakkityyppi.includes("katos") &&
-                            !(stop.lyhyt_nro.startsWith("Ki")
-                                && stop.pysakkityyppi.includes("teräskatos")),
-                    }))
-                    .sort((a, b) => a.shortId.localeCompare(b.shortId));
-                resolve(stops);
-            }));
-    });
-}
 
 function generatePdf(directory, filenames, outputFilename) {
     const outputPath = path.join(directory, outputFilename.replace(/(\/|\\)/g, ""));
@@ -136,13 +95,11 @@ function errorResponse(ctx, error) {
 }
 
 async function main() {
-    let stops = await fetchStops();
-    const stopIds = await fetchStopIds();
-    stops = stops.filter(stop => stopIds.includes(stop.stopId));
-
     const app = new Koa();
     const router = new Router();
 
+    // FIXME: Update UI to fetch from graphql and remove when data available
+    const stops = await fetchStops();
     router.get("/stops", (ctx) => {
         successResponse(ctx, stops);
     });
