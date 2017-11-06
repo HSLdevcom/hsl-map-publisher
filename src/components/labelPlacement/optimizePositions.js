@@ -10,6 +10,8 @@ import {
     getAngleCost,
 } from "./costFunctions";
 
+
+const timeout = 3 * 60 * 1000;
 const iterationsPerFactor = 10;
 
 const angles = [-32, -16, -8, -4, -1, 0, 1, 4, 8, 16, 32];
@@ -90,6 +92,8 @@ function getNextPlacement(initialPlacement, index, diffs, bbox) {
 }
 
 async function optimizePositions(initialPositions, bbox) {
+    const start = Date.now();
+
     let placement = {
         positions: initialPositions.map(position => updatePosition(position)),
         indexes: [],
@@ -100,12 +104,17 @@ async function optimizePositions(initialPositions, bbox) {
         for (let iteration = 0; iteration < iterationsPerFactor; iteration++) {
             const previousPlacement = placement;
             for (let index = 0; index < placement.positions.length; index++) {
+                if ((Date.now() - start) > timeout) {
+                    return placement.positions;
+                }
                 if (!placement.positions[index].isFixed) {
                     // eslint-disable-next-line no-await-in-loop
                     placement = await getNextPlacement(placement, index, diffs, bbox);
                 }
             }
-            if (placement === previousPlacement) break;
+            if (placement === previousPlacement) {
+                break;
+            }
         }
     }
 
