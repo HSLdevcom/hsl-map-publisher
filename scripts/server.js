@@ -83,26 +83,20 @@ function generatePdf(directory, filenames, outputFilename) {
     });
 }
 
-function convertToCmykPdf(filename) {
-    const cmykFilename = filename.replace(".tiff", ".cmyk.tiff");
+function convertToPdf(filename) {
     return new Promise((resolve, reject) => {
-        const cctiff = spawn("cctiff", ["rgb_test_out.icc", filename, cmykFilename]);
-        cctiff.stderr.on("data", data => reject(new Error(data.toString())));
-        cctiff.on("close", () => unlinkAsync(filename).then(() => {
-            const pdfFilename = filename.replace(".tiff", ".pdf");
-            const convert = spawn("convert", [
-                "-density",
-                SCALE * PDF_PPI,
-                "-units",
-                "PixelsPerInch",
-                cmykFilename,
-                pdfFilename,
-            ]);
-            convert.stderr.on("data", data => reject(new Error(data.toString())));
-            convert.on("close", () => unlinkAsync(cmykFilename).then(() => resolve(pdfFilename)));
-        }));
-    }
-  );
+        const pdfFilename = filename.replace(".tiff", ".pdf");
+        const convert = spawn("convert", [
+            "-density",
+            SCALE * PDF_PPI,
+            "-units",
+            "PixelsPerInch",
+            filename,
+            pdfFilename,
+        ]);
+        convert.stderr.on("data", data => reject(new Error(data.toString())));
+        convert.on("close", () => unlinkAsync(filename).then(() => resolve(pdfFilename)));
+    });
 }
 
 function generateFiles(component, props, outputFilename = "output.pdf") {
@@ -130,7 +124,7 @@ function generateFiles(component, props, outputFilename = "output.pdf") {
             generator.generate(options)
                 .then((success) => { // eslint-disable-line no-loop-func
                     queueLength--;
-                    return success && convertToCmykPdf(path.join(directory, filename));
+                    return success && convertToPdf(path.join(directory, filename));
                 })
         );
     }
@@ -139,7 +133,7 @@ function generateFiles(component, props, outputFilename = "output.pdf") {
         .then((filenames) => {
             const validFilenames = filenames.filter(name => !!name);
             logger.logInfo(`Successfully rendered ${validFilenames.length} / ${filenames.length} pages\n`);
-            return generatePdf(directory, validFilenames, outputFilename)
+            return generatePdf(directory, validFilenames, outputFilename);
         })
         .then(() => {
             logger.end("DONE");
