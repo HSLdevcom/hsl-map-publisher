@@ -1,8 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
-import ItemContainer from "components/itemContainer";
-import ItemFixed from "components/itemFixed";
-import ItemPositioned from "components/itemPositioned";
+import ItemContainer from "components/labelPlacement/itemContainer";
+import ItemFixed from "components/labelPlacement/itemFixed";
+import ItemPositioned from "components/labelPlacement/itemPositioned";
 import { Row, InlineSVG } from "components/util";
 
 import locationIcon from "icons/marker.svg";
