@@ -91,7 +91,7 @@ function getNextPlacement(initialPlacement, index, diffs, bbox) {
     });
 }
 
-async function optimizePositions(initialPositions, bbox) {
+async function optimizePositions(initialPositions, bbox, ctx = {}) {
     const start = Date.now();
 
     let placement = {
@@ -102,17 +102,20 @@ async function optimizePositions(initialPositions, bbox) {
     for (let factor = 0; factor < factors.length; factor++) {
         const diffs = diffsArray[factor];
         for (let iteration = 0; iteration < iterationsPerFactor; iteration++) {
-            const previousPlacement = placement;
+            const previous = placement;
             for (let index = 0; index < placement.positions.length; index++) {
-                if ((Date.now() - start) > timeout) {
-                    return placement.positions;
-                }
                 if (!placement.positions[index].isFixed) {
                     // eslint-disable-next-line no-await-in-loop
                     placement = await getNextPlacement(placement, index, diffs, bbox);
                 }
+                if (ctx.shouldCancel) {
+                    return null;
+                }
+                if ((Date.now() - start) > timeout) {
+                    return placement.positions;
+                }
             }
-            if (placement === previousPlacement) {
+            if (placement === previous) {
                 break;
             }
         }

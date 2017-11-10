@@ -21,9 +21,17 @@ class ItemContainer extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (prevProps.children !== this.props.children) {
-            this.promise = this.promise.then(() => this.updateChildren());
+        if (prevProps !== this.props) {
+            this.shouldCancel = true;
+            this.promise = this.promise.then(() => {
+                this.shouldCancel = false;
+                return this.updateChildren();
+            });
         }
+    }
+
+    componentWillUnmount() {
+        this.shouldCancel = true;
     }
 
     async updateChildren() {
@@ -42,10 +50,14 @@ class ItemContainer extends Component {
         // Get initial positions
         const initialPositions = refs.map(ref => ref.getPosition());
 
-        const positions = await optimizePositions(initialPositions, boundingBox);
+        const positions = await optimizePositions(initialPositions, boundingBox, this);
 
-        refs.forEach((ref, index) => ref.setPosition(positions[index].top, positions[index].left));
-        this.setState({ items: positions.filter(({ isFixed }) => !isFixed) });
+        if (positions) {
+            refs.forEach((ref, index) => (
+                ref.setPosition(positions[index].top, positions[index].left)
+            ));
+            this.setState({ items: positions.filter(({ isFixed }) => !isFixed) });
+        }
 
         renderQueue.remove(this);
     }
