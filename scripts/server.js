@@ -5,24 +5,33 @@ const jsonBody = require("koa-json-body");
 
 const fetchStops = require("./stops");
 const generator = require("./generator");
+const {
+    getBuilds, addBuild, addPoster, addEvent, updatePoster,
+} = require("./store");
 
 const PORT = 4000;
 
-async function generatePosters(component, propsArray) {
-    for (let i = 0; i < propsArray.length; i++) {
-        const props = propsArray[i];
-        const id = Date.now();
-        const onInfo = message => console.log(message);
-        const onError = error => console.error(error);
+async function generatePoster(buildId, component, props) {
+    const { id } = await addPoster({ buildId, component, props });
 
-        const options = {
-            id, component, props, onInfo, onError,
-        };
+    const onInfo = (message) => {
+        console.log(`${id}: ${message}`); // eslint-disable-line no-console
+        addEvent({ posterId: id, type: "INFO", message });
+    };
+    const onError = (error) => {
+        console.error(`${id}: ${error.message} ${error.stack}`); // eslint-disable-line no-console
+        addEvent({ posterId: id, type: "ERROR", message: error.message });
+    };
 
-        generator.generate(options)
-            .then(({ status, filename }) => console.log(filename))
-            .catch(error => console.eror(error)); // eslint-disable-line no-console
-    }
+    const options = {
+        id, component, props, onInfo, onError,
+    };
+
+    generator.generate(options)
+        .then(({ success }) => updatePoster({ id, status: success ? "READY" : "FAILED" }))
+        .catch(error => console.error(error)); // eslint-disable-line no-console
+
+    return { id };
 }
 
 function successResponse(ctx, body, type = "application/json") {
@@ -48,16 +57,36 @@ async function main() {
         successResponse(ctx, stops);
     });
 
-    router.post("/generate", async (ctx) => {
-        const { component, props } = ctx.request.body;
-
-        if (typeof component !== "string" || !(props instanceof Array) || !props.length) {
-            return errorResponse(ctx, new Error("Invalid request body"));
+    router.get("/builds", async (ctx) => {
+        try {
+            const builds = await getBuilds();
+            return successResponse(ctx, builds);
+        } catch (error) {
+            return errorResponse(ctx, error);
         }
+    });
+
+    router.post("/builds", async (ctx) => {
+        const { title } = ctx.request.body;
 
         try {
-            await generatePosters(component, props);
-            return successResponse(ctx, { success: true });
+            const build = await addBuild({ title });
+            return successResponse(ctx, build);
+        } catch (error) {
+            return errorResponse(ctx, error);
+        }
+    });
+
+    router.post("/posters", async (ctx) => {
+        const { buildId, component, props } = ctx.request.body;
+
+        try {
+            const posters = [];
+            for (let i = 0; i < props.length; i++) {
+                // eslint-disable-next-line no-await-in-loop
+                posters.push(await generatePoster(buildId, component, props[i]));
+            }
+            return successResponse(ctx, posters);
         } catch (error) {
             return errorResponse(ctx, error);
         }

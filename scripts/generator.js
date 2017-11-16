@@ -13,6 +13,8 @@ const SCALE = 96 / 72;
 let browser = null;
 let previous = Promise.resolve();
 
+const pdfPath = id => path.join(__dirname, "..", "output", `${id}.pdf`);
+
 async function initialize() {
     browser = await puppeteer.launch({ args: ["--no-sandbox", "--disable-setuid-sandbox"] });
     browser.on("disconnected", () => { browser = null; });
@@ -24,7 +26,7 @@ async function initialize() {
  */
 async function renderComponent(options) {
     const {
-        component, props, directory, filename, logger,
+        id, component, props, onInfo, onError,
     } = options;
 
     const page = await browser.newPage();
@@ -32,12 +34,12 @@ async function renderComponent(options) {
     page.on("error", (error) => {
         page.close();
         browser.close();
-        logger.logError(error);
+        onError(error);
     });
 
     page.on("console", ({ type, text }) => {
         if (["error", "warning", "log"].includes(type)) {
-            logger.logInfo(`Console(${type}): ${text}`);
+            onInfo(`Console(${type}): ${text}`);
         }
     });
 
@@ -63,27 +65,25 @@ async function renderComponent(options) {
         scale: SCALE,
     });
 
-    await writeFileAsync(path.join(directory, filename), contents);
+    await writeFileAsync(pdfPath(id), contents);
     await page.close();
 }
 
 async function renderComponentRetry(options) {
-    const { component, props, onInfo, onError } = options;
+    const { onInfo, onError } = options;
 
     for (let i = 0; i < MAX_RENDER_ATTEMPTS; i++) {
         /* eslint-disable no-await-in-loop */
         try {
-            if (i > 0) {
-                onInfo("Retrying");
-            }
+            onInfo(i > 0 ? "Retrying" : "Rendering");
             if (!browser) {
-                options.logger.logInfo("Creating new browser instance");
+                onInfo("Creating new browser instance");
                 await initialize();
             }
             const timeout = new Promise((resolve, reject) => setTimeout(reject, RENDER_TIMEOUT, new Error("Render timeout")));
             await Promise.race([renderComponent(options), timeout]);
-            options.logger.logInfo(`Successfully rendered ${options.filename}\n`);
-            return { success: true, filename: pdfFilename };
+            onInfo("Rendered successfully");
+            return { success: true };
         } catch (error) {
             onError(error);
         }
@@ -99,11 +99,9 @@ async function renderComponentRetry(options) {
  * @param {string} options.id - Unique id
  * @param {string} options.component - React component to render
  * @param {Object} options.props - Props to pass to component
- * @param {string} options.directory - Output directory
- * @param {string} options.filename - Output filename
  * @param {function} options.onInfo - Callback (string)
  * @param {function} options.onError - Callback (Error)
- * @returns {Promise} - Always resolves with { success, path? }
+ * @returns {Promise} - Always resolves with { success }
  */
 function generate(options) {
     previous = previous.then(() => renderComponentRetry(options));
