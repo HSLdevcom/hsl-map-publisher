@@ -1,84 +1,28 @@
-const fs = require("fs");
-const path = require("path");
-
 const Koa = require("koa");
 const Router = require("koa-router");
 const cors = require("@koa/cors");
 const jsonBody = require("koa-json-body");
 
-const moment = require("moment");
-const { spawn } = require("child_process");
-
 const fetchStops = require("./stops");
 const generator = require("./generator");
-const Logger = require("./logger");
-
-// 5 * 72 = 360 dpi
-const SCALE = 5;
 
 const PORT = 4000;
 
-const OUTPUT_PATH = path.join(__dirname, "..", "output");
+async function generatePosters(component, propsArray) {
+    for (let i = 0; i < propsArray.length; i++) {
+        const props = propsArray[i];
+        const id = Date.now();
+        const onInfo = message => console.log(message);
+        const onError = error => console.error(error);
 
-let queueLength = 0;
-
-function generatePdf(directory, filenames, outputFilename) {
-    const outputPath = path.join(directory, outputFilename.replace(/(\/|\\)/g, ""));
-    return new Promise((resolve, reject) => {
-        const pdftk = spawn("pdftk", [
-            ...filenames,
-            "cat",
-            "output",
-            outputPath,
-        ]);
-        pdftk.stderr.on("data", data => reject(new Error(data.toString())));
-        pdftk.on("close", resolve);
-    });
-}
-
-function generateFiles(component, props, outputFilename = "output.pdf") {
-    const identifier = moment().format("YYYY-MM-DD-HHmm-sSSSSS");
-    const directory = path.join(OUTPUT_PATH, identifier);
-
-    fs.mkdirSync(directory);
-    const logger = new Logger(path.join(directory, "build.log"));
-
-    const promises = [];
-    for (let i = 0; i < props.length; i++) {
-        const filename = `${i + 1}.pdf`;
         const options = {
-            logger,
-            filename,
-            directory,
-            component,
-            props: props[i],
-            scale: SCALE,
+            id, component, props, onInfo, onError,
         };
 
-        queueLength++;
-
-        promises.push(generator.generate(options)
-            .then((success) => { // eslint-disable-line no-loop-func
-                queueLength--;
-                return success && path.join(directory, filename);
-            }));
+        generator.generate(options)
+            .then(({ status, filename }) => console.log(filename))
+            .catch(error => console.eror(error)); // eslint-disable-line no-console
     }
-
-    Promise.all(promises)
-        .then((filenames) => {
-            const validFilenames = filenames.filter(name => !!name);
-            logger.logInfo(`Successfully rendered ${validFilenames.length} / ${filenames.length} pages\n`);
-            return generatePdf(directory, validFilenames, outputFilename);
-        })
-        .then(() => {
-            logger.end("DONE");
-        })
-        .catch((error) => {
-            logger.logError(error);
-            logger.end("FAIL");
-        });
-
-    return identifier;
 }
 
 function successResponse(ctx, body, type = "application/json") {
@@ -104,20 +48,16 @@ async function main() {
         successResponse(ctx, stops);
     });
 
-    router.get("/queueInfo", (ctx) => {
-        successResponse(ctx, { queueLength });
-    });
-
-    router.post("/generate", (ctx) => {
-        const { component, props, filename } = ctx.request.body;
+    router.post("/generate", async (ctx) => {
+        const { component, props } = ctx.request.body;
 
         if (typeof component !== "string" || !(props instanceof Array) || !props.length) {
             return errorResponse(ctx, new Error("Invalid request body"));
         }
 
         try {
-            const filePath = generateFiles(component, props, filename);
-            return successResponse(ctx, { path: filePath });
+            await generatePosters(component, props);
+            return successResponse(ctx, { success: true });
         } catch (error) {
             return errorResponse(ctx, error);
         }

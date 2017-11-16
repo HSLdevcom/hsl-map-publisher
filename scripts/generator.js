@@ -68,14 +68,13 @@ async function renderComponent(options) {
 }
 
 async function renderComponentRetry(options) {
-    options.logger.logInfo(`Rendering ${options.component} to ${options.filename}`);
-    options.logger.logInfo(`Using props ${JSON.stringify(options.props)}`);
+    const { component, props, onInfo, onError } = options;
 
     for (let i = 0; i < MAX_RENDER_ATTEMPTS; i++) {
         /* eslint-disable no-await-in-loop */
         try {
             if (i > 0) {
-                options.logger.logInfo("Retrying");
+                onInfo("Retrying");
             }
             if (!browser) {
                 options.logger.logInfo("Creating new browser instance");
@@ -84,26 +83,27 @@ async function renderComponentRetry(options) {
             const timeout = new Promise((resolve, reject) => setTimeout(reject, RENDER_TIMEOUT, new Error("Render timeout")));
             await Promise.race([renderComponent(options), timeout]);
             options.logger.logInfo(`Successfully rendered ${options.filename}\n`);
-            return true;
+            return { success: true, filename: pdfFilename };
         } catch (error) {
-            options.logger.logError(error);
+            onError(error);
         }
         /* eslint-enable no-await-in-loop */
     }
 
-    options.logger.logError(new Error(`Failed to render ${options.filename}\n`));
-    return false;
+    return { success: false };
 }
 
 /**
  * Adds component to render queue
  * @param {Object} options
- * @param {Logger} options.logger - Logger instance
+ * @param {string} options.id - Unique id
  * @param {string} options.component - React component to render
  * @param {Object} options.props - Props to pass to component
  * @param {string} options.directory - Output directory
  * @param {string} options.filename - Output filename
- * @returns {Promise}
+ * @param {function} options.onInfo - Callback (string)
+ * @param {function} options.onError - Callback (Error)
+ * @returns {Promise} - Always resolves with { success, path? }
  */
 function generate(options) {
     previous = previous.then(() => renderComponentRetry(options));
