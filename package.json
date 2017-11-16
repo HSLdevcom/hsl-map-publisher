@@ -73,6 +73,7 @@
     "nodemon": "^1.11.0",
     "png-stream": "^1.0.5",
     "prop-types": "^15.5.8",
+    "puppeteer": "^0.13.0",
     "qrcode": "^0.9.0",
     "query-string": "^4.3.2",
     "raw-loader": "^0.5.1",

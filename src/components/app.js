@@ -52,9 +52,9 @@ class App extends Component {
             const params = queryString.parse(location.pathname.substring(1));
             ComponentToRender = components[params.component];
             props = JSON.parse(params.props);
-            this.scale = Number(params.scale) || 1;
-            if (this.scale > 1) {
-                setMapScale(this.scale);
+            this.scale = 96 / 72;
+            if (params.scale) {
+                setMapScale(Number(params.scale));
             }
         } catch (error) {
             App.handleError(new Error("Failed to parse url fragment"));
