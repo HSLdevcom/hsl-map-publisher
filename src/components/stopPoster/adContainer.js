@@ -5,10 +5,10 @@ import renderQueue from "util/renderQueue";
 
 import { getFeedbackUrl } from "data/feedbackCodes";
 
-import mobileIcon from "icons/mobile_ad.svg";
-import mobileTrunkIcon from "icons/mobile_ad_trunk.svg";
-import feedbackIcon from "icons/feedback_ad.svg";
-
+import mobileIcon from "icons/ad_mobile.svg";
+import mobileTrunkIcon from "icons/ad_mobile_trunk.svg";
+import feedbackIcon from "icons/ad_feedback.svg";
+import noSmokingIcon from "icons/ad_nosmoking.svg";
 
 class AdContainer extends Component {
     constructor(props) {
@@ -18,6 +18,7 @@ class AdContainer extends Component {
         if (!this.props.isTrunkStop) ads.push(mobileIcon);
         if (this.props.isTrunkStop) ads.push(mobileTrunkIcon);
         if (getFeedbackUrl(this.props.shortId)) ads.push(feedbackIcon);
+        ads.push(noSmokingIcon);
 
         this.state = { ads };
     }
@@ -50,9 +51,14 @@ class AdContainer extends Component {
             height: this.props.height,
             overflow: "hidden",
         };
+        const iconStyle = {
+            marginTop: 52,
+            marginLeft: 55,
+            marginRight: 48,
+        };
         return (
             <div style={style} ref={(ref) => { this.root = ref; }}>
-                {this.state.ads.map((src, i) => <InlineSVG key={i} src={src}/>)}
+                {this.state.ads.map((src, i) => <InlineSVG key={i} style={iconStyle} src={src}/>)}
             </div>
         );
     }
