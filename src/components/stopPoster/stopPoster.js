@@ -191,7 +191,7 @@ class StopPoster extends Component {
                                     }
                                 </div>
                             </div>
-                            <Spacer width="100%" height={50}/>
+                            <Spacer width="100%" height={62}/>
                         </div>
                         <Footer shortId={this.props.shortId} isTrunkStop={this.props.isTrunkStop}/>
                     </JustifiedColumn>

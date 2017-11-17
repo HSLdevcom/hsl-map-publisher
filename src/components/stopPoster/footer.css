@@ -8,13 +8,13 @@
 
 .urlInfo {
     composes: url;
-    top: 346px;
+    top: 336px;
     left: 500px;
 }
 
 .urlFeedback {
     composes: url;
-    top: 346px;
+    top: 336px;
     left: 936px;
 }
 
@@ -25,12 +25,12 @@
 
 .qrCodeInfo {
     composes: qrCode;
-    top: 128px;
-    left: 732px;
+    top: 117px;
+    left: 731px;
 }
 
 .qrCodeFeedback {
     composes: qrCode;
-    top: 128px;
-    left: 1146px;
+    top: 117px;
+    left: 1145px;
 }
