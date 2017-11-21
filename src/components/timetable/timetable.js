@@ -55,6 +55,10 @@ const Timetable = props => (
                 {note}
             </div>
         ))}
+        <Spacer
+            height="var(--border-radius)"
+            width="100%"
+        />
     </div>
 );
 
