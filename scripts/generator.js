@@ -33,11 +33,12 @@ async function renderComponent(options) {
 
     page.on("error", (error) => {
         page.close();
-        logger.logError({ message: error });
-        throw error;
+        logger.logError(error);
+        // Get a fresh browser after a crash
+        browser.close();
     });
 
-    page.on("console", message => logger.logInfo(message));
+    page.on("console", ({ text }) => logger.logInfo(text));
 
     const fragment = `component=${component}&props=${JSON.stringify(props)}&scale=${scale}`;
     await page.goto(`http://localhost:${CLIENT_PORT}/${fragment}`);
