@@ -1,7 +1,5 @@
 const path = require("path");
 const webpack = require("webpack");
-const autoprefixer = require("autoprefixer");
-const modulesValues = require("postcss-modules-values");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 function getDevtool() {
@@ -80,7 +78,6 @@ module.exports = (options) => {
                     loaders: [
                         "style",
                         "css?modules&importLoaders=1&localIdentName=[name]_[local]_[hash:base64:5]",
-                        "postcss",
                     ],
                 },
                 {
@@ -93,6 +90,5 @@ module.exports = (options) => {
                 },
             ],
         },
-        postcss: [modulesValues, autoprefixer],
     };
 };

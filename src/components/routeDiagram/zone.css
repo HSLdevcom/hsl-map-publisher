@@ -1,5 +1,3 @@
-@value leftWidth, rightWidth, lineColor, lineWidth from "./values.css";
-
 .root {
     display: flex;
     align-items: center;
@@ -8,7 +6,7 @@
 }
 
 .left {
-    width: leftWidth;
+    width: var(--left-width);
 }
 
 .right {
@@ -17,14 +15,14 @@
     align-content: center;
     align-items: flex-start;
     padding-left: 20px;
-    width: rightWidth;
+    width: var(--right-width);
     box-sizing: border-box;
 }
 
 .border {
     height: 4px;
     width: 100%;
-    margin-left: calc(-1 * ( leftWidth + 20px + lineWidth ));
+    margin-left: calc(-1 * ( var(--left-width) + 20px + var(--line-width) ));
     margin-top: 2px;
     margin-bottom: 2px;
 }
@@ -47,7 +45,7 @@
     letter-spacing: -0.025em;
     text-transform: uppercase;
     color: white;
-    background: lineColor;
+    background: var(--line-color);
     border-radius: 6px;
 }
 
@@ -63,7 +61,7 @@
 
 .separatorTop {
     height: 14px;
-    border-left: lineWidth solid lineColor;
+    border-left: var(--line-border);
 }
 
 .separatorMiddle{
@@ -72,5 +70,5 @@
 
 .separatorBottom {
     height: 14px;
-    border-left: lineWidth solid lineColor;
+    border-left: var(--line-border);
 }

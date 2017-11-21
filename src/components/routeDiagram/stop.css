@@ -1,5 +1,3 @@
-@value leftWidth, rightWidth, lineColor, lineWidth from "./values.css";
-
 .root {
     display: flex;
     align-items: center;
@@ -8,13 +6,13 @@
 }
 
 .left {
-    width: leftWidth;
+    width: var(--left-width);
 }
 
 .right {
     display: flex;
     padding-left: 10px;
-    width: rightWidth;
+    width: var(--right-width);
     box-sizing: border-box;
 }
 
@@ -48,26 +46,26 @@
 
 .separatorTop {
     height: 12px;
-    border-left: lineWidth solid lineColor;
+    border-left: var(--line-border);
 }
 
 .separatorBottom {
     height: 12px;
-    border-left: lineWidth solid lineColor;
+    border-left: var(--line-border);
 }
 
 .separatorStop {
-    width: calc(4 * lineWidth);
-    height: calc(4 * lineWidth);
-    border: lineWidth solid lineColor;
-    border-radius: calc(4 * lineWidth);
-    margin-top: calc(lineWidth / -2);
-    margin-bottom: calc(lineWidth / -2);
-    margin-left: calc(-2.5 * lineWidth);
+    width: calc(4 * var(--line-width));
+    height: calc(4 * var(--line-width));
+    border: var(--line-border);
+    border-radius: calc(4 * var(--line-width));
+    margin-top: calc(var(--line-width) / -2);
+    margin-bottom: calc(var(--line-width) / -2);
+    margin-left: calc(-2.5 * var(--line-width));
 }
 
 .separatorLastStop {
     composes: separatorStop;
-    background: lineColor;
+    background: var(--line-color);
     border-radius: 0;
 }
