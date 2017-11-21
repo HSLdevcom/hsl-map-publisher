@@ -28,7 +28,6 @@
     "node": ">=8.0.0"
   },
   "devDependencies": {
-    "autoprefixer": "^6.7.6",
     "babel-core": "^6.23.1",
     "babel-loader": "^6.3.2",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
@@ -48,9 +47,6 @@
     "forever": "^0.15.3",
     "html-webpack-plugin": "^2.22.0",
     "path": "^0.12.7",
-    "postcss": "^5.2.16",
-    "postcss-loader": "^0.13.0",
-    "postcss-modules-values": "^1.2.2",
     "rimraf": "^2.6.1",
     "slimerjs": "^0.10.3",
     "style-loader": "^0.13.2",
