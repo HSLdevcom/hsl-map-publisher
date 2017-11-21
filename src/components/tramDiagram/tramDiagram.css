@@ -1,0 +1,29 @@
+@value borderRadius from "styles/common.css";
+
+.root {
+    background: white;
+    border-radius: borderRadius;
+    padding: 42px;
+    overflow: hidden;
+}
+
+.componentName {
+    padding: 0px 0px 20px;
+    font-size: 30px;
+    color: var(--hsl-blue);
+}
+
+.componentName > .title {
+    font-family: GothamRounded-Medium;
+}
+
+.componentName > .subtitle {
+    font-family: GothamRounded-Book;
+}
+
+.diagram {
+    margin-top: -195px;
+    margin-bottom: -45px;
+    margin-left: -62px;
+    margin-right: -50px;
+}

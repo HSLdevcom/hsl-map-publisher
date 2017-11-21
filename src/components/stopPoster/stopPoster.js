@@ -6,6 +6,7 @@ import { colorsByMode } from "util/domain";
 
 import CropMarks from "components/cropMarks";
 import RouteDiagram from "components/routeDiagram/routeDiagramContainer";
+import TramDiagram from "components/tramDiagram/tramDiagram";
 import Timetable from "components/timetable/timetableContainer";
 import StopMap from "components/map/stopMapContainer";
 
@@ -29,7 +30,7 @@ class StopPoster extends Component {
         super(props);
         this.state = {
             hasRoutesOnTop: false,
-            hasRouteDiagram: true,
+            hasDiagram: true,
             hasRoutes: true,
             hasStretchedLeftColumn: false,
             shouldRenderFixedContent: false,
@@ -69,8 +70,8 @@ class StopPoster extends Component {
                 this.setState({ hasRoutesOnTop: true });
                 return;
             }
-            if (this.state.hasRouteDiagram) {
-                this.setState({ hasRouteDiagram: false });
+            if (this.state.hasDiagram) {
+                this.setState({ hasDiagram: false });
                 return;
             }
             if (this.state.hasRoutes) {
@@ -138,10 +139,10 @@ class StopPoster extends Component {
                                     {this.state.hasRoutes && !this.state.hasRoutesOnTop &&
                                         <Spacer height={10}/>
                                     }
-                                    {this.state.hasRouteDiagram &&
+                                    {this.state.hasDiagram &&
                                         <StopPosterTimetable/>
                                     }
-                                    {!this.state.hasRouteDiagram &&
+                                    {!this.state.hasDiagram &&
                                         <StopPosterTimetable segments={["weekdays"]}/>
                                     }
                                     <div style={{ flex: 1 }} ref={(ref) => { this.ad = ref; }}>
@@ -159,7 +160,7 @@ class StopPoster extends Component {
                                 <Spacer width={10}/>
 
                                 <div className={styles.right}>
-                                    {!this.state.hasRouteDiagram &&
+                                    {!this.state.hasDiagram &&
                                         <div className={styles.timetables}>
                                             <StopPosterTimetable segments={["saturdays"]} hideDetails/>
                                             <Spacer width={10}/>
@@ -167,7 +168,7 @@ class StopPoster extends Component {
                                         </div>
                                     }
 
-                                    {!this.state.hasRouteDiagram && <Spacer height={10}/>}
+                                    {!this.state.hasDiagram && <Spacer height={10}/>}
 
                                     <div style={{ flex: 1 }} ref={(ref) => { this.map = ref; }}>
                                         {this.state.shouldRenderFixedContent &&
@@ -183,11 +184,14 @@ class StopPoster extends Component {
 
                                     <Spacer height={10}/>
 
-                                    {this.state.hasRouteDiagram &&
+                                    {this.state.hasDiagram && !this.props.isTramStop &&
                                         <RouteDiagram
                                             stopId={this.props.stopId}
                                             date={this.props.date}
                                         />
+                                    }
+                                    {this.state.hasDiagram && this.props.isTramStop &&
+                                        <TramDiagram/>
                                     }
                                 </div>
                             </div>
@@ -209,6 +213,7 @@ StopPoster.propTypes = {
     dateEnd: PropTypes.string,
     hasRoutes: PropTypes.bool.isRequired,
     isTrunkStop: PropTypes.bool.isRequired,
+    isTramStop: PropTypes.bool.isRequired,
     shortId: PropTypes.string.isRequired,
 };
 
