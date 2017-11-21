@@ -71,6 +71,11 @@ module.exports = (options) => {
                     exclude: /node_modules/,
                 },
                 {
+                    test: /\.worker\.js$/,
+                    loaders: ["babel", "worker"],
+                    exclude: /node_modules/,
+                },
+                {
                     test: /\.css$/,
                     loaders: [
                         "style",
