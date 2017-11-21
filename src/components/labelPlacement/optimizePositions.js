@@ -70,28 +70,26 @@ function comparePlacements(placement, other, bbox) {
 }
 
 function getNextPlacement(initialPlacement, index, diffs, bbox) {
-    return new Promise((resolve) => {
-        // Get potential positions for item at index
-        const placements = getPlacements({ ...initialPlacement, indexes: [] }, index, diffs, bbox);
+    // Get potential positions for item at index
+    const placements = getPlacements({ ...initialPlacement, indexes: [] }, index, diffs, bbox);
 
-        // Get positions where one overlapping item is updated as well
-        const placementsOverlapping = placements.reduce((prev, placement) => {
-            const overlapIndex = getOverlappingItem(placement, index);
-            if (!overlapIndex) return prev;
-            return [...prev, ...getPlacements(placement, overlapIndex, diffs, bbox)];
-        }, []);
+    // Get positions where one overlapping item is updated as well
+    const placementsOverlapping = placements.reduce((prev, placement) => {
+        const overlapIndex = getOverlappingItem(placement, index);
+        if (!overlapIndex) return prev;
+        return [...prev, ...getPlacements(placement, overlapIndex, diffs, bbox)];
+    }, []);
 
-        const nextPlacement = [
-            initialPlacement,
-            ...placements,
-            ...placementsOverlapping,
-        ].reduce((prev, cur) => comparePlacements(prev, cur, bbox));
+    const nextPlacement = [
+        initialPlacement,
+        ...placements,
+        ...placementsOverlapping,
+    ].reduce((prev, cur) => comparePlacements(prev, cur, bbox));
 
-        setTimeout(() => resolve(nextPlacement));
-    });
+    return nextPlacement;
 }
 
-async function optimizePositions(initialPositions, bbox, ctx = {}) {
+function optimizePositions(initialPositions, bbox) {
     const start = Date.now();
 
     let placement = {
@@ -105,11 +103,7 @@ async function optimizePositions(initialPositions, bbox, ctx = {}) {
             const previous = placement;
             for (let index = 0; index < placement.positions.length; index++) {
                 if (!placement.positions[index].isFixed) {
-                    // eslint-disable-next-line no-await-in-loop
-                    placement = await getNextPlacement(placement, index, diffs, bbox);
-                }
-                if (ctx.shouldCancel) {
-                    return null;
+                    placement = getNextPlacement(placement, index, diffs, bbox);
                 }
                 if ((Date.now() - start) > timeout) {
                     return placement.positions;

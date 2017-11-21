@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import renderQueue from "util/renderQueue";
 
 import ItemOverlay from "./itemOverlay";
-import optimizePositions from "./optimizePositions";
+import OptimizePositionsWorker from "./optimizePositions.worker";
 
 import styles from "./itemContainer.css";
 
@@ -17,24 +17,21 @@ class ItemContainer extends Component {
     }
 
     componentDidMount() {
-        this.promise = this.updateChildren();
+        this.updateChildren();
     }
 
     componentDidUpdate(prevProps) {
         if (prevProps !== this.props) {
-            this.shouldCancel = true;
-            this.promise = this.promise.then(() => {
-                this.shouldCancel = false;
-                return this.updateChildren();
-            });
+            this.worker.terminate();
+            this.updateChildren();
         }
     }
 
     componentWillUnmount() {
-        this.shouldCancel = true;
+        this.worker.terminate();
     }
 
-    async updateChildren() {
+    updateChildren() {
         renderQueue.add(this);
 
         const boundingBox = {
@@ -50,16 +47,22 @@ class ItemContainer extends Component {
         // Get initial positions
         const initialPositions = refs.map(ref => ref.getPosition());
 
-        const positions = await optimizePositions(initialPositions, boundingBox, this);
+        this.worker = new OptimizePositionsWorker();
 
-        if (positions) {
+        this.worker.addEventListener("message", (event) => {
+            const positions = event.data;
             refs.forEach((ref, index) => (
                 ref.setPosition(positions[index].top, positions[index].left)
             ));
             this.setState({ items: positions.filter(({ isFixed }) => !isFixed) });
-        }
+            renderQueue.remove(this);
+        });
 
-        renderQueue.remove(this);
+        this.worker.addEventListener("error", (event) => {
+            renderQueue.remove(this, { error: new Error(event.message) });
+        });
+
+        this.worker.postMessage({ positions: initialPositions, boundingBox });
     }
 
     render() {
