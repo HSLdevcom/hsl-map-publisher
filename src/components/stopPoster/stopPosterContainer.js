@@ -20,6 +20,11 @@ const stopPosterQuery = gql`
                             routeId
                             hasRegularDayDepartures(date: $date)
                             pickupDropoffType
+                            route {
+                                nodes {
+                                    mode
+                                }
+                            }
                         }
                     }
                 }
@@ -28,20 +33,25 @@ const stopPosterQuery = gql`
     }
 `;
 
-const propsMapper = withProps(props => ({
-    shortId: props.data.stop.shortId,
-    hasRoutes: props.data.stop.siblings.nodes.some(
-        ({ routeSegments }) => routeSegments.nodes.some(node => node.hasRegularDayDepartures)
-    ),
-    isTrunkStop: flatMap(
-         props.data.stop.siblings.nodes,
-         node => node.routeSegments.nodes
-             .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
-             .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
-             .filter(routeSegment => !isDropOffOnly(routeSegment))
-             .filter(routeSegment => isTrunkRoute(trimRouteId(routeSegment.routeId)))
-        ).length > 0,
-}));
+const propsMapper = withProps((props) => {
+    const routeSegments = flatMap(
+        props.data.stop.siblings.nodes,
+        node => node.routeSegments.nodes
+            .filter(routeSegment => routeSegment.hasRegularDayDepartures)
+            .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
+            .filter(routeSegment => !isDropOffOnly(routeSegment))
+    );
+
+    const routeIds = routeSegments.map(routeSegment => trimRouteId(routeSegment.routeId));
+    const modes = flatMap(routeSegments, node => node.route.nodes.map(route => route.mode));
+
+    return {
+        shortId: props.data.stop.shortId,
+        hasRoutes: routeIds.length > 0,
+        isTrunkStop: routeIds.some(routeId => isTrunkRoute(routeId)),
+        isTramStop: modes.every(mode => mode === "TRAM"),
+    };
+});
 
 const hoc = compose(
     graphql(stopPosterQuery),
