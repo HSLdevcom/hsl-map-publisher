@@ -13,13 +13,11 @@ function getEntry(entry, port) {
             "webpack/hot/only-dev-server",
             "react-hot-loader/patch",
             "babel-polyfill",
-            "whatwg-fetch",
             entry,
         ];
     }
     return [
         "babel-polyfill",
-        "whatwg-fetch",
         entry,
     ];
 }

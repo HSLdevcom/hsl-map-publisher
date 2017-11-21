@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import queryString from "query-string";
 import { ApolloClient, createNetworkInterface, ApolloProvider } from "react-apollo";
 
 import StopPoster from "components/stopPoster/stopPosterContainer";
@@ -49,12 +48,12 @@ class App extends Component {
         let props;
 
         try {
-            const params = queryString.parse(location.pathname.substring(1));
-            ComponentToRender = components[params.component];
-            props = JSON.parse(params.props);
+            const params = new URLSearchParams(location.pathname.substring(1));
+            ComponentToRender = components[params.get("component")];
+            props = JSON.parse(params.get("props"));
             this.scale = 96 / 72;
-            if (params.scale) {
-                setMapScale(Number(params.scale));
+            if (params.has("scale")) {
+                setMapScale(Number(params.get("scale")));
             }
         } catch (error) {
             App.handleError(new Error("Failed to parse url fragment"));
