@@ -1,8 +1,5 @@
-@value leftWidth from "./values.css";
-
 .root {
     display: flex;
     flex-flow: column;
-    margin-left: leftWidth;
+    margin-left: var(--left-width);
 }
-

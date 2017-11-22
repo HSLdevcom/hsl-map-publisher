@@ -1,11 +1,9 @@
-@value borderRadius from "styles/common.css";
-
 .root {
     position: relative;
     width: 100%;
-    padding: borderRadius;
-    padding-top: calc(borderRadius - 15px);
-    border-radius: borderRadius;
+    padding: var(--border-radius);
+    padding-top: calc(var(--border-radius) - 15px);
+    border-radius: var(--border-radius);
     color: var(--hsl-blue);
     background: var(--light-background);
     --timetable-accent-color: white;
@@ -37,8 +35,8 @@
 
 .validity {
     position: absolute;
-    top: calc(borderRadius - 15px);
-    right: borderRadius;
+    top: calc(var(--border-radius) - 15px);
+    right: var(--border-radius);
     font-family: GothamRounded-Book;
     font-size: 12px;
     line-height: 16px;

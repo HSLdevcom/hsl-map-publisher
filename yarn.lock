@@ -249,7 +249,7 @@ asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
 
-autoprefixer@^6.3.1, autoprefixer@^6.7.6:
+autoprefixer@^6.3.1:
   version "6.7.7"
   resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-6.7.7.tgz#1dbd1c835658e35ce3f9984099db00585c782014"
   dependencies:
@@ -3517,7 +3517,7 @@ loader-fs-cache@^1.0.0:
     find-cache-dir "^0.1.1"
     mkdirp "0.5.1"
 
-loader-utils@^0.2.11, loader-utils@^0.2.15, loader-utils@^0.2.16, loader-utils@~0.2.2, loader-utils@~0.2.5:
+loader-utils@^0.2.11, loader-utils@^0.2.16, loader-utils@~0.2.2, loader-utils@~0.2.5:
   version "0.2.17"
   resolved "https://registry.yarnpkg.com/loader-utils/-/loader-utils-0.2.17.tgz#f86e6374d43205a6e6c60e9196f17c0299bfb348"
   dependencies:
@@ -4558,13 +4558,6 @@ postcss-filter-plugins@^2.0.0:
     postcss "^5.0.4"
     uniqid "^4.0.0"
 
-postcss-loader@^0.13.0:
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/postcss-loader/-/postcss-loader-0.13.0.tgz#72fdaf0d29444df77d3751ce4e69dc40bc99ed85"
-  dependencies:
-    loader-utils "^0.2.15"
-    postcss "^5.2.0"
-
 postcss-merge-idents@^2.1.5:
   version "2.1.7"
   resolved "https://registry.yarnpkg.com/postcss-merge-idents/-/postcss-merge-idents-2.1.7.tgz#4c5530313c08e1d5b3bbf3d2bbc747e278eea270"
@@ -4646,7 +4639,7 @@ postcss-modules-scope@^1.0.0:
     css-selector-tokenizer "^0.6.0"
     postcss "^5.0.4"
 
-postcss-modules-values@^1.1.0, postcss-modules-values@^1.2.2:
+postcss-modules-values@^1.1.0:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/postcss-modules-values/-/postcss-modules-values-1.2.2.tgz#f0e7d476fe1ed88c5e4c7f97533a3e772ad94ca1"
   dependencies:
@@ -4733,7 +4726,7 @@ postcss-zindex@^2.0.1:
     postcss "^5.0.4"
     uniqs "^2.0.0"
 
-postcss@^5.0.10, postcss@^5.0.11, postcss@^5.0.12, postcss@^5.0.13, postcss@^5.0.14, postcss@^5.0.16, postcss@^5.0.2, postcss@^5.0.4, postcss@^5.0.5, postcss@^5.0.6, postcss@^5.0.8, postcss@^5.2.0, postcss@^5.2.16:
+postcss@^5.0.10, postcss@^5.0.11, postcss@^5.0.12, postcss@^5.0.13, postcss@^5.0.14, postcss@^5.0.16, postcss@^5.0.2, postcss@^5.0.4, postcss@^5.0.5, postcss@^5.0.6, postcss@^5.0.8, postcss@^5.2.16:
   version "5.2.17"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-5.2.17.tgz#cf4f597b864d65c8a492b2eabe9d706c879c388b"
   dependencies:

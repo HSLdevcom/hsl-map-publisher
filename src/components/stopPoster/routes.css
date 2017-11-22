@@ -1,5 +1,3 @@
-@value borderRadius from "styles/common.css";
-
 .root {
     display: flex;
     flex-shrink: 0;
@@ -7,8 +5,8 @@
     align-items: flex-start;
     color: black;
     background: white;
-    border-radius: borderRadius;
-    padding: calc(borderRadius - 12px) borderRadius;
+    border-radius: var(--border-radius);
+    padding: calc(var(--border-radius) - 12px) var(--border-radius);
     white-space: nowrap;
     overflow: hidden;
 }

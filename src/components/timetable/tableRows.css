@@ -1,12 +1,10 @@
-@value borderRadius from "styles/common.css";
-
 .root {
     color: black;
 }
 
 .root > * {
-    margin: 0 calc(-1 * borderRadius);
-    padding: 0 borderRadius;
+    margin: 0 calc(-1 * var(--border-radius));
+    padding: 0 var(--border-radius);
 }
 
 .root > *:nth-child(odd) {

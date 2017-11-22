@@ -1,6 +1,3 @@
-@value borderRadius from "styles/common.css";
-@value leftWidth, rightWidth, lineWidth from "./values.css";
-
 .root {
     display: flex;
     flex-flow: column nowrap;
@@ -8,7 +5,15 @@
     align-items: flex-start;
     padding: 42px;
     background: white;
-    border-radius: borderRadius;
+    border-radius: var(--border-radius);
+
+    --left-width: 10px;
+    --right-width: 200px;
+
+    --line-color: var(--hsl-blue);
+    --line-width: 2px;
+    --line-radius: 10px;
+    --line-border: var(--line-width) solid var(--line-color);
 }
 
 .componentName {
@@ -30,8 +35,8 @@
     align-items: center;
     flex-shrink: 0;
     color: black;
-    margin-left: leftWidth;
-    margin-bottom: calc(lineWidth * 2);
+    margin-left: var(--left-width);
+    margin-bottom: calc(var(--line-width) * 2);
 }
 
 .start .icon {

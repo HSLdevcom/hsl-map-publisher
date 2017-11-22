@@ -44,4 +44,5 @@ body, body * {
     --hsl-blue-light: rgb(213, 232, 250);
     --background: var(--hsl-blue);
     --light-background: var(--hsl-blue-light);
+    --border-radius: 56px;
 }
