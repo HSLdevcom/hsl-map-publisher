@@ -12,12 +12,10 @@ function getEntry(entry, port) {
             `webpack-dev-server/client?http://localhost:${port}`,
             "webpack/hot/only-dev-server",
             "react-hot-loader/patch",
-            "babel-polyfill",
             entry,
         ];
     }
     return [
-        "babel-polyfill",
         entry,
     ];
 }
@@ -31,8 +29,8 @@ function getPlugins() {
         ];
     }
     return [
-        new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.DefinePlugin({ "process.env": { NODE_ENV: '"production"' } }),
+        new webpack.optimize.ModuleConcatenationPlugin(),
         new HtmlWebpackPlugin({ template: "index.ejs" }),
     ];
 }
@@ -45,7 +43,7 @@ module.exports = (options) => {
         entry: getEntry(entry, port),
         plugins: getPlugins(),
         resolve: {
-            modulesDirectories: ["node_modules", directory],
+            modules: ["node_modules", directory],
         },
         output: {
             publicPath: "",
@@ -53,38 +51,39 @@ module.exports = (options) => {
             filename: "bundle.js",
         },
         module: {
-            preLoaders: [
+            rules: [
                 {
                     test: /\.js$/,
-                    loader: "eslint",
+                    loader: "eslint-loader",
+                    enforce: "pre",
                     exclude: /node_modules/,
                 },
-            ],
-            loaders: [
                 {
                     test: /\.js$/,
-                    loader: "babel",
+                    loader: "babel-loader",
                     exclude: /node_modules/,
                 },
                 {
                     test: /\.worker\.js$/,
-                    loaders: ["babel", "worker"],
+                    use: ["babel-loader", "worker-loader"],
                     exclude: /node_modules/,
                 },
                 {
                     test: /\.css$/,
-                    loaders: [
-                        "style",
-                        "css?modules&importLoaders=1&localIdentName=[name]_[local]_[hash:base64:5]",
+                    use: [
+                        "style-loader",
+                        {
+                            loader: "css-loader",
+                            options: {
+                                modules: true,
+                                localIdentName: "[name]_[local]_[hash:base64:5]",
+                            },
+                        },
                     ],
                 },
                 {
                     test: /\.svg$/,
-                    loaders: ["raw"],
-                },
-                {
-                    test: /\.json$/,
-                    loader: "json",
+                    loader: "raw-loader",
                 },
             ],
         },
