@@ -13,10 +13,6 @@ const SCALE = 96 / 72;
 let browser = null;
 let previous = Promise.resolve();
 
-function isInitialized() {
-    return browser !== null;
-}
-
 async function initialize() {
     browser = await puppeteer.launch({ args: ["--no-sandbox", "--disable-setuid-sandbox"] });
     browser.on("disconnected", () => { browser = null; });
@@ -74,7 +70,7 @@ async function renderComponentRetry(options) {
             if (i > 0) {
                 options.logger.logInfo("Retrying");
             }
-            if (!(await isInitialized())) {
+            if (!browser !== null) {
                 options.logger.logInfo("Creating new browser instance");
                 await initialize();
             }
