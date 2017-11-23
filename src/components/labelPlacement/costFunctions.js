@@ -3,10 +3,9 @@ import segseg from "segseg";
 const OVERLAP_COST_FIXED = 5;
 const OVERFLOW_COST = 500000;
 const INTERSECTION_COST = 5000;
-const DISTANCE_COST = 1;
-const ANGLE_COST = 0.5;
-
-const INTERSECTION_WITH_FIXED_COST = 50;
+const INTERSECTION_WITH_FIXED_COST = 25;
+const DISTANCE_COST = 2.5;
+const ANGLE_COST = 1;
 
 function hasOverflow(position, boundingBox) {
     return position.left < 0 || position.top < 0 ||
