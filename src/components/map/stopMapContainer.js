@@ -135,7 +135,9 @@ const mapPositionMapper = mapProps((props) => {
     });
     const [minLon, minLat] = viewport.unproject([0, 0]);
     const [maxLon, maxLat] = viewport.unproject([props.width, props.height]);
-    return { ...props, longitude, latitude, minLat, minLon, maxLat, maxLon };
+    return {
+        ...props, longitude, latitude, minLat, minLon, maxLat, maxLon,
+    };
 });
 
 

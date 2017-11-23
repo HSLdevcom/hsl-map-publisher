@@ -1,4 +1,6 @@
-const optimizePositions = require("./optimizePositions").default;
+/* eslint-disable no-restricted-globals */
+
+import optimizePositions from "./optimizePositions";
 
 self.addEventListener("message", (event) => {
     const { positions, boundingBox } = event.data;

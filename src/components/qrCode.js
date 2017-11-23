@@ -43,6 +43,7 @@ class QrCode extends Component {
                         src={this.state.src}
                         onLoad={() => renderQueue.remove(this)}
                         onError={() => renderQueue.remove(this, { error: new Error("Failed to render QR code") })}
+                        alt=""
                     />
                 }
             </div>

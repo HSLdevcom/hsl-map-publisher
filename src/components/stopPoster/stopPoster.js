@@ -132,7 +132,7 @@ class StopPoster extends Component {
                             <div className={styles.columns}>
                                 <div
                                     className={this.state.hasStretchedLeftColumn ?
-                                               styles.leftStretched : styles.left}
+                                        styles.leftStretched : styles.left}
                                 >
                                     {this.state.hasRoutes && !this.state.hasRoutesOnTop &&
                                         <Routes stopId={this.props.stopId} date={this.props.date}/>

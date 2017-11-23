@@ -24,7 +24,9 @@ const networkQuery = gql`
 const NETWORK_PADDING = 1000; // Padding in pixels
 
 export function addRoutesToStyle(options, mapStyle, query, date) {
-    const { center, width, height, zoom } = options;
+    const {
+        center, width, height, zoom,
+    } = options;
 
     const viewport = new PerspectiveMercatorViewport({
         longitude: center[0],
@@ -42,7 +44,9 @@ export function addRoutesToStyle(options, mapStyle, query, date) {
 
     return query({
         query: networkQuery,
-        variables: { minLat, minLon, maxLat, maxLon, date },
+        variables: {
+            minLat, minLon, maxLat, maxLon, date,
+        },
     }).then(({ data }) => {
         // eslint-disable-next-line no-param-reassign
         mapStyle.sources.routes = {

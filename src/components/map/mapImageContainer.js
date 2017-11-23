@@ -25,7 +25,9 @@ const getClient = getContext({
     }).isRequired,
 });
 
-const propsMapper = mapProps(({ options, components, date, client: { query }, extraLayers }) => {
+const propsMapper = mapProps(({
+    options, components, date, client: { query }, extraLayers,
+}) => {
     const mapStyle = getMapStyle(components);
 
     // Fetch routes from GraphQL instead of default vector tiles

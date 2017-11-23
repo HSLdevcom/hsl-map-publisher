@@ -8,7 +8,9 @@ function viewportContains(viewport, stop) {
 }
 
 function calculateStopsViewport(options) {
-    const { longitude, latitude, width, height, minZoom, maxZoom, stops } = options;
+    const {
+        longitude, latitude, width, height, minZoom, maxZoom, stops,
+    } = options;
     // Nearby stops with labels plus current stop (no label)
     const maxStops = (width * height * STOPS_PER_PIXEL) + 1;
 
@@ -17,7 +19,9 @@ function calculateStopsViewport(options) {
 
     // Increase zoom level until only max number of stops visible
     for (let zoom = minZoom; zoom <= maxZoom; zoom += 0.1) {
-        viewport = new PerspectiveMercatorViewport({ longitude, latitude, width, height, zoom });
+        viewport = new PerspectiveMercatorViewport({
+            longitude, latitude, width, height, zoom,
+        });
         visibleStops = visibleStops.filter(stop => viewportContains(viewport, stop)); // eslint-disable-line
         if (visibleStops.length <= maxStops) break;
     }

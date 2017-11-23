@@ -58,9 +58,8 @@ const StopMap = (props) => {
     };
 
     // Filter out stops that are behind the mini map
-    const stops = props.nearbyStops.filter(
-        stop => stop.x < miniMapStyle.left || stop.y < miniMapStyle.top
-    );
+    const stops = props.nearbyStops
+        .filter(stop => stop.x < miniMapStyle.left || stop.y < miniMapStyle.top);
 
     return (
         <div className={styles.root} style={mapStyle}>
@@ -169,8 +168,8 @@ const StopType = PropTypes.shape({
 });
 
 StopMap.propTypes = {
-    mapOptions: MapImage.propTypes.options,
-    miniMapOptions: MapImage.propTypes.options,
+    mapOptions: MapImage.propTypes.options.isRequired,
+    miniMapOptions: MapImage.propTypes.options.isRequired,
     currentStop: StopType.isRequired,
     nearbyStops: PropTypes.arrayOf(StopType).isRequired,
     pixelsPerMeter: PropTypes.number.isRequired,

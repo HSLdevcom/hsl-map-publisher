@@ -15,8 +15,7 @@ const getTransferModes = (terminal, nameFi) => {
     // Filter out bus terminals, until we have more specs how to handle those.
     if (terminal) {
         terminal.siblings.nodes.map(sibling =>
-            sibling.modes.nodes.filter(mode => mode !== "BUS").forEach(mode => modes.add(mode))
-        );
+            sibling.modes.nodes.filter(mode => mode !== "BUS").forEach(mode => modes.add(mode)));
     }
 
     return Array.from(modes);

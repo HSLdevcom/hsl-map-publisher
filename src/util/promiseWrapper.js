@@ -8,6 +8,23 @@ const hocFactory = propName => WrappedComponent => (
             this.state = { loading: !!props[propName] };
         }
 
+        componentDidMount() {
+            if (this.props[propName]) {
+                this.handlePromise(this.props[propName]);
+            }
+        }
+
+        componentWillReceiveProps(nextProps) {
+            if (nextProps[propName] && nextProps[propName] !== this.props[propName]) {
+                this.setState({ loading: true });
+                this.handlePromise(nextProps[propName]);
+            }
+        }
+
+        componentWillUnmount() {
+            this.promise = null;
+        }
+
         handlePromise(promise) {
             this.promise = promise;
             renderQueue.add(promise);
@@ -28,23 +45,6 @@ const hocFactory = propName => WrappedComponent => (
                         this.setState({ error, loading: false }, callback);
                     }
                 });
-        }
-
-        componentDidMount() {
-            if (this.props[propName]) {
-                this.handlePromise(this.props[propName]);
-            }
-        }
-
-        componentWillReceiveProps(nextProps) {
-            if (nextProps[propName] && nextProps[propName] !== this.props[propName]) {
-                this.setState({ loading: true });
-                this.handlePromise(nextProps[propName]);
-            }
-        }
-
-        componentWillUnmount() {
-            this.promise = null;
         }
 
         render() {
