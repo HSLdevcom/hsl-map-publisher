@@ -1,8 +1,6 @@
-@value borderRadius from "styles/common.css";
-
 .root {
     background: white;
-    border-radius: borderRadius;
+    border-radius: var(--border-radius);
     padding: 42px;
     overflow: hidden;
 }
