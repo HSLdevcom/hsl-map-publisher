@@ -8,6 +8,7 @@ const writeFileAsync = promisify(fs.writeFile);
 const CLIENT_PORT = 3000;
 const RENDER_TIMEOUT = 5 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
+const SCALE = 96 / 72;
 
 let browser = null;
 let previous = Promise.resolve();
@@ -27,7 +28,7 @@ async function initialize() {
  * @returns {Promise}
  */
 async function renderComponent(options) {
-    const { component, props, directory, filename, scale = 1, logger } = options;
+    const { component, props, directory, filename, logger } = options;
 
     const page = await browser.newPage();
 
@@ -40,7 +41,7 @@ async function renderComponent(options) {
 
     page.on("console", ({ text }) => logger.logInfo(text));
 
-    const fragment = `component=${component}&props=${JSON.stringify(props)}&scale=${scale}`;
+    const fragment = `component=${component}&props=${JSON.stringify(props)}`;
     await page.goto(`http://localhost:${CLIENT_PORT}/${fragment}`);
 
     const viewport = await page.evaluate(() =>
@@ -53,9 +54,10 @@ async function renderComponent(options) {
     await page.emulateMedia("screen");
     const contents = await page.pdf({
         printBackground: true,
-        width: viewport.width,
-        height: viewport.height,
+        width: viewport.width * SCALE,
+        height: viewport.height * SCALE,
         pageRanges: "1",
+        scale: SCALE,
     });
 
     await writeFileAsync(path.join(directory, filename), contents);
