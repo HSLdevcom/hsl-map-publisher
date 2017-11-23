@@ -2,7 +2,7 @@ import segseg from "segseg";
 
 const OVERLAP_COST_FIXED = 5;
 const OVERFLOW_COST = 500000;
-const INTERSECTION_COST = 50;
+const INTERSECTION_COST = 5000;
 const DISTANCE_COST = 1;
 const ANGLE_COST = 0.5;
 
@@ -69,8 +69,10 @@ function hasIntersectingLines(a, b) {
 function getIntersectionCost(positions, indexes) {
     let sum = 0;
     positions.forEach((position, i) => {
+        if (position.isFixed) return;
         indexes.forEach((j) => {
             if (j <= i) return;
+            if (positions[j].isFixed) return;
             if (hasIntersectingLines(position, positions[j])) sum += 1;
         });
     });
