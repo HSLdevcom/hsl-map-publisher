@@ -6,6 +6,7 @@ const INTERSECTION_COST = 5000;
 const DISTANCE_COST = 1;
 const ANGLE_COST = 0.5;
 
+const INTERSECTION_WITH_FIXED_COST = 50;
 
 function hasOverflow(position, boundingBox) {
     return position.left < 0 || position.top < 0 ||
@@ -79,6 +80,42 @@ function getIntersectionCost(positions, indexes) {
     return sum * INTERSECTION_COST;
 }
 
+function getFixedIntersectionCost(positions, indexes) {
+    let sum = 0;
+    positions.forEach((position, i) => {
+        indexes.forEach((j) => {
+            if (j >= i && indexes.includes(i)) return;
+            // If both are dynamic or fixed, return
+            if (position.isFixed === positions[j].isFixed) return;
+            const a = !position.isFixed ? position : positions[j];
+            const b = position.isFixed ? position : positions[j];
+
+            const a0 = [a.x, a.y];
+            const a1 = [a.x + a.cx, a.y + a.cy];
+
+            const tl = [b.left, b.top];
+            const tr = [b.left + b.width, b.top];
+            const bl = [b.left, b.top + b.height];
+            const br = [b.left + b.width, b.top + b.height];
+
+            const p1 = segseg(a0, a1, tl, tr);
+            const p2 = segseg(a0, a1, tl, bl);
+            const p3 = segseg(a0, a1, bl, br);
+            const p4 = segseg(a0, a1, tr, br);
+
+            const intersections = ([p1, p2, p3, p4]).filter(p => Array.isArray(p));
+
+            if (intersections.length === 2) {
+                const dx = intersections[0][0] - intersections[1][0];
+                const dy = intersections[0][1] - intersections[1][1];
+
+                sum += Math.sqrt((dx ** 2) + (dy ** 2));
+            }
+        });
+    });
+    return sum * INTERSECTION_WITH_FIXED_COST;
+}
+
 /**
  * Returns cost for increased distances from anchor
  * @param {Object[]} positions - Positions
@@ -110,6 +147,7 @@ export {
     getOverlapCost,
     hasIntersectingLines,
     getIntersectionCost,
+    getFixedIntersectionCost,
     getDistanceCost,
     getAngleCost,
 };

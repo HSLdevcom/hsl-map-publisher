@@ -7,6 +7,7 @@ import {
     getOverlapCost,
     getDistanceCost,
     getIntersectionCost,
+    getFixedIntersectionCost,
     getAngleCost,
 } from "./costFunctions";
 
@@ -32,7 +33,8 @@ function getCost(placement, bbox) {
     const distance = getDistanceCost(positions, indexes);
     const angle = getAngleCost(positions, indexes);
     const intersection = getIntersectionCost(positions, indexes);
-    return overflow + overlap + distance + angle + intersection;
+    const intersectionWithFixed = getFixedIntersectionCost(positions, indexes);
+    return overflow + overlap + distance + angle + intersection + intersectionWithFixed;
 }
 
 function getOverlappingItem(placement, indexToOverlap) {
