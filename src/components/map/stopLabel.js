@@ -1,5 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
+import uniqBy from "lodash/uniqBy";
+
 import { Row, Column, Spacer } from "components/util";
 import { getColor } from "util/domain";
 
@@ -12,16 +14,17 @@ const MAX_LABEL_CHARS = 36;
 const RouteList = (props) => {
     if (props.routes.length > MAX_LABEL_ROWS) {
         let rowLength = 0;
-        const components = props.routes.map((route, index, routes) => {
-            const content = `${route.routeId}${(index < routes.length - 1) ? ", " : ""}`;
-            const isNewLine = rowLength + content.length > MAX_LABEL_CHARS;
-            rowLength = isNewLine ? content.length : rowLength + content.length;
-            return (
-                <span className={styles.route} key={index} style={{ color: getColor(route) }}>
-                    {isNewLine && <br/>}{content}
-                </span>
-            );
-        });
+        const components = uniqBy(props.routes, route => route.routeId)
+            .map((route, index, routes) => {
+                const content = `${route.routeId}${(index < routes.length - 1) ? ", " : ""}`;
+                const isNewLine = rowLength + content.length > MAX_LABEL_CHARS;
+                rowLength = isNewLine ? content.length : rowLength + content.length;
+                return (
+                    <span className={styles.route} key={index} style={{ color: getColor(route) }}>
+                        {isNewLine && <br/>}{content}
+                    </span>
+                );
+            });
         return <div>{components}</div>;
     }
     return (
