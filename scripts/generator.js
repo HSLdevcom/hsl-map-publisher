@@ -70,7 +70,7 @@ async function renderComponentRetry(options) {
             if (i > 0) {
                 options.logger.logInfo("Retrying");
             }
-            if (!browser !== null) {
+            if (!browser) {
                 options.logger.logInfo("Creating new browser instance");
                 await initialize();
             }
