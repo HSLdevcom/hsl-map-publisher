@@ -5,7 +5,7 @@ const puppeteer = require("puppeteer");
 
 const writeFileAsync = promisify(fs.writeFile);
 
-const CLIENT_PORT = 3000;
+const CLIENT_URL = "http://localhost:3000";
 const RENDER_TIMEOUT = 5 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
 const SCALE = 96 / 72;
@@ -37,8 +37,8 @@ async function renderComponent(options) {
 
     page.on("console", ({ text }) => logger.logInfo(text));
 
-    const fragment = `component=${component}&props=${JSON.stringify(props)}`;
-    await page.goto(`http://localhost:${CLIENT_PORT}/?${fragment}`);
+    const encodedProps = encodeURIComponent(JSON.stringify(props));
+    await page.goto(`${CLIENT_URL}/?component=${component}&props=${encodedProps}`);
 
     const viewport = await page.evaluate(() =>
       new Promise((resolve, reject) => {
