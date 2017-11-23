@@ -9,44 +9,67 @@ const Line = props => (
         fill="none"
         stroke="#333333"
         strokeWidth="2"
+        clipPath={`url(#label-mask-${props.index})`}
     />
 );
 
-Line.propTypes = {
+const LineItemPropTypes = {
     x: PropTypes.number.isRequired,
     y: PropTypes.number.isRequired,
     cx: PropTypes.number.isRequired,
     cy: PropTypes.number.isRequired,
 };
 
-const Mask = props => (
-    <rect
-        x={props.left + MASK_MARGIN}
-        y={props.top + MASK_MARGIN}
-        width={props.width - (MASK_MARGIN * 2)}
-        height={props.height - (MASK_MARGIN * 2)}
-        fill="#000"
-    />
+Line.propTypes = {
+    ...LineItemPropTypes,
+    index: PropTypes.number.isRequired,
+};
+
+const ClipPath = props => (
+    <clipPath id={`label-mask-${props.index}`}>
+        <path
+            d={`
+                M0 0 h${props.totalWidth} v${props.totalHeight} H0z
+                M${((props.x + props.cx) - (props.width / 2)) + MASK_MARGIN}
+                 ${((props.y + props.cy) - (props.height / 2)) + MASK_MARGIN}
+                v${props.height - (2 * MASK_MARGIN)}
+                h${props.width - (2 * MASK_MARGIN)}
+                v-${props.height - (2 * MASK_MARGIN)}z
+              `}
+        />
+    </clipPath>
 );
 
-Mask.propTypes = {
-    left: PropTypes.number.isRequired,
-    top: PropTypes.number.isRequired,
+const ClipPathItemPropTypes = {
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+    cx: PropTypes.number.isRequired,
+    cy: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
+};
+
+ClipPath.propTypes = {
+    ...ClipPathItemPropTypes,
+    totalWidth: PropTypes.number.isRequired,
+    totalHeight: PropTypes.number.isRequired,
+    index: PropTypes.number.isRequired,
 };
 
 const ItemOverlay = props => (
     <svg width={props.width} height={props.height}>
         <defs>
-            <mask id="label-mask" x="0" y="0" width="1" height="1">
-                <rect width={props.width} height={props.height} fill="#fff"/>
-                {props.items.map((item, index) => <Mask key={index} {...item}/>)}
-            </mask>
+            {props.items.map((item, index) =>
+                <ClipPath
+                    key={index}
+                    index={index}
+                    totalWidth={props.width}
+                    totalHeight={props.height}
+                    {...item}
+                />
+              )}
         </defs>
-        <g mask="url(#label-mask)">
-            {props.items.map((item, index) => <Line key={index} {...item}/>)}
-        </g>
+        {props.items.map((item, index) => <Line key={index} index={index} {...item}/>)}
     </svg>
 );
 
@@ -55,8 +78,8 @@ ItemOverlay.propTypes = {
     height: PropTypes.number.isRequired,
     items: PropTypes.arrayOf(
         PropTypes.shape({
-            ...Line.propTypes,
-            ...Mask.propTypes,
+            ...LineItemPropTypes,
+            ...ClipPathItemPropTypes,
         })
     ).isRequired,
 };

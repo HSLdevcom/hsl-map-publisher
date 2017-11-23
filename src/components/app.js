@@ -1,11 +1,9 @@
 import React, { Component } from "react";
-import queryString from "query-string";
 import { ApolloClient, createNetworkInterface, ApolloProvider } from "react-apollo";
 
 import StopPoster from "components/stopPoster/stopPosterContainer";
 import Timetable from "components/timetable/timetableContainer";
 import renderQueue from "util/renderQueue";
-import { setMapScale } from "util/map";
 
 const components = {
     StopPoster,
@@ -36,8 +34,8 @@ class App extends Component {
                 }
                 if (window.callPhantom) {
                     window.callPhantom({
-                        width: this.root.offsetWidth * this.scale,
-                        height: this.root.offsetHeight * this.scale,
+                        width: this.root.offsetWidth,
+                        height: this.root.offsetHeight,
                     });
                 }
             });
@@ -49,13 +47,9 @@ class App extends Component {
         let props;
 
         try {
-            const params = queryString.parse(location.pathname.substring(1));
-            ComponentToRender = components[params.component];
-            props = JSON.parse(params.props);
-            this.scale = Number(params.scale) || 1;
-            if (this.scale > 1) {
-                setMapScale(this.scale);
-            }
+            const params = new URLSearchParams(location.search.substring(1));
+            ComponentToRender = components[params.get("component")];
+            props = JSON.parse(params.get("props"));
         } catch (error) {
             App.handleError(new Error("Failed to parse url fragment"));
             return null;
@@ -68,11 +62,7 @@ class App extends Component {
 
         return (
             <div
-                style={{
-                    display: "inline-block",
-                    transform: `scale(${this.scale})`,
-                    transformOrigin: "top left",
-                }}
+                style={{ display: "inline-block" }}
                 ref={(ref) => { this.root = ref; }}
             >
                 <ApolloProvider client={client}>

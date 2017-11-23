@@ -46,18 +46,14 @@
     "file-loader": "^0.9.0",
     "forever": "^0.15.3",
     "html-webpack-plugin": "^2.22.0",
-    "path": "^0.12.7",
     "rimraf": "^2.6.1",
-    "slimerjs": "^0.10.3",
     "style-loader": "^0.13.2",
     "url-loader": "^0.5.8",
     "webpack": "^1.14.0",
-    "webpack-dev-server": "^1.15.1",
-    "whatwg-fetch": "^1.0.0"
+    "webpack-dev-server": "^1.15.1"
   },
   "dependencies": {
     "classnames": "^2.2.5",
-    "concat-frames": "^1.0.3",
     "csv": "^1.1.1",
     "hsl-map-style": "HSLdevcom/hsl-map-style#d640b1f7656df1e594dbb0c897de4d877ed588fb",
     "iconv-lite": "^0.4.15",
@@ -69,12 +65,10 @@
     "material-ui": "^0.17.1",
     "moment": "^2.18.1",
     "node-fetch": "^1.6.3",
-    "node-phantom-promise": "^1.0.3",
     "nodemon": "^1.11.0",
-    "png-stream": "^1.0.5",
     "prop-types": "^15.5.8",
+    "puppeteer": "^0.13.0",
     "qrcode": "^0.9.0",
-    "query-string": "^4.3.2",
     "raw-loader": "^0.5.1",
     "react": "^15.6.1",
     "react-apollo": "^1.4.2",
@@ -84,8 +78,6 @@
     "react-virtualized": "^9.5.0",
     "recompose": "^0.23.1",
     "segseg": "^0.2.2",
-    "sharp": "^0.18.1",
-    "tile-merge-stream": "HSLdevcom/tile-merge-stream",
     "viewport-mercator-project": "^4.0.0",
     "worker-loader": "^1.1.0"
   }

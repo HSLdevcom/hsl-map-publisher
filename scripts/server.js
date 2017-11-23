@@ -6,26 +6,20 @@ const Router = require("koa-router");
 const jsonBody = require("koa-json-body");
 
 const moment = require("moment");
-const template = require("lodash/template");
 const iconv = require("iconv-lite");
 const csv = require("csv");
 const fetch = require("node-fetch");
 const spawn = require("child_process").spawn;
-const promisify = require("util").promisify;
 
 const generator = require("./generator");
 const Logger = require("./logger");
 
-const unlinkAsync = promisify(fs.unlink);
-
 // 5 * 72 = 360 dpi
 const SCALE = 5;
-const PDF_PPI = 72;
 
 const PORT = 4000;
 
 const OUTPUT_PATH = path.join(__dirname, "..", "output");
-const TEMPLATE = template(fs.readFileSync(path.join(__dirname, "index.html")));
 
 const API_URL = "http://kartat.hsl.fi/jore/graphql";
 
@@ -83,22 +77,6 @@ function generatePdf(directory, filenames, outputFilename) {
     });
 }
 
-function convertToPdf(filename) {
-    return new Promise((resolve, reject) => {
-        const pdfFilename = filename.replace(".tiff", ".pdf");
-        const convert = spawn("convert", [
-            "-density",
-            SCALE * PDF_PPI,
-            "-units",
-            "PixelsPerInch",
-            filename,
-            pdfFilename,
-        ]);
-        convert.stderr.on("data", data => reject(new Error(data.toString())));
-        convert.on("close", () => unlinkAsync(filename).then(() => resolve(pdfFilename)));
-    });
-}
-
 function generateFiles(component, props, outputFilename = "output.pdf") {
     const identifier = moment().format("YYYY-MM-DD-HHmm-sSSSSS");
     const directory = path.join(OUTPUT_PATH, identifier);
@@ -108,7 +86,7 @@ function generateFiles(component, props, outputFilename = "output.pdf") {
 
     const promises = [];
     for (let i = 0; i < props.length; i++) {
-        const filename = `${i + 1}.tiff`;
+        const filename = `${i + 1}.pdf`;
         const options = {
             logger,
             filename,
@@ -124,7 +102,7 @@ function generateFiles(component, props, outputFilename = "output.pdf") {
             generator.generate(options)
                 .then((success) => { // eslint-disable-line no-loop-func
                     queueLength--;
-                    return success && convertToPdf(path.join(directory, filename));
+                    return success && path.join(directory, filename);
                 })
         );
     }

@@ -1,137 +1,63 @@
 const fs = require("fs");
 const path = require("path");
-const driver = require("node-phantom-promise");
-const sharp = require("sharp");
-const PNGDecoder = require("png-stream").Decoder;
-const concat = require("concat-frames");
-const TileMergeStream = require("tile-merge-stream");
+const { promisify } = require("util");
+const puppeteer = require("puppeteer");
 
-const slimerjs = /^win/.test(process.platform) ? "slimerjs.cmd" : "slimerjs";
-const slimerPath = path.join(__dirname, "..", "node_modules", ".bin", slimerjs);
-const profilePath = path.join(__dirname, "..", "profile");
+const writeFileAsync = promisify(fs.writeFile);
 
 const CLIENT_PORT = 3000;
-const TILE_SIZE = 3000;
 const RENDER_TIMEOUT = 5 * 60 * 1000;
-const SLIMER_TIMEOUT = 10 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
+const SCALE = 96 / 72;
 
-let browser;
-let page;
+let browser = null;
 let previous = Promise.resolve();
 
-function isInitialized() {
-    if (!browser || !page) {
-        return Promise.resolve(false);
-    }
-    return new Promise((resolve) => {
-        setTimeout(() => resolve(false), SLIMER_TIMEOUT);
-        page.evaluate(() => true)
-            .then(status => resolve(!!status))
-            .catch(() => resolve(false));
-    });
-}
-
-function setCallbacks(logger) {
-    page.onError = error => logger.logError({ message: error });
-    page.onConsoleMessage = message => logger.logInfo(message);
-}
-
 async function initialize() {
-    browser = await driver.create({ path: slimerPath, parameters: ["-profile", profilePath] });
-    page = await browser.createPage();
-}
-
-async function open(component, props, scale = 1) {
-    const fragment = `component=${component}&props=${JSON.stringify(props)}&scale=${scale}`;
-    const status = await page.open(`http://localhost:${CLIENT_PORT}/${fragment}`);
-
-    if (status !== "success") {
-        throw new Error("Failed to open client app");
-    }
-}
-
-function flushBuffer(buffer, innerStream) {
-    return new Promise((resolve, reject) => {
-        const decoder = new PNGDecoder();
-
-        decoder.on("error", error => reject(error));
-        decoder.pipe(
-            concat(([{ width, height, pixels }]) => {
-                if (!innerStream.write({ width, height, data: pixels })) {
-                    innerStream.once("drain", () => resolve());
-                } else {
-                    process.nextTick(() => resolve());
-                }
-            })
-        );
-        decoder.end(buffer);
-    });
-}
-
-async function captureScreenshot(totalWidth, totalHeight, filename) {
-    const tileStream = new TileMergeStream({ width: totalWidth, height: totalHeight, channels: 4 });
-
-    const outStream = tileStream
-        .pipe(
-            sharp(undefined, {
-                raw: {
-                    width: totalWidth,
-                    height: totalHeight,
-                    channels: 4,
-                },
-            }).tiff({
-                compression: "lzw",
-            }))
-        .pipe(fs.createWriteStream(filename));
-
-    let top = 0;
-    while (top < totalHeight) {
-        let left = 0;
-        const height = Math.min(TILE_SIZE, totalHeight - top);
-        while (left < totalWidth) {
-            /* eslint-disable no-await-in-loop */
-            const width = Math.min(TILE_SIZE, totalWidth - left);
-            await page.set("clipRect", { top, left, width, height });
-            const base64 = await page.renderBase64({ format: "png" });
-            await flushBuffer(Buffer.from(base64, "base64"), tileStream);
-            left += width;
-            /* eslint-enable no-await-in-loop */
-        }
-        top += height;
-    }
-
-    tileStream.end();
-
-    return new Promise((resolve, reject) => {
-        outStream.on("finish", () => resolve());
-        outStream.on("error", error => reject(error));
-    });
+    browser = await puppeteer.launch({ args: ["--no-sandbox", "--disable-setuid-sandbox"] });
+    browser.on("disconnected", () => { browser = null; });
+    return browser;
 }
 
 /**
- * Renders component to bitmap file
+ * Renders component to PDF file
  * @returns {Promise}
  */
-function renderComponent(options) {
-    const { component, props, directory, filename, scale } = options;
+async function renderComponent(options) {
+    const { component, props, directory, filename, logger } = options;
 
-    return new Promise((resolve, reject) => {
-        setTimeout(() => reject(new Error("Render timeout")), RENDER_TIMEOUT);
-        // Set callback called by client app when component is ready
-        page.onCallback = ({ error, width, height }) => {
-            page.onCallback = null;
-            if (error) {
-                reject(new Error(error));
-                return;
-            }
-            captureScreenshot(width, height, path.join(directory, filename))
-                .then(() => resolve())
-                .catch(screenshotError => reject(screenshotError));
-        };
-        open(component, props, scale)
-            .catch(error => reject(error));
+    const page = await browser.newPage();
+
+    page.on("error", (error) => {
+        page.close();
+        logger.logError(error);
+        // Get a fresh browser after a crash
+        browser.close();
     });
+
+    page.on("console", ({ text }) => logger.logInfo(text));
+
+    const fragment = `component=${component}&props=${JSON.stringify(props)}`;
+    await page.goto(`http://localhost:${CLIENT_PORT}/?${fragment}`);
+
+    const viewport = await page.evaluate(() =>
+      new Promise((resolve, reject) => {
+          window.callPhantom = response =>
+            (response.error ? reject(response.error) : resolve(response));
+      })
+    );
+
+    await page.emulateMedia("screen");
+    const contents = await page.pdf({
+        printBackground: true,
+        width: viewport.width * SCALE,
+        height: viewport.height * SCALE,
+        pageRanges: "1",
+        scale: SCALE,
+    });
+
+    await writeFileAsync(path.join(directory, filename), contents);
+    return page.close();
 }
 
 async function renderComponentRetry(options) {
@@ -144,12 +70,12 @@ async function renderComponentRetry(options) {
             if (i > 0) {
                 options.logger.logInfo("Retrying");
             }
-            if (!(await isInitialized())) {
+            if (!browser) {
                 options.logger.logInfo("Creating new browser instance");
                 await initialize();
             }
-            setCallbacks(options.logger);
-            await renderComponent(options);
+            const timeout = new Promise((resolve, reject) => setTimeout(reject, RENDER_TIMEOUT, new Error("Render timeout")));
+            await Promise.race([renderComponent(options), timeout]);
             options.logger.logInfo(`Successfully rendered ${options.filename}\n`);
             return true;
         } catch (error) {
