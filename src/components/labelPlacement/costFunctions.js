@@ -72,8 +72,8 @@ function getIntersectionCost(positions, indexes) {
     positions.forEach((position, i) => {
         if (position.isFixed) return;
         indexes.forEach((j) => {
-            if (j <= i) return;
             if (positions[j].isFixed) return;
+            if (j >= i && indexes.includes(i)) return;
             if (hasIntersectingLines(position, positions[j])) sum += 1;
         });
     });
