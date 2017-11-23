@@ -33,12 +33,6 @@ body {
     margin: 0;
 }
 
-body, body * {
-    user-select: none;
-    -moz-osx-font-smoothing: unset;
-    -webkit-font-smoothing: none;
-}
-
 :root {
     --hsl-blue: rgb(0, 122, 201);
     --hsl-blue-light: rgb(213, 232, 250);
