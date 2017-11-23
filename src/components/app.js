@@ -47,7 +47,7 @@ class App extends Component {
         let props;
 
         try {
-            const params = new URLSearchParams(location.pathname.substring(1));
+            const params = new URLSearchParams(location.search.substring(1));
             ComponentToRender = components[params.get("component")];
             props = JSON.parse(params.get("props"));
         } catch (error) {

@@ -42,7 +42,7 @@ async function renderComponent(options) {
     page.on("console", ({ text }) => logger.logInfo(text));
 
     const fragment = `component=${component}&props=${JSON.stringify(props)}`;
-    await page.goto(`http://localhost:${CLIENT_PORT}/${fragment}`);
+    await page.goto(`http://localhost:${CLIENT_PORT}/?${fragment}`);
 
     const viewport = await page.evaluate(() =>
       new Promise((resolve, reject) => {
