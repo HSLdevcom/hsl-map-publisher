@@ -14,14 +14,14 @@
 }
 
 .content {
-    flex: 1;
+    flex: 1 1 auto;
     display: flex;
     flex-flow: column;
     overflow: hidden;
 }
 
 .columns {
-    flex: 1;
+    flex: 1 0 auto;
     display: flex;
     align-items: stretch;
     justify-content: space-between;
@@ -49,14 +49,18 @@
 }
 
 .timetables {
-    flex: 0 1 auto;
+    flex: 0 0 auto;
     display: flex;
     align-items: stretch;
     justify-content: space-between;
 }
 
 .timetable {
-    flex: 0 1 auto;
+    flex: 0 0 auto;
     display: flex;
     align-items: stretch;
+}
+
+.timetables > .timetable {
+    flex: 1 0 0;
 }

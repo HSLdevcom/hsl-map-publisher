@@ -3,7 +3,6 @@
     width: 100%;
     padding: var(--border-radius);
     padding-top: calc(var(--border-radius) - 15px);
-    padding-bottom: 0;
     border-radius: var(--border-radius);
     color: var(--hsl-blue);
     background: var(--light-background);
