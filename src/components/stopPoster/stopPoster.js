@@ -9,6 +9,7 @@ import RouteDiagram from "components/routeDiagram/routeDiagramContainer";
 import TramDiagram from "components/tramDiagram/tramDiagram";
 import Timetable from "components/timetable/timetableContainer";
 import StopMap from "components/map/stopMapContainer";
+import Metadata from "components/metadata";
 
 import Header from "./headerContainer";
 import Footer from "./footer";
@@ -198,6 +199,7 @@ class StopPoster extends Component {
                             <Spacer width="100%" height={62}/>
                         </div>
                         <Footer shortId={this.props.shortId} isTrunkStop={this.props.isTrunkStop}/>
+                        <Metadata date={this.props.date}/>
                     </JustifiedColumn>
                 </div>
             </CropMarks>
