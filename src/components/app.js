@@ -46,6 +46,12 @@ class App extends Component {
         }
     }
 
+    // eslint-disable-next-line class-methods-use-this
+    componentDidCatch(error, info) {
+        console.log(info);
+        App.handleError(error);
+    }
+
     render() {
         let ComponentToRender;
         let props;
