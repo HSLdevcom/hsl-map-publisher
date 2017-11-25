@@ -1,5 +1,10 @@
 import React, { Component } from "react";
-import { ApolloClient, createNetworkInterface, ApolloProvider } from "react-apollo";
+
+import { ApolloClient } from "apollo-client";
+import { createHttpLink } from "apollo-link-http";
+import { InMemoryCache } from "apollo-cache-inmemory";
+import { ApolloProvider } from "react-apollo";
+
 
 import StopPoster from "components/stopPoster/stopPosterContainer";
 import Timetable from "components/timetable/timetableContainer";
@@ -11,9 +16,8 @@ const components = {
 };
 
 const client = new ApolloClient({
-    networkInterface: createNetworkInterface({
-        uri: "http://kartat.hsl.fi/jore/graphql",
-    }),
+    link: createHttpLink({ uri: "http://kartat.hsl.fi/jore/graphql" }),
+    cache: new InMemoryCache(),
 });
 
 class App extends Component {

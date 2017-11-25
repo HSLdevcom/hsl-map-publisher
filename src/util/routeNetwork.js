@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { gql } from "react-apollo";
+import gql from "graphql-tag";
 import { PerspectiveMercatorViewport } from "viewport-mercator-project";
 import { trimRouteId } from "util/domain";
 

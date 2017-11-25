@@ -52,8 +52,13 @@
     "webpack-dev-server": "^2.9.4"
   },
   "dependencies": {
+    "apollo-cache-inmemory": "^1.1.1",
+    "apollo-client": "^2.0.3",
+    "apollo-link-http": "^1.2.0",
     "classnames": "^2.2.5",
     "csv": "^2.0.0",
+    "graphql": "^0.11.7",
+    "graphql-tag": "^2.5.0",
     "hsl-map-style": "HSLdevcom/hsl-map-style#d640b1f7656df1e594dbb0c897de4d877ed588fb",
     "iconv-lite": "^0.4.19",
     "json-loader": "^0.5.7",
@@ -70,7 +75,7 @@
     "qrcode": "^1.0.0",
     "raw-loader": "^0.5.1",
     "react": "^16.1.1",
-    "react-apollo": "^1.4.2",
+    "react-apollo": "^2.0.1",
     "react-dom": "^16.1.1",
     "react-hot-loader": "^3.1.3",
     "react-virtualized": "^9.12.0",
