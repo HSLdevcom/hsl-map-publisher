@@ -51,8 +51,8 @@ class StopPoster extends Component {
     }
 
     hasOverflow() {
-        return (this.content.scrollWidth > this.content.clientWidth) ||
-               (this.content.scrollHeight > this.content.clientHeight);
+        return (this.content.scrollWidth - this.content.clientWidth) > 1 ||
+               (this.content.scrollHeight - this.content.clientHeight) > 1;
     }
 
     updateLayout() {
