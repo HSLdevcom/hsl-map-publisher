@@ -1,5 +1,6 @@
 import segseg from "segseg";
 
+const OVERLAP_COST = 1;
 const OVERLAP_COST_FIXED = 5;
 const OVERFLOW_COST = 500000;
 const INTERSECTION_COST = 5000;
@@ -43,7 +44,7 @@ function getOverlapCost(positions, indexes) {
             if (!indexes.includes(j) || j > i) {
                 const area = getOverlapArea(positions[i], positions[j]);
                 const isFixed = positions[i].isFixed || positions[j].isFixed;
-                overlap += (isFixed ? area * OVERLAP_COST_FIXED : area);
+                overlap += area * (isFixed ? OVERLAP_COST_FIXED : OVERLAP_COST);
             }
         }
     });
