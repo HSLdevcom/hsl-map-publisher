@@ -136,7 +136,7 @@ function getDistanceCost(positions, indexes) {
 function getAngleCost(positions, indexes) {
     return ANGLE_COST * indexes.reduce((prev, index) => {
         const phi = Math.abs(positions[index].angle - positions[index].initialAngle) % 360;
-        return prev + phi > 180 ? 360 - phi : phi;
+        return prev + ((phi > 180) ? 360 - phi : phi);
     }, 0);
 }
 
