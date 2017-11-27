@@ -3,6 +3,7 @@ const path = require("path");
 
 const Koa = require("koa");
 const Router = require("koa-router");
+const cors = require("@koa/cors");
 const jsonBody = require("koa-json-body");
 
 const moment = require("moment");
@@ -169,6 +170,7 @@ async function main() {
     });
 
     app
+        .use(cors())
         .use(jsonBody({ fallback: true }))
         .use(router.routes())
         .use(router.allowedMethods())
