@@ -48,6 +48,7 @@ class App extends Component {
 
     // eslint-disable-next-line class-methods-use-this
     componentDidCatch(error, info) {
+        // eslint-disable-next-line no-console
         console.log(info);
         App.handleError(error);
     }
