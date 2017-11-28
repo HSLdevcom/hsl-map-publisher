@@ -1,43 +1,30 @@
+/* eslint-disable import/no-extraneous-dependencies */
 const webpack = require("webpack");
 const WebpackDevServer = require("webpack-dev-server");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
+const config = require("./webpack.config");
 
 const PORT = 3000;
 
-const defaultOptions = {
-    hot: process.env.HMR,
-    historyApiFallback: true,
-    stats: { colors: true },
-    disableHostCheck: false,
-};
+config.devtool = "eval";
 
-function createServer(config, port, options = {}) {
-    const opts = Object.assign({}, defaultOptions, options);
-
-    const compiler = webpack(config);
-    const server = new WebpackDevServer(compiler, opts);
-
-    server.listen(port, (err) => {
-        if (err) console.log(err);
-        console.log(`Listening at ${port}`);
-    });
+if (process.env.HMR === "true") {
+    config.entry = [
+        `webpack-dev-server/client?http://localhost:${PORT}`,
+        "webpack/hot/dev-server",
+        ...config.entry,
+    ];
+    config.plugins = [
+        new webpack.HotModuleReplacementPlugin(),
+        ...config.plugins,
+    ];
 }
 
-const config = require("./webpack.config");
+const options = {
+    hot: process.env.HMR === "true",
+    historyApiFallback: true,
+    stats: { colors: true },
+};
 
-module.exports = createServer(
-    Object.assign(config, {
-        devtool: "eval",
-        entry: [
-            `webpack-dev-server/client?http://localhost:${PORT}`,
-            "webpack/hot/only-dev-server",
-            "./src/index.js",
-        ],
-        plugins: [
-            new webpack.DefinePlugin({ "process.env": { NODE_ENV: '"development"' } }),
-            new webpack.HotModuleReplacementPlugin(),
-            new HtmlWebpackPlugin({ template: "index.ejs" }),
-        ],
-    })
-    , 3000
-);
+const server = new WebpackDevServer(webpack(config), options);
+
+server.listen(PORT);
