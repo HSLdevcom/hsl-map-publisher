@@ -25,17 +25,19 @@ function createServer(config, port, options = {}) {
 
 const config = require("./webpack.config");
 
-module.exports = createServer({
-    ...config,
-    devtool: "eval",
-    entry: [
-        `webpack-dev-server/client?http://localhost:${PORT}`,
-        "webpack/hot/only-dev-server",
-        "./src/index.js",
-    ],
-    plugins: [
-        new webpack.DefinePlugin({ "process.env": { NODE_ENV: '"development"' } }),
-        new webpack.HotModuleReplacementPlugin(),
-        new HtmlWebpackPlugin({ template: "index.ejs" }),
-    ],
-}, 3000);
+module.exports = createServer(
+    Object.assign(config, {
+        devtool: "eval",
+        entry: [
+            `webpack-dev-server/client?http://localhost:${PORT}`,
+            "webpack/hot/only-dev-server",
+            "./src/index.js",
+        ],
+        plugins: [
+            new webpack.DefinePlugin({ "process.env": { NODE_ENV: '"development"' } }),
+            new webpack.HotModuleReplacementPlugin(),
+            new HtmlWebpackPlugin({ template: "index.ejs" }),
+        ],
+    })
+    , 3000
+);
