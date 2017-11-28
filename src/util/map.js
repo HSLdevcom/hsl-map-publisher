@@ -1,7 +1,7 @@
 
 const API_URL = "http://kartat.hsl.fi";
 
-const scale = (process.env.NODE_ENV === "development") ? 1 : 5;
+const scale = 5;
 
 /**
  * Returns a map image
