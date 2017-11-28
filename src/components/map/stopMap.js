@@ -164,12 +164,12 @@ const StopType = PropTypes.shape({
         routeId: PropTypes.string.isRequired,
     }).isRequired).isRequired,
     stopIds: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
-    calculatedHeading: PropTypes.number.isRequired,
+    calculatedHeading: PropTypes.number,
 });
 
 StopMap.propTypes = {
-    mapOptions: MapImage.propTypes.options.isRequired,
-    miniMapOptions: MapImage.propTypes.options.isRequired,
+    mapOptions: PropTypes.shape(MapImage.optionsShape).isRequired,
+    miniMapOptions: PropTypes.shape(MapImage.optionsShape).isRequired,
     currentStop: StopType.isRequired,
     nearbyStops: PropTypes.arrayOf(StopType).isRequired,
     pixelsPerMeter: PropTypes.number.isRequired,

@@ -68,14 +68,16 @@ MapImageContainer.defaultProps = {
     date: new Date().toISOString().substring(0, 10),
 };
 
+MapImageContainer.optionsShape = {
+    center: PropTypes.arrayOf(PropTypes.number).isRequired,
+    zoom: PropTypes.number.isRequired,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
+    scale: PropTypes.number,
+};
+
 MapImageContainer.propTypes = {
-    options: PropTypes.shape({
-        center: PropTypes.arrayOf(PropTypes.number).isRequired,
-        zoom: PropTypes.number.isRequired,
-        width: PropTypes.number.isRequired,
-        height: PropTypes.number.isRequired,
-        scale: PropTypes.number,
-    }).isRequired,
+    options: PropTypes.shape(MapImageContainer.optionsShape).isRequired,
     components: PropTypes.objectOf(PropTypes.shape({
         enabled: PropTypes.bool.isRequired,
         useGraphQL: PropTypes.bool,
@@ -86,5 +88,6 @@ MapImageContainer.propTypes = {
         id: PropTypes.string.isRequired,
     })),
 };
+
 
 export default MapImageContainer;
