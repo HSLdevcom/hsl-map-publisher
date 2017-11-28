@@ -5,12 +5,12 @@
   "main": "index.js",
   "scripts": {
     "clean": "rimraf dist",
-    "bundle": "cross-env NODE_ENV=production webpack --config webpack.config.js",
+    "bundle": "webpack --config webpack.config.js",
     "build": "npm run clean && npm run bundle",
-    "start": "cross-env NODE_ENV=production node server.src",
-    "start:hot": "cross-env NODE_ENV=development node server.src",
-    "serve": "cross-env NODE_ENV=production node scripts/server",
-    "serve:hot": "cross-env NODE_ENV=development nodemon scripts/server"
+    "start": "node server.src",
+    "start:hot": "cross-env HMR=true node server",
+    "serve": "node scripts/server",
+    "serve:hot": "nodemon scripts/server"
   },
   "repository": {
     "type": "git",
