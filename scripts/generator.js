@@ -31,12 +31,15 @@ async function renderComponent(options) {
 
     page.on("error", (error) => {
         page.close();
-        logger.logError(error);
-        // Get a fresh browser after a crash
         browser.close();
+        logger.logError(error);
     });
 
-    page.on("console", ({ text }) => logger.logInfo(text));
+    page.on("console", ({ type, text }) => {
+        if (["error", "warning", "log"].includes(type)) {
+            logger.logInfo(`Console(${type}): ${text}`);
+        }
+    });
 
     const encodedProps = encodeURIComponent(JSON.stringify(props));
     await page.goto(`${CLIENT_URL}/?component=${component}&props=${encodedProps}`);
