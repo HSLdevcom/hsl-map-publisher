@@ -37,6 +37,11 @@ async function addBuild({ title }) {
     return { id };
 }
 
+async function updateBuild({ id, status }) {
+    await knex("build").where({ id }).update({ status });
+    return { id };
+}
+
 async function addPoster({ buildId, component, props }) {
     const id = uuidv1();
     await knex("poster").insert(convertKeys({
@@ -62,6 +67,7 @@ module.exports = {
     migrate,
     getBuilds,
     addBuild,
+    updateBuild,
     addPoster,
     updatePoster,
     addEvent,

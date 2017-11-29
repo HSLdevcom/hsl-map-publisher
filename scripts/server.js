@@ -6,7 +6,7 @@ const jsonBody = require("koa-json-body");
 const fetchStops = require("./stops");
 const generator = require("./generator");
 const {
-    migrate, getBuilds, addBuild, addPoster, addEvent, updatePoster,
+    migrate, getBuilds, addBuild, updateBuild, addPoster, updatePoster, addEvent,
 } = require("./store");
 
 const PORT = 4000;
@@ -64,6 +64,13 @@ async function main() {
     router.post("/builds", async (ctx) => {
         const { title } = ctx.request.body;
         const build = await addBuild({ title });
+        ctx.body = build;
+    });
+
+    router.put("/builds/:id", async (ctx) => {
+        const { id } = ctx.params;
+        const { status } = ctx.request.body;
+        const build = await updateBuild({ id, status });
         ctx.body = build;
     });
 
