@@ -34,18 +34,15 @@ async function generatePoster(buildId, component, props) {
     return { id };
 }
 
-function successResponse(ctx, body, type = "application/json") {
-    ctx.status = 200;
-    ctx.type = type;
-    ctx.body = body;
-}
-
-function errorResponse(ctx, error) {
-    ctx.status = 500;
-    ctx.body = { error: error.message };
-    console.error(error); // eslint-disable-line no-console
-    console.error(error.stack); // eslint-disable-line no-console
-}
+const errorHandler = async (ctx, next) => {
+    try {
+        await next();
+    } catch (error) {
+        ctx.status = 500;
+        ctx.body = { message: error.message };
+        console.error(error); // eslint-disable-line no-console
+    }
+};
 
 async function main() {
     await migrate();
@@ -56,53 +53,37 @@ async function main() {
     // FIXME: Update UI to fetch from graphql and remove when data available
     const stops = await fetchStops();
     router.get("/stops", (ctx) => {
-        successResponse(ctx, stops);
+        ctx.body = stops;
     });
 
     router.get("/builds", async (ctx) => {
-        try {
-            const builds = await getBuilds();
-            return successResponse(ctx, builds);
-        } catch (error) {
-            return errorResponse(ctx, error);
-        }
+        const builds = await getBuilds();
+        ctx.body = builds;
     });
 
     router.post("/builds", async (ctx) => {
         const { title } = ctx.request.body;
-
-        try {
-            const build = await addBuild({ title });
-            return successResponse(ctx, build);
-        } catch (error) {
-            return errorResponse(ctx, error);
-        }
+        const build = await addBuild({ title });
+        ctx.body = build;
     });
 
     router.post("/posters", async (ctx) => {
         const { buildId, component, props } = ctx.request.body;
-
-        try {
-            const posters = [];
-            for (let i = 0; i < props.length; i++) {
-                // eslint-disable-next-line no-await-in-loop
-                posters.push(await generatePoster(buildId, component, props[i]));
-            }
-            return successResponse(ctx, posters);
-        } catch (error) {
-            return errorResponse(ctx, error);
+        const posters = [];
+        for (let i = 0; i < props.length; i++) {
+            // eslint-disable-next-line no-await-in-loop
+            posters.push(await generatePoster(buildId, component, props[i]));
         }
+        ctx.body = posters;
     });
 
     app
+        .use(errorHandler)
         .use(cors())
         .use(jsonBody({ fallback: true }))
         .use(router.routes())
         .use(router.allowedMethods())
-        .listen(PORT, (err) => {
-            if (err) console.error(err); // eslint-disable-line no-console
-            console.log(`Listening at port ${PORT}`); // eslint-disable-line no-console
-        });
+        .listen(PORT, () => console.log(`Listening at ${PORT}`)); // eslint-disable-line no-console
 }
 
-main().catch(console.log.bind(console)); // eslint-disable-line no-console
+main().catch(error => console.error(error)); // eslint-disable-line no-console
