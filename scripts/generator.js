@@ -16,7 +16,6 @@ let previous = Promise.resolve();
 async function initialize() {
     browser = await puppeteer.launch({ args: ["--no-sandbox", "--disable-setuid-sandbox"] });
     browser.on("disconnected", () => { browser = null; });
-    return browser;
 }
 
 /**
@@ -24,7 +23,9 @@ async function initialize() {
  * @returns {Promise}
  */
 async function renderComponent(options) {
-    const { component, props, directory, filename, logger } = options;
+    const {
+        component, props, directory, filename, logger,
+    } = options;
 
     const page = await browser.newPage();
 
@@ -40,12 +41,12 @@ async function renderComponent(options) {
     const encodedProps = encodeURIComponent(JSON.stringify(props));
     await page.goto(`${CLIENT_URL}/?component=${component}&props=${encodedProps}`);
 
-    const viewport = await page.evaluate(() =>
-      new Promise((resolve, reject) => {
-          window.callPhantom = response =>
-            (response.error ? reject(response.error) : resolve(response));
-      })
-    );
+    const viewport = await page.evaluate(() => (
+        new Promise((resolve, reject) => {
+            window.callPhantom = response =>
+                (response.error ? reject(response.error) : resolve(response));
+        })
+    ));
 
     await page.emulateMedia("screen");
     const contents = await page.pdf({
@@ -57,7 +58,7 @@ async function renderComponent(options) {
     });
 
     await writeFileAsync(path.join(directory, filename), contents);
-    return page.close();
+    await page.close();
 }
 
 async function renderComponentRetry(options) {
