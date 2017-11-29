@@ -20,11 +20,15 @@ Open [http://localhost:3000/component=StopPoster&props={"stopId": "1284117", "da
 
 ### Running in Docker
 
+Start a postgres docker container:
+```
+docker run -d --name publisher-postgres -e POSTGRES_PASSWORD=mysecretpassword postgres
+```
+
+Build and start the container:
 ```
 docker build -t hsl-map-publisher .
-docker run -d -p 5000:5000 -v output:/output -v fonts:/fonts --shm-size=1G hsl-map-publisher
+docker run -d -p 4000:4000 -v output:/output -v fonts:/fonts --link publisher-postgres -e "PG_CONNECTION_STRING=postgres://postgres:mysecretpassword@publisher-postgres:5432/postgres" --shm-size=1G hsl-map-publisher
 ```
 
 where `fonts` is a directory containing `Gotham Rounded` and `Gotham XNarrow` OpenType fonts.
-
-Open [http://localhost:5000](http://localhost:5000)
