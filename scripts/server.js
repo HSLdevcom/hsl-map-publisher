@@ -6,7 +6,7 @@ const jsonBody = require("koa-json-body");
 const fetchStops = require("./stops");
 const generator = require("./generator");
 const {
-    getBuilds, addBuild, addPoster, addEvent, updatePoster,
+    migrate, getBuilds, addBuild, addPoster, addEvent, updatePoster,
 } = require("./store");
 
 const PORT = 4000;
@@ -48,6 +48,8 @@ function errorResponse(ctx, error) {
 }
 
 async function main() {
+    await migrate();
+
     const app = new Koa();
     const router = new Router();
 

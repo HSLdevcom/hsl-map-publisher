@@ -12,6 +12,10 @@ function convertKeys(object, converter) {
     return obj;
 }
 
+async function migrate() {
+    await knex.migrate.latest();
+}
+
 async function getBuilds() {
     const rows = await knex.select(
         "build.*",
@@ -55,6 +59,7 @@ async function addEvent({
 }
 
 module.exports = {
+    migrate,
     getBuilds,
     addBuild,
     addPoster,
