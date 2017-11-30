@@ -1,4 +1,5 @@
-import { gql, graphql } from "react-apollo";
+import { graphql } from "react-apollo";
+import gql from "graphql-tag";
 import mapProps from "recompose/mapProps";
 import flatMap from "lodash/flatMap";
 import sortBy from "lodash/sortBy";

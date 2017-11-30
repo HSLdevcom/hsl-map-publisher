@@ -101,13 +101,11 @@ class Routes extends Component {
 }
 
 Routes.propTypes = {
-    routes: PropTypes.arrayOf(
-        PropTypes.shape({
-            routeId: PropTypes.string.isRequired,
-            destinationFi: PropTypes.string.isRequired,
-            destinationSe: PropTypes.string.isRequired,
-        })
-    ).isRequired,
+    routes: PropTypes.arrayOf(PropTypes.shape({
+        routeId: PropTypes.string.isRequired,
+        destinationFi: PropTypes.string.isRequired,
+        destinationSe: PropTypes.string.isRequired,
+    })).isRequired,
 };
 
 export default Routes;

@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
-import { gql, graphql } from "react-apollo";
+import { graphql } from "react-apollo";
+import gql from "graphql-tag";
 import compose from "recompose/compose";
 import mapProps from "recompose/mapProps";
 import flatMap from "lodash/flatMap";
@@ -46,7 +47,7 @@ const propsMapper = mapProps(props => ({
                 ...routeSegment.route.nodes[0],
                 routeId: trimRouteId(routeSegment.routeId),
             }))
-        ).sort(routeCompare),
+    ).sort(routeCompare),
 }));
 
 const hoc = compose(

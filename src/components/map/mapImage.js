@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 
 const MapImage = props => (
-    <img src={props.src}/>
+    <img src={props.src} alt=""/>
 );
 
 MapImage.propTypes = {

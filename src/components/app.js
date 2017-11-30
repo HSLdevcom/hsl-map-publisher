@@ -1,5 +1,10 @@
 import React, { Component } from "react";
-import { ApolloClient, createNetworkInterface, ApolloProvider } from "react-apollo";
+
+import { ApolloClient } from "apollo-client";
+import { createHttpLink } from "apollo-link-http";
+import { InMemoryCache } from "apollo-cache-inmemory";
+import { ApolloProvider } from "react-apollo";
+
 
 import StopPoster from "components/stopPoster/stopPosterContainer";
 import Timetable from "components/timetable/timetableContainer";
@@ -11,9 +16,8 @@ const components = {
 };
 
 const client = new ApolloClient({
-    networkInterface: createNetworkInterface({
-        uri: "http://kartat.hsl.fi/jore/graphql",
-    }),
+    link: createHttpLink({ uri: "http://kartat.hsl.fi/jore/graphql" }),
+    cache: new InMemoryCache(),
 });
 
 class App extends Component {
@@ -42,12 +46,19 @@ class App extends Component {
         }
     }
 
+    // eslint-disable-next-line class-methods-use-this
+    componentDidCatch(error, info) {
+        // eslint-disable-next-line no-console
+        console.log(info);
+        App.handleError(error);
+    }
+
     render() {
         let ComponentToRender;
         let props;
 
         try {
-            const params = new URLSearchParams(location.search.substring(1));
+            const params = new URLSearchParams(window.location.search.substring(1));
             ComponentToRender = components[params.get("component")];
             props = JSON.parse(params.get("props"));
         } catch (error) {

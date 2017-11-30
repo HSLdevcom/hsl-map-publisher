@@ -1,3 +1,6 @@
+.git
+.gitignore
+dist
 node_modules
-output/**
-fonts/**
+output
+fonts

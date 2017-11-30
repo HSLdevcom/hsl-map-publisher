@@ -25,7 +25,7 @@ function prune(branch) {
         .reduce((prev, node) => [...prev, ...node.items], [])
         .reduce((prev, stop) => [...prev, ...(stop.destinations || [])], []);
 
-    branch.items = [  // eslint-disable-line no-param-reassign
+    branch.items = [ // eslint-disable-line no-param-reassign
         ...branch.items,
         { type: "gap", destinations },
     ];
@@ -80,7 +80,7 @@ function routesToTree(routes, shortId) {
             && currentZone !== item.zone
         ) {
             return [
-               { type: "zone", from: currentZone, to: item.zone },
+                { type: "zone", from: currentZone, to: item.zone },
                 item,
             ];
         } else if (prev.length > 0
@@ -89,7 +89,7 @@ function routesToTree(routes, shortId) {
         ) {
             return [
                 ...prev,
-                 { type: "zone", from: prev[prev.length - 1].zone, to: item.zone },
+                { type: "zone", from: prev[prev.length - 1].zone, to: item.zone },
                 item,
             ];
         }
@@ -97,7 +97,9 @@ function routesToTree(routes, shortId) {
     }, []));
 
     const root = itemsToTree(itemsListWithZoneBorders, { isEqual, merge });
-    generalizeTree(root, { width: MAX_WIDTH, height: MAX_HEIGHT, prune, truncate });
+    generalizeTree(root, {
+        width: MAX_WIDTH, height: MAX_HEIGHT, prune, truncate,
+    });
     sortBranches(root);
     return root;
 }

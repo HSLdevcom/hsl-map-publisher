@@ -21,7 +21,6 @@ WORKDIR ${WORK}
 
 # Add privileges for puppeteer user
 RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
-    && mkdir -p ${WORK} \
     && mkdir -p /home/pptruser/Downloads \
     && chown -R pptruser:pptruser /home/pptruser \
     && chown -R pptruser:pptruser ${WORK}
@@ -36,16 +35,15 @@ RUN yarn
 
 # Bundle app source
 COPY . ${WORK}
+RUN yarn build
 
-EXPOSE 5000
+EXPOSE 4000
 
 CMD \
   mkdir -p ~/.local/share/fonts/opentype && \
   cp /fonts/* ~/.local/share/fonts/opentype && \
   fc-cache -f -v && \
-  cd ${WORK} && \
-  rm -r output && ln -s /output . && \
-  node_modules/.bin/forever start -c "npm start" ./ && \
-  node_modules/.bin/forever start -c "npm run ui" ./ && \
-  node_modules/.bin/forever start -c "npm run serve" ./ && \
-  node_modules/.bin/forever --fifo logs 2
+  ln -s /output . && \
+  node_modules/.bin/forever start -c "yarn serve" ./ && \
+  node_modules/.bin/forever start -c "yarn server" ./ && \
+  node_modules/.bin/forever -f logs 1

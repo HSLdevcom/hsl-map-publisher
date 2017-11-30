@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
-import { gql, graphql } from "react-apollo";
+import { graphql } from "react-apollo";
+import gql from "graphql-tag";
 import mapProps from "recompose/mapProps";
 import compose from "recompose/compose";
 import find from "lodash/find";
@@ -106,7 +107,7 @@ function addMissingFridayNote(departure) {
         departure.dayType.length === 1 &&
         departure.dayType.includes("Pe") &&
         (!departure.note || !departure.note.includes("p"))
-        ? "p" : null
+            ? "p" : null
     );
 }
 
@@ -115,7 +116,7 @@ function addMissingNonAccessibleNote(departure) {
     return (
         departure.isAccessible === false &&
         (!departure.note || !departure.note.includes("e"))
-        ? "e" : null
+            ? "e" : null
     );
 }
 
@@ -142,19 +143,17 @@ const propsMapper = mapProps((props) => {
     const duplicateRoutes = [];
 
     // Search for routes with two different destinations from the same stop and add notes for them
-    Object.values(
-        groupBy(
-            flatMap(props.data.stop.siblings.nodes, stop => stop.routeSegments.nodes)
-                .filter(route => route.hasRegularDayDepartures && !isDropOffOnly(route)),
-            route => route.routeId
-        ))
+    Object.values(groupBy(
+        flatMap(props.data.stop.siblings.nodes, stop => stop.routeSegments.nodes)
+            .filter(route => route.hasRegularDayDepartures && !isDropOffOnly(route)),
+        route => route.routeId
+    ))
         .filter(routes => routes.length > 1)
         .forEach(directions =>
             directions.forEach((direction) => {
                 notes.push(`${trimRouteId(direction.routeId)}${"*".repeat(direction.direction)} ${direction.route.nodes[0].destinationFi} / ${direction.route.nodes[0].destinationSe}`);
                 duplicateRoutes.push(direction.routeId);
-            })
-        );
+            }));
 
     departures = departures.map(departure => ({
         ...departure,
