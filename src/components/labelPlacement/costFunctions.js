@@ -39,14 +39,13 @@ function getOverlapArea(a, b) {
  */
 function getOverlapCost(positions, indexes) {
     let overlap = 0;
-    indexes.forEach((i) => {
-        for (let j = 0; j < positions.length; j++) {
-            if (!indexes.includes(j) || j > i) {
-                const area = getOverlapArea(positions[i], positions[j]);
-                const isFixed = positions[i].isFixed || positions[j].isFixed;
-                overlap += area * (isFixed ? OVERLAP_COST_FIXED : OVERLAP_COST);
-            }
-        }
+    positions.forEach((position, i) => {
+        indexes.forEach((j) => {
+            if (j >= i && indexes.includes(i)) return;
+            const area = getOverlapArea(positions[i], positions[j]);
+            const isFixed = positions[i].isFixed || positions[j].isFixed;
+            overlap += area * (isFixed ? OVERLAP_COST_FIXED : OVERLAP_COST);
+        });
     });
     return overlap;
 }
