@@ -10,7 +10,7 @@ const moment = require("moment");
 const iconv = require("iconv-lite");
 const csv = require("csv");
 const fetch = require("node-fetch");
-const spawn = require("child_process").spawn;
+const { spawn } = require("child_process");
 
 const generator = require("./generator");
 const Logger = require("./logger");
@@ -59,8 +59,7 @@ function fetchStops() {
                     }))
                     .sort((a, b) => a.shortId.localeCompare(b.shortId));
                 resolve(stops);
-            })
-        );
+            }));
     });
 }
 
@@ -99,13 +98,11 @@ function generateFiles(component, props, outputFilename = "output.pdf") {
 
         queueLength++;
 
-        promises.push(
-            generator.generate(options)
-                .then((success) => { // eslint-disable-line no-loop-func
-                    queueLength--;
-                    return success && path.join(directory, filename);
-                })
-        );
+        promises.push(generator.generate(options)
+            .then((success) => { // eslint-disable-line no-loop-func
+                queueLength--;
+                return success && path.join(directory, filename);
+            }));
     }
 
     Promise.all(promises)
@@ -134,8 +131,8 @@ function successResponse(ctx, body, type = "application/json") {
 function errorResponse(ctx, error) {
     ctx.status = 500;
     ctx.body = { error: error.message };
-    console.error(error);
-    console.error(error.stack);
+    console.error(error); // eslint-disable-line no-console
+    console.error(error.stack); // eslint-disable-line no-console
 }
 
 async function main() {
@@ -175,11 +172,9 @@ async function main() {
         .use(router.routes())
         .use(router.allowedMethods())
         .listen(PORT, (err) => {
-            if (err) {
-                console.error(err);
-            }
-            console.log(`Listening at port ${PORT}`);
+            if (err) console.error(err); // eslint-disable-line no-console
+            console.log(`Listening at port ${PORT}`); // eslint-disable-line no-console
         });
 }
 
-main().catch(console.log.bind(console));
+main().catch(console.log.bind(console)); // eslint-disable-line no-console

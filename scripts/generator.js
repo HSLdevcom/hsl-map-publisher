@@ -16,7 +16,6 @@ let previous = Promise.resolve();
 async function initialize() {
     browser = await puppeteer.launch({ args: ["--no-sandbox", "--disable-setuid-sandbox"] });
     browser.on("disconnected", () => { browser = null; });
-    return browser;
 }
 
 /**
@@ -24,40 +23,48 @@ async function initialize() {
  * @returns {Promise}
  */
 async function renderComponent(options) {
-    const { component, props, directory, filename, logger } = options;
+    const {
+        component, props, directory, filename, logger,
+    } = options;
 
     const page = await browser.newPage();
 
     page.on("error", (error) => {
         page.close();
-        logger.logError(error);
-        // Get a fresh browser after a crash
         browser.close();
+        logger.logError(error);
     });
 
-    page.on("console", ({ text }) => logger.logInfo(text));
+    page.on("console", ({ type, text }) => {
+        if (["error", "warning", "log"].includes(type)) {
+            logger.logInfo(`Console(${type}): ${text}`);
+        }
+    });
 
     const encodedProps = encodeURIComponent(JSON.stringify(props));
     await page.goto(`${CLIENT_URL}/?component=${component}&props=${encodedProps}`);
 
-    const viewport = await page.evaluate(() =>
-      new Promise((resolve, reject) => {
-          window.callPhantom = response =>
-            (response.error ? reject(response.error) : resolve(response));
-      })
-    );
+    const { error, width, height } = await page.evaluate(() => (
+        new Promise((resolve) => {
+            window.callPhantom = opts => resolve(opts);
+        })
+    ));
+
+    if (error) {
+        throw new Error(error);
+    }
 
     await page.emulateMedia("screen");
     const contents = await page.pdf({
         printBackground: true,
-        width: viewport.width * SCALE,
-        height: viewport.height * SCALE,
+        width: width * SCALE,
+        height: height * SCALE,
         pageRanges: "1",
         scale: SCALE,
     });
 
     await writeFileAsync(path.join(directory, filename), contents);
-    return page.close();
+    await page.close();
 }
 
 async function renderComponentRetry(options) {
