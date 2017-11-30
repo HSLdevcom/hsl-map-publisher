@@ -44,18 +44,21 @@ async function renderComponent(options) {
     const encodedProps = encodeURIComponent(JSON.stringify(props));
     await page.goto(`${CLIENT_URL}/?component=${component}&props=${encodedProps}`);
 
-    const viewport = await page.evaluate(() => (
-        new Promise((resolve, reject) => {
-            window.callPhantom = response =>
-                (response.error ? reject(response.error) : resolve(response));
+    const { error, width, height } = await page.evaluate(() => (
+        new Promise((resolve) => {
+            window.callPhantom = opts => resolve(opts);
         })
     ));
+
+    if (error) {
+        throw new Error(error);
+    }
 
     await page.emulateMedia("screen");
     const contents = await page.pdf({
         printBackground: true,
-        width: viewport.width * SCALE,
-        height: viewport.height * SCALE,
+        width: width * SCALE,
+        height: height * SCALE,
         pageRanges: "1",
         scale: SCALE,
     });
