@@ -31,6 +31,46 @@ async function getBuilds() {
     return rows.map(row => convertKeys(row, camelCase));
 }
 
+async function getBuild({ id }) {
+    const buildRow = await knex
+        .select("*")
+        .from("build")
+        .whereNot("build.status", "REMOVED")
+        .andWhere("build.id", id)
+        .first();
+
+    if (!buildRow) {
+        const error = new Error(`Build ${id} not found`);
+        error.status = 404;
+        throw error;
+    }
+
+    const posterRows = await knex
+        .select(
+            "poster.id",
+            "poster.status",
+            "poster.component",
+            "poster.props",
+            "poster.created_at",
+            "poster.updated_at",
+            knex.raw(`json_agg(
+                json_build_object(
+                    'type', event.type,
+                    'message', event.message,
+                    'createdAt', event.created_at
+                ) order by event.created_at
+            ) as events`)
+        ).from("poster")
+        .whereNot("poster.status", "REMOVED")
+        .andWhere("poster.build_id", id)
+        .leftJoin("event", "event.poster_id", "poster.id")
+        .groupBy("poster.id");
+
+    const build = convertKeys(buildRow, camelCase);
+    const posters = posterRows.map(row => convertKeys(row, camelCase));
+    return Object.assign({}, build, { posters });
+}
+
 async function addBuild({ title }) {
     const id = uuidv1();
     await knex("build").insert({ id, title });
@@ -66,6 +106,7 @@ async function addEvent({
 module.exports = {
     migrate,
     getBuilds,
+    getBuild,
     addBuild,
     updateBuild,
     addPoster,

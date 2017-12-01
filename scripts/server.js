@@ -6,7 +6,7 @@ const jsonBody = require("koa-json-body");
 const fetchStops = require("./stops");
 const generator = require("./generator");
 const {
-    migrate, getBuilds, addBuild, updateBuild, addPoster, updatePoster, addEvent,
+    migrate, getBuilds, getBuild, addBuild, updateBuild, addPoster, updatePoster, addEvent,
 } = require("./store");
 
 const PORT = 4000;
@@ -38,7 +38,7 @@ const errorHandler = async (ctx, next) => {
     try {
         await next();
     } catch (error) {
-        ctx.status = 500;
+        ctx.status = error.status || 500;
         ctx.body = { message: error.message };
         console.error(error); // eslint-disable-line no-console
     }
@@ -58,6 +58,12 @@ async function main() {
 
     router.get("/builds", async (ctx) => {
         const builds = await getBuilds();
+        ctx.body = builds;
+    });
+
+    router.get("/builds/:id", async (ctx) => {
+        const { id } = ctx.params;
+        const builds = await getBuild({ id });
         ctx.body = builds;
     });
 
