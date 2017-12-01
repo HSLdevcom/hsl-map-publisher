@@ -6,7 +6,8 @@ const jsonBody = require("koa-json-body");
 const fetchStops = require("./stops");
 const generator = require("./generator");
 const {
-    migrate, getBuilds, getBuild, addBuild, updateBuild, addPoster, updatePoster, addEvent,
+    migrate, getBuilds, getBuild, addBuild, updateBuild,
+    getPoster, addPoster, updatePoster, addEvent,
 } = require("./store");
 
 const PORT = 4000;
@@ -26,7 +27,6 @@ async function generatePoster(buildId, component, props) {
     const options = {
         id, component, props, onInfo, onError,
     };
-
     generator.generate(options)
         .then(({ success }) => updatePoster({ id, status: success ? "READY" : "FAILED" }))
         .catch(error => console.error(error)); // eslint-disable-line no-console
@@ -80,6 +80,12 @@ async function main() {
         ctx.body = build;
     });
 
+    router.get("/posters/:id", async (ctx) => {
+        const { id } = ctx.params;
+        const poster = await getPoster({ id });
+        ctx.body = poster;
+    });
+
     router.post("/posters", async (ctx) => {
         const { buildId, component, props } = ctx.request.body;
         const posters = [];
@@ -88,6 +94,23 @@ async function main() {
             posters.push(await generatePoster(buildId, component, props[i]));
         }
         ctx.body = posters;
+    });
+
+    router.get("/downloadBuild/:id", async (ctx) => {
+        const { id } = ctx.params;
+        const { title, posters } = await getBuild({ id });
+        const posterIds = posters.map(({ id }) => id);
+        ctx.type = "application/pdf";
+        ctx.set("Content-Disposition", `attachment; filename="${title}-${id}.pdf"`);
+        ctx.body = generator.concatenate(posterIds);
+    });
+
+    router.get("/downloadPoster/:id", async (ctx) => {
+        const { id } = ctx.params;
+        const { component } = await getPoster({ id });
+        ctx.type = "application/pdf";
+        ctx.set("Content-Disposition", `attachment; filename="${component}-${id}.pdf"`);
+        ctx.body = generator.concatenate([id]);
     });
 
     app

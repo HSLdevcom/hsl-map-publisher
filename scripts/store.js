@@ -82,6 +82,22 @@ async function updateBuild({ id, status }) {
     return { id };
 }
 
+async function getPoster({ id }) {
+    const row = await knex
+        .select("*")
+        .from("poster")
+        .whereNot("poster.status", "REMOVED")
+        .andWhere("poster.id", id)
+        .first();
+
+    if (!row) {
+        const error = new Error(`Poster ${id} not found`);
+        error.status = 404;
+        throw error;
+    }
+    return convertKeys(row, camelCase);
+}
+
 async function addPoster({ buildId, component, props }) {
     const id = uuidv1();
     await knex("poster").insert(convertKeys({
@@ -109,6 +125,7 @@ module.exports = {
     getBuild,
     addBuild,
     updateBuild,
+    getPoster,
     addPoster,
     updatePoster,
     addEvent,

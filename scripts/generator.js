@@ -1,7 +1,8 @@
 const fs = require("fs");
 const path = require("path");
-const { promisify } = require("util");
 const puppeteer = require("puppeteer");
+const { promisify } = require("util");
+const { spawn } = require("child_process");
 
 const writeFileAsync = promisify(fs.writeFile);
 
@@ -108,4 +109,19 @@ function generate(options) {
     return previous;
 }
 
-module.exports = { generate };
+/**
+ * Concatenates posters to a multi-page PDF
+ * @param {Object} options
+ * @param {string[]} options.ids - Ids to concatate
+ * @returns {Readable} - PDF stream
+ */
+function concatenate(ids) {
+    const filenames = ids.map(id => pdfPath(id));
+    const pdftk = spawn("pdftk", [...filenames, "cat", "output", "-"]);
+    pdftk.stderr.on("data", (data) => {
+        pdftk.stdout.emit("error", new Error(data.toString()));
+    });
+    return pdftk.stdout;
+}
+
+module.exports = { generate, concatenate };
