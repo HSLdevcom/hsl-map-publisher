@@ -7,7 +7,7 @@
     "clean": "rimraf dist",
     "bundle": "webpack --config webpack.config.js",
     "build": "yarn run clean && yarn run bundle",
-    "serve": "serve --port=3000 dist",
+    "serve": "serve dist",
     "start": "node server",
     "start:hot": "cross-env HMR=true node server",
     "server": "node scripts/server",
