@@ -68,7 +68,7 @@ const StopMap = (props) => {
                     options={props.mapOptions}
                     components={{
                         text_fisv: { enabled: true },
-                        routes: { enabled: true, useGraphQL: true },
+                        routes: { enabled: true },
                         citybikes: { enabled: true },
                         print: { enabled: true },
                         municipal_borders: { enabled: true },
