@@ -1,17 +1,20 @@
 const fs = require("fs");
 const path = require("path");
-const { promisify } = require("util");
 const puppeteer = require("puppeteer");
+const { promisify } = require("util");
+const { spawn } = require("child_process");
 
 const writeFileAsync = promisify(fs.writeFile);
 
-const CLIENT_URL = "http://localhost:3000";
+const CLIENT_URL = "http://localhost:5000";
 const RENDER_TIMEOUT = 5 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
 const SCALE = 96 / 72;
 
 let browser = null;
 let previous = Promise.resolve();
+
+const pdfPath = id => path.join(__dirname, "..", "output", `${id}.pdf`);
 
 async function initialize() {
     browser = await puppeteer.launch({ args: ["--no-sandbox", "--disable-setuid-sandbox"] });
@@ -24,7 +27,7 @@ async function initialize() {
  */
 async function renderComponent(options) {
     const {
-        component, props, directory, filename, logger,
+        id, component, props, onInfo, onError,
     } = options;
 
     const page = await browser.newPage();
@@ -32,12 +35,12 @@ async function renderComponent(options) {
     page.on("error", (error) => {
         page.close();
         browser.close();
-        logger.logError(error);
+        onError(error);
     });
 
     page.on("console", ({ type, text }) => {
         if (["error", "warning", "log"].includes(type)) {
-            logger.logInfo(`Console(${type}): ${text}`);
+            onInfo(`Console(${type}): ${text}`);
         }
     });
 
@@ -63,51 +66,62 @@ async function renderComponent(options) {
         scale: SCALE,
     });
 
-    await writeFileAsync(path.join(directory, filename), contents);
+    await writeFileAsync(pdfPath(id), contents);
     await page.close();
 }
 
 async function renderComponentRetry(options) {
-    options.logger.logInfo(`Rendering ${options.component} to ${options.filename}`);
-    options.logger.logInfo(`Using props ${JSON.stringify(options.props)}`);
+    const { onInfo, onError } = options;
 
     for (let i = 0; i < MAX_RENDER_ATTEMPTS; i++) {
         /* eslint-disable no-await-in-loop */
         try {
-            if (i > 0) {
-                options.logger.logInfo("Retrying");
-            }
+            onInfo(i > 0 ? "Retrying" : "Rendering");
             if (!browser) {
-                options.logger.logInfo("Creating new browser instance");
+                onInfo("Creating new browser instance");
                 await initialize();
             }
             const timeout = new Promise((resolve, reject) => setTimeout(reject, RENDER_TIMEOUT, new Error("Render timeout")));
             await Promise.race([renderComponent(options), timeout]);
-            options.logger.logInfo(`Successfully rendered ${options.filename}\n`);
-            return true;
+            onInfo("Rendered successfully");
+            return { success: true };
         } catch (error) {
-            options.logger.logError(error);
+            onError(error);
         }
         /* eslint-enable no-await-in-loop */
     }
 
-    options.logger.logError(new Error(`Failed to render ${options.filename}\n`));
-    return false;
+    return { success: false };
 }
 
 /**
  * Adds component to render queue
  * @param {Object} options
- * @param {Logger} options.logger - Logger instance
+ * @param {string} options.id - Unique id
  * @param {string} options.component - React component to render
  * @param {Object} options.props - Props to pass to component
- * @param {string} options.directory - Output directory
- * @param {string} options.filename - Output filename
- * @returns {Promise}
+ * @param {function} options.onInfo - Callback (string)
+ * @param {function} options.onError - Callback (Error)
+ * @returns {Promise} - Always resolves with { success }
  */
 function generate(options) {
     previous = previous.then(() => renderComponentRetry(options));
     return previous;
 }
 
-module.exports = { generate };
+/**
+ * Concatenates posters to a multi-page PDF
+ * @param {Object} options
+ * @param {string[]} options.ids - Ids to concatate
+ * @returns {Readable} - PDF stream
+ */
+function concatenate(ids) {
+    const filenames = ids.map(id => pdfPath(id));
+    const pdftk = spawn("pdftk", [...filenames, "cat", "output", "-"]);
+    pdftk.stderr.on("data", (data) => {
+        pdftk.stdout.emit("error", new Error(data.toString()));
+    });
+    return pdftk.stdout;
+}
+
+module.exports = { generate, concatenate };
