@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 import styles from "./zone.css";
 
@@ -25,5 +26,10 @@ const Zone = props => (
         </div>
     </div>
 );
+
+Zone.propTypes = {
+    from: PropTypes.string.isRequired,
+    to: PropTypes.string.isRequired,
+};
 
 export default Zone;

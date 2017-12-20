@@ -1,5 +1,7 @@
+import PropTypes from "prop-types";
 import { graphql } from "react-apollo";
 import gql from "graphql-tag";
+import compose from "recompose/compose";
 import mapProps from "recompose/mapProps";
 import flatMap from "lodash/flatMap";
 import sortBy from "lodash/sortBy";
@@ -54,6 +56,19 @@ const routeDiagramQuery = gql`
     }
 `;
 
+const nodeToStop = ({ stopByStopId }) => {
+    const { terminalByTerminalId, ...stop } = stopByStopId;
+    if (!terminalByTerminalId) {
+        return { ...stop, transferModes: [] };
+    }
+    const transferModes = flatMap(
+        terminalByTerminalId.siblings.nodes,
+        // Filter out bus terminals, until we have more specs how to handle those
+        sibling => sibling.modes.nodes.filter(mode => mode !== "BUS")
+    );
+    return { ...stop, transferModes };
+};
+
 const propsMapper = mapProps((props) => {
     const routes = flatMap(
         props.data.stop.siblings.nodes,
@@ -66,14 +81,22 @@ const propsMapper = mapProps((props) => {
                 ...routeSegment.route.nodes[0],
                 routeId: trimRouteId(routeSegment.routeId),
                 // List all stops (including drop-off only) for each route
-                stops: sortBy(routeSegment.nextStops.nodes, node => node.stopIndex)
-                    .map(node => node.stopByStopId),
+                stops: sortBy(routeSegment.nextStops.nodes, node => node.stopIndex).map(nodeToStop),
             }))
     );
-
     return { tree: routesToTree(routes, props.data.stop.shortId) };
 });
 
-const RoutesContainer = apolloWrapper(propsMapper)(RouteDiagram);
+const hoc = compose(
+    graphql(routeDiagramQuery),
+    apolloWrapper(propsMapper)
+);
 
-export default graphql(routeDiagramQuery)(RoutesContainer);
+const RouteDiagramContainer = hoc(RouteDiagram);
+
+RouteDiagramContainer.propTypes = {
+    stopId: PropTypes.string.isRequired,
+    date: PropTypes.string.isRequired,
+};
+
+export default RouteDiagramContainer;
