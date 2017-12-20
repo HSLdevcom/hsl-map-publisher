@@ -6,9 +6,9 @@ import styles from "./tableHeader.css";
 const TableHeader = props => (
     <div className={styles.root}>
         <div className={styles.title}>
-            <span className={styles.strong}>{props.titleFi}</span>
+            <span className={styles.strong}>{props.title}</span>
             &nbsp;&nbsp;
-            {props.titleSe}
+            {props.subtitle}
         </div>
 
         <div className={styles.subtitle}>
@@ -24,8 +24,8 @@ const TableHeader = props => (
 );
 
 TableHeader.propTypes = {
-    titleFi: PropTypes.string.isRequired,
-    titleSe: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    subtitle: PropTypes.string.isRequired,
 };
 
 export default TableHeader;

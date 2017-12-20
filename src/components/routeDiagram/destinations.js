@@ -23,8 +23,8 @@ const Destinations = (props) => {
                         </Row>
                     ))}
                     <Column style={{ flexBasis: "100%" }}>
-                        <div className={styles.title}>{destinations[0].title}</div>
-                        <div className={styles.subtitle}>{destinations[0].subtitle}</div>
+                        <div className={styles.title}>{destinations[0].titleFi}</div>
+                        <div className={styles.subtitle}>{destinations[0].titleSe}</div>
                     </Column>
                 </WrappingRow>
             ))}
@@ -35,10 +35,9 @@ const Destinations = (props) => {
 Destinations.propTypes = {
     destinations: PropTypes.arrayOf(PropTypes.shape({
         routeId: PropTypes.string.isRequired,
-        title: PropTypes.string.isRequired,
-        subtitle: PropTypes.string.isRequired,
+        titleFi: PropTypes.string.isRequired,
+        titleSe: PropTypes.string,
     })).isRequired,
 };
-
 
 export default Destinations;
