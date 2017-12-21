@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 import { InlineSVG } from "components/util";
 import { iconsByMode } from "util/domain";
@@ -7,22 +8,10 @@ import styles from "./stop.css";
 
 const metroRegexp = / ?\(M\)$/;
 
-const getTransferModes = (terminal, nameFi) => {
-    const modes = new Set();
-
-    if (metroRegexp.test(nameFi)) { modes.add("SUBWAY"); }
-
-    // Filter out bus terminals, until we have more specs how to handle those.
-    if (terminal) {
-        terminal.siblings.nodes.map(sibling =>
-            sibling.modes.nodes.filter(mode => mode !== "BUS").forEach(mode => modes.add(mode)));
-    }
-
-    return Array.from(modes);
-};
-
 const Stop = (props) => {
-    const transferModes = getTransferModes(props.terminalByTerminalId, props.nameFi);
+    const modes = new Set();
+    if (metroRegexp.test(props.nameFi)) modes.add("SUBWAY");
+    props.transferModes.forEach(mode => modes.add(mode));
 
     return (
         <div className={styles.root}>
@@ -45,13 +34,24 @@ const Stop = (props) => {
                     </div>
                 </div>
                 <div className={styles.iconContainer}>
-                    {transferModes.map((mode, index) => (
+                    {Array.from(modes).map((mode, index) => (
                         <InlineSVG key={index} className={styles.icon} src={iconsByMode[mode]}/>
                     ))}
                 </div>
             </div>
         </div>
     );
+};
+
+Stop.defaultProps = {
+    nameSe: null,
+};
+
+Stop.propTypes = {
+    nameFi: PropTypes.string.isRequired,
+    nameSe: PropTypes.string,
+    isLast: PropTypes.bool.isRequired,
+    transferModes: PropTypes.arrayOf(PropTypes.oneOf(["BUS", "TRAM", "FERRY", "RAIL", "SUBWAY"])).isRequired,
 };
 
 export default Stop;

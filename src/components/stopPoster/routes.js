@@ -104,7 +104,7 @@ Routes.propTypes = {
     routes: PropTypes.arrayOf(PropTypes.shape({
         routeId: PropTypes.string.isRequired,
         destinationFi: PropTypes.string.isRequired,
-        destinationSe: PropTypes.string.isRequired,
+        destinationSe: PropTypes.string,
     })).isRequired,
 };
 

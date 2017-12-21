@@ -3,7 +3,7 @@ const webpack = require("webpack");
 const WebpackDevServer = require("webpack-dev-server");
 const config = require("./webpack.config");
 
-const PORT = 3000;
+const PORT = 5000;
 
 config.devtool = "eval";
 

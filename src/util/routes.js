@@ -67,8 +67,8 @@ function routesToTree(routes, shortId) {
             if (index === stops.length - 1) {
                 item.destinations = [{
                     routeId: route.routeId,
-                    title: route.destinationFi,
-                    subtitle: route.destinationSe,
+                    titleFi: route.destinationFi,
+                    titleSe: route.destinationSe,
                 }];
             }
             return item;

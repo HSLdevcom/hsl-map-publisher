@@ -54,7 +54,7 @@ RouteList.propTypes = {
     routes: PropTypes.arrayOf(PropTypes.shape({
         routeId: PropTypes.string.isRequired,
         destinationFi: PropTypes.string.isRequired,
-        destinationSe: PropTypes.string.isRequired,
+        destinationSe: PropTypes.string,
     })).isRequired,
 };
 
@@ -68,10 +68,14 @@ const StopLabel = props => (
     </div>
 );
 
+StopLabel.defaultProps = {
+    nameSe: null,
+};
+
 StopLabel.propTypes = {
     ...RouteList.propTypes.routes,
     nameFi: PropTypes.string.isRequired,
-    nameSe: PropTypes.string.isRequired,
+    nameSe: PropTypes.string,
 };
 
 export default StopLabel;

@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import groupBy from "lodash/groupBy";
 import { Row, WrappingRow, Column } from "components/util";
 import routeCompare from "util/routeCompare";
@@ -22,13 +23,21 @@ const Destinations = (props) => {
                         </Row>
                     ))}
                     <Column style={{ flexBasis: "100%" }}>
-                        <div className={styles.title}>{destinations[0].title}</div>
-                        <div className={styles.subtitle}>{destinations[0].subtitle}</div>
+                        <div className={styles.title}>{destinations[0].titleFi}</div>
+                        <div className={styles.subtitle}>{destinations[0].titleSe}</div>
                     </Column>
                 </WrappingRow>
             ))}
         </div>
     );
+};
+
+Destinations.propTypes = {
+    destinations: PropTypes.arrayOf(PropTypes.shape({
+        routeId: PropTypes.string.isRequired,
+        titleFi: PropTypes.string.isRequired,
+        titleSe: PropTypes.string,
+    })).isRequired,
 };
 
 export default Destinations;
