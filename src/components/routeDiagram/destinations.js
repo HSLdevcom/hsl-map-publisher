@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import groupBy from "lodash/groupBy";
 import { Row, WrappingRow, Column } from "components/util";
 import routeCompare from "util/routeCompare";
@@ -30,5 +31,14 @@ const Destinations = (props) => {
         </div>
     );
 };
+
+Destinations.propTypes = {
+    destinations: PropTypes.arrayOf(PropTypes.shape({
+        routeId: PropTypes.string.isRequired,
+        title: PropTypes.string.isRequired,
+        subtitle: PropTypes.string.isRequired,
+    })).isRequired,
+};
+
 
 export default Destinations;

@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 import Destinations from "./destinations";
 import Stop from "./stop";
@@ -24,13 +25,13 @@ function getWidth(nodes, isRoot = true) {
 }
 
 function isLastStop(item) {
-    return item.destinations && item.destinations.length;
+    return !!item.destinations && item.destinations.length > 0;
 }
 
 const Path = props => (
     <div className={styles.root}>
         <div className={styles.header}/>
-        {props.items && props.items.map((item, index) => (
+        {props.items.map((item, index) => (
             <div key={index}>
                 {item.type === "stop" && <Stop {...item} isLast={isLastStop(item)}/>}
                 {item.type === "gap" && <Gap/>}
@@ -49,5 +50,19 @@ const Path = props => (
         }
     </div>
 );
+
+
+Path.defaultProps = {
+    children: null,
+};
+
+Path.propTypes = {
+    items: PropTypes.arrayOf(PropTypes.shape({
+        type: PropTypes.oneOf(["stop", "gap", "zone"]).isRequired,
+        destinations: PropTypes.arrayOf(PropTypes.object),
+    })).isRequired,
+};
+
+Path.propTypes.children = PropTypes.arrayOf(PropTypes.shape(Path.propTypes));
 
 export default Path;
