@@ -33,19 +33,19 @@ const Timetable = props => (
         }
         {props.weekdays && props.weekdays.length > 0 &&
             <div>
-                <TableHeader titleFi="Maanantai - Perjantai" titleSe="Måndag - Fredag"/>
+                <TableHeader title="Maanantai - Perjantai" subtitle="Måndag - Fredag"/>
                 <TableRows departures={props.weekdays}/>
             </div>
         }
         {props.saturdays && props.saturdays.length > 0 &&
             <div>
-                <TableHeader titleFi="Lauantai" titleSe="Lördag"/>
+                <TableHeader title="Lauantai" subtitle="Lördag"/>
                 <TableRows departures={props.saturdays}/>
             </div>
         }
         {props.sundays && props.sundays.length > 0 &&
             <div>
-                <TableHeader titleFi="Sunnuntai" titleSe="Söndag"/>
+                <TableHeader title="Sunnuntai" subtitle="Söndag"/>
                 <TableRows departures={props.sundays}/>
             </div>
         }

@@ -52,7 +52,7 @@ const Header = (props) => {
         <JustifiedRow style={{ margin: "0 10px" }}>
             <Group>
                 <Title>{props.nameFi}</Title>
-                <Subtitle>{props.nameSe}</Subtitle>
+                {props.nameSe && <Subtitle>{props.nameSe}</Subtitle>}
             </Group>
             {zone &&
             <CenteringColumn>
@@ -70,9 +70,13 @@ const Header = (props) => {
     );
 };
 
+Header.defaultProps = {
+    nameSe: null,
+};
+
 Header.propTypes = {
     nameFi: PropTypes.string.isRequired,
-    nameSe: PropTypes.string.isRequired,
+    nameSe: PropTypes.string,
     shortId: PropTypes.string.isRequired,
 };
 

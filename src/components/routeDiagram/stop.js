@@ -43,9 +43,13 @@ const Stop = (props) => {
     );
 };
 
+Stop.defaultProps = {
+    nameSe: null,
+};
+
 Stop.propTypes = {
     nameFi: PropTypes.string.isRequired,
-    nameSe: PropTypes.string.isRequired,
+    nameSe: PropTypes.string,
     isLast: PropTypes.bool.isRequired,
     transferModes: PropTypes.arrayOf(PropTypes.oneOf(["BUS", "TRAM", "FERRY", "RAIL", "SUBWAY"])).isRequired,
 };
