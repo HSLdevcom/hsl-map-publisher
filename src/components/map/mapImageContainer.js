@@ -1,40 +1,26 @@
 import PropTypes from "prop-types";
-
 import compose from "recompose/compose";
 import mapProps from "recompose/mapProps";
-import getContext from "recompose/getContext";
-
 import hslMapStyle from "hsl-map-style";
 
 import { fetchMap } from "util/map";
 import promiseWrapper from "util/promiseWrapper";
-import { addRoutesToStyle } from "util/routeNetwork";
-
 import MapImage from "./mapImage";
 
-function getMapStyle(components) {
-    return hslMapStyle.generateStyle({
+const propsMapper = mapProps(({
+    options, components, date, extraLayers,
+}) => {
+    const mapStyle = hslMapStyle.generateStyle({
         components,
         glyphsUrl: "http://kartat.hsl.fi/",
     });
-}
 
-const getClient = getContext({
-    client: PropTypes.shape({
-        query: PropTypes.func.isRequired,
-    }).isRequired,
-});
-
-const propsMapper = mapProps(({
-    options, components, date, client: { query }, extraLayers,
-}) => {
-    const mapStyle = getMapStyle(components);
-
-    // Fetch routes from GraphQL instead of default vector tiles
-    if (components.routes && components.routes.enabled && components.routes.useGraphQL) {
-        const src = addRoutesToStyle(options, mapStyle, query, date)
-            .then(styleWithRoutes => fetchMap(options, styleWithRoutes));
-        return { src };
+    // Set date for which to show stops and routes
+    if (components.routes && components.routes.enabled && date) {
+        mapStyle.sources.routes.url += `?date=${date}`;
+    }
+    if (components.stops && components.stops.enabled && date) {
+        mapStyle.sources.stops.url += `?date=${date}`;
     }
 
     // Remove source containing bus routes (rail and subway routes have separate sources)
@@ -56,7 +42,6 @@ const propsMapper = mapProps(({
 });
 
 const hoc = compose(
-    getClient,
     propsMapper,
     promiseWrapper("src")
 );
@@ -64,8 +49,8 @@ const hoc = compose(
 const MapImageContainer = hoc(MapImage);
 
 MapImageContainer.defaultProps = {
-    // Used only when routes component is enabled
-    date: new Date().toISOString().substring(0, 10),
+    // Used only when routes or stops component is enabled
+    date: null,
 };
 
 MapImageContainer.optionsShape = {
@@ -80,7 +65,6 @@ MapImageContainer.propTypes = {
     options: PropTypes.shape(MapImageContainer.optionsShape).isRequired,
     components: PropTypes.objectOf(PropTypes.shape({
         enabled: PropTypes.bool.isRequired,
-        useGraphQL: PropTypes.bool,
         hideBusRoutes: PropTypes.bool,
     })).isRequired,
     date: PropTypes.string,
