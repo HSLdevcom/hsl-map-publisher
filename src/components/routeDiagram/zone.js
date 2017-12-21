@@ -27,9 +27,14 @@ const Zone = props => (
     </div>
 );
 
+Zone.defaultProps = {
+    from: null,
+    to: null,
+};
+
 Zone.propTypes = {
-    from: PropTypes.string.isRequired,
-    to: PropTypes.string.isRequired,
+    from: PropTypes.string,
+    to: PropTypes.string,
 };
 
 export default Zone;
