@@ -29,6 +29,12 @@
     left: 731px;
 }
 
+.qrCodeTicketSales {
+    composes: qrCode;
+    top: 180px;
+    left: 730px;
+}
+
 .qrCodeFeedback {
     composes: qrCode;
     top: 117px;
