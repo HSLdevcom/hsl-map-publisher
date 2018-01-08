@@ -79,6 +79,12 @@ function getIntersectionCost(positions, indexes) {
     return sum * INTERSECTION_COST;
 }
 
+/**
+ * Returns cost for intersected areas with fixed items
+ * @param {Object[]} positions - Positions
+ * @param {number[]} indexes - Indexes to check
+ * @returns {number}
+ */
 function getFixedIntersectionCost(positions, indexes) {
     let sum = 0;
     positions.forEach((position, i) => {
