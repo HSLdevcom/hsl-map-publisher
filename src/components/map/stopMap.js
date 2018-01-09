@@ -71,6 +71,7 @@ const StopMap = (props) => {
                         routes: { enabled: true },
                         citybikes: { enabled: true },
                         print: { enabled: true },
+                        ticket_sales: { enabled: true },
                         municipal_borders: { enabled: true },
                     }}
                     date={props.date}
