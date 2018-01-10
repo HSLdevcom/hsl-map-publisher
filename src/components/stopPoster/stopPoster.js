@@ -179,6 +179,7 @@ class StopPoster extends Component {
                                                  date={this.props.date}
                                                  width={this.map.clientWidth}
                                                  height={this.map.clientHeight}
+                                                 showCitybikes={this.props.isSummerTimetable}
                                              />
                                         }
                                     </div>

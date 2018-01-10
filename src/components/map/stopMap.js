@@ -69,7 +69,7 @@ const StopMap = (props) => {
                     components={{
                         text_fisv: { enabled: true },
                         routes: { enabled: true },
-                        citybikes: { enabled: true },
+                        citybikes: { enabled: props.showCitybikes },
                         print: { enabled: true },
                         ticket_sales: { enabled: true },
                         municipal_borders: { enabled: true },
@@ -175,6 +175,7 @@ StopMap.propTypes = {
     nearbyStops: PropTypes.arrayOf(StopType).isRequired,
     pixelsPerMeter: PropTypes.number.isRequired,
     date: PropTypes.string.isRequired,
+    showCitybikes: PropTypes.bool.isRequired,
 };
 
 export default StopMap;

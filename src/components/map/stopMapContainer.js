@@ -105,12 +105,12 @@ const nearbyStopsMapper = mapProps((props) => {
     };
 
     return {
+        ...props,
         currentStop,
         nearbyStops,
         pixelsPerMeter: viewport.getDistanceScales().pixelsPerMeter[0],
         mapOptions,
         miniMapOptions,
-        date: props.date,
     };
 });
 
