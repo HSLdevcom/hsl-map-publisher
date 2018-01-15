@@ -82,6 +82,11 @@ async function updateBuild({ id, status }) {
     return { id };
 }
 
+async function removeBuild({ id }) {
+    await knex("build").where({ id }).update({ status: "REMOVED" });
+    return { id };
+}
+
 async function getPoster({ id }) {
     const row = await knex
         .select("*")
@@ -111,6 +116,11 @@ async function updatePoster({ id, status }) {
     return { id };
 }
 
+async function removePoster({ id }) {
+    await knex("poster").where({ id }).update({ status: "REMOVED" });
+    return { id };
+}
+
 async function addEvent({
     posterId = null, buildId = null, type, message,
 }) {
@@ -125,8 +135,10 @@ module.exports = {
     getBuild,
     addBuild,
     updateBuild,
+    removeBuild,
     getPoster,
     addPoster,
     updatePoster,
+    removePoster,
     addEvent,
 };

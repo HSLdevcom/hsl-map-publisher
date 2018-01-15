@@ -6,8 +6,9 @@ const jsonBody = require("koa-json-body");
 const fetchStops = require("./stops");
 const generator = require("./generator");
 const {
-    migrate, getBuilds, getBuild, addBuild, updateBuild,
-    getPoster, addPoster, updatePoster, addEvent,
+    migrate, addEvent,
+    getBuilds, getBuild, addBuild, updateBuild, removeBuild,
+    getPoster, addPoster, updatePoster, removePoster,
 } = require("./store");
 
 const PORT = 4000;
@@ -80,6 +81,12 @@ async function main() {
         ctx.body = build;
     });
 
+    router.delete("/builds/:id", async (ctx) => {
+        const { id } = ctx.params;
+        const build = await removeBuild({ id });
+        ctx.body = build;
+    });
+
     router.get("/posters/:id", async (ctx) => {
         const { id } = ctx.params;
         const poster = await getPoster({ id });
@@ -94,6 +101,12 @@ async function main() {
             posters.push(await generatePoster(buildId, component, props[i]));
         }
         ctx.body = posters;
+    });
+
+    router.delete("/posters/:id", async (ctx) => {
+        const { id } = ctx.params;
+        const poster = await removePoster({ id });
+        ctx.body = poster;
     });
 
     router.get("/downloadBuild/:id", async (ctx) => {
