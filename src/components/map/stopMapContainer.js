@@ -25,6 +25,7 @@ const nearbyStopsQuery = gql`
         stopGroups: stopGroupedByShortIdByBbox(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon) {
             nodes {
                 stopIds
+                shortId
                 lat
                 lon
                 nameFi
