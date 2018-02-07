@@ -9,7 +9,21 @@ import TableRows from "./tableRows";
 import styles from "./timetable.css";
 
 const Timetable = props => (
-    <div className={classNames(styles.root, { [styles.summer]: props.isSummerTimetable })}>
+    <div className={classNames(styles.root, {
+        [styles.summer]: props.isSummerTimetable,
+        [styles.printable]: props.printable,
+    })}
+    >
+        {props.showStopInformation &&
+            <div className={styles.componentName}>
+                <div className={styles.title}>
+                    {props.stopNameFi} ({props.stopShortId})&nbsp;&nbsp;
+                </div>
+                <div className={styles.subtitle}>
+                    {props.stopNameSe}
+                </div>
+            </div>
+        }
         {props.showComponentName &&
             <div className={styles.componentName}>
                 <div className={styles.title}>
@@ -66,6 +80,7 @@ Timetable.defaultProps = {
     showValidityPeriod: true,
     showNotes: true,
     showComponentName: true,
+    printable: false,
 };
 
 Timetable.propTypes = {
@@ -79,6 +94,11 @@ Timetable.propTypes = {
     dateBegin: PropTypes.string.isRequired,
     dateEnd: PropTypes.string.isRequired,
     showComponentName: PropTypes.bool,
+    showStopInformation: PropTypes.bool.isRequired,
+    printable: PropTypes.bool,
+    stopShortId: PropTypes.string.isRequired,
+    stopNameFi: PropTypes.string.isRequired,
+    stopNameSe: PropTypes.string.isRequired,
 };
 
 export default Timetable;

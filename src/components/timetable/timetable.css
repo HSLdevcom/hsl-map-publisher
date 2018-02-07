@@ -9,6 +9,11 @@
     --timetable-accent-color: white;
 }
 
+.root.printable {
+    width: auto;
+    border-radius: 0;
+}
+
 .root.summer {
     background: white;
     --timetable-accent-color: var(--light-background);

@@ -3,6 +3,7 @@
     margin: 15px 0;
     font-family: GothamRounded-Book;
     color: var(--timetable-text-color);
+    page-break-after: avoid;
 }
 
 .strong {

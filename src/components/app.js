@@ -71,9 +71,15 @@ class App extends Component {
             return null;
         }
 
+        let rootStyle = {};
+
+        if (!props.printTimetablesAsA4) {
+            rootStyle = { display: "inline-block" };
+        }
+
         return (
             <div
-                style={{ display: "inline-block" }}
+                style={rootStyle}
                 ref={(ref) => { this.root = ref; }}
             >
                 <ApolloProvider client={client}>

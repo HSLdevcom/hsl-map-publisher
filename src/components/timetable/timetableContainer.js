@@ -54,6 +54,9 @@ function getNotes(isSummerTimetable) {
 const timetableQuery = gql`
     query timetableQuery($stopId: String!, $date: Date!) {
         stop: stopByStopId(stopId: $stopId) {
+            nameFi
+            nameSe
+            shortId
             siblings {
                 nodes {
                     routeSegments: routeSegmentsForDate(date: $date) {
@@ -187,7 +190,12 @@ const propsMapper = mapProps((props) => {
         isSummerTimetable: props.isSummerTimetable,
         showValidityPeriod: props.showValidityPeriod,
         showNotes: props.showNotes,
-        showComponentName: props.showComponentName,
+        showComponentName: !props.printTimetablesAsA4 && props.showComponentName,
+        showStopInformation: props.printTimetablesAsA4,
+        stopNameFi: props.data.stop.nameFi,
+        stopNameSe: props.data.stop.nameSe,
+        stopShortId: props.data.stop.shortId,
+        printable: props.printTimetablesAsA4,
     };
 });
 
@@ -206,6 +214,7 @@ TimetableContainer.defaultProps = {
     showNotes: true,
     segments: ["weekdays", "saturdays", "sundays"],
     showComponentName: true,
+    printTimetablesAsA4: false,
 };
 
 TimetableContainer.propTypes = {
@@ -218,6 +227,7 @@ TimetableContainer.propTypes = {
     showNotes: PropTypes.bool,
     segments: PropTypes.arrayOf(PropTypes.oneOf(["weekdays", "saturdays", "sundays"])),
     showComponentName: PropTypes.bool,
+    printTimetablesAsA4: PropTypes.bool,
 };
 
 export default TimetableContainer;

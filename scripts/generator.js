@@ -58,13 +58,25 @@ async function renderComponent(options) {
     }
 
     await page.emulateMedia("screen");
-    const contents = await page.pdf({
-        printBackground: true,
-        width: width * SCALE,
-        height: height * SCALE,
-        pageRanges: "1",
-        scale: SCALE,
-    });
+
+    let printOptions = {};
+    if (props.printTimetablesAsA4) {
+        printOptions = {
+            printBackground: true,
+            format: "A4",
+            margin: 0,
+        };
+    } else {
+        printOptions = {
+            printBackground: true,
+            width: width * SCALE,
+            height: height * SCALE,
+            pageRanges: "1",
+            scale: SCALE,
+        };
+    }
+
+    const contents = await page.pdf(printOptions);
 
     await writeFileAsync(pdfPath(id), contents);
     await page.close();
