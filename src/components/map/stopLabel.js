@@ -60,7 +60,7 @@ RouteList.propTypes = {
 
 const StopLabel = props => (
     <div className={styles.label}>
-        <div className={styles.title}>{props.nameFi}</div>
+        <div className={styles.title}>{props.nameFi} {props.shortId && `(${props.shortId})`}</div>
         <div className={styles.subtitle}>{props.nameSe}</div>
         <div className={styles.content}>
             <RouteList routes={props.routes}/>
@@ -70,12 +70,14 @@ const StopLabel = props => (
 
 StopLabel.defaultProps = {
     nameSe: null,
+    shortId: null,
 };
 
 StopLabel.propTypes = {
     ...RouteList.propTypes.routes,
     nameFi: PropTypes.string.isRequired,
     nameSe: PropTypes.string,
+    shortId: PropTypes.string,
 };
 
 export default StopLabel;
