@@ -1,10 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
+import classNames from "classnames";
 
 import styles from "./tableHeader.css";
 
 const TableHeader = props => (
-    <div className={styles.root}>
+    <div className={classNames(styles.root, {
+        [styles.largerPaddingTop]: props.printingAsA4,
+    })}
+    >
         <div className={styles.title}>
             <span className={styles.strong}>{props.title}</span>
             &nbsp;&nbsp;
@@ -23,9 +27,14 @@ const TableHeader = props => (
     </div>
 );
 
+TableHeader.defaultProps = {
+    printingAsA4: false,
+};
+
 TableHeader.propTypes = {
     title: PropTypes.string.isRequired,
     subtitle: PropTypes.string.isRequired,
+    printingAsA4: PropTypes.bool,
 };
 
 export default TableHeader;

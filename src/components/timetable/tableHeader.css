@@ -6,6 +6,10 @@
     page-break-after: avoid;
 }
 
+.root.largerPaddingTop {
+    padding-top: 25px;
+}
+
 .strong {
     font-family: GothamRounded-Medium;
 }
