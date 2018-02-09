@@ -60,7 +60,7 @@ RouteList.propTypes = {
 
 const StopLabel = props => (
     <div className={styles.label}>
-        <div className={styles.title}>{props.nameFi} {props.shortId && `(${props.shortId})`}</div>
+        <div className={styles.title}>{props.nameFi} {props.shortId && `(${props.shortId.replace(/\s+/g, "")})`}</div>
         <div className={styles.subtitle}>{props.nameSe}</div>
         <div className={styles.content}>
             <RouteList routes={props.routes}/>
