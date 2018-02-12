@@ -196,7 +196,7 @@ const propsMapper = mapProps((props) => {
         stopNameSe: props.data.stop.nameSe,
         stopShortId: props.data.stop.shortId,
         printableAsA4: props.printTimetablesAsA4,
-        greyscale: props.greyscale,
+        greyscale: props.printTimetablesAsGreyscale,
     };
 });
 
@@ -216,7 +216,7 @@ TimetableContainer.defaultProps = {
     segments: ["weekdays", "saturdays", "sundays"],
     showComponentName: true,
     printTimetablesAsA4: false,
-    greyscale: false,
+    printTimetablesAsGreyscale: false,
 };
 
 TimetableContainer.propTypes = {
@@ -230,7 +230,7 @@ TimetableContainer.propTypes = {
     segments: PropTypes.arrayOf(PropTypes.oneOf(["weekdays", "saturdays", "sundays"])),
     showComponentName: PropTypes.bool,
     printTimetablesAsA4: PropTypes.bool,
-    greyscale: PropTypes.bool,
+    printTimetablesAsGreyscale: PropTypes.bool,
 };
 
 export default TimetableContainer;
