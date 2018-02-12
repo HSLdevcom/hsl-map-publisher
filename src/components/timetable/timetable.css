@@ -9,9 +9,24 @@
     --timetable-accent-color: white;
 }
 
+.root > div {
+    page-break-inside: avoid;
+}
+
 .root.summer {
     background: white;
     --timetable-accent-color: var(--light-background);
+}
+
+.root.greyscale {
+    background: white;
+    color: black;
+    --timetable-accent-color: #eaeaea;
+}
+
+.root.printable {
+    width: auto;
+    border-radius: 0;
 }
 
 .componentName {

@@ -9,7 +9,22 @@ import TableRows from "./tableRows";
 import styles from "./timetable.css";
 
 const Timetable = props => (
-    <div className={classNames(styles.root, { [styles.summer]: props.isSummerTimetable })}>
+    <div className={classNames(styles.root, {
+        [styles.summer]: props.isSummerTimetable,
+        [styles.printable]: props.printableAsA4,
+        [styles.greyscale]: props.greyscale,
+    })}
+    >
+        {props.showStopInformation &&
+            <div className={styles.componentName}>
+                <div className={styles.title}>
+                    {props.stopNameFi} {props.stopShortId && `(${props.stopShortId.replace(/\s+/g, "")})`} &nbsp;&nbsp;
+                </div>
+                <div className={styles.subtitle}>
+                    {props.stopNameSe}
+                </div>
+            </div>
+        }
         {props.showComponentName &&
             <div className={styles.componentName}>
                 <div className={styles.title}>
@@ -33,19 +48,27 @@ const Timetable = props => (
         }
         {props.weekdays && props.weekdays.length > 0 &&
             <div>
-                <TableHeader title="Maanantai - Perjantai" subtitle="Måndag - Fredag"/>
+                <TableHeader
+                    title="Maanantai - Perjantai"
+                    subtitle="Måndag - Fredag"
+                    printingAsA4={props.printableAsA4}
+                />
                 <TableRows departures={props.weekdays}/>
             </div>
         }
         {props.saturdays && props.saturdays.length > 0 &&
             <div>
-                <TableHeader title="Lauantai" subtitle="Lördag"/>
+                <TableHeader title="Lauantai" subtitle="Lördag" printingAsA4={props.printableAsA4}/>
                 <TableRows departures={props.saturdays}/>
             </div>
         }
         {props.sundays && props.sundays.length > 0 &&
             <div>
-                <TableHeader title="Sunnuntai" subtitle="Söndag"/>
+                <TableHeader
+                    title="Sunnuntai"
+                    subtitle="Söndag"
+                    printingAsA4={props.printableAsA4}
+                />
                 <TableRows departures={props.sundays}/>
             </div>
         }
@@ -66,6 +89,8 @@ Timetable.defaultProps = {
     showValidityPeriod: true,
     showNotes: true,
     showComponentName: true,
+    printableAsA4: false,
+    greyscale: false,
 };
 
 Timetable.propTypes = {
@@ -79,6 +104,12 @@ Timetable.propTypes = {
     dateBegin: PropTypes.string.isRequired,
     dateEnd: PropTypes.string.isRequired,
     showComponentName: PropTypes.bool,
+    showStopInformation: PropTypes.bool.isRequired,
+    printableAsA4: PropTypes.bool,
+    stopShortId: PropTypes.string.isRequired,
+    stopNameFi: PropTypes.string.isRequired,
+    stopNameSe: PropTypes.string.isRequired,
+    greyscale: PropTypes.bool,
 };
 
 export default Timetable;

@@ -3,6 +3,11 @@
     margin: 15px 0;
     font-family: GothamRounded-Book;
     color: var(--timetable-text-color);
+    page-break-after: avoid;
+}
+
+.root.largerPaddingTop {
+    padding-top: 25px;
 }
 
 .strong {
