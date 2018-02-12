@@ -18,7 +18,7 @@ const Timetable = props => (
         {props.showStopInformation &&
             <div className={styles.componentName}>
                 <div className={styles.title}>
-                    {props.stopNameFi} ({props.stopShortId})&nbsp;&nbsp;
+                    {props.stopNameFi} {props.stopShortId && `(${props.stopShortId.replace(/\s+/g, "")})`} &nbsp;&nbsp;
                 </div>
                 <div className={styles.subtitle}>
                     {props.stopNameSe}
