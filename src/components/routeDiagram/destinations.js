@@ -11,7 +11,7 @@ const Destinations = (props) => {
         return null;
     }
 
-    const destinationsByTitle = groupBy(props.destinations.sort(routeCompare), "title");
+    const destinationsByTitle = groupBy(props.destinations.sort(routeCompare), "titleFi");
 
     return (
         <div className={styles.destinations}>
