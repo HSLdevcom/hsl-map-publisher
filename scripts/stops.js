@@ -21,14 +21,14 @@ function fetchAllStops() {
     return new Promise((resolve, reject) => {
         fs.createReadStream(`${__dirname}/stops.csv`)
             .pipe(iconv.decodeStream("ISO-8859-1"))
-            .pipe(csv.parse({ delimiter: "#", columns: true }, (err, data) => {
+            .pipe(csv.parse({ delimiter: ";", columns: true }, (err, data) => {
                 if (err) reject(err);
                 const stops = data
                     .map(stop => ({
                         stopId: stop.tunnus,
                         shortId: stop.lyhyt_nro,
                         nameFi: stop.nimi_suomi,
-                        group: `${stop.aikataulutyyppi_hsl}${stop.aikataulutyyppi_hkl}`,
+                        group: stop.jakoalue,
                         index: stop.ajojarjestys,
                         hasShelter: stop.pysakkityyppi.includes("katos") &&
                             !(stop.lyhyt_nro.startsWith("Ki")
