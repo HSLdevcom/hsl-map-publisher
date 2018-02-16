@@ -20,7 +20,7 @@ async function fetchStopIds() {
 function fetchAllStops() {
     return new Promise((resolve, reject) => {
         fs.createReadStream(`${__dirname}/stops.csv`)
-            .pipe(iconv.decodeStream("ISO-8859-1"))
+            .pipe(iconv.decodeStream("UTF-8"))
             .pipe(csv.parse({ delimiter: ";", columns: true }, (err, data) => {
                 if (err) reject(err);
                 const stops = data
