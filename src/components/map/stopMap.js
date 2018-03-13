@@ -105,8 +105,8 @@ const StopMap = (props) => {
                     </ItemFixed>
 
                     <ItemFixed
-                        top={(mapStyle.height / 2) - (2 * LOCATION_RADIUS)}
-                        left={(mapStyle.width / 2) - LOCATION_RADIUS}
+                        top={props.projectedCurrentLocation.y - (2 * LOCATION_RADIUS)}
+                        left={props.projectedCurrentLocation.x - LOCATION_RADIUS}
                     >
                         <Row style={{ height: LOCATION_RADIUS * 2 }}>
                             <LocationSymbol size={LOCATION_RADIUS * 2}/>
@@ -180,6 +180,11 @@ const StopType = PropTypes.shape({
     calculatedHeading: PropTypes.number,
 });
 
+const ProjectedCurrentLocation = PropTypes.shape({
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+});
+
 StopMap.propTypes = {
     mapOptions: PropTypes.shape(MapImage.optionsShape).isRequired,
     miniMapOptions: PropTypes.shape(MapImage.optionsShape).isRequired,
@@ -188,6 +193,7 @@ StopMap.propTypes = {
     pixelsPerMeter: PropTypes.number.isRequired,
     date: PropTypes.string.isRequired,
     showCitybikes: PropTypes.bool.isRequired,
+    projectedCurrentLocation: PropTypes.shape(ProjectedCurrentLocation).isRequired,
 };
 
 export default StopMap;

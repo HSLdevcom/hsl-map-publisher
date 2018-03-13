@@ -20,9 +20,9 @@ const MINI_MAP_WIDTH = 450;
 const MINI_MAP_HEIGHT = 360;
 const MINI_MAP_ZOOM = 9;
 
-const nearbyStopsQuery = gql`
-    query nearbyStopsQuery($minLat: Float!, $minLon: Float!, $maxLat: Float!, $maxLon: Float!, $date: Date!) {
-        stopGroups: stopGroupedByShortIdByBbox(minLat: $minLat, minLon: $minLon, maxLat: $maxLat, maxLon: $maxLon) {
+const nearbyItemsQuery = gql`
+    query nearbyItemsQuery($minInterestLat: Float!, $minInterestLon: Float!, $maxInterestLat: Float!, $maxInterestLon: Float!, $date: Date!) {
+        stopGroups: stopGroupedByShortIdByBbox(minLat: $minInterestLat, minLon: $minInterestLon, maxLat: $maxInterestLat, maxLon: $maxInterestLon) {
             nodes {
                 stopIds
                 shortId
@@ -50,6 +50,13 @@ const nearbyStopsQuery = gql`
                     }
                 }
             }
+        },
+        terminals: terminalsByBbox(minLat: $minInterestLat, minLon: $minInterestLon, maxLat: $maxInterestLat, maxLon: $maxInterestLon) {
+            nodes {
+                nameFi
+                lat
+                lon
+            }
         }
     }
 `;
@@ -71,14 +78,26 @@ const stopsMapper = stopGroup => ({
             }))).sort(routeCompare),
 });
 
-const nearbyStopsMapper = mapProps((props) => {
+const nearbyItemsMapper = mapProps((props) => {
     const stops = props.data.stopGroups.nodes
         // Merge properties from mode-specific stops
         .map(stopsMapper)
         // Filter out stops with no departures
         .filter(stop => !!stop.routes.length);
 
-    const { projectedStops, viewport } = calculateStopsViewport({
+    const terminals = props.data.terminals.nodes
+        .map(t => ({ lat: t.lat, lon: t.lon, name: t.nameFi }));
+
+    const {
+        projectedStops,
+        viewport,
+        center,
+        projectedCurrentLocation,
+        minLon,
+        minLat,
+        maxLon,
+        maxLat,
+    } = calculateStopsViewport({
         longitude: props.longitude,
         latitude: props.latitude,
         width: props.width,
@@ -86,13 +105,14 @@ const nearbyStopsMapper = mapProps((props) => {
         minZoom: MIN_ZOOM,
         maxZoom: MAX_ZOOM,
         stops,
+        terminals,
     });
 
     const currentStop = projectedStops.find(({ stopIds }) => stopIds.includes(props.stopId));
     const nearbyStops = projectedStops.filter(({ stopIds }) => !stopIds.includes(props.stopId));
 
     const mapOptions = {
-        center: [props.longitude, props.latitude],
+        center: [center.longitude, center.latitude],
         width: props.width,
         height: props.height,
         zoom: viewport.zoom,
@@ -112,6 +132,11 @@ const nearbyStopsMapper = mapProps((props) => {
         pixelsPerMeter: viewport.getDistanceScales().pixelsPerMeter[0],
         mapOptions,
         miniMapOptions,
+        projectedCurrentLocation,
+        minLon,
+        minLat,
+        maxLon,
+        maxLat,
     };
 });
 
@@ -125,29 +150,44 @@ const mapPositionQuery = gql`
     }
 `;
 
-const mapPositionMapper = mapProps((props) => {
+const mapInterestsMapper = mapProps((props) => {
     const longitude = props.data.stop.lon;
     const latitude = props.data.stop.lat;
+
+    const maxDimensionsForInterests = {
+        height: props.height * 2,
+        width: props.width * 2,
+    };
+
     const viewport = new PerspectiveMercatorViewport({
         longitude,
         latitude,
-        width: props.width,
-        height: props.height,
+        width: maxDimensionsForInterests.width,
+        height: maxDimensionsForInterests.height,
         zoom: MIN_ZOOM,
     });
-    const [minLon, minLat] = viewport.unproject([0, 0]);
-    const [maxLon, maxLat] = viewport.unproject([props.width, props.height]);
+    const [minInterestLon, minInterestLat] = viewport.unproject([0, 0]);
+    const [maxInterestLon, maxInterestLat] = viewport.unproject([
+        maxDimensionsForInterests.width,
+        maxDimensionsForInterests.height,
+    ]);
     return {
-        ...props, longitude, latitude, minLat, minLon, maxLat, maxLon,
+        ...props,
+        longitude,
+        latitude,
+        minInterestLat,
+        minInterestLon,
+        maxInterestLat,
+        maxInterestLon,
     };
 });
 
 
 const hoc = compose(
     graphql(mapPositionQuery),
-    apolloWrapper(mapPositionMapper),
-    graphql(nearbyStopsQuery),
-    apolloWrapper(nearbyStopsMapper)
+    apolloWrapper(mapInterestsMapper),
+    graphql(nearbyItemsQuery),
+    apolloWrapper(nearbyItemsMapper)
 );
 
 const StopMapContainer = hoc(StopMap);

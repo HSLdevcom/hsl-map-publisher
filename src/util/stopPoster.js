@@ -26,13 +26,36 @@ function calculateStopsViewport(options) {
         if (visibleStops.length <= maxStops) break;
     }
 
+    const center = {
+        longitude,
+        latitude,
+    };
+
     // Calculate pixel coordinates for each stop
     const projectedStops = visibleStops.map((stop) => {
         const [x, y] = viewport.project([stop.lon, stop.lat]);
         return { ...stop, x, y };
     });
 
-    return { projectedStops, viewport };
+    const [minLon, minLat] = viewport.unproject([0, 0]);
+    const [maxLon, maxLat] = viewport.unproject([options.width, options.height]);
+
+    const [x, y] = viewport.project([longitude, latitude]);
+    const projectedCurrentLocation = {
+        x,
+        y,
+    };
+
+    return {
+        projectedStops,
+        viewport,
+        center,
+        projectedCurrentLocation,
+        minLon,
+        minLat,
+        maxLon,
+        maxLat,
+    };
 }
 
 export {
