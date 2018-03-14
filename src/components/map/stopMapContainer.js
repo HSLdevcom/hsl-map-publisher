@@ -20,6 +20,10 @@ const MINI_MAP_WIDTH = 450;
 const MINI_MAP_HEIGHT = 360;
 const MINI_MAP_ZOOM = 9;
 
+// Mini map position
+const MINI_MAP_MARGIN_RIGHT = 60;
+const MINI_MAP_MARGIN_BOTTOM = -40;
+
 const nearbyItemsQuery = gql`
     query nearbyItemsQuery($minInterestLat: Float!, $minInterestLon: Float!, $maxInterestLat: Float!, $maxInterestLon: Float!, $date: Date!) {
         stopGroups: stopGroupedByShortIdByBbox(minLat: $minInterestLat, minLon: $minInterestLon, maxLat: $maxInterestLat, maxLon: $maxInterestLon) {
@@ -50,13 +54,6 @@ const nearbyItemsQuery = gql`
                     }
                 }
             }
-        },
-        terminals: terminalsByBbox(minLat: $minInterestLat, minLon: $minInterestLon, maxLat: $maxInterestLat, maxLon: $maxInterestLon) {
-            nodes {
-                nameFi
-                lat
-                lon
-            }
         }
     }
 `;
@@ -85,13 +82,9 @@ const nearbyItemsMapper = mapProps((props) => {
         // Filter out stops with no departures
         .filter(stop => !!stop.routes.length);
 
-    const terminals = props.data.terminals.nodes
-        .map(t => ({ lat: t.lat, lon: t.lon, name: t.nameFi }));
-
     const {
         projectedStops,
         viewport,
-        center,
         projectedCurrentLocation,
         minLon,
         minLat,
@@ -105,14 +98,16 @@ const nearbyItemsMapper = mapProps((props) => {
         minZoom: MIN_ZOOM,
         maxZoom: MAX_ZOOM,
         stops,
-        terminals,
+        currentStopId: props.stopId,
+        miniMapStartX: props.width - MINI_MAP_WIDTH - MINI_MAP_MARGIN_RIGHT,
+        miniMapStartY: props.height - MINI_MAP_HEIGHT - MINI_MAP_MARGIN_BOTTOM,
     });
 
     const currentStop = projectedStops.find(({ stopIds }) => stopIds.includes(props.stopId));
     const nearbyStops = projectedStops.filter(({ stopIds }) => !stopIds.includes(props.stopId));
 
     const mapOptions = {
-        center: [center.longitude, center.latitude],
+        center: [viewport.longitude, viewport.latitude],
         width: props.width,
         height: props.height,
         zoom: viewport.zoom,
@@ -123,16 +118,21 @@ const nearbyItemsMapper = mapProps((props) => {
         width: MINI_MAP_WIDTH,
         height: MINI_MAP_HEIGHT,
         zoom: MINI_MAP_ZOOM,
+        marginRight: MINI_MAP_MARGIN_RIGHT,
+        marginBottom: MINI_MAP_MARGIN_BOTTOM,
     };
 
     return {
         ...props,
-        currentStop,
+        currentStop: {
+            ...currentStop,
+            x: projectedCurrentLocation.x,
+            y: projectedCurrentLocation.y,
+        },
         nearbyStops,
         pixelsPerMeter: viewport.getDistanceScales().pixelsPerMeter[0],
         mapOptions,
         miniMapOptions,
-        projectedCurrentLocation,
         minLon,
         minLat,
         maxLon,

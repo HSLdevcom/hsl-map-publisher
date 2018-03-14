@@ -22,10 +22,6 @@ const STOP_RADIUS = 20;
 const LOCATION_RADIUS = 30;
 const LOCATION_RADIUS_MINI = 10;
 
-// Mini map position
-const MINI_MAP_MARGIN_RIGHT = 60;
-const MINI_MAP_MARGIN_BOTTOM = -40;
-
 // Overlays
 const INFO_MARGIN_BOTTOM = 78;
 const INFO_MARGIN_LEFT = 44;
@@ -52,8 +48,8 @@ const StopMap = (props) => {
         height: props.mapOptions.height,
     };
     const miniMapStyle = {
-        left: mapStyle.width - MINI_MAP_MARGIN_RIGHT - props.miniMapOptions.width,
-        top: mapStyle.height - MINI_MAP_MARGIN_BOTTOM - props.miniMapOptions.height,
+        left: mapStyle.width - props.miniMapOptions.marginRight - props.miniMapOptions.width,
+        top: mapStyle.height - props.miniMapOptions.marginBottom - props.miniMapOptions.height,
         width: props.miniMapOptions.width,
         height: props.miniMapOptions.height,
     };
@@ -105,8 +101,8 @@ const StopMap = (props) => {
                     </ItemFixed>
 
                     <ItemFixed
-                        top={props.projectedCurrentLocation.y - (2 * LOCATION_RADIUS)}
-                        left={props.projectedCurrentLocation.x - LOCATION_RADIUS}
+                        top={props.currentStop.y - (2 * LOCATION_RADIUS)}
+                        left={props.currentStop.x - LOCATION_RADIUS}
                     >
                         <Row style={{ height: LOCATION_RADIUS * 2 }}>
                             <LocationSymbol size={LOCATION_RADIUS * 2}/>
@@ -180,11 +176,6 @@ const StopType = PropTypes.shape({
     calculatedHeading: PropTypes.number,
 });
 
-const ProjectedCurrentLocation = PropTypes.shape({
-    x: PropTypes.number.isRequired,
-    y: PropTypes.number.isRequired,
-});
-
 StopMap.propTypes = {
     mapOptions: PropTypes.shape(MapImage.optionsShape).isRequired,
     miniMapOptions: PropTypes.shape(MapImage.optionsShape).isRequired,
@@ -193,7 +184,6 @@ StopMap.propTypes = {
     pixelsPerMeter: PropTypes.number.isRequired,
     date: PropTypes.string.isRequired,
     showCitybikes: PropTypes.bool.isRequired,
-    projectedCurrentLocation: PropTypes.shape(ProjectedCurrentLocation).isRequired,
 };
 
 export default StopMap;
