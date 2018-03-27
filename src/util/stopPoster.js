@@ -1,10 +1,11 @@
 import { PerspectiveMercatorViewport } from "viewport-mercator-project";
 
 const STOPS_PER_PIXEL = 0.000006;
-const MAJOR_TRANSPORT_WEIGHT = 50;
-const DISTANCE_WEIGHT = 0.1;
-const ZOOM_WEIGHT = 1;
-const STOP_AMOUNT_WEIGHT = 10000;
+const MAJOR_TRANSPORT_WEIGHT = 500;
+const AVERAGE_DISTANCE_WEIGHT = 5;
+const CURRENT_STOP_DISTANCE_WEIGHT = 1;
+const ZOOM_WEIGHT = 80;
+const STOP_AMOUNT_WEIGHT = 200;
 const DISTANCES_FROM_CENTRE = [0, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30];
 const ANGLES = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
 
@@ -18,8 +19,8 @@ function toRadians(angle) {
     return angle * (Math.PI / 180);
 }
 
-function getStopDistanceCost(stop, centerLon, centerLat) {
-    return Math.hypot(stop.lon - centerLon, stop.lat - centerLat);
+function getDistanceBetweenPoints(x, y, centerX, centerY) {
+    return Math.sqrt(((x - centerX) ** 2) + ((y - centerY) ** 2));
 }
 
 function calculateStopsViewport(options) {
@@ -46,6 +47,7 @@ function calculateStopsViewport(options) {
     let bestViewPort = null;
     let bestViewPortScore = 0;
     let bestVisibleStops = [];
+    const mapMidPoint = { x: width / 2, y: height / 2 };
 
     const allStops = stops.map(stop => ({
         ...stop,
@@ -77,20 +79,48 @@ function calculateStopsViewport(options) {
                         .some(sId => sId === currentStopId));
 
                 if (visibleStops.length <= maxStops && currentStopIsVisible) {
-                    const stopDistance = visibleStops
-                        .map(stop =>
-                            getStopDistanceCost(stop, viewport.longitude, viewport.latitude))
-                        .reduce((a, b) => a + b);
+                    const averagePoint = visibleStops
+                        .map((stop) => {
+                            const [tX, tY] = viewport.project([stop.lon, stop.lat]);
+                            return { x: tX, y: tY };
+                        }).reduce((a, b) => ({ x: a.x + b.x, y: a.y + b.y }));
+                    averagePoint.x /= visibleStops.length;
+                    averagePoint.y /= visibleStops.length;
+
+                    const relativeAverageStopDistance =
+                        getDistanceBetweenPoints(
+                            averagePoint.x,
+                            averagePoint.y,
+                            mapMidPoint.x,
+                            mapMidPoint.y
+                        ) / Math.max(width, height);
+
+                    const currentStop = visibleStops
+                        .find(s => s.stopIds
+                            .some(sID => sID === currentStopId));
+
+                    const [tX, tY] = viewport.project([currentStop.lon, currentStop.lat]);
+                    const currentStopDistanceFromCenter =
+                        getDistanceBetweenPoints(tX, tY, mapMidPoint.x, mapMidPoint.y);
+                    const relativeDistance =
+                        currentStopDistanceFromCenter / Math.max(height, width);
 
                     const visibleMajorStationsPoints = visibleStops
                         .filter(stop => stop.major).length;
 
-                    const zoomPoints = 24 - zoom;
+                    const zoomPoints = maxZoom - zoom;
 
                     let score = visibleStops.length * STOP_AMOUNT_WEIGHT;
                     score += zoomPoints * ZOOM_WEIGHT;
                     score += visibleMajorStationsPoints * MAJOR_TRANSPORT_WEIGHT;
-                    score += (1 / (stopDistance / visibleStops.length)) * DISTANCE_WEIGHT;
+                    score +=
+                        Math.max(height, width)
+                        * (0.5 - relativeAverageStopDistance)
+                        * AVERAGE_DISTANCE_WEIGHT;
+                    score +=
+                        Math.max(height, width)
+                        * (0.5 - relativeDistance)
+                        * CURRENT_STOP_DISTANCE_WEIGHT;
 
                     if (score > bestViewPortScore) {
                         bestViewPortScore = score;
