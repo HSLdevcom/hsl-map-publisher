@@ -3090,9 +3090,9 @@ hpack.js@^2.1.6:
     readable-stream "^2.0.1"
     wbuf "^1.1.0"
 
-hsl-map-style@HSLdevcom/hsl-map-style#e878a1b9ee88a6ebc4e31e684121b7946e3da085:
+hsl-map-style@HSLdevcom/hsl-map-style#8ae7c4fbb76d518360bf67dee36b7b60c0e7acea:
   version "1.0.0"
-  resolved "https://codeload.github.com/HSLdevcom/hsl-map-style/tar.gz/e878a1b9ee88a6ebc4e31e684121b7946e3da085"
+  resolved "https://codeload.github.com/HSLdevcom/hsl-map-style/tar.gz/8ae7c4fbb76d518360bf67dee36b7b60c0e7acea"
   dependencies:
     lodash "^4.17.4"
 
