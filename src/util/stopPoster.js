@@ -1,11 +1,11 @@
 import { PerspectiveMercatorViewport } from "viewport-mercator-project";
 
 const STOPS_PER_PIXEL = 0.000006;
-const MAJOR_TRANSPORT_WEIGHT = 500;
-const AVERAGE_DISTANCE_WEIGHT = 5;
+const MAJOR_TRANSPORT_WEIGHT = 5;
+const AVERAGE_DISTANCE_WEIGHT = 2;
 const CURRENT_STOP_DISTANCE_WEIGHT = 1;
-const ZOOM_WEIGHT = 80;
-const STOP_AMOUNT_WEIGHT = 200;
+const ZOOM_WEIGHT = 1;
+const STOP_AMOUNT_WEIGHT = 5;
 const DISTANCES_FROM_CENTRE = [0, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30];
 const ANGLES = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
 
@@ -54,6 +54,10 @@ function calculateStopsViewport(options) {
         major: stop.routes.some(route => route.mode === "SUBWAY" || route.mode === "RAIL"),
     }));
 
+    const defaultViewport = new PerspectiveMercatorViewport({
+        longitude, latitude, width, height, zoom: maxZoom,
+    });
+
     zoomLevels.forEach((zoom) => {
         const baseViewport = new PerspectiveMercatorViewport({
             longitude, latitude, width, height, zoom,
@@ -78,7 +82,7 @@ function calculateStopsViewport(options) {
                     .some(s => s.stopIds
                         .some(sId => sId === currentStopId));
 
-                if (visibleStops.length <= maxStops && currentStopIsVisible) {
+                if (visibleStops.length <= maxStops && currentStopIsVisible && viewport) {
                     const averagePoint = visibleStops
                         .map((stop) => {
                             const [tX, tY] = viewport.project([stop.lon, stop.lat]);
@@ -93,7 +97,7 @@ function calculateStopsViewport(options) {
                             averagePoint.y,
                             mapMidPoint.x,
                             mapMidPoint.y
-                        ) / Math.max(width, height);
+                        ) / (Math.max(width, height) / 2);
 
                     const currentStop = visibleStops
                         .find(s => s.stopIds
@@ -103,23 +107,19 @@ function calculateStopsViewport(options) {
                     const currentStopDistanceFromCenter =
                         getDistanceBetweenPoints(tX, tY, mapMidPoint.x, mapMidPoint.y);
                     const relativeDistance =
-                        currentStopDistanceFromCenter / Math.max(height, width);
+                        currentStopDistanceFromCenter / (Math.max(height, width) / 2);
 
                     const visibleMajorStationsPoints = visibleStops
                         .filter(stop => stop.major).length;
 
-                    const zoomPoints = maxZoom - zoom;
-
-                    let score = visibleStops.length * STOP_AMOUNT_WEIGHT;
-                    score += zoomPoints * ZOOM_WEIGHT;
-                    score += visibleMajorStationsPoints * MAJOR_TRANSPORT_WEIGHT;
+                    let score = (visibleStops.length / maxStops) * STOP_AMOUNT_WEIGHT;
+                    score += ((zoom - minZoom) / (maxZoom - minZoom)) * ZOOM_WEIGHT;
+                    score += (Math.max(visibleMajorStationsPoints, 5) / 5) * MAJOR_TRANSPORT_WEIGHT;
                     score +=
-                        Math.max(height, width)
-                        * (0.5 - relativeAverageStopDistance)
+                        (1 - relativeAverageStopDistance)
                         * AVERAGE_DISTANCE_WEIGHT;
                     score +=
-                        Math.max(height, width)
-                        * (0.5 - relativeDistance)
+                        (1 - relativeDistance)
                         * CURRENT_STOP_DISTANCE_WEIGHT;
 
                     if (score > bestViewPortScore) {
@@ -131,6 +131,13 @@ function calculateStopsViewport(options) {
             });
         });
     });
+
+    if (!bestViewPort) {
+        bestViewPort = defaultViewport;
+        console.log("Setting default viewport");
+        bestVisibleStops = allStops.filter(stop =>
+            viewportContains(defaultViewport, stop, width, height, miniMapStartX, miniMapStartY));
+    }
 
     // Calculate pixel coordinates for each stop
     const projectedStops = bestVisibleStops.map((stop) => {
