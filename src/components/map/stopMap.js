@@ -7,6 +7,7 @@ import { Row, InlineSVG } from "components/util";
 
 import locationIcon from "icons/marker.svg";
 
+import MapCoordinateHelper from "../../util/mapCoordinateHelper";
 import MapImage from "./mapImageContainer";
 import Scalebar from "./scalebar";
 import StopSymbol from "./stopSymbol";
@@ -20,10 +21,6 @@ import placeLabelCity from "./city-layer.json";
 const STOP_RADIUS = 20;
 const LOCATION_RADIUS = 30;
 const LOCATION_RADIUS_MINI = 10;
-
-// Mini map position
-const MINI_MAP_MARGIN_RIGHT = 60;
-const MINI_MAP_MARGIN_BOTTOM = -40;
 
 // Overlays
 const INFO_MARGIN_BOTTOM = 78;
@@ -51,8 +48,8 @@ const StopMap = (props) => {
         height: props.mapOptions.height,
     };
     const miniMapStyle = {
-        left: mapStyle.width - MINI_MAP_MARGIN_RIGHT - props.miniMapOptions.width,
-        top: mapStyle.height - MINI_MAP_MARGIN_BOTTOM - props.miniMapOptions.height,
+        left: mapStyle.width - props.miniMapOptions.marginRight - props.miniMapOptions.width,
+        top: mapStyle.height - props.miniMapOptions.marginBottom - props.miniMapOptions.height,
         width: props.miniMapOptions.width,
         height: props.miniMapOptions.height,
     };
@@ -60,6 +57,12 @@ const StopMap = (props) => {
     // Filter out stops that are behind the mini map
     const stops = props.nearbyStops
         .filter(stop => stop.x < miniMapStyle.left || stop.y < miniMapStyle.top);
+
+    const miniMapCoordinateHelper =
+        new MapCoordinateHelper(props.miniMapOptions);
+    const newPosition = miniMapCoordinateHelper.getMapCenter();
+    const [miniMarkerOffsetLeft, miniMarkerOffsetTop]
+        = miniMapCoordinateHelper.getCurrentPosition(newPosition.viewport);
 
     return (
         <div className={styles.root} style={mapStyle}>
@@ -98,8 +101,8 @@ const StopMap = (props) => {
                     </ItemFixed>
 
                     <ItemFixed
-                        top={(mapStyle.height / 2) - (2 * LOCATION_RADIUS)}
-                        left={(mapStyle.width / 2) - LOCATION_RADIUS}
+                        top={props.currentStop.y - (2 * LOCATION_RADIUS)}
+                        left={props.currentStop.x - LOCATION_RADIUS}
                     >
                         <Row style={{ height: LOCATION_RADIUS * 2 }}>
                             <LocationSymbol size={LOCATION_RADIUS * 2}/>
@@ -135,7 +138,10 @@ const StopMap = (props) => {
 
             <div className={styles.miniMap} style={miniMapStyle}>
                 <MapImage
-                    options={props.miniMapOptions}
+                    options={{
+                        ...props.miniMapOptions,
+                        center: newPosition.mapCenter,
+                    }}
                     components={{
                         text: { enabled: false },
                         print: { enabled: true },
@@ -145,10 +151,12 @@ const StopMap = (props) => {
                     extraLayers={[placeLabelCity]}
                 />
                 <div
-                    className={styles.center}
                     style={{
                         marginLeft: -LOCATION_RADIUS_MINI,
                         marginTop: -2 * LOCATION_RADIUS_MINI,
+                        top: miniMarkerOffsetTop,
+                        left: miniMarkerOffsetLeft,
+                        position: "absolute",
                     }}
                 >
                     <LocationSymbol size={LOCATION_RADIUS_MINI * 2}/>
