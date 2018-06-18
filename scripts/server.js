@@ -8,7 +8,7 @@ const generator = require("./generator");
 const {
     migrate, addEvent,
     getBuilds, getBuild, addBuild, updateBuild, removeBuild,
-    getPoster, addPoster, updatePoster, removePoster,
+    getPoster, addPoster, updatePoster, removePoster, getTemplates
 } = require("./store");
 
 const PORT = 4000;
@@ -53,8 +53,15 @@ async function main() {
 
     // FIXME: Update UI to fetch from graphql and remove when data available
     const stops = await fetchStops();
+
+    const templates = await getTemplates()
+
     router.get("/stops", (ctx) => {
         ctx.body = stops;
+    });
+
+    router.get("/templates", (ctx) => {
+        ctx.body = templates;
     });
 
     router.get("/builds", async (ctx) => {

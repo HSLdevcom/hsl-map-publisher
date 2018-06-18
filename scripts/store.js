@@ -129,6 +129,29 @@ async function addEvent({
     }, snakeCase));
 }
 
+const templates = [
+    {
+        area: "footer",
+        name: "footer_ticketsales",
+        images: [
+            {
+                src: "ticket_sales.svg",
+                size: 1,
+            }, {
+                src: "stop_feedback.svg",
+                size: 1,
+            }, {
+                src: "ticket_zones.svg",
+                size: 1,
+            }
+        ],
+    },
+];
+
+async function getTemplates() {
+    return Promise.resolve(templates);
+}
+
 module.exports = {
     migrate,
     getBuilds,
@@ -141,4 +164,5 @@ module.exports = {
     updatePoster,
     removePoster,
     addEvent,
+    getTemplates,
 };
