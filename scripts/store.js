@@ -188,10 +188,6 @@ const templateImagePath = (templateName, fileName) =>
 async function getTemplates() {
     return pMap(templates, async template => Object.assign(template, {
         images: await pMap(template.images, async (image) => {
-            if (image.svg) {
-                return image;
-            }
-
             const svgPath = templateImagePath(template.id, image.src);
             let svg = "";
 
@@ -237,6 +233,7 @@ async function addTemplate({ label }) {
 async function saveTemplateImages(templateId, images) {
     return pMap(images, async (image) => {
         const svgContent = get(image, "svg", "");
+        delete image.svg;
 
         if (!svgContent) {
             return image;
@@ -247,13 +244,11 @@ async function saveTemplateImages(templateId, images) {
         try {
             await writeFileAsync(svgPath, svgContent);
         } catch (e) {
-            console.log(e);
             const error = new Error(`SVG ${image.src} write failed.`);
             error.status = 400;
             throw error;
         }
 
-        delete image.svg;
         return image;
     });
 }
@@ -262,13 +257,14 @@ async function saveTemplate(template) {
     const { id } = template;
     const existingTemplateIndex = templates.findIndex(temp => temp.id === id);
 
-    const savedImages = await saveTemplateImages(template.id, template.images);
-    merge(template, { images: savedImages });
+    const newTemplate = { ...template };
+    const savedImages = await saveTemplateImages(template.id, newTemplate.images);
+    newTemplate.images = savedImages;
 
     if (existingTemplateIndex === -1) {
-        templates.push(template);
+        templates.push(newTemplate);
     } else {
-        merge(templates[existingTemplateIndex], template);
+        merge(templates[existingTemplateIndex], newTemplate);
     }
 }
 
