@@ -84,8 +84,8 @@ async function main() {
 
     router.post("/templates", async (ctx) => {
         const { label } = ctx.request.body;
-        const template = await addTemplate({ label });
-        ctx.body = template;
+        const { id } = await addTemplate({ label });
+        ctx.body = id;
     });
 
     router.put("/templates", async (ctx) => {

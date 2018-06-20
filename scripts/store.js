@@ -162,30 +162,13 @@ async function addEvent({
         }, snakeCase));
 }
 
-const templates = [
-    {
-        area: "footer",
-        id: "footer_ticketsales",
-        label: "Footer - Ticketsales",
-        images: [
-            {
-                src: "ticket_sales.svg",
-                size: 1,
-            }, {
-                src: "stop_feedback.svg",
-                size: 1,
-            }, {
-                src: "ticket_zones.svg",
-                size: 1,
-            },
-        ],
-    },
-];
-
 const templateImagePath = (templateName, fileName) =>
     path.join(__dirname, "..", "templates", templateName, fileName);
 
 async function getTemplates() {
+    const templates = await knex("template")
+        .select("*");
+
     return pMap(templates, async template => Object.assign(template, {
         images: await pMap(template.images, async (image) => {
             const svgPath = templateImagePath(template.id, image.src);
@@ -216,17 +199,20 @@ async function addTemplate({ label }) {
             {
                 src: "",
                 size: 1,
-            }, {
+            },
+            {
                 src: "",
                 size: 1,
-            }, {
+            },
+            {
                 src: "",
                 size: 1,
             },
         ],
     };
 
-    templates.push(template);
+    await knex("template")
+        .insert(template);
     return template;
 }
 
@@ -253,19 +239,34 @@ async function saveTemplateImages(templateId, images) {
     });
 }
 
+async function getTemplate({ id }) {
+    const templateRow = await knex
+        .select("*")
+        .from("template")
+        .where({ id })
+        .first();
+
+    return templateRow;
+}
+
 async function saveTemplate(template) {
     const { id } = template;
-    const existingTemplateIndex = templates.findIndex(temp => temp.id === id);
+    const existingTemplate = await getTemplate({ id });
 
     const newTemplate = { ...template };
     const savedImages = await saveTemplateImages(template.id, newTemplate.images);
-    newTemplate.images = savedImages;
+    newTemplate.images = JSON.stringify(savedImages);
 
-    if (existingTemplateIndex === -1) {
-        templates.push(newTemplate);
+    if (existingTemplate) {
+        await knex("template")
+            .where({ id })
+            .update(newTemplate);
     } else {
-        merge(templates[existingTemplateIndex], newTemplate);
+        await knex("template")
+            .insert(template);
     }
+
+    return newTemplate;
 }
 
 module.exports = {
