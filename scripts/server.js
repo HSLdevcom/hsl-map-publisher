@@ -8,28 +8,48 @@ const generator = require("./generator");
 const {
     migrate, addEvent,
     getBuilds, getBuild, addBuild, updateBuild, removeBuild,
-    getPoster, addPoster, updatePoster, removePoster, getTemplates
+    getPoster, addPoster, updatePoster, removePoster, getTemplates, addTemplate,
+    saveTemplate,
 } = require("./store");
 
 const PORT = 4000;
 
 async function generatePoster(buildId, component, props) {
-    const { id } = await addPoster({ buildId, component, props });
+    const { id } = await addPoster({
+        buildId,
+        component,
+        props,
+    });
 
     const onInfo = (message) => {
         console.log(`${id}: ${message}`); // eslint-disable-line no-console
-        addEvent({ posterId: id, type: "INFO", message });
+        addEvent({
+            posterId: id,
+            type: "INFO",
+            message,
+        });
     };
     const onError = (error) => {
         console.error(`${id}: ${error.message} ${error.stack}`); // eslint-disable-line no-console
-        addEvent({ posterId: id, type: "ERROR", message: error.message });
+        addEvent({
+            posterId: id,
+            type: "ERROR",
+            message: error.message,
+        });
     };
 
     const options = {
-        id, component, props, onInfo, onError,
+        id,
+        component,
+        props,
+        onInfo,
+        onError,
     };
     generator.generate(options)
-        .then(({ success }) => updatePoster({ id, status: success ? "READY" : "FAILED" }))
+        .then(({ success }) => updatePoster({
+            id,
+            status: success ? "READY" : "FAILED",
+        }))
         .catch(error => console.error(error)); // eslint-disable-line no-console
 
     return { id };
@@ -54,14 +74,24 @@ async function main() {
     // FIXME: Update UI to fetch from graphql and remove when data available
     const stops = await fetchStops();
 
-    const templates = await getTemplates()
-
     router.get("/stops", (ctx) => {
         ctx.body = stops;
     });
 
-    router.get("/templates", (ctx) => {
-        ctx.body = templates;
+    router.get("/templates", async (ctx) => {
+        ctx.body = await getTemplates();
+    });
+
+    router.post("/templates", async (ctx) => {
+        const { label } = ctx.request.body;
+        const template = await addTemplate({ label });
+        ctx.body = template;
+    });
+
+    router.put("/templates", async (ctx) => {
+        const template = ctx.request.body;
+        await saveTemplate(template);
+        ctx.body = true;
     });
 
     router.get("/builds", async (ctx) => {
@@ -84,7 +114,10 @@ async function main() {
     router.put("/builds/:id", async (ctx) => {
         const { id } = ctx.params;
         const { status } = ctx.request.body;
-        const build = await updateBuild({ id, status });
+        const build = await updateBuild({
+            id,
+            status,
+        });
         ctx.body = build;
     });
 
@@ -119,7 +152,8 @@ async function main() {
     router.get("/downloadBuild/:id", async (ctx) => {
         const { id } = ctx.params;
         const { title, posters } = await getBuild({ id });
-        const posterIds = posters.filter(poster => poster.status === "READY").map(poster => poster.id);
+        const posterIds = posters.filter(poster => poster.status === "READY")
+            .map(poster => poster.id);
         ctx.type = "application/pdf";
         ctx.set("Content-Disposition", `attachment; filename="${title}-${id}.pdf"`);
         ctx.body = generator.concatenate(posterIds);
@@ -142,4 +176,5 @@ async function main() {
         .listen(PORT, () => console.log(`Listening at ${PORT}`)); // eslint-disable-line no-console
 }
 
-main().catch(error => console.error(error)); // eslint-disable-line no-console
+main()
+    .catch(error => console.error(error)); // eslint-disable-line no-console

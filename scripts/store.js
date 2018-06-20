@@ -3,12 +3,23 @@ const camelCase = require("lodash/camelCase");
 const snakeCase = require("lodash/snakeCase");
 const config = require("../knexfile");
 const knex = require("knex")(config);
+const pMap = require("p-map");
+const path = require("path");
+const merge = require("lodash/merge");
+const get = require("lodash/get");
+const fs = require("fs");
+const { promisify } = require("util");
+const mkdirp = require("mkdirp");
+
+const readFileAsync = promisify(fs.readFile);
+const writeFileAsync = promisify(fs.writeFile);
 
 function convertKeys(object, converter) {
     const obj = {};
-    Object.keys(object).forEach((key) => {
-        obj[converter(key)] = object[key];
-    });
+    Object.keys(object)
+          .forEach((key) => {
+              obj[converter(key)] = object[key];
+          });
     return obj;
 }
 
@@ -21,12 +32,13 @@ async function getBuilds() {
         "build.*",
         knex.raw("count(case when poster.status = 'PENDING' then 1 end)::integer as pending"),
         knex.raw("count(case when poster.status = 'FAILED' then 1 end)::integer as failed"),
-        knex.raw("count(case when poster.status = 'READY' then 1 end)::integer as ready")
-    ).from("build")
-        .whereNot("build.status", "REMOVED")
-        .leftJoin("poster", "build.id", "poster.build_id")
-        .orderBy("build.created_at", "desc")
-        .groupBy("build.id");
+        knex.raw("count(case when poster.status = 'READY' then 1 end)::integer as ready"),
+                           )
+                           .from("build")
+                           .whereNot("build.status", "REMOVED")
+                           .leftJoin("poster", "build.id", "poster.build_id")
+                           .orderBy("build.created_at", "desc")
+                           .groupBy("build.id");
 
     return rows.map(row => convertKeys(row, camelCase));
 }
@@ -59,8 +71,9 @@ async function getBuild({ id }) {
                     'message', event.message,
                     'createdAt', event.created_at
                 ) order by event.created_at
-            ) as events`)
-        ).from("poster")
+            ) as events`),
+        )
+        .from("poster")
         .whereNot("poster.status", "REMOVED")
         .andWhere("poster.build_id", id)
         .leftJoin("event", "event.poster_id", "poster.id")
@@ -73,17 +86,25 @@ async function getBuild({ id }) {
 
 async function addBuild({ title }) {
     const id = uuidv1();
-    await knex("build").insert({ id, title });
+    await knex("build")
+        .insert({
+            id,
+            title,
+        });
     return { id };
 }
 
 async function updateBuild({ id, status }) {
-    await knex("build").where({ id }).update({ status });
+    await knex("build")
+        .where({ id })
+        .update({ status });
     return { id };
 }
 
 async function removeBuild({ id }) {
-    await knex("build").where({ id }).update({ status: "REMOVED" });
+    await knex("build")
+        .where({ id })
+        .update({ status: "REMOVED" });
     return { id };
 }
 
@@ -105,34 +126,47 @@ async function getPoster({ id }) {
 
 async function addPoster({ buildId, component, props }) {
     const id = uuidv1();
-    await knex("poster").insert(convertKeys({
-        id, buildId, component, props,
-    }, snakeCase));
+    await knex("poster")
+        .insert(convertKeys({
+            id,
+            buildId,
+            component,
+            props,
+        }, snakeCase));
     return { id };
 }
 
 async function updatePoster({ id, status }) {
-    await knex("poster").where({ id }).update({ status });
+    await knex("poster")
+        .where({ id })
+        .update({ status });
     return { id };
 }
 
 async function removePoster({ id }) {
-    await knex("poster").where({ id }).update({ status: "REMOVED" });
+    await knex("poster")
+        .where({ id })
+        .update({ status: "REMOVED" });
     return { id };
 }
 
 async function addEvent({
     posterId = null, buildId = null, type, message,
 }) {
-    await knex("event").insert(convertKeys({
-        posterId, buildId, type, message,
-    }, snakeCase));
+    await knex("event")
+        .insert(convertKeys({
+            posterId,
+            buildId,
+            type,
+            message,
+        }, snakeCase));
 }
 
 const templates = [
     {
         area: "footer",
-        name: "footer_ticketsales",
+        id: "footer_ticketsales",
+        label: "Footer - Ticketsales",
         images: [
             {
                 src: "ticket_sales.svg",
@@ -143,13 +177,99 @@ const templates = [
             }, {
                 src: "ticket_zones.svg",
                 size: 1,
-            }
+            },
         ],
     },
 ];
 
+const templateImagePath = (templateName, fileName) =>
+    path.join(__dirname, "..", "templates", templateName, fileName);
+
 async function getTemplates() {
-    return Promise.resolve(templates);
+    return pMap(templates, async template => Object.assign(template, {
+        images: await pMap(template.images, async (image) => {
+            if (image.svg) {
+                return image;
+            }
+
+            const svgPath = templateImagePath(template.id, image.src);
+            let svg = "";
+
+            try {
+                svg = await readFileAsync(svgPath, "utf-8");
+            } catch (e) {
+                svg = "";
+            }
+
+            return Object.assign(image, { svg });
+        }),
+    }));
+}
+
+async function addTemplate({ label }) {
+    const templateId = snakeCase(label);
+    const templatePath = path.join(__dirname, "..", "templates", templateId);
+
+    mkdirp(templatePath, { mode: 755 });
+
+    const template = {
+        label,
+        id: templateId,
+        area: "footer",
+        images: [
+            {
+                src: "",
+                size: 1,
+            }, {
+                src: "",
+                size: 1,
+            }, {
+                src: "",
+                size: 1,
+            },
+        ],
+    };
+
+    templates.push(template);
+    return template;
+}
+
+async function saveTemplateImages(templateId, images) {
+    return pMap(images, async (image) => {
+        const svgContent = get(image, "svg", "");
+
+        if (!svgContent) {
+            return image;
+        }
+
+        const svgPath = templateImagePath(templateId, image.src);
+
+        try {
+            await writeFileAsync(svgPath, svgContent);
+        } catch (e) {
+            console.log(e);
+            const error = new Error(`SVG ${image.src} write failed.`);
+            error.status = 400;
+            throw error;
+        }
+
+        delete image.svg;
+        return image;
+    });
+}
+
+async function saveTemplate(template) {
+    const { id } = template;
+    const existingTemplateIndex = templates.findIndex(temp => temp.id === id);
+
+    const savedImages = await saveTemplateImages(template.id, template.images);
+    merge(template, { images: savedImages });
+
+    if (existingTemplateIndex === -1) {
+        templates.push(template);
+    } else {
+        merge(templates[existingTemplateIndex], template);
+    }
 }
 
 module.exports = {
@@ -165,4 +285,6 @@ module.exports = {
     removePoster,
     addEvent,
     getTemplates,
+    addTemplate,
+    saveTemplate,
 };
