@@ -1,13 +1,13 @@
 exports.up = async (knex) => {
     await knex.schema.createTable("template_images", (table) => {
         table.uuid("id")
-             .primary();
+            .primary();
         table.string("name")
-             .notNullable();
-        table.string("svg")
-             .notNullable();
+            .notNullable();
+        table.text("svg")
+            .notNullable();
         table.integer("default_size")
-             .notNullable();
+            .notNullable();
         table.timestamps(true, true);
     });
 };

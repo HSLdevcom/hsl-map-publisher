@@ -10,6 +10,7 @@ const get = require("lodash/get");
 const fs = require("fs");
 const { promisify } = require("util");
 const mkdirp = require("mkdirp");
+const createEmptyTemplate = require("./createEmptyTemplate");
 
 const readFileAsync = promisify(fs.readFile);
 const writeFileAsync = promisify(fs.writeFile);
@@ -171,45 +172,31 @@ async function getTemplates() {
 
     return pMap(templates, async template => Object.assign(template, {
         images: await pMap(template.images, async (image) => {
-            const svgPath = templateImagePath(template.id, image.src);
-            let svg = "";
+            const emptyImage = {
+                id: "",
+                name: "",
+                svg: "",
+                size: 1,
+            };
 
-            try {
-                svg = await readFileAsync(svgPath, "utf-8");
-            } catch (e) {
-                svg = "";
+            if (!image.id) {
+                return emptyImage;
             }
 
-            return Object.assign(image, { svg });
+            const img = await knex
+                .select("*")
+                .from("template_images")
+                .where({ id: image.id });
+
+            img.size = img.default_size;
+            return img || emptyImage;
         }),
     }));
 }
 
 async function addTemplate({ label }) {
     const templateId = snakeCase(label);
-    const templatePath = path.join(__dirname, "..", "templates", templateId);
-
-    mkdirp(templatePath, { mode: 755 });
-
-    const template = {
-        label,
-        id: templateId,
-        area: "footer",
-        images: [
-            {
-                src: "",
-                size: 1,
-            },
-            {
-                src: "",
-                size: 1,
-            },
-            {
-                src: "",
-                size: 1,
-            },
-        ],
-    };
+    const template = createEmptyTemplate(label, templateId);
 
     await knex("template")
         .insert(template);
@@ -218,23 +205,36 @@ async function addTemplate({ label }) {
 
 async function saveTemplateImages(templateId, images) {
     return pMap(images, async (image) => {
+        let existingImage = null;
+
+        if (image.id) {
+            existingImage = await knex
+                .select("*")
+                .from("template_images")
+                .where({ id: image.id })
+                .first();
+        }
+
         const svgContent = get(image, "svg", "");
-        delete image.svg;
+        const id = existingImage ? existingImage.id : uuidv1();
 
-        if (!svgContent) {
-            return image;
+        const newImage = {
+            id,
+            name: image.name,
+            svg: svgContent,
+            default_size: image.size,
+        };
+
+        if (existingImage) {
+            await knex("template_images")
+                .where({ id })
+                .update(newImage);
+        } else {
+            await knex("template_images")
+                .insert(newImage);
         }
 
-        const svgPath = templateImagePath(templateId, image.src);
-
-        try {
-            await writeFileAsync(svgPath, svgContent);
-        } catch (e) {
-            const error = new Error(`SVG ${image.src} write failed.`);
-            error.status = 400;
-            throw error;
-        }
-
+        merge(image, { id });
         return image;
     });
 }
