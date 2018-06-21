@@ -18,9 +18,9 @@ const writeFileAsync = promisify(fs.writeFile);
 function convertKeys(object, converter) {
     const obj = {};
     Object.keys(object)
-        .forEach((key) => {
-            obj[converter(key)] = object[key];
-        });
+          .forEach((key) => {
+              obj[converter(key)] = object[key];
+          });
     return obj;
 }
 
@@ -33,13 +33,13 @@ async function getBuilds() {
         "build.*",
         knex.raw("count(case when poster.status = 'PENDING' then 1 end)::integer as pending"),
         knex.raw("count(case when poster.status = 'FAILED' then 1 end)::integer as failed"),
-        knex.raw("count(case when poster.status = 'READY' then 1 end)::integer as ready")
-    )
-        .from("build")
-        .whereNot("build.status", "REMOVED")
-        .leftJoin("poster", "build.id", "poster.build_id")
-        .orderBy("build.created_at", "desc")
-        .groupBy("build.id");
+        knex.raw("count(case when poster.status = 'READY' then 1 end)::integer as ready"),
+                           )
+                           .from("build")
+                           .whereNot("build.status", "REMOVED")
+                           .leftJoin("poster", "build.id", "poster.build_id")
+                           .orderBy("build.created_at", "desc")
+                           .groupBy("build.id");
 
     return rows.map(row => convertKeys(row, camelCase));
 }
@@ -72,7 +72,7 @@ async function getBuild({ id }) {
                     'message', event.message,
                     'createdAt', event.created_at
                 ) order by event.created_at
-            ) as events`)
+            ) as events`),
         )
         .from("poster")
         .whereNot("poster.status", "REMOVED")
@@ -165,7 +165,8 @@ async function addEvent({
 
 async function getTemplates() {
     const templates = await knex("template")
-        .select("*");
+        .select("*")
+        .orderBy("created_at", "asc");
 
     return pMap(templates, async template => Object.assign(template, {
         images: await pMap(template.images, async (image) => {
@@ -206,7 +207,8 @@ async function addTemplate({ label }) {
 
 async function getImages() {
     return knex("template_images")
-        .select("*");
+        .select("*")
+        .orderBy("updated_at", "asc");
 }
 
 async function saveTemplateImages(images) {
