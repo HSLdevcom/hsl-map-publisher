@@ -292,7 +292,7 @@ async function getImages() {
 }
 
 function templateHasImage(template, imageName) {
-    return template.images.some(img => img.name === image.name);
+    return template.images.some(img => img.name === imageName);
 }
 
 async function removeImage({ name }) {
