@@ -9,7 +9,7 @@ const {
     migrate, addEvent,
     getBuilds, getBuild, addBuild, updateBuild, removeBuild,
     getPoster, addPoster, updatePoster, removePoster, getTemplates, addTemplate,
-    saveTemplate,
+    saveTemplate, getImages,
 } = require("./store");
 
 const PORT = 4000;
@@ -78,14 +78,18 @@ async function main() {
         ctx.body = stops;
     });
 
+    router.get("/images", async (ctx) => {
+        ctx.body = await getImages();
+    });
+
     router.get("/templates", async (ctx) => {
         ctx.body = await getTemplates();
     });
 
     router.post("/templates", async (ctx) => {
         const { label } = ctx.request.body;
-        const { id } = await addTemplate({ label });
-        ctx.body = id;
+        const template = await addTemplate({ label });
+        ctx.body = template;
     });
 
     router.put("/templates", async (ctx) => {

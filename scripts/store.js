@@ -163,9 +163,6 @@ async function addEvent({
         }, snakeCase));
 }
 
-const templateImagePath = (templateName, fileName) =>
-    path.join(__dirname, "..", "templates", templateName, fileName);
-
 async function getTemplates() {
     const templates = await knex("template")
         .select("*");
@@ -173,24 +170,26 @@ async function getTemplates() {
     return pMap(templates, async template => Object.assign(template, {
         images: await pMap(template.images, async (image) => {
             const emptyImage = {
-                id: "",
                 name: "",
                 svg: "",
                 size: 1,
             };
 
-            if (!image.id) {
+            if (!image.name) {
                 return emptyImage;
             }
 
-            const img = await knex
+            const dbImg = await knex
                 .select("*")
                 .from("template_images")
-                .where({ id: image.id })
+                .where({ name: image.name })
                 .first();
 
-            img.size = img.default_size;
-            return img || emptyImage;
+            if (dbImg) {
+                return merge({}, image, dbImg);
+            }
+
+            return emptyImage;
         }),
     }));
 }
@@ -202,43 +201,43 @@ async function addTemplate({ label }) {
     await knex("template")
         .insert(template);
 
-    // TODO: Make sure this works.
-
     return template;
+}
+
+async function getImages() {
+    return knex("template_images")
+        .select("*");
 }
 
 async function saveTemplateImages(images) {
     return pMap(images, async (image) => {
         let existingImage = null;
 
-        if (image.id) {
+        if (image.name) {
             existingImage = await knex
                 .select("*")
                 .from("template_images")
-                .where({ id: image.id })
+                .where({ name: image.name })
                 .first();
         }
 
         const svgContent = get(image, "svg", "");
-        const id = existingImage ? existingImage.id : uuidv1();
+        const name = existingImage ? existingImage.name : image.name;
 
         const newImage = {
-            id,
-            name: image.name,
+            name,
             svg: svgContent,
             default_size: image.size,
         };
 
         if (existingImage) {
             await knex("template_images")
-                .where({ id })
+                .where({ name })
                 .update(newImage);
         } else {
             await knex("template_images")
                 .insert(newImage);
         }
-
-        Object.assign(image, { id });
 
         return image;
     });
@@ -287,6 +286,7 @@ module.exports = {
     updatePoster,
     removePoster,
     addEvent,
+    getImages,
     getTemplates,
     addTemplate,
     saveTemplate,

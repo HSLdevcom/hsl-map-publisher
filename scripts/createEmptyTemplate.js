@@ -5,17 +5,14 @@ module.exports = function createEmptyTemplate(label, id) {
         area: "footer",
         images: JSON.stringify([
             {
-                id: "",
                 name: "",
                 svg: "",
                 size: 1,
             }, {
-                id: "",
                 name: "",
                 svg: "",
                 size: 1,
             }, {
-                id: "",
                 name: "",
                 svg: "",
                 size: 1,
