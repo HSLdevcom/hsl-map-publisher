@@ -202,6 +202,8 @@ async function addTemplate({ label }) {
     await knex("template")
         .insert(template);
 
+    // TODO: Make sure this works.
+
     return template;
 }
 
