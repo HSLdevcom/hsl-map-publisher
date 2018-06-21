@@ -3,7 +3,7 @@ module.exports = function createEmptyTemplate(label, id) {
         label,
         id,
         area: "footer",
-        images: [
+        images: JSON.stringify([
             {
                 id: "",
                 name: "",
@@ -19,12 +19,7 @@ module.exports = function createEmptyTemplate(label, id) {
                 name: "",
                 svg: "",
                 size: 1,
-            }, {
-                id: "",
-                name: "",
-                svg: "",
-                size: 1,
             },
-        ],
+        ]),
     };
-}
+};

@@ -18,9 +18,9 @@ const writeFileAsync = promisify(fs.writeFile);
 function convertKeys(object, converter) {
     const obj = {};
     Object.keys(object)
-          .forEach((key) => {
-              obj[converter(key)] = object[key];
-          });
+        .forEach((key) => {
+            obj[converter(key)] = object[key];
+        });
     return obj;
 }
 
@@ -33,13 +33,13 @@ async function getBuilds() {
         "build.*",
         knex.raw("count(case when poster.status = 'PENDING' then 1 end)::integer as pending"),
         knex.raw("count(case when poster.status = 'FAILED' then 1 end)::integer as failed"),
-        knex.raw("count(case when poster.status = 'READY' then 1 end)::integer as ready"),
-                           )
-                           .from("build")
-                           .whereNot("build.status", "REMOVED")
-                           .leftJoin("poster", "build.id", "poster.build_id")
-                           .orderBy("build.created_at", "desc")
-                           .groupBy("build.id");
+        knex.raw("count(case when poster.status = 'READY' then 1 end)::integer as ready")
+    )
+        .from("build")
+        .whereNot("build.status", "REMOVED")
+        .leftJoin("poster", "build.id", "poster.build_id")
+        .orderBy("build.created_at", "desc")
+        .groupBy("build.id");
 
     return rows.map(row => convertKeys(row, camelCase));
 }
@@ -72,7 +72,7 @@ async function getBuild({ id }) {
                     'message', event.message,
                     'createdAt', event.created_at
                 ) order by event.created_at
-            ) as events`),
+            ) as events`)
         )
         .from("poster")
         .whereNot("poster.status", "REMOVED")
@@ -186,7 +186,8 @@ async function getTemplates() {
             const img = await knex
                 .select("*")
                 .from("template_images")
-                .where({ id: image.id });
+                .where({ id: image.id })
+                .first();
 
             img.size = img.default_size;
             return img || emptyImage;
@@ -200,10 +201,11 @@ async function addTemplate({ label }) {
 
     await knex("template")
         .insert(template);
+
     return template;
 }
 
-async function saveTemplateImages(templateId, images) {
+async function saveTemplateImages(images) {
     return pMap(images, async (image) => {
         let existingImage = null;
 
@@ -234,7 +236,8 @@ async function saveTemplateImages(templateId, images) {
                 .insert(newImage);
         }
 
-        merge(image, { id });
+        Object.assign(image, { id });
+
         return image;
     });
 }
@@ -253,8 +256,9 @@ async function saveTemplate(template) {
     const { id } = template;
     const existingTemplate = await getTemplate({ id });
 
-    const newTemplate = { ...template };
-    const savedImages = await saveTemplateImages(template.id, newTemplate.images);
+    const newTemplate = merge({}, template);
+
+    const savedImages = await saveTemplateImages(newTemplate.images);
     newTemplate.images = JSON.stringify(savedImages);
 
     if (existingTemplate) {
