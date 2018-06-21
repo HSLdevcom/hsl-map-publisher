@@ -205,12 +205,52 @@ async function addTemplate({ label }) {
     return template;
 }
 
-async function getImages() {
-    return knex("template_images")
+async function getTemplate({ id }) {
+    const templateRow = await knex
         .select("*")
-        .orderBy("updated_at", "asc");
+        .from("template")
+        .where({ id })
+        .first();
+
+    return templateRow;
 }
 
+async function saveTemplate(template) {
+    const { id } = template;
+    const existingTemplate = await getTemplate({ id });
+
+    const newTemplate = merge({}, template);
+
+    const savedImages = await saveTemplateImages(newTemplate.images);
+    newTemplate.images = JSON.stringify(savedImages);
+
+    if (existingTemplate) {
+        await knex("template")
+            .where({ id })
+            .update(newTemplate);
+    } else {
+        await knex("template")
+            .insert(template);
+    }
+
+    return newTemplate;
+}
+
+async function removeTemplate({ id }) {
+    if (id === "default_footer") {
+        const error = new Error("You cannot remove the default template.");
+        error.status = 400;
+        throw error;
+    }
+
+    await knex("template")
+        .where({ id })
+        .del();
+
+    return { id };
+}
+
+// Not exported. Saves the passed images into the database.
 async function saveTemplateImages(images) {
     return pMap(images, async (image) => {
         let existingImage = null;
@@ -245,35 +285,31 @@ async function saveTemplateImages(images) {
     });
 }
 
-async function getTemplate({ id }) {
-    const templateRow = await knex
+async function getImages() {
+    return knex("template_images")
         .select("*")
-        .from("template")
-        .where({ id })
-        .first();
-
-    return templateRow;
+        .orderBy("updated_at", "asc");
 }
 
-async function saveTemplate(template) {
-    const { id } = template;
-    const existingTemplate = await getTemplate({ id });
+function templateHasImage(template, imageName) {
+    return template.images.some(img => img.name === image.name);
+}
 
-    const newTemplate = merge({}, template);
+async function removeImage({ name }) {
+    const templates = await knex("template")
+        .select("*");
 
-    const savedImages = await saveTemplateImages(newTemplate.images);
-    newTemplate.images = JSON.stringify(savedImages);
-
-    if (existingTemplate) {
-        await knex("template")
-            .where({ id })
-            .update(newTemplate);
-    } else {
-        await knex("template")
-            .insert(template);
+    if (templates.some(template => templateHasImage(template, name))) {
+        const error = new Error(`Image '${name}' is in use in one or more templates!`);
+        error.status = 400;
+        throw error;
     }
 
-    return newTemplate;
+    await knex("template_images")
+        .where({ name })
+        .del();
+
+    return { name };
 }
 
 module.exports = {
@@ -288,8 +324,10 @@ module.exports = {
     updatePoster,
     removePoster,
     addEvent,
-    getImages,
     getTemplates,
     addTemplate,
     saveTemplate,
+    removeTemplate,
+    getImages,
+    removeImage,
 };

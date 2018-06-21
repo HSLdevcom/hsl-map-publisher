@@ -9,7 +9,7 @@ const {
     migrate, addEvent,
     getBuilds, getBuild, addBuild, updateBuild, removeBuild,
     getPoster, addPoster, updatePoster, removePoster, getTemplates, addTemplate,
-    saveTemplate, getImages,
+    saveTemplate, getImages, removeImage, removeTemplate,
 } = require("./store");
 
 const PORT = 4000;
@@ -82,6 +82,12 @@ async function main() {
         ctx.body = await getImages();
     });
 
+    router.delete("/images/:name", async (ctx) => {
+        const { name } = ctx.params;
+        const image = await removeImage({ name });
+        ctx.body = image;
+    });
+
     router.get("/templates", async (ctx) => {
         ctx.body = await getTemplates();
     });
@@ -96,6 +102,12 @@ async function main() {
         const template = ctx.request.body;
         await saveTemplate(template);
         ctx.body = true;
+    });
+
+    router.delete("/templates/:id", async (ctx) => {
+        const { id } = ctx.params;
+        const template = await removeTemplate({ id });
+        ctx.body = template;
     });
 
     router.get("/builds", async (ctx) => {
