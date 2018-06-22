@@ -253,15 +253,15 @@ async function removeTemplate({ id }) {
 // Not exported. Saves the passed images into the database.
 async function saveTemplateImages(images) {
     return pMap(images, async (image) => {
-        let existingImage = null;
-
-        if (image.name) {
-            existingImage = await knex
-                .select("*")
-                .from("template_images")
-                .where({ name: image.name })
-                .first();
+        if (!image.name) {
+            return image;
         }
+
+        const existingImage = await knex
+            .select("*")
+            .from("template_images")
+            .where({ name: image.name })
+            .first();
 
         const svgContent = get(image, "svg", "");
         const name = existingImage ? existingImage.name : image.name;
