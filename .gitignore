@@ -6,3 +6,4 @@ dist
 fonts
 yarn-error.log
 /templates
+graphql.config.json

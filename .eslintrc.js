@@ -20,8 +20,10 @@ module.exports = {
             "functions": "never"
         }],
         "quotes": ["error", "double", {"avoidEscape": true}],
+        "no-console": 0,
         "react/jsx-indent": ["error", 4],
         "react/jsx-indent-props": ["error", 4],
+        "react/forbid-prop-types": 0,
         "react/jsx-filename-extension": ["error", {"extensions": [".js"]}],
         "react/jsx-tag-spacing": ["error", {"beforeSelfClosing": "never"}],
         "react/jsx-space-before-closing": ["error", "never"],

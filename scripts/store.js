@@ -163,36 +163,46 @@ async function addEvent({
         }, snakeCase));
 }
 
+async function getTemplateImage(image) {
+    const emptyImage = {
+        name: "",
+        svg: "",
+        size: 1,
+    };
+
+    if (!image.name) {
+        return emptyImage;
+    }
+
+    const dbImg = await knex
+        .select("*")
+        .from("template_images")
+        .where({ name: image.name })
+        .first();
+
+    if (dbImg) {
+        return merge({}, image, dbImg);
+    }
+
+    return emptyImage;
+}
+
+async function getTemplateImages(template) {
+    if (!template) {
+        return template;
+    }
+
+    return Object.assign(template, {
+        images: await pMap(template.images, getTemplateImage),
+    });
+}
+
 async function getTemplates() {
     const templates = await knex("template")
         .select("*")
         .orderBy("created_at", "asc");
 
-    return pMap(templates, async template => Object.assign(template, {
-        images: await pMap(template.images, async (image) => {
-            const emptyImage = {
-                name: "",
-                svg: "",
-                size: 1,
-            };
-
-            if (!image.name) {
-                return emptyImage;
-            }
-
-            const dbImg = await knex
-                .select("*")
-                .from("template_images")
-                .where({ name: image.name })
-                .first();
-
-            if (dbImg) {
-                return merge({}, image, dbImg);
-            }
-
-            return emptyImage;
-        }),
-    }));
+    return pMap(templates, getTemplateImages);
 }
 
 async function addTemplate({ label }) {
@@ -205,49 +215,18 @@ async function addTemplate({ label }) {
     return template;
 }
 
-async function getTemplate({ id }) {
+async function getTemplate({ id }, fetchImages = true) {
     const templateRow = await knex
         .select("*")
         .from("template")
         .where({ id })
         .first();
 
-    return templateRow;
-}
-
-async function saveTemplate(template) {
-    const { id } = template;
-    const existingTemplate = await getTemplate({ id });
-
-    const newTemplate = merge({}, template);
-
-    const savedImages = await saveTemplateImages(newTemplate.images);
-    newTemplate.images = JSON.stringify(savedImages);
-
-    if (existingTemplate) {
-        await knex("template")
-            .where({ id })
-            .update(newTemplate);
-    } else {
-        await knex("template")
-            .insert(template);
+    if (!fetchImages) {
+        return templateRow;
     }
 
-    return newTemplate;
-}
-
-async function removeTemplate({ id }) {
-    if (id === "default_footer") {
-        const error = new Error("You cannot remove the default template.");
-        error.status = 400;
-        throw error;
-    }
-
-    await knex("template")
-        .where({ id })
-        .del();
-
-    return { id };
+    return getTemplateImages(templateRow);
 }
 
 // Not exported. Saves the passed images into the database.
@@ -283,6 +262,41 @@ async function saveTemplateImages(images) {
 
         return image;
     });
+}
+
+async function saveTemplate(template) {
+    const { id } = template;
+    const existingTemplate = await getTemplate({ id }, false);
+
+    const newTemplate = merge({}, template);
+
+    const savedImages = await saveTemplateImages(newTemplate.images);
+    newTemplate.images = JSON.stringify(savedImages);
+
+    if (existingTemplate) {
+        await knex("template")
+            .where({ id })
+            .update(newTemplate);
+    } else {
+        await knex("template")
+            .insert(template);
+    }
+
+    return newTemplate;
+}
+
+async function removeTemplate({ id }) {
+    if (id === "default_footer") {
+        const error = new Error("You cannot remove the default template.");
+        error.status = 400;
+        throw error;
+    }
+
+    await knex("template")
+        .where({ id })
+        .del();
+
+    return { id };
 }
 
 async function getImages() {
@@ -325,6 +339,7 @@ module.exports = {
     removePoster,
     addEvent,
     getTemplates,
+    getTemplate,
     addTemplate,
     saveTemplate,
     removeTemplate,

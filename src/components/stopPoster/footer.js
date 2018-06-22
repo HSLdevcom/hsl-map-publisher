@@ -27,6 +27,8 @@ const Footer = (props) => {
         src = ticketSalesUrl ? ticketSalesFeedbackFooterIcon : feedbackFooterIcon;
     }
 
+    console.log(props.template);
+
     return (
         <div style={{ position: "relative" }}>
             <InlineSVG src={src}/>
@@ -51,8 +53,13 @@ const Footer = (props) => {
 };
 
 Footer.propTypes = {
+    template: PropTypes.any,
     shortId: PropTypes.string.isRequired,
     isTrunkStop: PropTypes.bool.isRequired,
+};
+
+Footer.defaultProps = {
+    template: {},
 };
 
 export default Footer;
