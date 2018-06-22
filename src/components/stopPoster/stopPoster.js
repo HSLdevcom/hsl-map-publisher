@@ -100,6 +100,8 @@ class StopPoster extends Component {
             return null;
         }
 
+        const { template } = this.props;
+
         const StopPosterTimetable = props => (
             <div className={styles.timetable}>
                 <Timetable
@@ -199,7 +201,11 @@ class StopPoster extends Component {
                             </div>
                             <Spacer width="100%" height={62}/>
                         </div>
-                        <Footer shortId={this.props.shortId} isTrunkStop={this.props.isTrunkStop}/>
+                        <Footer
+                            template={template}
+                            shortId={this.props.shortId}
+                            isTrunkStop={this.props.isTrunkStop}
+                        />
                         <Metadata date={this.props.date}/>
                     </JustifiedColumn>
                 </div>
@@ -218,6 +224,7 @@ StopPoster.propTypes = {
     isTrunkStop: PropTypes.bool.isRequired,
     isTramStop: PropTypes.bool.isRequired,
     shortId: PropTypes.string.isRequired,
+    template: PropTypes.any.isRequired,
 };
 
 StopPoster.defaultProps = {

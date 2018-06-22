@@ -3,6 +3,7 @@ const path = require("path");
 const puppeteer = require("puppeteer");
 const { promisify } = require("util");
 const { spawn } = require("child_process");
+const { getTemplate } = require("./store");
 
 const writeFileAsync = promisify(fs.writeFile);
 
@@ -27,7 +28,7 @@ async function initialize() {
  */
 async function renderComponent(options) {
     const {
-        id, component, props, onInfo, onError,
+        id, component, template, props, onInfo, onError,
     } = options;
 
     const page = await browser.newPage();
@@ -44,8 +45,15 @@ async function renderComponent(options) {
         }
     });
 
+    const templateData = await getTemplate({ id: template });
+
     const encodedProps = encodeURIComponent(JSON.stringify(props));
-    await page.goto(`${CLIENT_URL}/?component=${component}&props=${encodedProps}`);
+    const encodedTemplate = encodeURIComponent(JSON.stringify(templateData));
+    const pageUrl = `${CLIENT_URL}/?component=${component}&props=${encodedProps}&template=${encodedTemplate}`;
+
+    console.log(`Opening ${pageUrl} in Puppeteer.`);
+
+    await page.goto(pageUrl);
 
     const { error, width, height } = await page.evaluate(() => (
         new Promise((resolve) => {

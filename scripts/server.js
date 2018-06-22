@@ -14,10 +14,11 @@ const {
 
 const PORT = 4000;
 
-async function generatePoster(buildId, component, props) {
+async function generatePoster(buildId, component, template, props) {
     const { id } = await addPoster({
         buildId,
         component,
+        template,
         props,
     });
 
@@ -42,6 +43,7 @@ async function generatePoster(buildId, component, props) {
         id,
         component,
         props,
+        template,
         onInfo,
         onError,
     };
@@ -150,11 +152,13 @@ async function main() {
     });
 
     router.post("/posters", async (ctx) => {
-        const { buildId, component, props } = ctx.request.body;
+        const {
+            buildId, component, props, template,
+        } = ctx.request.body;
         const posters = [];
         for (let i = 0; i < props.length; i++) {
             // eslint-disable-next-line no-await-in-loop
-            posters.push(await generatePoster(buildId, component, props[i]));
+            posters.push(await generatePoster(buildId, component, template, props[i]));
         }
         ctx.body = posters;
     });
@@ -182,6 +186,7 @@ async function main() {
         ctx.set("Content-Disposition", `attachment; filename="${component}-${id}.pdf"`);
         ctx.body = generator.concatenate([id]);
     });
+
 
     app
         .use(errorHandler)

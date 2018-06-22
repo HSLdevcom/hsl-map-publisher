@@ -163,36 +163,46 @@ async function addEvent({
         }, snakeCase));
 }
 
+async function getTemplateImage(image) {
+    const emptyImage = {
+        name: "",
+        svg: "",
+        size: 1,
+    };
+
+    if (!image.name) {
+        return emptyImage;
+    }
+
+    const dbImg = await knex
+        .select("*")
+        .from("template_images")
+        .where({ name: image.name })
+        .first();
+
+    if (dbImg) {
+        return merge({}, image, dbImg);
+    }
+
+    return emptyImage;
+}
+
+async function getTemplateImages(template) {
+    if (!template) {
+        return template;
+    }
+
+    return Object.assign(template, {
+        images: await pMap(template.images, getTemplateImage),
+    });
+}
+
 async function getTemplates() {
     const templates = await knex("template")
         .select("*")
         .orderBy("created_at", "asc");
 
-    return pMap(templates, async template => Object.assign(template, {
-        images: await pMap(template.images, async (image) => {
-            const emptyImage = {
-                name: "",
-                svg: "",
-                size: 1,
-            };
-
-            if (!image.name) {
-                return emptyImage;
-            }
-
-            const dbImg = await knex
-                .select("*")
-                .from("template_images")
-                .where({ name: image.name })
-                .first();
-
-            if (dbImg) {
-                return merge({}, image, dbImg);
-            }
-
-            return emptyImage;
-        }),
-    }));
+    return pMap(templates, getTemplateImages);
 }
 
 async function addTemplate({ label }) {
@@ -205,19 +215,58 @@ async function addTemplate({ label }) {
     return template;
 }
 
-async function getTemplate({ id }) {
+async function getTemplate({ id }, fetchImages = true) {
     const templateRow = await knex
         .select("*")
         .from("template")
         .where({ id })
         .first();
 
-    return templateRow;
+    if (!fetchImages) {
+        return templateRow;
+    }
+
+    return getTemplateImages(templateRow);
+}
+
+// Not exported. Saves the passed images into the database.
+async function saveTemplateImages(images) {
+    return pMap(images, async (image) => {
+        if (!image.name) {
+            return image;
+        }
+
+        const existingImage = await knex
+            .select("*")
+            .from("template_images")
+            .where({ name: image.name })
+            .first();
+
+        const svgContent = get(image, "svg", "");
+        const name = existingImage ? existingImage.name : image.name;
+
+        const newImage = {
+            name,
+            svg: svgContent,
+            default_size: image.size,
+        };
+
+        if (existingImage) {
+            await knex("template_images")
+                .where({ name })
+                .update(newImage);
+        } else {
+            await knex("template_images")
+                .insert(newImage);
+        }
+
+        return image;
+    });
 }
 
 async function saveTemplate(template) {
     const { id } = template;
-    const existingTemplate = await getTemplate({ id });
+    const existingTemplate = await getTemplate({ id }, false);
 
     const newTemplate = merge({}, template);
 
@@ -248,41 +297,6 @@ async function removeTemplate({ id }) {
         .del();
 
     return { id };
-}
-
-// Not exported. Saves the passed images into the database.
-async function saveTemplateImages(images) {
-    return pMap(images, async (image) => {
-        let existingImage = null;
-
-        if (image.name) {
-            existingImage = await knex
-                .select("*")
-                .from("template_images")
-                .where({ name: image.name })
-                .first();
-        }
-
-        const svgContent = get(image, "svg", "");
-        const name = existingImage ? existingImage.name : image.name;
-
-        const newImage = {
-            name,
-            svg: svgContent,
-            default_size: image.size,
-        };
-
-        if (existingImage) {
-            await knex("template_images")
-                .where({ name })
-                .update(newImage);
-        } else {
-            await knex("template_images")
-                .insert(newImage);
-        }
-
-        return image;
-    });
 }
 
 async function getImages() {
@@ -325,6 +339,7 @@ module.exports = {
     removePoster,
     addEvent,
     getTemplates,
+    getTemplate,
     addTemplate,
     saveTemplate,
     removeTemplate,

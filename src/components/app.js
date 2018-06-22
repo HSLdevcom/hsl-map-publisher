@@ -55,11 +55,14 @@ class App extends Component {
     render() {
         let ComponentToRender;
         let props;
+        let params;
+        let template;
 
         try {
-            const params = new URLSearchParams(window.location.search.substring(1));
+            params = new URLSearchParams(window.location.search.substring(1));
             ComponentToRender = components[params.get("component")];
             props = JSON.parse(params.get("props"));
+            template = JSON.parse(params.get("template"));
         } catch (error) {
             App.handleError(new Error("Failed to parse url fragment"));
             return null;
@@ -82,7 +85,7 @@ class App extends Component {
                 ref={(ref) => { this.root = ref; }}
             >
                 <ApolloProvider client={client}>
-                    <ComponentToRender {...props}/>
+                    <ComponentToRender {...props} template={template}/>
                 </ApolloProvider>
             </div>
         );
