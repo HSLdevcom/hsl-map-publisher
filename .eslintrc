@@ -1,5 +1,5 @@
-module.exports = {
-    parserOptions: {
+{
+    "parserOptions": {
     "ecmaVersion": 8,
     "sourceType": "module",
         "ecmaFeatures": {
@@ -7,8 +7,8 @@ module.exports = {
             "experimentalObjectRestSpread": true
         }
     },
-    extends: "airbnb",
-    rules: {
+    "extends": "airbnb",
+    "rules": {
         "indent": ["error", 4],
         "no-plusplus": ["off"],
         "no-restricted-syntax": ["off"],
@@ -21,6 +21,9 @@ module.exports = {
         }],
         "quotes": ["error", "double", {"avoidEscape": true}],
         "no-console": 0,
+        "max-len": 0,
+        "no-unused-vars": 0,
+        "react/no-unused-prop-types": 0,
         "react/jsx-indent": ["error", 4],
         "react/jsx-indent-props": ["error", 4],
         "react/forbid-prop-types": 0,
@@ -31,7 +34,7 @@ module.exports = {
         "jsx-a11y/img-has-alt": ["off"],
         "import/named": ["error"]
     },
-    env: {
+    "env": {
         "browser": true,
         "node": true,
         "es6": true
@@ -39,4 +42,4 @@ module.exports = {
     "plugins": [
         "react"
     ]
-};
+}

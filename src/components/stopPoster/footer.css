@@ -1,3 +1,40 @@
+.footerWrapper {
+    position: relative;
+    height: 418px;
+    width: 100%;
+}
+
+.footerPiece {
+    position: absolute;
+    height: 418px;
+    width: auto;
+}
+
+.dottedLine {
+    position: relative;
+    height: auto;
+    top: -6px;
+    left: 0;
+}
+
+.hslLogo {
+    top: 69px;
+    left: 23px;
+    height: 385px;
+}
+
+.hslLogo svg {
+    height: 100%;
+    width: auto;
+    fill: red;
+}
+
+.customerService {
+    top: 40px;
+    right: 11px;
+    height: auto;
+    width: 458px;
+}
 
 .url {
     position: absolute;

@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import QrCode from "components/qrCode";
 import { InlineSVG } from "components/util";
+import classnames from "classnames";
 
 import tagsByShortId from "data/tagsByShortId";
 import { getFeedbackUrl } from "data/feedbackCodes";
@@ -11,6 +12,10 @@ import ticketSalesFeedbackFooterIcon from "icons/footer_feedback_ticketsales.svg
 import footerIcon from "icons/footer.svg";
 import feedbackFooterIcon from "icons/footer_feedback.svg";
 import trunkRouteFooterIcon from "icons/footer_trunk.svg";
+
+import dottedLine from "svg/dotted_line.svg";
+import hslLogo from "svg/hsl_logo.svg";
+import customerService from "svg/customer_service.svg";
 
 import styles from "./footer.css";
 
@@ -30,10 +35,12 @@ const Footer = (props) => {
     console.log(props.template);
 
     return (
-        <div style={{ position: "relative" }}>
-            <InlineSVG src={src}/>
+        <div className={styles.footerWrapper}>
+            <InlineSVG className={styles.dottedLine} src={dottedLine}/>
+            <InlineSVG className={classnames(styles.footerPiece, styles.hslLogo)} src={hslLogo}/>
+            <InlineSVG className={classnames(styles.footerPiece, styles.customerService)} src={customerService}/>
 
-            {!ticketSalesUrl &&
+            {/*! ticketSalesUrl &&
             <span>
                 <div className={styles.urlInfo}>{stopInfoUrl}</div>
                 <QrCode className={styles.qrCodeInfo} url={`http://${stopInfoUrl}`}/>
@@ -47,7 +54,7 @@ const Footer = (props) => {
                     <div className={styles.urlFeedback}>{feedbackUrl}</div>
                     <QrCode className={styles.qrCodeFeedback} url={`http://${feedbackUrl}`}/>
                 </span>
-            }
+            */}
         </div>
     );
 };
@@ -59,7 +66,7 @@ Footer.propTypes = {
 };
 
 Footer.defaultProps = {
-    template: {},
+    template: null,
 };
 
 export default Footer;

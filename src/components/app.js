@@ -62,7 +62,7 @@ class App extends Component {
             params = new URLSearchParams(window.location.search.substring(1));
             ComponentToRender = components[params.get("component")];
             props = JSON.parse(params.get("props"));
-            template = JSON.parse(params.get("template"));
+            template = params.get("template");
         } catch (error) {
             App.handleError(new Error("Failed to parse url fragment"));
             return null;

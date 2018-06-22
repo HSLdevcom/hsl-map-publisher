@@ -33,6 +33,10 @@ async function renderComponent(options) {
 
     const page = await browser.newPage();
 
+    // Provide the template through this function instead of the URL,
+    // as it will contain large SVG files.
+    await page.exposeFunction("getTemplate", templateId => getTemplate({ id: templateId }, "svg"));
+
     page.on("error", (error) => {
         page.close();
         browser.close();
@@ -45,11 +49,8 @@ async function renderComponent(options) {
         }
     });
 
-    const templateData = await getTemplate({ id: template });
-
     const encodedProps = encodeURIComponent(JSON.stringify(props));
-    const encodedTemplate = encodeURIComponent(JSON.stringify(templateData));
-    const pageUrl = `${CLIENT_URL}/?component=${component}&props=${encodedProps}&template=${encodedTemplate}`;
+    const pageUrl = `${CLIENT_URL}/?component=${component}&props=${encodedProps}&template=${template}`;
 
     console.log(`Opening ${pageUrl} in Puppeteer.`);
 

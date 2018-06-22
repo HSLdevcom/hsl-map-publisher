@@ -30,6 +30,7 @@ class StopPoster extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            template: null,
             hasRoutesOnTop: false,
             hasDiagram: true,
             hasRoutes: true,
@@ -43,6 +44,15 @@ class StopPoster extends Component {
     }
 
     componentDidMount() {
+        if (this.props.template) {
+            window.getTemplate(this.props.template)
+                .then((templateData) => {
+                    this.setState({
+                        template: templateData,
+                    });
+                });
+        }
+
         renderQueue.onEmpty(error => !error && this.updateLayout(), { ignore: this });
     }
 
@@ -51,6 +61,10 @@ class StopPoster extends Component {
     }
 
     hasOverflow() {
+        if (!this.content) {
+            return false;
+        }
+
         return (this.content.scrollWidth - this.content.clientWidth) > 1 ||
                (this.content.scrollHeight - this.content.clientHeight) > 1;
     }
@@ -100,7 +114,7 @@ class StopPoster extends Component {
             return null;
         }
 
-        const { template } = this.props;
+        const { template } = this.state;
 
         const StopPosterTimetable = props => (
             <div className={styles.timetable}>
