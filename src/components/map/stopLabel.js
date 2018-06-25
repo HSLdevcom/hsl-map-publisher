@@ -21,11 +21,16 @@ const RouteList = (props) => {
                 rowLength = isNewLine ? content.length : rowLength + content.length;
                 return (
                     <span className={styles.route} key={index} style={{ color: getColor(route) }}>
-                        {isNewLine && <br/>}{content}
+                        {isNewLine && <br/>}
+                        {content}
                     </span>
                 );
             });
-        return <div>{components}</div>;
+        return (
+            <div>
+                {components}
+            </div>
+        );
     }
     return (
         <Row>
@@ -40,9 +45,13 @@ const RouteList = (props) => {
             <Column>
                 {props.routes.map((route, index) => (
                     <div key={index}>
-                        <span className={styles.destination}>{route.destinationFi}</span>
+                        <span className={styles.destination}>
+                            {route.destinationFi}
+                        </span>
                         {"\xa0"}
-                        <span className={styles.destinationLight}>{route.destinationSe}</span>
+                        <span className={styles.destinationLight}>
+                            {route.destinationSe}
+                        </span>
                     </div>
                 ))}
             </Column>
@@ -60,8 +69,14 @@ RouteList.propTypes = {
 
 const StopLabel = props => (
     <div className={styles.label}>
-        <div className={styles.title}>{props.nameFi} {props.shortId && `(${props.shortId.replace(/\s+/g, "")})`}</div>
-        <div className={styles.subtitle}>{props.nameSe}</div>
+        <div className={styles.title}>
+            {props.nameFi}
+            {" "}
+            {props.shortId && `(${props.shortId.replace(/\s+/g, "")})`}
+        </div>
+        <div className={styles.subtitle}>
+            {props.nameSe}
+        </div>
         <div className={styles.content}>
             <RouteList routes={props.routes}/>
         </div>

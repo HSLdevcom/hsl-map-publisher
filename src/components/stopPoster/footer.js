@@ -19,6 +19,16 @@ import customerService from "svg/customer_service.svg";
 
 import styles from "./footer.css";
 
+const dynamicSlotStyles = [
+    { top: "26px", left: "463px" },
+    { top: "26px", left: "887px" },
+    { top: "26px", left: "1309px" },
+];
+
+function createDynamicSlots(template) {
+    console.log(template);
+}
+
 const Footer = (props) => {
     const ticketSalesUrl = tagsByShortId[props.shortId.replace(/\s/g, "")];
     const stopInfoUrl = `hsl.fi/pysakit/${props.shortId.replace(/\s/g, "")}`;
@@ -32,13 +42,18 @@ const Footer = (props) => {
         src = ticketSalesUrl ? ticketSalesFeedbackFooterIcon : feedbackFooterIcon;
     }
 
-    console.log(props.template);
+    createDynamicSlots(props.template);
 
     return (
         <div className={styles.footerWrapper}>
+            <InlineSVG className={styles.footerTemplate} src={src}/>
             <InlineSVG className={styles.dottedLine} src={dottedLine}/>
             <InlineSVG className={classnames(styles.footerPiece, styles.hslLogo)} src={hslLogo}/>
-            <InlineSVG className={classnames(styles.footerPiece, styles.customerService)} src={customerService}/>
+            <InlineSVG
+                className={classnames(styles.footerPiece, styles.customerService)}
+                src={customerService}
+            />
+            <div className={styles.dynamicSlot}/>
 
             {/*! ticketSalesUrl &&
             <span>

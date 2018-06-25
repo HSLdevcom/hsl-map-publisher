@@ -62,17 +62,16 @@ const stopsMapper = stopGroup => ({
     ...stopGroup,
     // Assume all stops face the same way
     calculatedHeading: stopGroup.stops.nodes[0].calculatedHeading,
-    routes: flatMap(stopGroup.stops.nodes, node =>
-        node.routeSegments.nodes
-            .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
-            .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
-            .filter(routeSegment => !isDropOffOnly(routeSegment))
-            .map(routeSegment => ({
-                routeId: trimRouteId(routeSegment.routeId),
-                destinationFi: routeSegment.route.nodes[0].destinationFi,
-                destinationSe: routeSegment.route.nodes[0].destinationSe,
-                mode: routeSegment.route.nodes[0].mode,
-            }))).sort(routeCompare),
+    routes: flatMap(stopGroup.stops.nodes, node => node.routeSegments.nodes
+        .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
+        .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
+        .filter(routeSegment => !isDropOffOnly(routeSegment))
+        .map(routeSegment => ({
+            routeId: trimRouteId(routeSegment.routeId),
+            destinationFi: routeSegment.route.nodes[0].destinationFi,
+            destinationSe: routeSegment.route.nodes[0].destinationSe,
+            mode: routeSegment.route.nodes[0].mode,
+        }))).sort(routeCompare),
 });
 
 const nearbyItemsMapper = mapProps((props) => {

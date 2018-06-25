@@ -15,62 +15,82 @@ const Timetable = props => (
         [styles.greyscale]: props.greyscale,
     })}
     >
-        {props.showStopInformation &&
-            <div className={styles.componentName}>
-                <div className={styles.title}>
-                    {props.stopNameFi} {props.stopShortId && `(${props.stopShortId.replace(/\s+/g, "")})`} &nbsp;&nbsp;
+        {props.showStopInformation
+            && (
+                <div className={styles.componentName}>
+                    <div className={styles.title}>
+                        {props.stopNameFi}
+                        {" "}
+                        {props.stopShortId && `(${props.stopShortId.replace(/\s+/g, "")})`}
+                        {" "}
+&nbsp;&nbsp;
+                    </div>
+                    <div className={styles.subtitle}>
+                        {props.stopNameSe}
+                    </div>
                 </div>
-                <div className={styles.subtitle}>
-                    {props.stopNameSe}
-                </div>
-            </div>
+            )
         }
-        {props.showComponentName &&
-            <div className={styles.componentName}>
-                <div className={styles.title}>
+        {props.showComponentName
+            && (
+                <div className={styles.componentName}>
+                    <div className={styles.title}>
                     Pysäkkiaikataulu&nbsp;&nbsp;
-                </div>
-                <div className={styles.subtitle}>
+                    </div>
+                    <div className={styles.subtitle}>
                     Hållplatstidtabell
+                    </div>
                 </div>
-            </div>
+            )
         }
-        {props.showValidityPeriod &&
-            <div className={styles.validity}>
-                <div>Aikataulut voimassa</div>
-                <div>Tidtabeller giltiga</div>
-                <div>
-                    {new Date(props.dateBegin).toLocaleDateString("fi")}
+        {props.showValidityPeriod
+            && (
+                <div className={styles.validity}>
+                    <div>
+Aikataulut voimassa
+                    </div>
+                    <div>
+Tidtabeller giltiga
+                    </div>
+                    <div>
+                        {new Date(props.dateBegin).toLocaleDateString("fi")}
                     &nbsp;-&nbsp;
-                    {new Date(props.dateEnd).toLocaleDateString("fi")}
+                        {new Date(props.dateEnd).toLocaleDateString("fi")}
+                    </div>
                 </div>
-            </div>
+            )
         }
-        {props.weekdays && props.weekdays.length > 0 &&
-            <div>
-                <TableHeader
-                    title="Maanantai - Perjantai"
-                    subtitle="Måndag - Fredag"
-                    printingAsA4={props.printableAsA4}
-                />
-                <TableRows departures={props.weekdays}/>
-            </div>
+        {props.weekdays && props.weekdays.length > 0
+            && (
+                <div>
+                    <TableHeader
+                        title="Maanantai - Perjantai"
+                        subtitle="Måndag - Fredag"
+                        printingAsA4={props.printableAsA4}
+                    />
+                    <TableRows departures={props.weekdays}/>
+                </div>
+            )
         }
-        {props.saturdays && props.saturdays.length > 0 &&
-            <div>
-                <TableHeader title="Lauantai" subtitle="Lördag" printingAsA4={props.printableAsA4}/>
-                <TableRows departures={props.saturdays}/>
-            </div>
+        {props.saturdays && props.saturdays.length > 0
+            && (
+                <div>
+                    <TableHeader title="Lauantai" subtitle="Lördag" printingAsA4={props.printableAsA4}/>
+                    <TableRows departures={props.saturdays}/>
+                </div>
+            )
         }
-        {props.sundays && props.sundays.length > 0 &&
-            <div>
-                <TableHeader
-                    title="Sunnuntai"
-                    subtitle="Söndag"
-                    printingAsA4={props.printableAsA4}
-                />
-                <TableRows departures={props.sundays}/>
-            </div>
+        {props.sundays && props.sundays.length > 0
+            && (
+                <div>
+                    <TableHeader
+                        title="Sunnuntai"
+                        subtitle="Söndag"
+                        printingAsA4={props.printableAsA4}
+                    />
+                    <TableRows departures={props.sundays}/>
+                </div>
+            )
         }
         {props.showNotes && props.notes.length !== 0 && <Spacer height={20}/>}
         {props.showNotes && props.notes.map(note => (

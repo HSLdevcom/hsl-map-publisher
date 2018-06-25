@@ -58,11 +58,9 @@ const StopMap = (props) => {
     const stops = props.nearbyStops
         .filter(stop => stop.x < miniMapStyle.left || stop.y < miniMapStyle.top);
 
-    const miniMapCoordinateHelper =
-        new MapCoordinateHelper(props.miniMapOptions);
+    const miniMapCoordinateHelper = new MapCoordinateHelper(props.miniMapOptions);
     const newPosition = miniMapCoordinateHelper.getMapCenter();
-    const [miniMarkerOffsetLeft, miniMarkerOffsetTop]
-        = miniMapCoordinateHelper.getCurrentPosition(newPosition.viewport);
+    const [miniMarkerOffsetLeft, miniMarkerOffsetTop] = miniMapCoordinateHelper.getCurrentPosition(newPosition.viewport);
 
     return (
         <div className={styles.root} style={mapStyle}>
@@ -106,8 +104,12 @@ const StopMap = (props) => {
                     >
                         <Row style={{ height: LOCATION_RADIUS * 2 }}>
                             <LocationSymbol size={LOCATION_RADIUS * 2}/>
-                            <div className={styles.title}>Olet tässä</div>
-                            <div className={styles.subtitle}>Du är här</div>
+                            <div className={styles.title}>
+Olet tässä
+                            </div>
+                            <div className={styles.subtitle}>
+Du är här
+                            </div>
                         </Row>
                     </ItemFixed>
 

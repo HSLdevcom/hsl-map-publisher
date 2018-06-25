@@ -51,20 +51,40 @@ const Header = (props) => {
     return (
         <JustifiedRow style={{ margin: "0 10px" }}>
             <Group>
-                <Title>{props.nameFi}</Title>
-                {props.nameSe && <Subtitle>{props.nameSe}</Subtitle>}
+                <Title>
+                    {props.nameFi}
+                </Title>
+                {props.nameSe && (
+                    <Subtitle>
+                        {props.nameSe}
+                    </Subtitle>
+                )}
             </Group>
-            {zone &&
-            <CenteringColumn>
-                <Title small>Lippuvyöhyke</Title>
-                <Subtitle small>Resezon</Subtitle>
-                <div className={styles.zone}>{zone}</div>
-            </CenteringColumn>
+            {zone
+            && (
+                <CenteringColumn>
+                    <Title small>
+Lippuvyöhyke
+                    </Title>
+                    <Subtitle small>
+Resezon
+                    </Subtitle>
+                    <div className={styles.zone}>
+                        {zone}
+                    </div>
+                </CenteringColumn>
+            )
             }
             <CenteringColumn>
-                <Title small>Pysäkkinumero</Title>
-                <Subtitle small>Hållplatsnummer</Subtitle>
-                <div className={styles.stop}>{props.shortId.replace(" ", "")}</div>
+                <Title small>
+Pysäkkinumero
+                </Title>
+                <Subtitle small>
+Hållplatsnummer
+                </Subtitle>
+                <div className={styles.stop}>
+                    {props.shortId.replace(" ", "")}
+                </div>
             </CenteringColumn>
         </JustifiedRow>
     );

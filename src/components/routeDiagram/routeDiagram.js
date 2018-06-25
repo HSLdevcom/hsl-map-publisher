@@ -21,7 +21,9 @@ const RouteDiagram = props => (
             <InlineSVG src={markerIcon} className={styles.icon}/>
             <div className={styles.title}>
                         Olet tässä&nbsp;&nbsp;
-                <span className={styles.subtitle}>Du är här</span>
+                <span className={styles.subtitle}>
+Du är här
+                </span>
             </div>
         </div>
         <Path {...props.tree}/>

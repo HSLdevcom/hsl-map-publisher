@@ -34,15 +34,15 @@ class AdContainer extends Component {
 
     updateLayout() {
         if (this.hasOverflow()) {
-            this.setState({ ads: this.state.ads.slice(0, -1) });
-            return;
+            this.setState(state => ({ ads: state.ads.slice(0, -1) }));
+        } else {
+            renderQueue.remove(this);
         }
-        renderQueue.remove(this);
     }
 
     hasOverflow() {
-        return (this.root.scrollWidth > this.root.clientWidth) ||
-               (this.root.scrollHeight > this.root.clientHeight);
+        return (this.root.scrollWidth > this.root.clientWidth)
+               || (this.root.scrollHeight > this.root.clientHeight);
     }
 
     render() {

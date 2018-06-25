@@ -10,6 +10,23 @@
     width: auto;
 }
 
+.footerTemplate {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    /*display: none;*/
+}
+
+.dynamicSlot {
+    position: absolute;
+    top: 26px;
+    width: 392px;
+    height: 358px;
+    box-sizing: content-box;
+    border: 3px dashed white;
+}
+
 .dottedLine {
     position: relative;
     height: auto;

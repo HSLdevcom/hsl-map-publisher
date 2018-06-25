@@ -1,19 +1,23 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CleanWebpackPlugin = require("clean-webpack-plugin");
 
 module.exports = {
-    devtool: "source-map",
-    entry: ["./src/index.js"],
+    entry: [
+        "babel-polyfill",
+        "./src/index.js",
+    ],
     plugins: [
-        new HtmlWebpackPlugin({ template: "index.ejs" })
+        new CleanWebpackPlugin(["dist"]),
+        new HtmlWebpackPlugin(),
     ],
     resolve: {
         modules: ["node_modules", "src"],
     },
     output: {
-        publicPath: "",
         path: path.join(__dirname, "dist"),
         filename: "bundle.js",
+        globalObject: "this",
     },
     module: {
         rules: [
@@ -22,6 +26,9 @@ module.exports = {
                 loader: "eslint-loader",
                 enforce: "pre",
                 exclude: /node_modules/,
+                options: {
+                    cache: true,
+                },
             },
             {
                 test: /\.js$/,
@@ -41,6 +48,7 @@ module.exports = {
                         loader: "css-loader",
                         options: {
                             modules: true,
+                            importLoaders: 1,
                             localIdentName: "[name]_[local]_[hash:base64:5]",
                         },
                     },

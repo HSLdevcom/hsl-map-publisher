@@ -10,19 +10,37 @@ const TableHeader = props => (
     })}
     >
         <div className={styles.title}>
-            <span className={styles.strong}>{props.title}</span>
+            <span className={styles.strong}>
+                {props.title}
+            </span>
             &nbsp;&nbsp;
             {props.subtitle}
         </div>
 
         <div className={styles.subtitle}>
-            <div className={styles.strong}>Tunti</div>
-            <div><span className={styles.strong}>min</span> / linja Ajat ovat arvioituja</div>
+            <div className={styles.strong}>
+Tunti
+            </div>
+            <div>
+                <span className={styles.strong}>
+min
+                </span>
+                {" "}
+/ linja Ajat ovat arvioituja
+            </div>
         </div>
 
         <div className={styles.subtitle}>
-            <div className={styles.strong}>Timme</div>
-            <div><span className={styles.strong}>min</span> / linje Tiderna är beräknade</div>
+            <div className={styles.strong}>
+Timme
+            </div>
+            <div>
+                <span className={styles.strong}>
+min
+                </span>
+                {" "}
+/ linje Tiderna är beräknade
+            </div>
         </div>
     </div>
 );

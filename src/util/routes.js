@@ -9,10 +9,10 @@ function isEqual(stop, other) {
     if (stop.type === "zone") {
         return (stop.from === other.from && stop.to === other.to);
     }
-    return ((stop.terminalId !== null) &&
-           (stop.terminalId === other.terminalId)) ||
-           ((stop.nameFi === other.nameFi) &&
-           (stop.nameSe === other.nameSe));
+    return ((stop.terminalId !== null)
+           && (stop.terminalId === other.terminalId))
+           || ((stop.nameFi === other.nameFi)
+           && (stop.nameSe === other.nameSe));
 }
 
 function merge(stop, other) {
@@ -83,7 +83,7 @@ function routesToTree(routes, shortId) {
                 { type: "zone", from: currentZone, to: item.zone },
                 item,
             ];
-        } else if (prev.length > 0
+        } if (prev.length > 0
             && prev[prev.length - 1].type === "stop"
             && prev[prev.length - 1].zone !== item.zone
         ) {

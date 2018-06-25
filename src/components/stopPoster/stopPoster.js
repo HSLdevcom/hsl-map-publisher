@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import { hot } from "react-hot-loader";
 import { JustifiedColumn, Spacer } from "components/util";
 import renderQueue from "util/renderQueue";
 import { colorsByMode } from "util/domain";
@@ -65,8 +66,8 @@ class StopPoster extends Component {
             return false;
         }
 
-        return (this.content.scrollWidth - this.content.clientWidth) > 1 ||
-               (this.content.scrollHeight - this.content.clientHeight) > 1;
+        return (this.content.scrollWidth - this.content.clientWidth) > 1
+               || (this.content.scrollHeight - this.content.clientHeight) > 1;
     }
 
     updateLayout() {
@@ -139,37 +140,39 @@ class StopPoster extends Component {
                         <Header stopId={this.props.stopId}/>
                         <div className={styles.content} ref={(ref) => { this.content = ref; }}>
                             <Spacer width="100%" height={50}/>
-                            {this.state.hasRoutes && this.state.hasRoutesOnTop &&
-                            <Routes stopId={this.props.stopId} date={this.props.date}/>
+                            {this.state.hasRoutes && this.state.hasRoutesOnTop
+                            && <Routes stopId={this.props.stopId} date={this.props.date}/>
                             }
-                            {this.state.hasRoutes && this.state.hasRoutesOnTop &&
-                            <Spacer height={10}/>
+                            {this.state.hasRoutes && this.state.hasRoutesOnTop
+                            && <Spacer height={10}/>
                             }
                             <div className={styles.columns}>
                                 <div
-                                    className={this.state.hasStretchedLeftColumn ?
-                                        styles.leftStretched : styles.left}
+                                    className={this.state.hasStretchedLeftColumn
+                                        ? styles.leftStretched : styles.left}
                                 >
-                                    {this.state.hasRoutes && !this.state.hasRoutesOnTop &&
-                                        <Routes stopId={this.props.stopId} date={this.props.date}/>
+                                    {this.state.hasRoutes && !this.state.hasRoutesOnTop
+                                        && <Routes stopId={this.props.stopId} date={this.props.date}/>
                                     }
-                                    {this.state.hasRoutes && !this.state.hasRoutesOnTop &&
-                                        <Spacer height={10}/>
+                                    {this.state.hasRoutes && !this.state.hasRoutesOnTop
+                                        && <Spacer height={10}/>
                                     }
-                                    {this.state.hasDiagram &&
-                                        <StopPosterTimetable/>
+                                    {this.state.hasDiagram
+                                        && <StopPosterTimetable/>
                                     }
-                                    {!this.state.hasDiagram &&
-                                        <StopPosterTimetable segments={["weekdays"]}/>
+                                    {!this.state.hasDiagram
+                                        && <StopPosterTimetable segments={["weekdays"]}/>
                                     }
                                     <div style={{ flex: 1 }} ref={(ref) => { this.ad = ref; }}>
-                                        {this.state.shouldRenderFixedContent &&
-                                            <AdContainer
-                                                width={this.ad.clientWidth}
-                                                height={this.ad.clientHeight}
-                                                shortId={this.props.shortId}
-                                                isTrunkStop={this.props.isTrunkStop}
-                                            />
+                                        {this.state.shouldRenderFixedContent
+                                            && (
+                                                <AdContainer
+                                                    width={this.ad.clientWidth}
+                                                    height={this.ad.clientHeight}
+                                                    shortId={this.props.shortId}
+                                                    isTrunkStop={this.props.isTrunkStop}
+                                                />
+                                            )
                                         }
                                     </div>
                                 </div>
@@ -177,39 +180,45 @@ class StopPoster extends Component {
                                 <Spacer width={10}/>
 
                                 <div className={styles.right}>
-                                    {!this.state.hasDiagram &&
-                                        <div className={styles.timetables}>
-                                            <StopPosterTimetable segments={["saturdays"]} hideDetails/>
-                                            <Spacer width={10}/>
-                                            <StopPosterTimetable segments={["sundays"]} hideDetails/>
-                                        </div>
+                                    {!this.state.hasDiagram
+                                        && (
+                                            <div className={styles.timetables}>
+                                                <StopPosterTimetable segments={["saturdays"]} hideDetails/>
+                                                <Spacer width={10}/>
+                                                <StopPosterTimetable segments={["sundays"]} hideDetails/>
+                                            </div>
+                                        )
                                     }
 
                                     {!this.state.hasDiagram && <Spacer height={10}/>}
 
                                     <div style={{ flex: 1 }} ref={(ref) => { this.map = ref; }}>
-                                        {this.state.shouldRenderFixedContent &&
-                                         this.map.clientHeight >= MAP_MIN_HEIGHT &&
-                                             <StopMap
-                                                 stopId={this.props.stopId}
-                                                 date={this.props.date}
-                                                 width={this.map.clientWidth}
-                                                 height={this.map.clientHeight}
-                                                 showCitybikes={this.props.isSummerTimetable}
-                                             />
+                                        {this.state.shouldRenderFixedContent
+                                         && this.map.clientHeight >= MAP_MIN_HEIGHT
+                                             && (
+                                                 <StopMap
+                                                     stopId={this.props.stopId}
+                                                     date={this.props.date}
+                                                     width={this.map.clientWidth}
+                                                     height={this.map.clientHeight}
+                                                     showCitybikes={this.props.isSummerTimetable}
+                                                 />
+                                             )
                                         }
                                     </div>
 
                                     <Spacer height={10}/>
 
-                                    {this.state.hasDiagram && !this.props.isTramStop &&
-                                        <RouteDiagram
-                                            stopId={this.props.stopId}
-                                            date={this.props.date}
-                                        />
+                                    {this.state.hasDiagram && !this.props.isTramStop
+                                        && (
+                                            <RouteDiagram
+                                                stopId={this.props.stopId}
+                                                date={this.props.date}
+                                            />
+                                        )
                                     }
-                                    {this.state.hasDiagram && this.props.isTramStop &&
-                                        <TramDiagram/>
+                                    {this.state.hasDiagram && this.props.isTramStop
+                                        && <TramDiagram/>
                                     }
                                 </div>
                             </div>
@@ -247,4 +256,4 @@ StopPoster.defaultProps = {
     dateEnd: null,
 };
 
-export default StopPoster;
+export default hot(module)(StopPoster);
