@@ -4,10 +4,9 @@ import QrCode from "components/qrCode";
 import { InlineSVG } from "components/util";
 import classnames from "classnames";
 import get from "lodash/get";
-
+import cheerio from "cheerio";
 import tagsByShortId from "data/tagsByShortId";
 import { getFeedbackUrl } from "data/feedbackCodes";
-
 import ticketSalesFooterIcon from "icons/footer_ticketsales.svg";
 import ticketSalesFeedbackFooterIcon from "icons/footer_feedback_ticketsales.svg";
 import footerIcon from "icons/footer.svg";
@@ -17,8 +16,11 @@ import trunkRouteFooterIcon from "icons/footer_trunk.svg";
 import dottedLine from "svg/dotted_line.svg";
 import hslLogo from "svg/hsl_logo.svg";
 import customerService from "svg/customer_service.svg";
-
 import styles from "./footer.css";
+
+function getQrCodeFromSvg(svg) {
+    const $ = cheerio(svg);
+}
 
 const slotMargin = 25;
 const slotWidth = 392;
@@ -34,6 +36,8 @@ function createDynamicSlots(template) {
             const marginToWidth = size > 1 ? size * slotMargin : 0;
             const width = slotWidth * size + marginToWidth;
             const left = firstSlotLeft + (slotWidth * idx) + (slotMargin * idx);
+
+            const qrCode = getQrCodeFromSvg(svg);
 
             slots.push({
                 svg,
@@ -51,15 +55,6 @@ const Footer = (props) => {
     const ticketSalesUrl = tagsByShortId[props.shortId.replace(/\s/g, "")];
     const stopInfoUrl = `hsl.fi/pysakit/${props.shortId.replace(/\s/g, "")}`;
     const feedbackUrl = getFeedbackUrl(props.shortId);
-
-    let src = ticketSalesUrl ? ticketSalesFooterIcon : footerIcon;
-    if (props.isTrunkStop) {
-        src = trunkRouteFooterIcon;
-    }
-    if (feedbackUrl) {
-        src = ticketSalesUrl ? ticketSalesFeedbackFooterIcon : feedbackFooterIcon;
-    }
-
     const slots = createDynamicSlots(props.template);
 
     return (
@@ -78,22 +73,6 @@ const Footer = (props) => {
                     dangerouslySetInnerHTML={{ __html: slot.svg }}
                 />
             ))}
-
-            {/*! ticketSalesUrl &&
-            <span>
-                <div className={styles.urlInfo}>{stopInfoUrl}</div>
-                <QrCode className={styles.qrCodeInfo} url={`http://${stopInfoUrl}`}/>
-            </span>
-            }
-            {ticketSalesUrl &&
-                <QrCode className={styles.qrCodeTicketSales} url={ticketSalesUrl}/>
-            }
-            {feedbackUrl &&
-                <span>
-                    <div className={styles.urlFeedback}>{feedbackUrl}</div>
-                    <QrCode className={styles.qrCodeFeedback} url={`http://${feedbackUrl}`}/>
-                </span>
-            */}
         </div>
     );
 };
