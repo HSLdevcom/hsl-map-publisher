@@ -10,21 +10,17 @@
     width: auto;
 }
 
-.footerTemplate {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    /*display: none;*/
-}
-
 .dynamicSlot {
     position: absolute;
-    top: 26px;
-    width: 392px;
+    top: 33px;
     height: 358px;
-    box-sizing: content-box;
-    border: 3px dashed white;
+    overflow: hidden;
+    border-radius: 25px;
+}
+
+.dynamicSlot svg {
+    height: auto;
+    width: 100%;
 }
 
 .dottedLine {

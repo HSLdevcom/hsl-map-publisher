@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import QrCode from "components/qrCode";
 import { InlineSVG } from "components/util";
 import classnames from "classnames";
+import get from "lodash/get";
 
 import tagsByShortId from "data/tagsByShortId";
 import { getFeedbackUrl } from "data/feedbackCodes";
@@ -19,14 +20,31 @@ import customerService from "svg/customer_service.svg";
 
 import styles from "./footer.css";
 
-const dynamicSlotStyles = [
-    { top: "26px", left: "463px" },
-    { top: "26px", left: "887px" },
-    { top: "26px", left: "1309px" },
-];
+const slotMargin = 25;
+const slotWidth = 392;
+const firstSlotLeft = 453;
 
 function createDynamicSlots(template) {
-    console.log(template);
+    return get(template, "images", [])
+        .reduce((slots, { size = 1, svg = "", name = "" }, idx) => {
+            if (!size) {
+                return slots;
+            }
+
+            const marginToWidth = size > 1 ? size * slotMargin : 0;
+            const width = slotWidth * size + marginToWidth;
+            const left = firstSlotLeft + (slotWidth * idx) + (slotMargin * idx);
+
+            slots.push({
+                svg,
+                name,
+                style: {
+                    width,
+                    left,
+                },
+            });
+            return slots;
+        }, []);
 }
 
 const Footer = (props) => {
@@ -42,18 +60,24 @@ const Footer = (props) => {
         src = ticketSalesUrl ? ticketSalesFeedbackFooterIcon : feedbackFooterIcon;
     }
 
-    createDynamicSlots(props.template);
+    const slots = createDynamicSlots(props.template);
 
     return (
         <div className={styles.footerWrapper}>
-            <InlineSVG className={styles.footerTemplate} src={src}/>
             <InlineSVG className={styles.dottedLine} src={dottedLine}/>
             <InlineSVG className={classnames(styles.footerPiece, styles.hslLogo)} src={hslLogo}/>
             <InlineSVG
                 className={classnames(styles.footerPiece, styles.customerService)}
                 src={customerService}
             />
-            <div className={styles.dynamicSlot}/>
+            {slots.map((slot, idx) => (
+                <div
+                    key={`slot_${idx}_${slot.name}`}
+                    className={styles.dynamicSlot}
+                    style={slot.style}
+                    dangerouslySetInnerHTML={{ __html: slot.svg }}
+                />
+            ))}
 
             {/*! ticketSalesUrl &&
             <span>
