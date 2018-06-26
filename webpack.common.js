@@ -9,7 +9,9 @@ module.exports = {
     ],
     plugins: [
         new CleanWebpackPlugin(["dist"]),
-        new HtmlWebpackPlugin(),
+        new HtmlWebpackPlugin({
+            title: "Stop poster",
+        }),
     ],
     resolve: {
         modules: ["node_modules", "src"],
