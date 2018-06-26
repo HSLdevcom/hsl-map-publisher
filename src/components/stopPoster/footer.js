@@ -134,7 +134,7 @@ const Footer = (props) => {
                                     style={get(area, "style", {})}
                                     className={styles.url}
                                 >
-                                    {get(urlsByType, get(area, "data", ""))}
+                                    {get(urlsByType, get(area, "data", "")).replace("http://", "")}
                                 </span>
                             );
                         }
