@@ -18,9 +18,21 @@
     border-radius: 25px;
 }
 
-.dynamicSlot svg {
+.svgContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.svgContainer svg {
     height: auto;
     width: 100%;
+}
+
+.qrCode {
+    position: absolute;
 }
 
 .dottedLine {
@@ -54,39 +66,5 @@
     font-size: 20px;
     font-family: GothamXNarrow-Medium;
     color: black;
-}
-
-.urlInfo {
-    composes: url;
-    top: 336px;
-    left: 500px;
-}
-
-.urlFeedback {
-    composes: url;
-    top: 336px;
-    left: 936px;
-}
-
-.qrCode {
-    position: absolute;
-    width: 140px;
-}
-
-.qrCodeInfo {
-    composes: qrCode;
-    top: 117px;
-    left: 730px;
-}
-
-.qrCodeTicketSales {
-    composes: qrCode;
-    top: 179px;
-    left: 729px;
-}
-
-.qrCodeFeedback {
-    composes: qrCode;
-    top: 117px;
-    left: 1144px;
+    padding: 2px 0;
 }
