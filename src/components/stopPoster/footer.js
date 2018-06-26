@@ -14,9 +14,9 @@ import hslLogo from "svg/hsl_logo.svg";
 import customerService from "svg/customer_service.svg";
 import styles from "./footer.css";
 
-function getSvgElementPosition($element) {
-    const parseAttr = attr => Math.round(parseInt(attr, 10));
+const parseAttr = attr => Math.round(parseInt(attr, 10));
 
+function getSvgElementPosition($element, widthModifier = 0, heightModifier = 0) {
     const width = $element[0].tagName === "line"
         ? parseAttr($element.attr("x2")) - parseAttr($element.attr("x1"))
         : parseAttr($element.attr("width"));
@@ -29,14 +29,14 @@ function getSvgElementPosition($element) {
         ? parseAttr($element.attr("y1")) - (height / 2) : parseAttr($element.attr("y"));
 
     return {
-        top: posY,
-        left: posX,
-        width,
-        height,
+        top: posY - heightModifier,
+        left: posX - widthModifier,
+        width: width - widthModifier,
+        height: height - heightModifier,
     };
 }
 
-function getDynamicAreas(svg) {
+function getDynamicAreas(svg, widthModifier, heightModifier) {
     const $ = cheerio.load(svg);
     const dynamicAreas = $(".dynamic-area");
     const areas = [];
@@ -46,7 +46,7 @@ function getDynamicAreas(svg) {
         const areaType = area.data("area-type");
         const areaData = area.data("area-data");
 
-        const areaPosition = getSvgElementPosition(area);
+        const areaPosition = getSvgElementPosition(area, widthModifier);
 
         areas.push({
             data: areaData,
@@ -59,7 +59,7 @@ function getDynamicAreas(svg) {
 }
 
 const slotMargin = 25;
-const slotWidth = 392;
+const slotWidth = 300;
 const firstSlotLeft = 453;
 
 function createTemplateSlots(template) {
@@ -72,8 +72,17 @@ function createTemplateSlots(template) {
             const marginToWidth = size > 1 ? size * slotMargin : 0;
             const width = slotWidth * size + marginToWidth;
             const left = firstSlotLeft + (slotWidth * idx) + (slotMargin * idx);
+            const $svg = cheerio.load(svg);
 
-            const dynamicAreas = getDynamicAreas(svg);
+            const svgViewBox = $svg("svg").attr("viewBox").split(" ");
+            const svgWidth = parseAttr(svgViewBox[2]);
+            const svgHeight = parseAttr(svgViewBox[3]);
+
+            // TODO: Make sensible modifiers
+
+            const svgWidthModifier = Math.abs(((slotWidth / svgWidth) - 1) * 100);
+            const svgHeightModifier = Math.abs(((slotWidth / svgHeight) - 1) * 100);
+            const dynamicAreas = getDynamicAreas(svg, svgWidthModifier, svgHeightModifier);
 
             slots.push({
                 svg,
@@ -105,44 +114,57 @@ const Footer = (props) => {
                 className={classnames(styles.footerPiece, styles.customerService)}
                 src={customerService}
             />
-            {slots.map((slot, slotIdx) => (
-                <div
-                    key={`slot_${slotIdx}_${slot.name}`}
-                    className={styles.dynamicSlot}
-                    style={slot.style}
-                >
+            {slots.map((slot, slotIdx) => {
+                if (!slot.svg || slot.size === 0) {
+                    return null;
+                }
+
+                return (
                     <div
-                        className={styles.svgContainer}
-                        dangerouslySetInnerHTML={{ __html: slot.svg }}
-                    />
-                    {slot.dynamicAreas.map((area, areaIdx) => {
-                        if (area.type === "qr-code") {
-                            return (
-                                <QrCode
-                                    key={`dynamic_area_${area.type}_${areaIdx}`}
-                                    style={get(area, "style", {})}
-                                    className={styles.qrCode}
-                                    url={get(urlsByType, get(area, "data", ""))}
-                                />
-                            );
-                        }
+                        key={`slot_${slotIdx}_${slot.name}`}
+                        className={styles.dynamicSlot}
+                        style={slot.style}
+                    >
+                        <div
+                            className={styles.svgContainer}
+                            dangerouslySetInnerHTML={{ __html: slot.svg }}
+                        />
+                        {slot.dynamicAreas.map((area, areaIdx) => {
+                            const url = get(urlsByType, get(area, "data", ""), null);
 
-                        if (area.type === "url-display") {
-                            return (
-                                <span
-                                    key={`dynamic_area_${area.type}_${areaIdx}`}
-                                    style={get(area, "style", {})}
-                                    className={styles.url}
-                                >
-                                    {get(urlsByType, get(area, "data", "")).replace("http://", "")}
-                                </span>
-                            );
-                        }
+                            if (!url) {
+                                props.onError(`No URL set for key '${get(area, "data", "")}' and stop ${props.shortId}!`);
+                                return null;
+                            }
 
-                        return null;
-                    })}
-                </div>
-            ))}
+                            if (area.type === "qr-code") {
+                                return (
+                                    <QrCode
+                                        key={`dynamic_area_${area.type}_${areaIdx}`}
+                                        style={get(area, "style", {})}
+                                        className={styles.qrCode}
+                                        url={url}
+                                    />
+                                );
+                            }
+
+                            if (area.type === "url-display") {
+                                return (
+                                    <span
+                                        key={`dynamic_area_${area.type}_${areaIdx}`}
+                                        style={get(area, "style", {})}
+                                        className={styles.url}
+                                    >
+                                        {url.replace("http://", "")}
+                                    </span>
+                                );
+                            }
+
+                            return null;
+                        })}
+                    </div>
+                );
+            })}
         </div>
     );
 };
@@ -151,6 +173,7 @@ Footer.propTypes = {
     template: PropTypes.any,
     shortId: PropTypes.string.isRequired,
     isTrunkStop: PropTypes.bool.isRequired,
+    onError: PropTypes.func.isRequired,
 };
 
 Footer.defaultProps = {
