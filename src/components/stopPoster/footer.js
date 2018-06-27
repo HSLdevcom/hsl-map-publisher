@@ -17,22 +17,24 @@ import styles from "./footer.css";
 const parseAttr = attr => Math.round(parseInt(attr, 10));
 
 function getSvgElementPosition($element, widthModifier = 0, heightModifier = 0) {
-    const width = $element[0].tagName === "line"
+    const isLine = $element[0].tagName === "line";
+
+    const width = isLine
         ? parseAttr($element.attr("x2")) - parseAttr($element.attr("x1"))
         : parseAttr($element.attr("width"));
-    const height = $element[0].tagName === "line" ? parseAttr($element.attr("stroke-width"))
+    const height = isLine ? parseAttr($element.attr("stroke-width"))
         : parseAttr($element.attr("height"));
 
-    const posX = $element[0].tagName === "line"
+    const posX = isLine
         ? parseAttr($element.attr("x1")) : parseAttr($element.attr("x"));
-    const posY = $element[0].tagName === "line"
+    const posY = isLine
         ? parseAttr($element.attr("y1")) - (height / 2) : parseAttr($element.attr("y"));
 
     return {
-        top: posY - heightModifier,
-        left: posX - widthModifier,
-        width: width - widthModifier,
-        height: height - heightModifier,
+        top: posY - (posY * widthModifier),
+        left: posX - (posX * widthModifier),
+        width: width - (width * widthModifier),
+        height: height - (height * widthModifier),
     };
 }
 
@@ -46,7 +48,7 @@ function getDynamicAreas(svg, widthModifier, heightModifier) {
         const areaType = area.data("area-type");
         const areaData = area.data("area-data");
 
-        const areaPosition = getSvgElementPosition(area, widthModifier);
+        const areaPosition = getSvgElementPosition(area, widthModifier, heightModifier);
 
         areas.push({
             data: areaData,
@@ -59,7 +61,8 @@ function getDynamicAreas(svg, widthModifier, heightModifier) {
 }
 
 const slotMargin = 25;
-const slotWidth = 300;
+const slotWidth = 392;
+const slotHeight = 358;
 const firstSlotLeft = 453;
 
 function createTemplateSlots(template) {
@@ -74,14 +77,15 @@ function createTemplateSlots(template) {
             const left = firstSlotLeft + (slotWidth * idx) + (slotMargin * idx);
             const $svg = cheerio.load(svg);
 
-            const svgViewBox = $svg("svg").attr("viewBox").split(" ");
+            const svgViewBox = $svg("svg")
+                .attr("viewBox")
+                .split(" ");
             const svgWidth = parseAttr(svgViewBox[2]);
             const svgHeight = parseAttr(svgViewBox[3]);
 
-            // TODO: Make sensible modifiers
+            const svgWidthModifier = (svgWidth / slotWidth) - 1;
+            const svgHeightModifier = (svgHeight / slotHeight) - 1;
 
-            const svgWidthModifier = Math.abs(((slotWidth / svgWidth) - 1) * 100);
-            const svgHeightModifier = Math.abs(((slotWidth / svgHeight) - 1) * 100);
             const dynamicAreas = getDynamicAreas(svg, svgWidthModifier, svgHeightModifier);
 
             slots.push({
@@ -90,6 +94,7 @@ function createTemplateSlots(template) {
                 dynamicAreas,
                 style: {
                     width,
+                    height: slotHeight,
                     left,
                 },
             });

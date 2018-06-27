@@ -13,7 +13,6 @@
 .dynamicSlot {
     position: absolute;
     top: 33px;
-    height: 358px;
     overflow: hidden;
     border-radius: 25px;
 }

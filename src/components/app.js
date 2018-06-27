@@ -14,8 +14,12 @@ const components = {
     Timetable,
 };
 
+const graphqlUrl = process.env.NODE_ENV === "development"
+    ? "https://kartat.hsldev.com/jore/graphql"
+    : "http://kartat.hsl.fi/jore/graphql";
+
 const client = new ApolloClient({
-    link: createHttpLink({ uri: "http://kartat.hsl.fi/jore/graphql" }),
+    link: createHttpLink({ uri: graphqlUrl }),
     cache: new InMemoryCache(),
 });
 
