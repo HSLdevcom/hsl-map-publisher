@@ -1,20 +1,14 @@
 const uuidv1 = require("uuid/v1");
 const camelCase = require("lodash/camelCase");
 const snakeCase = require("lodash/snakeCase");
-const config = require("../knexfile");
-const knex = require("knex")(config);
 const pMap = require("p-map");
-const path = require("path");
 const merge = require("lodash/merge");
 const get = require("lodash/get");
-const fs = require("fs");
-const { promisify } = require("util");
-const mkdirp = require("mkdirp");
+const config = require("../knexfile");
+// eslint-disable-next-line import/order
+const knex = require("knex")(config);
 const createEmptyTemplate = require("./createEmptyTemplate");
 const cleanup = require("./cleanup");
-
-const readFileAsync = promisify(fs.readFile);
-const writeFileAsync = promisify(fs.writeFile);
 
 // Must cleanup knex, otherwise the process keeps going.
 cleanup(() => {
@@ -160,7 +154,7 @@ async function getTemplateImage(image, fields = "*") {
     const emptyImage = {
         name: "",
         svg: "",
-        size: 1,
+        size: get(image, "size", 1),
     };
 
     if (!image.name) {
@@ -194,7 +188,6 @@ async function getTemplates() {
     const templates = await knex("template")
         .select("*")
         .orderBy("created_at", "asc");
-
     return pMap(templates, getTemplateImages);
 }
 
