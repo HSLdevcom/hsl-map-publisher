@@ -150,28 +150,28 @@ async function addEvent({
         }, snakeCase));
 }
 
-async function getTemplateImage(image, fields = "*") {
-    const emptyImage = {
-        name: "",
+async function getTemplateImage(slot, fields = "*") {
+    const emptySlot = {
+        imageName: "",
         svg: "",
-        size: get(image, "size", 1),
+        size: get(slot, "size", 1),
     };
 
-    if (!image.name) {
-        return emptyImage;
+    if (!slot.imageName) {
+        return emptySlot;
     }
 
     const dbImg = await knex
         .select(fields)
         .from("template_images")
-        .where({ name: image.name })
+        .where({ name: slot.imageName })
         .first();
 
     if (dbImg) {
-        return merge({}, image, dbImg);
+        return merge({}, slot, dbImg);
     }
 
-    return emptyImage;
+    return emptySlot;
 }
 
 async function getTemplateImages(template, fields = "*") {
@@ -180,7 +180,11 @@ async function getTemplateImages(template, fields = "*") {
     }
 
     return Object.assign(template, {
-        images: await pMap(template.images, img => getTemplateImage(img, fields)),
+        areas: await pMap(template.areas, async (area) => {
+            // eslint-disable-next-line no-param-reassign
+            area.slots = await pMap(area.slots, slot => getTemplateImage(slot, fields));
+            return area;
+        }),
     });
 }
 
