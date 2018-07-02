@@ -21,6 +21,38 @@ async function initialize() {
     browser.on("disconnected", () => { browser = null; });
 }
 
+function pageLoadedHandler(page, props, id) {
+    return async ({ error = null, width, height }) => {
+        if (error) {
+            throw new Error(error);
+        }
+
+        await page.emulateMedia("screen");
+
+        let printOptions = {};
+        if (props.printTimetablesAsA4) {
+            printOptions = {
+                printBackground: true,
+                format: "A4",
+                margin: 0,
+            };
+        } else {
+            printOptions = {
+                printBackground: true,
+                width: width * SCALE,
+                height: height * SCALE,
+                pageRanges: "1",
+                scale: SCALE,
+            };
+        }
+
+        const contents = await page.pdf(printOptions);
+
+        await writeFileAsync(pdfPath(id), contents);
+        await page.close();
+    };
+}
+
 /**
  * Renders component to PDF file
  * @returns {Promise}
@@ -45,41 +77,13 @@ async function renderComponent(options) {
     });
 
     const encodedProps = encodeURIComponent(JSON.stringify(props));
-    await page.goto(`${CLIENT_URL}/?component=${component}&props=${encodedProps}`);
 
-    const { error, width, height } = await page.evaluate(() => (
-        new Promise((resolve) => {
-            window.callPhantom = opts => resolve(opts);
-        })
-    ));
+    await page.goto(`${CLIENT_URL}/?component=${component}&props=${encodedProps}`, {
+        timeout: 120000,
+    });
 
-    if (error) {
-        throw new Error(error);
-    }
-
-    await page.emulateMedia("screen");
-
-    let printOptions = {};
-    if (props.printTimetablesAsA4) {
-        printOptions = {
-            printBackground: true,
-            format: "A4",
-            margin: 0,
-        };
-    } else {
-        printOptions = {
-            printBackground: true,
-            width: width * SCALE,
-            height: height * SCALE,
-            pageRanges: "1",
-            scale: SCALE,
-        };
-    }
-
-    const contents = await page.pdf(printOptions);
-
-    await writeFileAsync(pdfPath(id), contents);
-    await page.close();
+    const onPageLoaded = pageLoadedHandler(page, props, id);
+    await page.exposeFunction("callPhantom", onPageLoaded);
 }
 
 async function renderComponentRetry(options) {
@@ -136,4 +140,7 @@ function concatenate(ids) {
     return pdftk.stdout;
 }
 
-module.exports = { generate, concatenate };
+module.exports = {
+    generate,
+    concatenate,
+};
