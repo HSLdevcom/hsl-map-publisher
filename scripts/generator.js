@@ -7,7 +7,7 @@ const { spawn } = require("child_process");
 const writeFileAsync = promisify(fs.writeFile);
 
 const CLIENT_URL = "http://localhost:5000";
-const RENDER_TIMEOUT = 5 * 60 * 1000;
+const RENDER_TIMEOUT = 60 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
 const SCALE = 96 / 72;
 
@@ -17,40 +17,14 @@ let previous = Promise.resolve();
 const pdfPath = id => path.join(__dirname, "..", "output", `${id}.pdf`);
 
 async function initialize() {
-    browser = await puppeteer.launch({ args: ["--no-sandbox", "--disable-setuid-sandbox"] });
+    browser = await puppeteer.launch({
+        args: [
+            "--no-sandbox",
+            "--disable-setuid-sandbox",
+            "--disable-web-security",
+        ],
+    });
     browser.on("disconnected", () => { browser = null; });
-}
-
-function pageLoadedHandler(page, props, id) {
-    return async ({ error = null, width, height }) => {
-        if (error) {
-            throw new Error(error);
-        }
-
-        await page.emulateMedia("screen");
-
-        let printOptions = {};
-        if (props.printTimetablesAsA4) {
-            printOptions = {
-                printBackground: true,
-                format: "A4",
-                margin: 0,
-            };
-        } else {
-            printOptions = {
-                printBackground: true,
-                width: width * SCALE,
-                height: height * SCALE,
-                pageRanges: "1",
-                scale: SCALE,
-            };
-        }
-
-        const contents = await page.pdf(printOptions);
-
-        await writeFileAsync(pdfPath(id), contents);
-        await page.close();
-    };
 }
 
 /**
@@ -77,13 +51,47 @@ async function renderComponent(options) {
     });
 
     const encodedProps = encodeURIComponent(JSON.stringify(props));
+    const url = `${CLIENT_URL}/?component=${component}&props=${encodedProps}`;
 
-    await page.goto(`${CLIENT_URL}/?component=${component}&props=${encodedProps}`, {
-        timeout: 120000,
+    console.log(url);
+
+    await page.goto(url, {
+        timeout: RENDER_TIMEOUT,
     });
 
-    const onPageLoaded = pageLoadedHandler(page, props, id);
-    await page.exposeFunction("callPhantom", onPageLoaded);
+    const { error = null, width, height } = await page.evaluate(() => (
+        new Promise((resolve) => {
+            window.callPhantom = opts => resolve(opts);
+        })
+    ));
+
+    if (error) {
+        throw new Error(error);
+    }
+
+    await page.emulateMedia("screen");
+
+    let printOptions = {};
+    if (props.printTimetablesAsA4) {
+        printOptions = {
+            printBackground: true,
+            format: "A4",
+            margin: 0,
+        };
+    } else {
+        printOptions = {
+            printBackground: true,
+            width: width * SCALE,
+            height: height * SCALE,
+            pageRanges: "1",
+            scale: SCALE,
+        };
+    }
+
+    const contents = await page.pdf(printOptions);
+
+    await writeFileAsync(pdfPath(id), contents);
+    await page.close();
 }
 
 async function renderComponentRetry(options) {
