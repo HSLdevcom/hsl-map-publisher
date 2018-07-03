@@ -16,7 +16,7 @@ const PORT = 4000;
 async function generatePoster(buildId, component, props) {
     const { id } = await addPoster({ buildId, component, props });
 
-    const onInfo = (message) => {
+    const onInfo = (message = "No message.") => {
         console.log(`${id}: ${message}`); // eslint-disable-line no-console
         addEvent({ posterId: id, type: "INFO", message });
     };

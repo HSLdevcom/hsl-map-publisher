@@ -7,7 +7,7 @@ const { spawn } = require("child_process");
 const writeFileAsync = promisify(fs.writeFile);
 
 const CLIENT_URL = "http://localhost:5000";
-const RENDER_TIMEOUT = 5 * 60 * 1000;
+const RENDER_TIMEOUT = 60 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
 const SCALE = 96 / 72;
 
@@ -17,7 +17,13 @@ let previous = Promise.resolve();
 const pdfPath = id => path.join(__dirname, "..", "output", `${id}.pdf`);
 
 async function initialize() {
-    browser = await puppeteer.launch({ args: ["--no-sandbox", "--disable-setuid-sandbox"] });
+    browser = await puppeteer.launch({
+        args: [
+            "--no-sandbox",
+            "--disable-setuid-sandbox",
+            "--disable-web-security",
+        ],
+    });
     browser.on("disconnected", () => { browser = null; });
 }
 
@@ -45,9 +51,15 @@ async function renderComponent(options) {
     });
 
     const encodedProps = encodeURIComponent(JSON.stringify(props));
-    await page.goto(`${CLIENT_URL}/?component=${component}&props=${encodedProps}`);
+    const url = `${CLIENT_URL}/?component=${component}&props=${encodedProps}`;
 
-    const { error, width, height } = await page.evaluate(() => (
+    console.log(url);
+
+    await page.goto(url, {
+        timeout: RENDER_TIMEOUT,
+    });
+
+    const { error = null, width, height } = await page.evaluate(() => (
         new Promise((resolve) => {
             window.callPhantom = opts => resolve(opts);
         })
@@ -136,4 +148,7 @@ function concatenate(ids) {
     return pdftk.stdout;
 }
 
-module.exports = { generate, concatenate };
+module.exports = {
+    generate,
+    concatenate,
+};
