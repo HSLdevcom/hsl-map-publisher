@@ -2,13 +2,15 @@ const uuidv1 = require("uuid/v1");
 const camelCase = require("lodash/camelCase");
 const snakeCase = require("lodash/snakeCase");
 const pMap = require("p-map");
+const pReduce = require("p-reduce");
 const merge = require("lodash/merge");
 const get = require("lodash/get");
+const pick = require("lodash/pick");
 const config = require("../knexfile");
 // eslint-disable-next-line import/order
 const knex = require("knex")(config);
-const createEmptyTemplate = require("./createEmptyTemplate");
-const cleanup = require("./cleanup");
+const createEmptyTemplate = require("./util/createEmptyTemplate");
+const cleanup = require("./util/cleanup");
 
 // Must cleanup knex, otherwise the process keeps going.
 cleanup(() => {
@@ -142,30 +144,35 @@ async function addEvent({
     posterId = null, buildId = null, type, message,
 }) {
     const msg = !message ? "No message." : message;
-    await knex("event").insert(convertKeys({
-        posterId, buildId, type, message: msg,
-    }, snakeCase));
+    await knex("event")
+        .insert(convertKeys({
+            posterId,
+            buildId,
+            type,
+            message: msg,
+        }, snakeCase));
 }
 
 async function getTemplateImage(slot, fields = "*") {
     const emptySlot = {
-        imageName: "",
-        svg: "",
+        image: null,
         size: get(slot, "size", 1),
     };
 
-    if (!slot.imageName) {
+    const imageName = get(slot, "image.name", "");
+
+    if (!imageName) {
         return emptySlot;
     }
 
     const dbImg = await knex
         .select(fields)
         .from("template_images")
-        .where({ name: slot.imageName })
+        .where({ name: imageName })
         .first();
 
     if (dbImg) {
-        return merge({}, slot, dbImg);
+        return merge({}, slot, { image: dbImg });
     }
 
     return emptySlot;
@@ -176,12 +183,10 @@ async function getTemplateImages(template, fields = "*") {
         return template;
     }
 
-    return Object.assign(template, {
-        areas: await pMap(template.areas, async (area) => {
-            // eslint-disable-next-line no-param-reassign
-            area.slots = await pMap(area.slots, slot => getTemplateImage(slot, fields));
-            return area;
-        }),
+    return merge({}, template, {
+        areas: await pMap(template.areas, async area => merge({}, area, {
+            slots: await pMap(area.slots, slot => getTemplateImage(slot, fields)),
+        })),
     });
 }
 
@@ -217,37 +222,42 @@ async function getTemplate({ id }, imageFields = "*") {
 }
 
 // Not exported. Saves the passed images into the database.
-async function saveTemplateImages(images) {
-    return pMap(images, async (image) => {
-        if (!image.name) {
-            return image;
+async function saveAreaImages(slots) {
+    return pMap(slots, async (slot) => {
+        if (!slot.image) {
+            return slot;
         }
+
+        const imageName = get(slot, "image.name", "");
 
         const existingImage = await knex
             .select("*")
             .from("template_images")
-            .where({ name: image.name })
+            .where({ name: imageName })
             .first();
 
-        const svgContent = get(image, "svg", "");
-        const name = existingImage ? existingImage.name : image.name;
+        const svgContent = get(slot, "image.svg", "");
 
-        const newImage = {
-            name,
-            svg: svgContent,
-            default_size: image.size,
-        };
+        if (svgContent) {
+            const newImage = {
+                name: imageName,
+                svg: svgContent,
+                default_size: slot.size,
+            };
 
-        if (existingImage) {
-            await knex("template_images")
-                .where({ name })
-                .update(newImage);
-        } else {
-            await knex("template_images")
-                .insert(newImage);
+            if (existingImage) {
+                await knex("template_images")
+                    .where({ name: imageName })
+                    .update(newImage);
+            } else {
+                await knex("template_images")
+                    .insert(newImage);
+            }
         }
 
-        return image;
+        // eslint-disable-next-line no-param-reassign
+        slot.image = { name: imageName };
+        return slot;
     });
 }
 
@@ -255,10 +265,13 @@ async function saveTemplate(template) {
     const { id } = template;
     const existingTemplate = await getTemplate({ id }, false);
 
-    const newTemplate = merge({}, template);
+    const savedAreas = await pMap(template.areas, async area => merge({}, area, {
+        slots: await saveAreaImages(area.slots),
+    }));
 
-    const savedImages = await saveTemplateImages(newTemplate.images);
-    newTemplate.images = JSON.stringify(savedImages);
+    const newTemplate = merge({}, template, {
+        areas: JSON.stringify(savedAreas),
+    });
 
     if (existingTemplate) {
         await knex("template")
@@ -273,7 +286,7 @@ async function saveTemplate(template) {
 }
 
 async function removeTemplate({ id }) {
-    if (id === "default_footer") {
+    if (/default/.test(id)) {
         const error = new Error("You cannot remove the default template.");
         error.status = 400;
         throw error;
@@ -293,7 +306,11 @@ async function getImages() {
 }
 
 function templateHasImage(template, imageName) {
-    return template.images.some(img => img.name === imageName);
+    return template.areas.some(
+        area => area.slots.some(
+            slot => get(slot, "image.name", "_") === imageName
+        )
+    );
 }
 
 async function removeImage({ name }) {

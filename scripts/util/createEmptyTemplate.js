@@ -2,30 +2,27 @@ module.exports = function createEmptyTemplate(label, id) {
     return {
         label,
         id,
-        areas: JSON.stringify({
-            footer: {
+        areas: JSON.stringify([
+            {
                 key: "footer",
                 orientation: "horizontal",
                 background: "#0077C7",
                 resizeable: true,
                 slots: [
                     {
-                        imageName: "",
-                        svg: "",
+                        image: null,
                         size: 1,
                     },
                     {
-                        imageName: "",
-                        svg: "",
+                        image: null,
                         size: 1,
                     },
                     {
-                        imageName: "",
-                        svg: "",
+                        image: null,
                         size: 1,
                     },
                 ],
             },
-        }),
+        ]),
     };
 };

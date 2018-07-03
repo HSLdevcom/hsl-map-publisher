@@ -1,4 +1,4 @@
-const createEmptyTemplate = require("../scripts/createEmptyTemplate");
+const createEmptyTemplate = require("../scripts/util/createEmptyTemplate");
 
 exports.seed = function (knex) {
     return knex("template")
@@ -6,6 +6,6 @@ exports.seed = function (knex) {
         .then(() =>
             knex("template")
                 .insert([
-                    createEmptyTemplate("Default footer", "default_footer"),
+                    createEmptyTemplate("Default", "default"),
                 ]));
 };
