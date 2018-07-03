@@ -141,13 +141,10 @@ async function removePoster({ id }) {
 async function addEvent({
     posterId = null, buildId = null, type, message,
 }) {
-    await knex("event")
-        .insert(convertKeys({
-            posterId,
-            buildId,
-            type,
-            message,
-        }, snakeCase));
+    const msg = !message ? "No message." : message;
+    await knex("event").insert(convertKeys({
+        posterId, buildId, type, message: msg,
+    }, snakeCase));
 }
 
 async function getTemplateImage(slot, fields = "*") {

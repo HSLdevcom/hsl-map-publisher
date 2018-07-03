@@ -18,7 +18,13 @@ let previous = Promise.resolve();
 const pdfPath = id => path.join(__dirname, "..", "output", `${id}.pdf`);
 
 async function initialize() {
-    browser = await puppeteer.launch({ args: ["--no-sandbox", "--disable-setuid-sandbox"] });
+    browser = await puppeteer.launch({
+        args: [
+            "--no-sandbox",
+            "--disable-setuid-sandbox",
+            "--disable-web-security",
+        ],
+    });
     browser.on("disconnected", () => { browser = null; });
 }
 
@@ -54,9 +60,11 @@ async function renderComponent(options) {
 
     console.log(`Opening ${pageUrl} in Puppeteer.`);
 
-    await page.goto(pageUrl);
+    await page.goto(pageUrl, {
+        timeout: RENDER_TIMEOUT,
+    });
 
-    const { error, width, height } = await page.evaluate(() => (
+    const { error = null, width, height } = await page.evaluate(() => (
         new Promise((resolve) => {
             window.callPhantom = opts => resolve(opts);
         })
@@ -145,4 +153,7 @@ function concatenate(ids) {
     return pdftk.stdout;
 }
 
-module.exports = { generate, concatenate };
+module.exports = {
+    generate,
+    concatenate,
+};

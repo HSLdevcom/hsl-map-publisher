@@ -22,7 +22,7 @@ async function generatePoster(buildId, component, template, props) {
         props,
     });
 
-    const onInfo = (message) => {
+    const onInfo = (message = "No message.") => {
         console.log(`${id}: ${message}`); // eslint-disable-line no-console
         addEvent({
             posterId: id,
