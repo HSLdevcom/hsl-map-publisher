@@ -11,7 +11,13 @@
     "start": "node server",
     "start:hot": "cross-env HMR=true node server",
     "server": "node scripts/server",
-    "server:hot": "nodemon scripts/server"
+    "server:hot": "PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres nodemon scripts/server",
+    "docker:build": "docker build -t hsl-map-publisher .",
+    "docker:run": "docker run -d -p 4000:4000 --name publisher -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres -e \"PG_CONNECTION_STRING=postgres://postgres:postgres@publisher-postgres:5432/postgres\" --shm-size=1G hsl-map-publisher",
+    "docker:stop": "docker stop publisher",
+    "docker:rm": "docker rm publisher",
+    "docker:rebuild": "yarn run docker:stop && yarn run docker:rm && yarn run docker:build && yarn run docker:run",
+    "docker:logs": "docker logs publisher"
   },
   "repository": {
     "type": "git",
@@ -70,7 +76,7 @@
     "nodemon": "^1.12.1",
     "pg": "^7.4.0",
     "prop-types": "^15.6.0",
-    "puppeteer": "^0.13.0",
+    "puppeteer": "^1.5.0",
     "qrcode": "^1.0.0",
     "raw-loader": "^0.5.1",
     "react": "^16.1.1",

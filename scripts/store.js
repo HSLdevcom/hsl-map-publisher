@@ -124,8 +124,9 @@ async function removePoster({ id }) {
 async function addEvent({
     posterId = null, buildId = null, type, message,
 }) {
+    const msg = !message ? "No message." : message;
     await knex("event").insert(convertKeys({
-        posterId, buildId, type, message,
+        posterId, buildId, type, message: msg,
     }, snakeCase));
 }
 
