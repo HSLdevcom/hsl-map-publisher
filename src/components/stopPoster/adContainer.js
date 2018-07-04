@@ -4,13 +4,6 @@ import get from "lodash/get";
 import { InlineSVG } from "components/util";
 import renderQueue from "util/renderQueue";
 
-import { getFeedbackUrl } from "data/feedbackCodes";
-
-import mobileIcon from "icons/ad_mobile.svg";
-import mobileTrunkIcon from "icons/ad_mobile_trunk.svg";
-import feedbackIcon from "icons/ad_feedback.svg";
-import noSmokingIcon from "icons/ad_nosmoking.svg";
-
 class AdContainer extends Component {
     constructor(props) {
         super(props);
