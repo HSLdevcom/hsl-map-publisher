@@ -65,41 +65,43 @@ const slotWidth = 392;
 const slotHeight = 358;
 const firstSlotLeft = 453;
 
-function createTemplateSlots(template) {
-    return get(template, "images", [])
-        .reduce((slots, { size = 1, svg = "", name = "" }, idx) => {
-            if (!size) {
-                return slots;
-            }
+function createTemplateSlots(areaSlots) {
+    return areaSlots.reduce((slots, { image, size }, idx) => {
+        const { svg = "", name } = image;
 
-            const marginToWidth = size > 1 ? size * slotMargin : 0;
-            const width = slotWidth * size + marginToWidth;
-            const left = firstSlotLeft + (slotWidth * idx) + (slotMargin * idx);
-            const $svg = cheerio.load(svg);
-
-            const svgViewBox = $svg("svg")
-                .attr("viewBox")
-                .split(" ");
-            const svgWidth = parseAttr(svgViewBox[2]);
-            const svgHeight = parseAttr(svgViewBox[3]);
-
-            const svgWidthModifier = (svgWidth / slotWidth) - 1;
-            const svgHeightModifier = (svgHeight / slotHeight) - 1;
-
-            const dynamicAreas = getDynamicAreas(svg, svgWidthModifier, svgHeightModifier);
-
-            slots.push({
-                svg,
-                name,
-                dynamicAreas,
-                style: {
-                    width,
-                    height: slotHeight,
-                    left,
-                },
-            });
+        if (!size || !svg) {
             return slots;
-        }, []);
+        }
+
+        const marginToWidth = size > 1 ? size * slotMargin : 0;
+        const width = slotWidth * size + marginToWidth;
+        const left = firstSlotLeft + (slotWidth * idx) + (slotMargin * idx);
+        const $svg = cheerio.load(svg);
+
+        const svgViewBox = $svg("svg")
+            .attr("viewBox")
+            .split(" ");
+        const svgWidth = parseAttr(svgViewBox[2]);
+        const svgHeight = parseAttr(svgViewBox[3]);
+
+        const svgWidthModifier = (svgWidth / slotWidth) - 1;
+        const svgHeightModifier = (svgHeight / slotHeight) - 1;
+
+        const dynamicAreas = getDynamicAreas(svg, svgWidthModifier, svgHeightModifier);
+
+        slots.push({
+            svg,
+            name,
+            dynamicAreas,
+            style: {
+                width,
+                height: slotHeight,
+                left,
+            },
+        });
+
+        return slots;
+    }, []);
 }
 
 const Footer = (props) => {
@@ -109,7 +111,7 @@ const Footer = (props) => {
         feedback: getFeedbackUrl(props.shortId),
     };
 
-    const slots = createTemplateSlots(props.template);
+    const slots = createTemplateSlots(get(props, "template.slots", []));
 
     return (
         <div className={styles.footerWrapper}>

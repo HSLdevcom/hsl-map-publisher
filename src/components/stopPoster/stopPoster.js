@@ -239,7 +239,7 @@ class StopPoster extends Component {
                         </div>
                         <Footer
                             onError={this.onError}
-                            template={template}
+                            template={template ? template.areas.find(t => t.key === "footer") : {}}
                             shortId={this.props.shortId}
                             isTrunkStop={this.props.isTrunkStop}
                         />
