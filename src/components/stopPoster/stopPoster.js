@@ -174,10 +174,10 @@ class StopPoster extends Component {
                                         {this.state.shouldRenderFixedContent
                                          && (
                                              <AdContainer
+                                                 template={template.areas.find(t => t.key === "ads")}
                                                  width={this.ad.clientWidth}
                                                  height={this.ad.clientHeight}
                                                  shortId={this.props.shortId}
-                                                 isTrunkStop={this.props.isTrunkStop}
                                              />
                                          )
                                         }

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import get from "lodash/get";
 import { InlineSVG } from "components/util";
 import renderQueue from "util/renderQueue";
 
@@ -14,11 +15,9 @@ class AdContainer extends Component {
     constructor(props) {
         super(props);
 
-        const ads = [];
-        if (!this.props.isTrunkStop) ads.push(mobileIcon);
-        if (this.props.isTrunkStop) ads.push(mobileTrunkIcon);
-        if (getFeedbackUrl(this.props.shortId)) ads.push(feedbackIcon);
-        ads.push(noSmokingIcon);
+        const ads = get(props, "template.slots", [])
+            .map(slot => get(slot, "image.svg", "")) // get svg's from template
+            .filter(svg => !!svg); // Only non-falsy svg's allowed
 
         this.state = { ads };
     }
@@ -68,7 +67,7 @@ AdContainer.propTypes = {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     shortId: PropTypes.string.isRequired,
-    isTrunkStop: PropTypes.bool.isRequired,
+    template: PropTypes.any.isRequired,
 };
 
 export default AdContainer;
