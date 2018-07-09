@@ -46,4 +46,4 @@ async function fetchStops() {
     return stops.filter(stop => stopIds.includes(stop.stopId));
 }
 
-module.exports = fetchStops;
+module.exports = { fetchStops, fetchStopIds };
