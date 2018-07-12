@@ -3,7 +3,7 @@ const Router = require("koa-router");
 const cors = require("@koa/cors");
 const jsonBody = require("koa-json-body");
 
-const fetchStops = require("./stops");
+const { fetchStops } = require("./stops");
 const generator = require("./generator");
 const {
     migrate, addEvent,
