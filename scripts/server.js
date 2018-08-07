@@ -51,12 +51,6 @@ async function main() {
     const app = new Koa();
     const router = new Router();
 
-    // FIXME: Update UI to fetch from graphql and remove when data available
-    const stops = await fetchStops();
-    router.get("/stops", (ctx) => {
-        ctx.body = stops;
-    });
-
     router.get("/builds", async (ctx) => {
         const builds = await getBuilds();
         ctx.body = builds;
