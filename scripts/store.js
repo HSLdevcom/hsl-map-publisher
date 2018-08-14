@@ -31,7 +31,12 @@ async function migrate() {
 }
 
 async function getBuilds() {
-    const rows = await knex.select("build.*", knex.raw("count(case when poster.status = 'PENDING' then 1 end)::integer as pending"), knex.raw("count(case when poster.status = 'FAILED' then 1 end)::integer as failed"), knex.raw("count(case when poster.status = 'READY' then 1 end)::integer as ready"))
+    const rows = await knex.select(
+        "build.*",
+        knex.raw("count(case when poster.status = 'PENDING' then 1 end)::integer as pending"),
+        knex.raw("count(case when poster.status = 'FAILED' then 1 end)::integer as failed"),
+        knex.raw("count(case when poster.status = 'READY' then 1 end)::integer as ready")
+    )
         .from("build")
         .whereNot("build.status", "REMOVED")
         .leftJoin("poster", "build.id", "poster.build_id")
@@ -56,13 +61,21 @@ async function getBuild({ id }) {
     }
 
     const posterRows = await knex
-        .select("poster.id", "poster.status", "poster.component", "poster.props", "poster.created_at", "poster.updated_at", knex.raw(`json_agg(
+        .select(
+            "poster.id",
+            "poster.status",
+            "poster.component",
+            "poster.props",
+            "poster.created_at",
+            "poster.updated_at",
+            knex.raw(`json_agg(
                 json_build_object(
                     'type', event.type,
                     'message', event.message,
                     'createdAt', event.created_at
                 ) order by event.created_at
-            ) as events`))
+            ) as events`)
+        )
         .from("poster")
         .whereNot("poster.status", "REMOVED")
         .andWhere("poster.build_id", id)
