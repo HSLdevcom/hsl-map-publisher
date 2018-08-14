@@ -23,7 +23,7 @@ const Timetable = props => (
                         {" "}
                         {props.stopShortId && `(${props.stopShortId.replace(/\s+/g, "")})`}
                         {" "}
-&nbsp;&nbsp;
+                        &nbsp;&nbsp;
                     </div>
                     <div className={styles.subtitle}>
                         {props.stopNameSe}
@@ -47,10 +47,10 @@ const Timetable = props => (
             && (
                 <div className={styles.validity}>
                     <div>
-Aikataulut voimassa
+                        Aikataulut voimassa
                     </div>
                     <div>
-Tidtabeller giltiga
+                        Tidtabeller giltiga
                     </div>
                     <div>
                         {new Date(props.dateBegin).toLocaleDateString("fi")}

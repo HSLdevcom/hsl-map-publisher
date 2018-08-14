@@ -11,18 +11,18 @@ const RouteDiagram = props => (
     <div className={styles.root}>
         <div className={styles.componentName}>
             <div className={styles.title}>
-                        Linjojen reitit
+                Linjojen reitit
             </div>
             <div className={styles.subtitle}>
-                        Linjernas rutter
+                Linjernas rutter
             </div>
         </div>
         <div className={styles.start}>
             <InlineSVG src={markerIcon} className={styles.icon}/>
             <div className={styles.title}>
-                        Olet tässä&nbsp;&nbsp;
+                    Olet tässä&nbsp;&nbsp;
                 <span className={styles.subtitle}>
-Du är här
+                    Du är här
                 </span>
             </div>
         </div>

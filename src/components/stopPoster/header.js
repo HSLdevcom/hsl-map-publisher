@@ -64,10 +64,10 @@ const Header = (props) => {
             && (
                 <CenteringColumn>
                     <Title small>
-Lippuvyöhyke
+                        Lippuvyöhyke
                     </Title>
                     <Subtitle small>
-Resezon
+                        Resezon
                     </Subtitle>
                     <div className={styles.zone}>
                         {zone}
@@ -77,10 +77,10 @@ Resezon
             }
             <CenteringColumn>
                 <Title small>
-Pysäkkinumero
+                    Pysäkkinumero
                 </Title>
                 <Subtitle small>
-Hållplatsnummer
+                    Hållplatsnummer
                 </Subtitle>
                 <div className={styles.stop}>
                     {props.shortId.replace(" ", "")}

@@ -19,27 +19,27 @@ const TableHeader = props => (
 
         <div className={styles.subtitle}>
             <div className={styles.strong}>
-Tunti
+                Tunti
             </div>
             <div>
                 <span className={styles.strong}>
-min
+                    min
                 </span>
                 {" "}
-/ linja Ajat ovat arvioituja
+                / linja Ajat ovat arvioituja
             </div>
         </div>
 
         <div className={styles.subtitle}>
             <div className={styles.strong}>
-Timme
+                Timme
             </div>
             <div>
                 <span className={styles.strong}>
-min
+                    min
                 </span>
                 {" "}
-/ linje Tiderna är beräknade
+                / linje Tiderna är beräknade
             </div>
         </div>
     </div>
