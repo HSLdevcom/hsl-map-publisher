@@ -9,11 +9,14 @@ const scales = factors.reduce((prev, cur) => [...prev, ...values.map(val => val 
 
 const Scalebar = (props) => {
     const meters = props.targetWidth / props.pixelsPerMeter;
-    const scale = scales.reduce((prev, cur) =>
-        (Math.abs(cur - meters) < Math.abs(prev - meters) ? cur : prev), 0);
+    const scale = scales.reduce((prev, cur) => (Math.abs(cur - meters) < Math.abs(prev - meters) ? cur : prev), 0);
     return (
         <div className={styles.root}>
-            <div>{scale} m</div>
+            <div>
+                {scale}
+                {" "}
+m
+            </div>
             <div style={{ width: props.pixelsPerMeter * scale }}/>
         </div>
     );

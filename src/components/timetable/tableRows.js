@@ -9,9 +9,13 @@ import styles from "./tableRows.css";
 
 const Departure = props => (
     <div className={styles.item}>
-        <div className={styles.minutes}>{props.minutes < 10 && "0"}{props.minutes}</div>
+        <div className={styles.minutes}>
+            {props.minutes < 10 && "0"}
+            {props.minutes}
+        </div>
         /&#x202F;
-        {trimRouteId(props.routeId)}{props.note}
+        {trimRouteId(props.routeId)}
+        {props.note}
     </div>
 );
 
@@ -27,7 +31,8 @@ Departure.propTypes = {
 const TableRow = props => (
     <Row>
         <div className={styles.hours}>
-            {(props.hours % 24) < 10 && "0"}{props.hours % 24}
+            {(props.hours % 24) < 10 && "0"}
+            {props.hours % 24}
         </div>
         <WrappingRow>
             {sortBy(props.departures, a => a.minutes).map((departure, index) => (

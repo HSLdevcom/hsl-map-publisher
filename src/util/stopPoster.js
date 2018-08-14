@@ -75,8 +75,7 @@ function calculateStopsViewport(options) {
                     longitude: lon, latitude: lat, width, height, zoom,
                 });
 
-                const visibleStops = allStops.filter(stop =>
-                    viewportContains(viewport, stop, width, height, miniMapStartX, miniMapStartY));
+                const visibleStops = allStops.filter(stop => viewportContains(viewport, stop, width, height, miniMapStartX, miniMapStartY));
 
                 const currentStopIsVisible = visibleStops
                     .some(s => s.stopIds
@@ -91,23 +90,20 @@ function calculateStopsViewport(options) {
                     averagePoint.x /= visibleStops.length;
                     averagePoint.y /= visibleStops.length;
 
-                    const relativeAverageStopDistance =
-                        getDistanceBetweenPoints(
-                            averagePoint.x,
-                            averagePoint.y,
-                            mapMidPoint.x,
-                            mapMidPoint.y
-                        ) / (Math.max(width, height) / 2);
+                    const relativeAverageStopDistance = getDistanceBetweenPoints(
+                        averagePoint.x,
+                        averagePoint.y,
+                        mapMidPoint.x,
+                        mapMidPoint.y
+                    ) / (Math.max(width, height) / 2);
 
                     const currentStop = visibleStops
                         .find(s => s.stopIds
                             .some(sID => sID === currentStopId));
 
                     const [tX, tY] = viewport.project([currentStop.lon, currentStop.lat]);
-                    const currentStopDistanceFromCenter =
-                        getDistanceBetweenPoints(tX, tY, mapMidPoint.x, mapMidPoint.y);
-                    const relativeDistance =
-                        currentStopDistanceFromCenter / (Math.max(height, width) / 2);
+                    const currentStopDistanceFromCenter = getDistanceBetweenPoints(tX, tY, mapMidPoint.x, mapMidPoint.y);
+                    const relativeDistance = currentStopDistanceFromCenter / (Math.max(height, width) / 2);
 
                     const visibleMajorStationsPoints = visibleStops
                         .filter(stop => stop.major).length;
@@ -115,11 +111,11 @@ function calculateStopsViewport(options) {
                     let score = (visibleStops.length / maxStops) * STOP_AMOUNT_WEIGHT;
                     score += ((zoom - minZoom) / (maxZoom - minZoom)) * ZOOM_WEIGHT;
                     score += (Math.max(visibleMajorStationsPoints, 5) / 5) * MAJOR_TRANSPORT_WEIGHT;
-                    score +=
-                        (1 - relativeAverageStopDistance)
+                    score
+                        += (1 - relativeAverageStopDistance)
                         * AVERAGE_DISTANCE_WEIGHT;
-                    score +=
-                        (1 - relativeDistance)
+                    score
+                        += (1 - relativeDistance)
                         * CURRENT_STOP_DISTANCE_WEIGHT;
 
                     if (score > bestViewPortScore) {
@@ -135,8 +131,7 @@ function calculateStopsViewport(options) {
     if (!bestViewPort) {
         bestViewPort = defaultViewport;
         console.log("Setting default viewport");
-        bestVisibleStops = allStops.filter(stop =>
-            viewportContains(defaultViewport, stop, width, height, miniMapStartX, miniMapStartY));
+        bestVisibleStops = allStops.filter(stop => viewportContains(defaultViewport, stop, width, height, miniMapStartX, miniMapStartY));
     }
 
     // Calculate pixel coordinates for each stop

@@ -40,8 +40,8 @@ function getCost(placement, bbox) {
 function getOverlappingItem(placement, indexToOverlap) {
     const { positions } = placement;
     for (let i = 0; i < positions.length; i++) {
-        if (i !== indexToOverlap && !positions[i].isFixed &&
-            getOverlapArea(positions[i], positions[indexToOverlap]) > 0) {
+        if (i !== indexToOverlap && !positions[i].isFixed
+            && getOverlapArea(positions[i], positions[indexToOverlap]) > 0) {
             return i;
         }
     }

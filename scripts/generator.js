@@ -3,11 +3,12 @@ const path = require("path");
 const puppeteer = require("puppeteer");
 const { promisify } = require("util");
 const { spawn } = require("child_process");
+const { getTemplate } = require("./store");
 
 const writeFileAsync = promisify(fs.writeFile);
 
 const CLIENT_URL = "http://localhost:5000";
-const RENDER_TIMEOUT = 60 * 60 * 1000;
+const RENDER_TIMEOUT = 5 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
 const SCALE = 96 / 72;
 
@@ -33,10 +34,14 @@ async function initialize() {
  */
 async function renderComponent(options) {
     const {
-        id, component, props, onInfo, onError,
+        id, component, template, props, onInfo, onError,
     } = options;
 
     const page = await browser.newPage();
+
+    // Provide the template through this function instead of the URL,
+    // as it will contain large SVG files.
+    await page.exposeFunction("getTemplate", templateId => getTemplate({ id: templateId }, "svg"));
 
     page.on("error", (error) => {
         page.close();
@@ -51,11 +56,11 @@ async function renderComponent(options) {
     });
 
     const encodedProps = encodeURIComponent(JSON.stringify(props));
-    const url = `${CLIENT_URL}/?component=${component}&props=${encodedProps}`;
+    const pageUrl = `${CLIENT_URL}/?component=${component}&props=${encodedProps}&template=${template}`;
 
-    console.log(url);
+    console.log(`Opening ${pageUrl} in Puppeteer.`);
 
-    await page.goto(url, {
+    await page.goto(pageUrl, {
         timeout: RENDER_TIMEOUT,
     });
 

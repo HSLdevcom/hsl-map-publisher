@@ -40,13 +40,15 @@ const Path = props => (
             </div>
         ))}
 
-        {props.children &&
-            <div>
-                <div className={styles.footer} style={{ width: getWidth(props.children) }}/>
-                <div className={styles.children}>
-                    {props.children.map((branch, index) => <Path key={index} {...branch}/>)}
+        {props.children
+            && (
+                <div>
+                    <div className={styles.footer} style={{ width: getWidth(props.children) }}/>
+                    <div className={styles.children}>
+                        {props.children.map((branch, index) => <Path key={index} {...branch}/>)}
+                    </div>
                 </div>
-            </div>
+            )
         }
     </div>
 );
@@ -63,6 +65,7 @@ Path.propTypes = {
     })).isRequired,
 };
 
+// eslint-disable-next-line
 Path.propTypes.children = PropTypes.arrayOf(PropTypes.shape(Path.propTypes));
 
 export default Path;

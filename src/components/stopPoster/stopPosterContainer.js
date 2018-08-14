@@ -6,7 +6,9 @@ import withProps from "recompose/withProps";
 import flatMap from "lodash/flatMap";
 
 import apolloWrapper from "util/apolloWrapper";
-import { isNumberVariant, trimRouteId, isTrunkRoute, isDropOffOnly } from "util/domain";
+import {
+    isNumberVariant, trimRouteId, isTrunkRoute, isDropOffOnly,
+} from "util/domain";
 
 import StopPoster from "./stopPoster";
 

@@ -37,14 +37,16 @@ class QrCode extends Component {
     render() {
         return (
             <div style={this.props.style} className={this.props.className}>
-                {this.state.src &&
-                    <img
-                        style={{ display: "block", width: "100%" }}
-                        src={this.state.src}
-                        onLoad={() => renderQueue.remove(this)}
-                        onError={() => renderQueue.remove(this, { error: new Error("Failed to render QR code") })}
-                        alt=""
-                    />
+                {this.state.src
+                    && (
+                        <img
+                            style={{ display: "block", width: "100%" }}
+                            src={this.state.src}
+                            onLoad={() => renderQueue.remove(this)}
+                            onError={() => renderQueue.remove(this, { error: new Error("Failed to render QR code") })}
+                            alt=""
+                        />
+                    )
                 }
             </div>
         );
