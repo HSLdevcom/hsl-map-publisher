@@ -8,28 +8,50 @@ const generator = require("./generator");
 const {
     migrate, addEvent,
     getBuilds, getBuild, addBuild, updateBuild, removeBuild,
-    getPoster, addPoster, updatePoster, removePoster,
+    getPoster, addPoster, updatePoster, removePoster, getTemplates, addTemplate,
+    saveTemplate, getImages, removeImage, removeTemplate,
 } = require("./store");
 
 const PORT = 4000;
 
-async function generatePoster(buildId, component, props) {
-    const { id } = await addPoster({ buildId, component, props });
+async function generatePoster(buildId, component, template, props) {
+    const { id } = await addPoster({
+        buildId,
+        component,
+        template,
+        props,
+    });
 
     const onInfo = (message = "No message.") => {
         console.log(`${id}: ${message}`); // eslint-disable-line no-console
-        addEvent({ posterId: id, type: "INFO", message });
+        addEvent({
+            posterId: id,
+            type: "INFO",
+            message,
+        });
     };
     const onError = (error) => {
         console.error(`${id}: ${error.message} ${error.stack}`); // eslint-disable-line no-console
-        addEvent({ posterId: id, type: "ERROR", message: error.message });
+        addEvent({
+            posterId: id,
+            type: "ERROR",
+            message: error.message,
+        });
     };
 
     const options = {
-        id, component, props, onInfo, onError,
+        id,
+        component,
+        props,
+        template,
+        onInfo,
+        onError,
     };
     generator.generate(options)
-        .then(({ success }) => updatePoster({ id, status: success ? "READY" : "FAILED" }))
+        .then(({ success }) => updatePoster({
+            id,
+            status: success ? "READY" : "FAILED",
+        }))
         .catch(error => console.error(error)); // eslint-disable-line no-console
 
     return { id };
@@ -53,8 +75,41 @@ async function main() {
 
     // FIXME: Update UI to fetch from graphql and remove when data available
     const stops = await fetchStops();
+
     router.get("/stops", (ctx) => {
         ctx.body = stops;
+    });
+
+    router.get("/images", async (ctx) => {
+        ctx.body = await getImages();
+    });
+
+    router.delete("/images/:name", async (ctx) => {
+        const { name } = ctx.params;
+        const image = await removeImage({ name });
+        ctx.body = image;
+    });
+
+    router.get("/templates", async (ctx) => {
+        ctx.body = await getTemplates();
+    });
+
+    router.post("/templates", async (ctx) => {
+        const { label } = ctx.request.body;
+        const template = await addTemplate({ label });
+        ctx.body = template;
+    });
+
+    router.put("/templates", async (ctx) => {
+        const template = ctx.request.body;
+        await saveTemplate(template);
+        ctx.body = true;
+    });
+
+    router.delete("/templates/:id", async (ctx) => {
+        const { id } = ctx.params;
+        const template = await removeTemplate({ id });
+        ctx.body = template;
     });
 
     router.get("/builds", async (ctx) => {
@@ -77,7 +132,10 @@ async function main() {
     router.put("/builds/:id", async (ctx) => {
         const { id } = ctx.params;
         const { status } = ctx.request.body;
-        const build = await updateBuild({ id, status });
+        const build = await updateBuild({
+            id,
+            status,
+        });
         ctx.body = build;
     });
 
@@ -94,11 +152,13 @@ async function main() {
     });
 
     router.post("/posters", async (ctx) => {
-        const { buildId, component, props } = ctx.request.body;
+        const {
+            buildId, component, props, template,
+        } = ctx.request.body;
         const posters = [];
         for (let i = 0; i < props.length; i++) {
             // eslint-disable-next-line no-await-in-loop
-            posters.push(await generatePoster(buildId, component, props[i]));
+            posters.push(await generatePoster(buildId, component, template, props[i]));
         }
         ctx.body = posters;
     });
@@ -112,7 +172,8 @@ async function main() {
     router.get("/downloadBuild/:id", async (ctx) => {
         const { id } = ctx.params;
         const { title, posters } = await getBuild({ id });
-        const posterIds = posters.filter(poster => poster.status === "READY").map(poster => poster.id);
+        const posterIds = posters.filter(poster => poster.status === "READY")
+            .map(poster => poster.id);
         ctx.type = "application/pdf";
         ctx.set("Content-Disposition", `attachment; filename="${title}-${id}.pdf"`);
         ctx.body = generator.concatenate(posterIds);
@@ -126,6 +187,7 @@ async function main() {
         ctx.body = generator.concatenate([id]);
     });
 
+
     app
         .use(errorHandler)
         .use(cors())
@@ -135,4 +197,5 @@ async function main() {
         .listen(PORT, () => console.log(`Listening at ${PORT}`)); // eslint-disable-line no-console
 }
 
-main().catch(error => console.error(error)); // eslint-disable-line no-console
+main()
+    .catch(error => console.error(error)); // eslint-disable-line no-console

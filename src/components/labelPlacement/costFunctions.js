@@ -9,14 +9,13 @@ const DISTANCE_COST = 2.5;
 const ANGLE_COST = 1;
 
 function hasOverflow(position, boundingBox) {
-    return position.left < 0 || position.top < 0 ||
-          (position.left + position.width) > boundingBox.width ||
-          (position.top + position.height) > boundingBox.height;
+    return position.left < 0 || position.top < 0
+          || (position.left + position.width) > boundingBox.width
+          || (position.top + position.height) > boundingBox.height;
 }
 
 function getOverflowCost(positions, indexes, boundingBox) {
-    return OVERFLOW_COST * indexes.reduce((prev, index) =>
-        (hasOverflow(positions[index], boundingBox) ? (prev + 1) : prev), 0);
+    return OVERFLOW_COST * indexes.reduce((prev, index) => (hasOverflow(positions[index], boundingBox) ? (prev + 1) : prev), 0);
 }
 
 /**
@@ -128,8 +127,7 @@ function getFixedIntersectionCost(positions, indexes) {
  * @returns {number}
  */
 function getDistanceCost(positions, indexes) {
-    return DISTANCE_COST * indexes.reduce((prev, index) =>
-        prev + (positions[index].distance - positions[index].initialDistance), 0);
+    return DISTANCE_COST * indexes.reduce((prev, index) => prev + (positions[index].distance - positions[index].initialDistance), 0);
 }
 
 /**

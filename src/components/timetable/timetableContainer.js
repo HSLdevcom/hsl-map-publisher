@@ -107,9 +107,9 @@ function getDuplicateRouteNote(duplicateRoutes, departure) {
 
 function addMissingFridayNote(departure) {
     return (
-        departure.dayType.length === 1 &&
-        departure.dayType.includes("Pe") &&
-        (!departure.note || !departure.note.includes("p"))
+        departure.dayType.length === 1
+        && departure.dayType.includes("Pe")
+        && (!departure.note || !departure.note.includes("p"))
             ? "p" : null
     );
 }
@@ -117,8 +117,8 @@ function addMissingFridayNote(departure) {
 
 function addMissingNonAccessibleNote(departure) {
     return (
-        departure.isAccessible === false &&
-        (!departure.note || !departure.note.includes("e"))
+        departure.isAccessible === false
+        && (!departure.note || !departure.note.includes("e"))
             ? "e" : null
     );
 }
@@ -152,11 +152,10 @@ const propsMapper = mapProps((props) => {
         route => route.routeId
     ))
         .filter(routes => routes.length > 1)
-        .forEach(directions =>
-            directions.forEach((direction) => {
-                notes.push(`${trimRouteId(direction.routeId)}${"*".repeat(direction.direction)} ${direction.route.nodes[0].destinationFi} / ${direction.route.nodes[0].destinationSe}`);
-                duplicateRoutes.push(direction.routeId);
-            }));
+        .forEach(directions => directions.forEach((direction) => {
+            notes.push(`${trimRouteId(direction.routeId)}${"*".repeat(direction.direction)} ${direction.route.nodes[0].destinationFi} / ${direction.route.nodes[0].destinationSe}`);
+            duplicateRoutes.push(direction.routeId);
+        }));
 
     departures = departures.map(departure => ({
         ...departure,

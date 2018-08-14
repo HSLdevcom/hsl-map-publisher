@@ -73,11 +73,13 @@ class ItemContainer extends Component {
         });
         return (
             <div className={styles.root} ref={(ref) => { this.root = ref; }}>
-                {this.state.items && <ItemOverlay
-                    width={this.root.offsetWidth}
-                    height={this.root.offsetHeight}
-                    items={this.state.items}
-                />}
+                {this.state.items && (
+                    <ItemOverlay
+                        width={this.root.offsetWidth}
+                        height={this.root.offsetHeight}
+                        items={this.state.items}
+                    />
+                )}
                 {children}
             </div>
         );

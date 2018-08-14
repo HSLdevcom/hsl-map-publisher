@@ -59,14 +59,15 @@ ClipPath.propTypes = {
 const ItemOverlay = props => (
     <svg width={props.width} height={props.height}>
         <defs>
-            {props.items.map((item, index) =>
-                (<ClipPath
+            {props.items.map((item, index) => (
+                <ClipPath
                     key={index}
                     index={index}
                     totalWidth={props.width}
                     totalHeight={props.height}
                     {...item}
-                />))}
+                />
+            ))}
         </defs>
         {props.items.map((item, index) => <Line key={index} index={index} {...item}/>)}
     </svg>

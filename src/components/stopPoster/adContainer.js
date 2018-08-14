@@ -1,24 +1,16 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import get from "lodash/get";
 import { InlineSVG } from "components/util";
 import renderQueue from "util/renderQueue";
-
-import { getFeedbackUrl } from "data/feedbackCodes";
-
-import mobileIcon from "icons/ad_mobile.svg";
-import mobileTrunkIcon from "icons/ad_mobile_trunk.svg";
-import feedbackIcon from "icons/ad_feedback.svg";
-import noSmokingIcon from "icons/ad_nosmoking.svg";
 
 class AdContainer extends Component {
     constructor(props) {
         super(props);
 
-        const ads = [];
-        if (!this.props.isTrunkStop) ads.push(mobileIcon);
-        if (this.props.isTrunkStop) ads.push(mobileTrunkIcon);
-        if (getFeedbackUrl(this.props.shortId)) ads.push(feedbackIcon);
-        ads.push(noSmokingIcon);
+        const ads = get(props, "template.slots", [])
+            .map(slot => get(slot, "image.svg", "")) // get svg's from template
+            .filter(svg => !!svg); // Only non-falsy svg's allowed
 
         this.state = { ads };
     }
@@ -34,15 +26,15 @@ class AdContainer extends Component {
 
     updateLayout() {
         if (this.hasOverflow()) {
-            this.setState({ ads: this.state.ads.slice(0, -1) });
-            return;
+            this.setState(state => ({ ads: state.ads.slice(0, -1) }));
+        } else {
+            renderQueue.remove(this);
         }
-        renderQueue.remove(this);
     }
 
     hasOverflow() {
-        return (this.root.scrollWidth > this.root.clientWidth) ||
-               (this.root.scrollHeight > this.root.clientHeight);
+        return (this.root.scrollWidth > this.root.clientWidth)
+               || (this.root.scrollHeight > this.root.clientHeight);
     }
 
     render() {
@@ -68,7 +60,7 @@ AdContainer.propTypes = {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     shortId: PropTypes.string.isRequired,
-    isTrunkStop: PropTypes.bool.isRequired,
+    template: PropTypes.any.isRequired,
 };
 
 export default AdContainer;

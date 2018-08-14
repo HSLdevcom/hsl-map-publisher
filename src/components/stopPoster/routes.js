@@ -41,7 +41,7 @@ class Routes extends Component {
         if (this.hasOverflow()) {
             if (this.state.columns > 1) {
                 renderQueue.add(this);
-                this.setState({ columns: this.state.columns - 1 });
+                this.setState(state => ({ columns: state.columns - 1 }));
                 return;
             }
             renderQueue.remove(this, { error: new Error("Failed to remove routes overflow") });

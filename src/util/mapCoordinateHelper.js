@@ -14,19 +14,16 @@ const SOUTHERNMOST_LINE = {
 function isSouthOfSouthernmostLine([lon, lat]) {
     return (
         (lon - SOUTHERNMOST_LINE.start.lon)
-        *
-        (SOUTHERNMOST_LINE.end.lat - SOUTHERNMOST_LINE.start.lat)
+        * (SOUTHERNMOST_LINE.end.lat - SOUTHERNMOST_LINE.start.lat)
     ) - (
         (lat - SOUTHERNMOST_LINE.start.lat)
-        *
-        (SOUTHERNMOST_LINE.end.lon - SOUTHERNMOST_LINE.start.lon)
+        * (SOUTHERNMOST_LINE.end.lon - SOUTHERNMOST_LINE.start.lon)
     ) > 0;
 }
 
 function getNewBottomMostPoint(lon) {
     const slope = (SOUTHERNMOST_LINE.end.lat - SOUTHERNMOST_LINE.start.lat)
-    /
-    (SOUTHERNMOST_LINE.end.lon - SOUTHERNMOST_LINE.start.lon);
+    / (SOUTHERNMOST_LINE.end.lon - SOUTHERNMOST_LINE.start.lon);
 
     return ((lon - SOUTHERNMOST_LINE.start.lon) * slope)
     + SOUTHERNMOST_LINE.start.lat;
@@ -49,14 +46,12 @@ export default class MapCoordinateHelper {
     }
 
     getMapCenter() {
-        const initialBottomPoint =
-            this.viewport.unproject([this.mapOptions.width / 2, this.mapOptions.height]);
+        const initialBottomPoint = this.viewport.unproject([this.mapOptions.width / 2, this.mapOptions.height]);
 
         let mapCenter = null;
 
         if (isSouthOfSouthernmostLine(initialBottomPoint)) {
-            const mapHeight =
-                this.viewport.unproject([0, 0])[1]
+            const mapHeight = this.viewport.unproject([0, 0])[1]
                 - this.viewport.unproject([0, this.mapOptions.height])[1];
 
             mapCenter = [

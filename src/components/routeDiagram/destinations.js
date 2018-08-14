@@ -19,12 +19,18 @@ const Destinations = (props) => {
                 <WrappingRow key={groupIndex} style={{ marginBottom: 5 }}>
                     {destinations.map((destination, index) => (
                         <Row key={index}>
-                            <div className={styles.routeId}>{destination.routeId}</div>
+                            <div className={styles.routeId}>
+                                {destination.routeId}
+                            </div>
                         </Row>
                     ))}
                     <Column style={{ flexBasis: "100%" }}>
-                        <div className={styles.title}>{destinations[0].titleFi}</div>
-                        <div className={styles.subtitle}>{destinations[0].titleSe}</div>
+                        <div className={styles.title}>
+                            {destinations[0].titleFi}
+                        </div>
+                        <div className={styles.subtitle}>
+                            {destinations[0].titleSe}
+                        </div>
                     </Column>
                 </WrappingRow>
             ))}

@@ -55,13 +55,13 @@ function isTrunkRoute(routeId) {
 function trimRouteId(routeId) {
     if (isRailRoute(routeId) && isNumberVariant(routeId)) {
         return routeId.substring(1, 5).replace(RAIL_ROUTE_ID_REGEXP, "");
-    } else if (isRailRoute(routeId)) {
+    } if (isRailRoute(routeId)) {
         return routeId.replace(RAIL_ROUTE_ID_REGEXP, "");
-    } else if (isSubwayRoute(routeId) && isNumberVariant(routeId)) {
+    } if (isSubwayRoute(routeId) && isNumberVariant(routeId)) {
         return routeId.substring(1, 5).replace(SUBWAY_ROUTE_ID_REGEXP, "");
-    } else if (isSubwayRoute(routeId)) {
+    } if (isSubwayRoute(routeId)) {
         return routeId.replace(SUBWAY_ROUTE_ID_REGEXP, "");
-    } else if (isNumberVariant(routeId)) {
+    } if (isNumberVariant(routeId)) {
         // Do not show number variants
         return routeId.substring(1, 5).replace(/^[0]+/g, "");
     }
