@@ -3,7 +3,6 @@ const Router = require("koa-router");
 const cors = require("@koa/cors");
 const jsonBody = require("koa-json-body");
 
-const { fetchStops } = require("./stops");
 const generator = require("./generator");
 const {
     migrate, addEvent,
@@ -72,13 +71,6 @@ async function main() {
 
     const app = new Koa();
     const router = new Router();
-
-    // FIXME: Update UI to fetch from graphql and remove when data available
-    const stops = await fetchStops();
-
-    router.get("/stops", (ctx) => {
-        ctx.body = stops;
-    });
 
     router.get("/images", async (ctx) => {
         ctx.body = await getImages();
