@@ -4,6 +4,8 @@ import { ApolloClient } from "apollo-client";
 import { createHttpLink } from "apollo-link-http";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { ApolloProvider } from "react-apollo";
+import qs from "qs";
+import get from "lodash/get";
 
 import StopPoster from "components/stopPoster/stopPosterContainer";
 import Timetable from "components/timetable/timetableContainer";
@@ -63,10 +65,13 @@ class App extends Component {
         let template;
 
         try {
-            params = new URLSearchParams(window.location.search.substring(1));
-            ComponentToRender = components[params.get("component")];
-            props = JSON.parse(params.get("props"));
-            template = params.get("template");
+            params = qs.parse(window.location.search, {
+                ignoreQueryPrefix: true,
+                decoder: str => (str === "true" ? true : str === "false" ? false : decodeURIComponent(str)),
+            });
+            ComponentToRender = components[get(params, "component", "")];
+            props = get(params, "props", "{}");
+            template = get(params, "template", "");
         } catch (error) {
             App.handleError(new Error("Failed to parse url fragment"));
             return null;

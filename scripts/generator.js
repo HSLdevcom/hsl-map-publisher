@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const puppeteer = require("puppeteer");
+const qs = require("qs");
 const { promisify } = require("util");
 const { spawn } = require("child_process");
 const { getTemplate } = require("./store");
@@ -55,8 +56,8 @@ async function renderComponent(options) {
         }
     });
 
-    const encodedProps = encodeURIComponent(JSON.stringify(props));
-    const pageUrl = `${CLIENT_URL}/?component=${component}&props=${encodedProps}&template=${template}`;
+    const encodedProps = qs.stringify({ component, props, template });
+    const pageUrl = `${CLIENT_URL}/?${encodedProps}`;
 
     console.log(`Opening ${pageUrl} in Puppeteer.`);
 
