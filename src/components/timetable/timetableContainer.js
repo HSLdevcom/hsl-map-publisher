@@ -34,20 +34,38 @@ function groupDepartures(departures) {
 }
 
 function getNotes(isSummerTimetable) {
+    // because apparently there may be many
+    let didForceShowPNote = false;
+
     return function getNotesInner(routeSegment) {
         if (!routeSegment.hasRegularDayDepartures) {
             return [];
         }
+
         return routeSegment.notes.nodes
             // Y = Yleisöaikataulu
-            .filter(({ noteType }) => noteType.includes("Y"))
             // V = Ympäri vuoden
             // K = Vain kesäaikataulu
             // T = Vain talviaikatalu
-            .filter(({ noteType }) => (
-                noteType.includes("V") || noteType.includes(isSummerTimetable ? "K" : "T")
-            ))
-            .map(note => note.noteText);
+            .filter(({ noteType, noteText }) => {
+                // Find the pe or p notes and force them to show.
+                if (!didForceShowPNote && /^pe?\s/.test(noteText)) {
+                    didForceShowPNote = true;
+                    return true;
+                }
+
+                if (/^e\s/.test(noteText)) {
+                    return true;
+                }
+
+                return noteType.includes("Y")
+                       && (noteType.includes("V")
+                        || noteType.includes(isSummerTimetable ? "K" : "T"));
+            })
+            .map((note) => {
+                const noteText = note.noteText || "";
+                return noteText.replace(/^pe\s/, "p ");
+            });
     };
 }
 
@@ -166,7 +184,6 @@ const propsMapper = mapProps((props) => {
             getDuplicateRouteNote(duplicateRoutes, departure),
         ].join(""),
     }));
-
 
     const { weekdays, saturdays, sundays } = pick(groupDepartures(departures), props.segments);
 
