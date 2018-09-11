@@ -25,6 +25,7 @@
     "no-console": 0,
     "max-len": 0,
     "no-unused-vars": 0,
+    "no-nested-ternary": "off",
     "react/no-unused-prop-types": 0,
     "react/jsx-indent": [ "error", 4 ],
     "react/jsx-indent-props": [ "error", 4 ],
