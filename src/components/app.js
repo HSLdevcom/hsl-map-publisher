@@ -67,7 +67,18 @@ class App extends Component {
         try {
             params = qs.parse(window.location.search, {
                 ignoreQueryPrefix: true,
-                decoder: str => (str === "true" ? true : str === "false" ? false : decodeURIComponent(str)),
+                decoder: (str) => {
+                    // Make booleans booleans again
+                    // qs encodes booleans to strings, we need to make sure that they are real booleans.
+                    if (str === "true") {
+                        return true;
+                    }
+                    if (str === "false") {
+                        return false;
+                    }
+
+                    return decodeURIComponent(str);
+                },
             });
             ComponentToRender = components[get(params, "component", "")];
             props = get(params, "props", "{}");
