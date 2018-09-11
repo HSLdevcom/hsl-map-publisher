@@ -85,10 +85,10 @@ class Routes extends Component {
                                     style={{ color: getColor(route) }}
                                 >
                                     <div className={styles.title}>
-                                        {route.destinationFi}
+                                        {route.destinationFi + (route.viaFi ? ` via ${route.viaFi}` : "")}
                                     </div>
                                     <div className={styles.subtitle}>
-                                        {route.destinationSe}
+                                        {route.destinationSe + (route.viaSe ? ` via ${route.viaSe}` : "")}
                                     </div>
                                 </div>
                             ))}

@@ -19,6 +19,8 @@ query routesQuery($stopId: String!, $date: Date!) {
                 routeSegments: routeSegmentsForDate(date: $date) {
                     nodes {
                         routeId
+                        viaFi
+                        viaSe
                         hasRegularDayDepartures(date: $date)
                         pickupDropoffType
                         route {
@@ -45,6 +47,8 @@ const propsMapper = mapProps(props => ({
             .filter(routeSegment => !isDropOffOnly(routeSegment))
             .map(routeSegment => ({
                 ...routeSegment.route.nodes[0],
+                viaFi: routeSegment.viaFi,
+                viaSe: routeSegment.viaSe,
                 routeId: trimRouteId(routeSegment.routeId),
             }))
     ).sort(routeCompare),
