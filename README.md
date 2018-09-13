@@ -55,6 +55,12 @@ The React app needs to be run separately:
 npm start
 ```
 
+Now you can use the UI with the server, or open a poster separately in yor browser. The poster app needs `component` and `props` query parameters, and the server will echo the currently rendering URL in its console. But if you just need to open the poster app, you can use this link that will show H0454, Snellmaninkatu:
+
+`http://localhost:5000/?component=StopPoster&props%5BstopId%5D=1010124&props%5Bdate%5D=2018-09-13&props%5BisSummerTimetable%5D=false&props%5BdateBegin%5D=&props%5BdateEnd%5D=&props%5BprintTimetablesAsA4%5D=false&props%5BprintTimetablesAsGreyscale%5D=false&template=mock_template`
+
+Note that the template name doesn't matter when opening the URL outside of Puppeteer, as it will fall back to a mock template.
+
 ### Running in Docker
 
 Start a Postgres Docker container:
