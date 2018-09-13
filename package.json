@@ -10,7 +10,7 @@
     "serve": "serve dist",
     "start": "webpack-serve ./webpack.dev.js",
     "server": "node scripts/server",
-    "server:hot": "PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5678/postgres forever -w -t --killSignal=SIGTERM --watchDirectory scripts scripts/server.js",
+    "server:hot": "forever -w -t --killSignal=SIGTERM --watchDirectory scripts scripts/server.js",
     "knex": "PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres knex",
     "docker:build": "docker build -t hsl-map-publisher .",
     "docker:run": "docker run -d -p 4000:4000 --name publisher -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres -e \"PG_CONNECTION_STRING=postgres://postgres:postgres@publisher-postgres:5432/postgres\" --shm-size=1G hsl-map-publisher",

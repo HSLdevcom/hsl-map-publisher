@@ -13,14 +13,7 @@ Install `pdftk`
 
 ### App
 
-React app and components for HSL stop posters
-
-Start development server:
-```
-yarn start:hot
-```
-
-Open [http://localhost:5000/?component=StopPoster&props={"stopId": "1284117", "date": "2018-01-15"}](http://localhost:5000/?component=StopPoster&props={%22stopId%22:%221284117%22,%22date%22:%222018-01-15%22})
+Server for creating HSL stop posters. Uses React to render the posters, and a PostgreSQL database to save builds. Use the [publisher-ui](https://github.com/HSLdevcom/hsl-map-publisher-ui) project to control the server.
 
 ### Writing components
 
@@ -37,9 +30,29 @@ Start Postgres:
 docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres
 ```
 
-Start server:
+Adjust the port if you have many Postgres instances running on your machine. The server needs the `PG_CONNECTION_STRING` environment variable set, which it uses to connect to your Postgres instance. If you use the default Postgres port, it looks like this:
+
+```bash
+PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres
 ```
-PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres yarn server
+
+Again, adjust the port if you are running yoir Publisher Postgres instance in an other port.
+
+Start the Publisher server, prepending the Postgres connection string:
+```bash
+PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres npm run server:hot
+```
+
+That command will run a Forever instance that watches for changes and restarts the server when they happen.
+
+Alternatively, to run the server with plain Node, leave off `hot`:
+```bash
+PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres npm run server
+```
+
+The React app needs to be run separately:
+```bash
+npm start
 ```
 
 ### Running in Docker
