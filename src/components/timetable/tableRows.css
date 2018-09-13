@@ -4,7 +4,7 @@
 
 .root > * {
     margin: 0 calc(-1 * var(--border-radius));
-    padding: 0 var(--border-radius);
+    padding: 0 calc(var(--border-radius) * 0.5) 0 var(--border-radius);
 }
 
 .root > *:nth-child(odd) {
@@ -13,12 +13,13 @@
 
 .item {
     display: flex;
-    min-width: 52px;
+    min-width: 60px;
     padding: 4px 0;
     font-family: GothamXNarrow-Book;
     font-size: 12px;
     letter-spacing: -.025em;
     line-height: 8px;
+    margin-right: 4px;
 }
 
 .minutes {

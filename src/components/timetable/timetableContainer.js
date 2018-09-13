@@ -64,7 +64,7 @@ function getNotes(isSummerTimetable) {
             })
             .map((note) => {
                 const noteText = note.noteText || "";
-                return noteText.replace(/^pe\s/, "p ");
+                return noteText.replace(/^(p|pe)(\s=)?\s/, "pe = ");
             });
     };
 }
@@ -134,11 +134,24 @@ function addMissingFridayNote(departure) {
 
 
 function addMissingNonAccessibleNote(departure) {
-    return (
-        departure.isAccessible === false
-        && (!departure.note || !departure.note.includes("e"))
-            ? "e" : null
-    );
+    return departure.isAccessible === false
+           && (!departure.note || !departure.note.includes("e")) ? "e" : null;
+}
+
+// Bandaid for making the notes uniform and logical
+function modifyNote(departureNote) {
+    if (!departureNote) {
+        return null;
+    }
+
+    switch (departureNote) {
+    case "p":
+        return "pe";
+    case "pe":
+        return "pe\u202Fe";
+    default:
+        return departureNote;
+    }
 }
 
 const propsMapper = mapProps((props) => {
@@ -177,12 +190,12 @@ const propsMapper = mapProps((props) => {
 
     departures = departures.map(departure => ({
         ...departure,
-        note: [
+        note: modifyNote([
             departure.note,
             addMissingNonAccessibleNote(departure),
             addMissingFridayNote(departure),
             getDuplicateRouteNote(duplicateRoutes, departure),
-        ].join(""),
+        ].join("")),
     }));
 
     const { weekdays, saturdays, sundays } = pick(groupDepartures(departures), props.segments);
