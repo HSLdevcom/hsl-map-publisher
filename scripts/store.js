@@ -166,7 +166,7 @@ async function addEvent({
         }, snakeCase));
 }
 
-async function getTemplateImage(slot, fields = "*") {
+async function getTemplateImage(slot) {
     const emptySlot = {
         image: null,
         size: get(slot, "size", 1),
@@ -179,7 +179,7 @@ async function getTemplateImage(slot, fields = "*") {
     }
 
     const dbImg = await knex
-        .select(fields)
+        .select("*")
         .from("template_images")
         .where({ name: imageName })
         .first();
@@ -191,14 +191,14 @@ async function getTemplateImage(slot, fields = "*") {
     return emptySlot;
 }
 
-async function getTemplateImages(template, fields = "*") {
+async function getTemplateImages(template) {
     if (!template) {
         return template;
     }
 
     return merge({}, template, {
         areas: await pMap(template.areas, async area => merge({}, area, {
-            slots: await pMap(area.slots, slot => getTemplateImage(slot, fields)),
+            slots: await pMap(area.slots, slot => getTemplateImage(slot)),
         })),
     });
 }
@@ -207,7 +207,7 @@ async function getTemplates() {
     const templates = await knex("template")
         .select("*")
         .orderBy("created_at", "asc");
-    return pMap(templates, getTemplateImages);
+    return pMap(templates, template => getTemplateImages(template));
 }
 
 async function addTemplate({ label }) {
@@ -220,18 +220,18 @@ async function addTemplate({ label }) {
     return template;
 }
 
-async function getTemplate({ id }, imageFields = "*") {
+async function getTemplate({ id }, withImages = true) {
     const templateRow = await knex
         .select("*")
         .from("template")
         .where({ id })
         .first();
 
-    if (imageFields === "none") {
+    if (!withImages) {
         return templateRow;
     }
 
-    return getTemplateImages(templateRow, imageFields);
+    return getTemplateImages(templateRow);
 }
 
 // Not exported. Saves the passed images into the database.

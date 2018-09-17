@@ -4,6 +4,7 @@ const puppeteer = require("puppeteer");
 const qs = require("qs");
 const { promisify } = require("util");
 const { spawn } = require("child_process");
+const log = require("./util/log");
 const { getTemplate } = require("./store");
 
 const writeFileAsync = promisify(fs.writeFile);
@@ -42,7 +43,8 @@ async function renderComponent(options) {
 
     // Provide the template through this function instead of the URL,
     // as it will contain large SVG files.
-    await page.exposeFunction("getTemplate", templateId => getTemplate({ id: templateId }, "svg"));
+    await page.exposeFunction("getTemplate", templateId => getTemplate({ id: templateId }));
+    await page.exposeFunction("serverLog", log);
 
     page.on("error", (error) => {
         page.close();

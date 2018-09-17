@@ -67,7 +67,8 @@ const firstSlotLeft = 453;
 
 function createTemplateSlots(areaSlots) {
     return areaSlots.reduce((slots, { image, size }, idx) => {
-        const { svg = "", name } = image;
+        const svg = get(image, "svg", "");
+        const name = get(image, "name", "");
 
         if (!size || !svg) {
             return slots;
@@ -122,9 +123,7 @@ const Footer = (props) => {
                 src={customerService}
             />
             {slots.map((slot, slotIdx) => {
-                if (!slot.svg || slot.size === 0) {
-                    return null;
-                }
+                const svg = get(slot, "svg", "");
 
                 return (
                     <div
@@ -134,7 +133,7 @@ const Footer = (props) => {
                     >
                         <div
                             className={styles.svgContainer}
-                            dangerouslySetInnerHTML={{ __html: slot.svg }}
+                            dangerouslySetInnerHTML={{ __html: svg }}
                         />
                         {slot.dynamicAreas.map((area, areaIdx) => {
                             const url = get(urlsByType, get(area, "data", ""), null);
