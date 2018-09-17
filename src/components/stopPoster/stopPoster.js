@@ -9,7 +9,6 @@ import CropMarks from "components/cropMarks";
 import RouteDiagram from "components/routeDiagram/routeDiagramContainer";
 import TramDiagram from "components/tramDiagram/tramDiagram";
 import Timetable from "components/timetable/timetableContainer";
-import StopMap from "components/map/stopMapContainer";
 import Metadata from "components/metadata";
 
 import Header from "./headerContainer";
@@ -19,8 +18,7 @@ import Routes from "./routesContainer";
 import AdContainer from "./adContainer";
 
 import styles from "./stopPoster.css";
-
-const MAP_MIN_HEIGHT = 500;
+import CustomMap from "../map/customMap";
 
 const trunkStopStyle = {
     "--background": colorsByMode.TRUNK,
@@ -205,20 +203,13 @@ class StopPoster extends Component {
 
                                     {!this.state.hasDiagram && <Spacer height={10}/>}
 
-                                    <div style={{ flex: 1 }} ref={(ref) => { this.map = ref; }}>
-                                        {this.state.shouldRenderFixedContent
-                                         && this.map.clientHeight >= MAP_MIN_HEIGHT
-                                         && (
-                                             <StopMap
-                                                 stopId={this.props.stopId}
-                                                 date={this.props.date}
-                                                 width={this.map.clientWidth}
-                                                 height={this.map.clientHeight}
-                                                 showCitybikes={this.props.isSummerTimetable}
-                                             />
-                                         )
-                                        }
-                                    </div>
+                                    <CustomMap
+                                        shouldRenderFixedContent={this.state.shouldRenderFixedContent}
+                                        stopId={this.props.stopId}
+                                        date={this.props.date}
+                                        isSummerTimetable={this.props.isSummerTimetable}
+                                        template={template ? template.areas.find(t => t.key === "map") : null}
+                                    />
 
                                     <Spacer height={10}/>
 
