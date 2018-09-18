@@ -183,7 +183,7 @@ async function main() {
     app
         .use(errorHandler)
         .use(cors())
-        .use(jsonBody({ fallback: true }))
+        .use(jsonBody({ fallback: true, limit: '10mb' }))
         .use(router.routes())
         .use(router.allowedMethods())
         .listen(PORT, () => console.log(`Listening at ${PORT}`)); // eslint-disable-line no-console
