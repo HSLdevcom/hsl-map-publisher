@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { hot } from "react-hot-loader";
+import { get } from "lodash";
 import { JustifiedColumn, Spacer } from "components/util";
 import renderQueue from "util/renderQueue";
 import { colorsByMode } from "util/domain";
@@ -45,14 +46,25 @@ class StopPoster extends Component {
         renderQueue.add(this);
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         if (this.props.template) {
-            window.getTemplate(this.props.template)
-                .then((templateData) => {
-                    this.setState({
-                        template: templateData,
-                    });
-                });
+            renderQueue.add(this);
+
+            let templateReq;
+            let templateBody = null;
+
+            try {
+                // This url will probably always be the same. If you find yourself
+                // changing it, please make an .env setup while you're at it.
+                templateReq = await window.fetch(`http://localhost:4000/templates/${this.props.template}`);
+                templateBody = await templateReq.json();
+            } catch (err) {
+                this.onError(err);
+            }
+
+            this.setState({
+                template: templateBody,
+            });
         }
 
         renderQueue.onEmpty(error => !error && this.updateLayout(), { ignore: this });
@@ -172,7 +184,7 @@ class StopPoster extends Component {
                                         {this.state.shouldRenderFixedContent
                                          && (
                                              <AdContainer
-                                                 template={template.areas.find(t => t.key === "ads")}
+                                                 template={template ? get(template, "areas", []).find(t => t.key === "ads") : {}}
                                                  width={this.ad.clientWidth}
                                                  height={this.ad.clientHeight}
                                                  shortId={this.props.shortId}
@@ -208,7 +220,7 @@ class StopPoster extends Component {
                                         stopId={this.props.stopId}
                                         date={this.props.date}
                                         isSummerTimetable={this.props.isSummerTimetable}
-                                        template={template ? template.areas.find(t => t.key === "map") : null}
+                                        template={template ? get(template, "areas", []).find(t => t.key === "map") : null}
                                     />
 
                                     <Spacer height={10}/>
@@ -230,7 +242,7 @@ class StopPoster extends Component {
                         </div>
                         <Footer
                             onError={this.onError}
-                            template={template ? template.areas.find(t => t.key === "footer") : {}}
+                            template={template ? get(template, "areas", []).find(t => t.key === "footer") : {}}
                             shortId={this.props.shortId}
                             isTrunkStop={this.props.isTrunkStop}
                         />

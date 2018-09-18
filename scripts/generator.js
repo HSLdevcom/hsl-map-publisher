@@ -41,9 +41,6 @@ async function renderComponent(options) {
 
     const page = await browser.newPage();
 
-    // Provide the template through this function instead of the URL,
-    // as it will contain large SVG files.
-    await page.exposeFunction("getTemplate", templateId => getTemplate({ id: templateId }));
     await page.exposeFunction("serverLog", log);
 
     page.on("error", (error) => {
