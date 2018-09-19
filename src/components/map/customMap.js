@@ -105,7 +105,7 @@ class CustomMap extends Component {
                 {({ measureRef }) => (
                     <div
                         style={{
-                            flex: 1,
+                            flex: wrapperHeight === "auto" ? 1 : "none",
                             width: "100%",
                             height: wrapperHeight,
                         }}
