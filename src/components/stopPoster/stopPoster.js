@@ -74,6 +74,13 @@ class StopPoster extends Component {
         renderQueue.onEmpty(error => !error && this.updateLayout(), { ignore: this });
     }
 
+    componentWillUnmount() {
+        if (this.mapMutationObserver) {
+            this.mapMutationObserver.disconnect();
+            this.mapMutationObserver = null;
+        }
+    }
+
     onError(error) {
         renderQueue.remove(this, { error: new Error(error) });
     }
@@ -124,7 +131,9 @@ class StopPoster extends Component {
             return;
         }
 
-        renderQueue.remove(this);
+        window.setTimeout(() => {
+            renderQueue.remove(this);
+        }, 1000);
     }
 
     render() {
@@ -215,13 +224,14 @@ class StopPoster extends Component {
 
                                     {!this.state.hasDiagram && <Spacer height={10}/>}
 
-                                    <CustomMap
-                                        shouldRenderFixedContent={this.state.shouldRenderFixedContent}
-                                        stopId={this.props.stopId}
-                                        date={this.props.date}
-                                        isSummerTimetable={this.props.isSummerTimetable}
-                                        template={template ? get(template, "areas", []).find(t => t.key === "map") : null}
-                                    />
+                                    { this.state.shouldRenderFixedContent && (
+                                        <CustomMap
+                                            stopId={this.props.stopId}
+                                            date={this.props.date}
+                                            isSummerTimetable={this.props.isSummerTimetable}
+                                            template={template ? get(template, "areas", []).find(t => t.key === "map") : null}
+                                        />
+                                    )}
 
                                     <Spacer height={10}/>
 

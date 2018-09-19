@@ -2,8 +2,10 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import get from "lodash/get";
 import cheerio from "cheerio";
+import Measure from "react-measure";
 import StopMap from "./stopMapContainer";
 import { InlineSVG } from "../util";
+import renderQueue from "../../util/renderQueue";
 
 const MAP_MIN_HEIGHT = 500;
 const parseAttr = attr => Math.round(parseInt(attr, 10));
@@ -16,22 +18,37 @@ class CustomMap extends Component {
         isSummerTimetable: PropTypes.bool,
         // eslint-disable-next-line react/require-default-props
         template: PropTypes.any,
-        shouldRenderFixedContent: PropTypes.bool.isRequired,
     }
 
-    constructor(props) {
-        super();
-        this.map = React.createRef();
+    state = {
+        mapImage: "",
+        mapWidth: -1,
+        mapHeight: -1,
+    };
 
-        const mapImage = get(props, "template.slots[0].image.svg", "");
-
-        this.state = {
-            mapImage,
-        };
+    componentDidMount() {
+        renderQueue.add(this);
+        this.updateTemplateImage();
     }
 
     componentDidUpdate() {
         this.updateTemplateImage();
+    }
+
+    onResize = ({ client: { width, height } }) => {
+        const { mapWidth, mapHeight } = this.state;
+
+        // We only need one measurement
+        if (mapWidth > -1 || mapHeight > -1) {
+            return;
+        }
+
+        this.setState({
+            mapWidth: width,
+            mapHeight: height,
+        }, () => {
+            renderQueue.remove(this);
+        });
     }
 
     updateTemplateImage() {
@@ -50,10 +67,9 @@ class CustomMap extends Component {
             stopId,
             date,
             isSummerTimetable,
-            shouldRenderFixedContent,
         } = this.props;
 
-        const { mapImage } = this.state;
+        const { mapImage, mapWidth, mapHeight } = this.state;
 
         let mapImageWidth = 0;
         let mapImageHeight = 0;
@@ -76,31 +92,39 @@ class CustomMap extends Component {
             aspectRatio = mapImageHeight / mapImageWidth;
         }
 
-        const { clientWidth = 0, clientHeight = 0 } = (this.map.current || {});
-
         const mapImageStyle = {
-            width: clientWidth,
-            height: clientWidth * aspectRatio,
+            width: mapWidth,
+            height: mapWidth * aspectRatio,
         };
 
-        const wrapperHeight = aspectRatio > 0 ? clientWidth * aspectRatio : "auto";
+        // Aspect ratio height of SVG if one is set, auto otherwise.
+        const wrapperHeight = aspectRatio > 0 ? mapWidth * aspectRatio : "auto";
 
         return (
-            <div style={{ flex: wrapperHeight === "auto" ? 1 : "none", height: wrapperHeight }} ref={this.map}>
-                { mapImage ? (
-                    <InlineSVG style={mapImageStyle} src={mapImage}/>
-                ) : (shouldRenderFixedContent && clientHeight >= MAP_MIN_HEIGHT)
-                  && (
-                      <StopMap
-                          stopId={stopId}
-                          date={date}
-                          width={clientWidth}
-                          height={clientHeight}
-                          showCitybikes={isSummerTimetable}
-                      />
-                  )
-                }
-            </div>
+            <Measure client onResize={this.onResize}>
+                {({ measureRef }) => (
+                    <div
+                        style={{
+                            flex: 1,
+                            width: "100%",
+                            height: wrapperHeight,
+                        }}
+                        ref={measureRef}
+                    >
+                        { mapImage ? (
+                            <InlineSVG style={mapImageStyle} src={mapImage}/>
+                        ) : mapHeight >= MAP_MIN_HEIGHT ? (
+                            <StopMap
+                                stopId={stopId}
+                                date={date}
+                                width={mapWidth}
+                                height={mapHeight}
+                                showCitybikes={isSummerTimetable}
+                            />
+                        ) : null }
+                    </div>
+                )}
+            </Measure>
         );
     }
 }
