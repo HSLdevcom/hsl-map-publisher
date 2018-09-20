@@ -5,12 +5,11 @@ const qs = require("qs");
 const { promisify } = require("util");
 const { spawn } = require("child_process");
 const log = require("./util/log");
-const { getTemplate } = require("./store");
 
 const writeFileAsync = promisify(fs.writeFile);
 
 const CLIENT_URL = "http://localhost:5000";
-const RENDER_TIMEOUT = 5 * 60 * 1000;
+const RENDER_TIMEOUT = 10 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
 const SCALE = 96 / 72;
 
@@ -41,9 +40,6 @@ async function renderComponent(options) {
 
     const page = await browser.newPage();
 
-    // Provide the template through this function instead of the URL,
-    // as it will contain large SVG files.
-    await page.exposeFunction("getTemplate", templateId => getTemplate({ id: templateId }));
     await page.exposeFunction("serverLog", log);
 
     page.on("error", (error) => {

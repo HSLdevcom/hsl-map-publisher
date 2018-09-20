@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import get from "lodash/get";
+import difference from "lodash/difference";
 import { InlineSVG } from "components/util";
 import renderQueue from "util/renderQueue";
 
@@ -21,7 +22,33 @@ class AdContainer extends Component {
     }
 
     componentDidUpdate() {
+        this.updateAds();
         this.updateLayout();
+    }
+
+    updateAds() {
+        const currentAds = this.state.ads;
+
+        const newAds = get(this.props, "template.slots", [])
+            .map(slot => get(slot, "image.svg", "")) // get svg's from template
+            .filter(svg => !!svg); // Only non-falsy svg's allowed
+
+        const nextAds = currentAds.reduce((updatedAds, ad, index) => {
+            const nextAd = newAds[index];
+            if (nextAd !== ad) {
+                updatedAds.push(nextAd);
+            } else {
+                updatedAds.push(ad);
+            }
+
+            return updatedAds;
+        }, []);
+
+        if (difference(currentAds, nextAds).length !== 0) {
+            this.setState({
+                ads: nextAds,
+            });
+        }
     }
 
     updateLayout() {

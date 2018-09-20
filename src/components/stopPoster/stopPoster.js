@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { hot } from "react-hot-loader";
+import { get } from "lodash";
 import { JustifiedColumn, Spacer } from "components/util";
 import renderQueue from "util/renderQueue";
 import { colorsByMode } from "util/domain";
@@ -9,7 +10,6 @@ import CropMarks from "components/cropMarks";
 import RouteDiagram from "components/routeDiagram/routeDiagramContainer";
 import TramDiagram from "components/tramDiagram/tramDiagram";
 import Timetable from "components/timetable/timetableContainer";
-import StopMap from "components/map/stopMapContainer";
 import Metadata from "components/metadata";
 
 import Header from "./headerContainer";
@@ -19,8 +19,7 @@ import Routes from "./routesContainer";
 import AdContainer from "./adContainer";
 
 import styles from "./stopPoster.css";
-
-const MAP_MIN_HEIGHT = 500;
+import CustomMap from "../map/customMap";
 
 const trunkStopStyle = {
     "--background": colorsByMode.TRUNK,
@@ -47,14 +46,25 @@ class StopPoster extends Component {
         renderQueue.add(this);
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         if (this.props.template) {
-            window.getTemplate(this.props.template)
-                .then((templateData) => {
-                    this.setState({
-                        template: templateData,
-                    });
-                });
+            renderQueue.add(this);
+
+            let templateReq;
+            let templateBody = null;
+
+            try {
+                // This url will probably always be the same. If you find yourself
+                // changing it, please make an .env setup while you're at it.
+                templateReq = await window.fetch(`http://localhost:4000/templates/${this.props.template}`);
+                templateBody = await templateReq.json();
+            } catch (err) {
+                this.onError(err);
+            }
+
+            this.setState({
+                template: templateBody,
+            });
         }
 
         renderQueue.onEmpty(error => !error && this.updateLayout(), { ignore: this });
@@ -62,6 +72,13 @@ class StopPoster extends Component {
 
     componentDidUpdate() {
         renderQueue.onEmpty(error => !error && this.updateLayout(), { ignore: this });
+    }
+
+    componentWillUnmount() {
+        if (this.mapMutationObserver) {
+            this.mapMutationObserver.disconnect();
+            this.mapMutationObserver = null;
+        }
     }
 
     onError(error) {
@@ -114,7 +131,9 @@ class StopPoster extends Component {
             return;
         }
 
-        renderQueue.remove(this);
+        window.setTimeout(() => {
+            renderQueue.remove(this);
+        }, 1000);
     }
 
     render() {
@@ -174,7 +193,7 @@ class StopPoster extends Component {
                                         {this.state.shouldRenderFixedContent
                                          && (
                                              <AdContainer
-                                                 template={template.areas.find(t => t.key === "ads")}
+                                                 template={template ? get(template, "areas", []).find(t => t.key === "ads") : {}}
                                                  width={this.ad.clientWidth}
                                                  height={this.ad.clientHeight}
                                                  shortId={this.props.shortId}
@@ -205,20 +224,14 @@ class StopPoster extends Component {
 
                                     {!this.state.hasDiagram && <Spacer height={10}/>}
 
-                                    <div style={{ flex: 1 }} ref={(ref) => { this.map = ref; }}>
-                                        {this.state.shouldRenderFixedContent
-                                         && this.map.clientHeight >= MAP_MIN_HEIGHT
-                                         && (
-                                             <StopMap
-                                                 stopId={this.props.stopId}
-                                                 date={this.props.date}
-                                                 width={this.map.clientWidth}
-                                                 height={this.map.clientHeight}
-                                                 showCitybikes={this.props.isSummerTimetable}
-                                             />
-                                         )
-                                        }
-                                    </div>
+                                    { this.state.shouldRenderFixedContent && (
+                                        <CustomMap
+                                            stopId={this.props.stopId}
+                                            date={this.props.date}
+                                            isSummerTimetable={this.props.isSummerTimetable}
+                                            template={template ? get(template, "areas", []).find(t => t.key === "map") : null}
+                                        />
+                                    )}
 
                                     <Spacer height={10}/>
 
@@ -239,7 +252,7 @@ class StopPoster extends Component {
                         </div>
                         <Footer
                             onError={this.onError}
-                            template={template ? template.areas.find(t => t.key === "footer") : {}}
+                            template={template ? get(template, "areas", []).find(t => t.key === "footer") : {}}
                             shortId={this.props.shortId}
                             isTrunkStop={this.props.isTrunkStop}
                         />

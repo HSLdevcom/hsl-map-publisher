@@ -8,7 +8,7 @@ const {
     migrate, addEvent,
     getBuilds, getBuild, addBuild, updateBuild, removeBuild,
     getPoster, addPoster, updatePoster, removePoster, getTemplates, addTemplate,
-    saveTemplate, getImages, removeImage, removeTemplate,
+    saveTemplate, getImages, removeImage, removeTemplate, getTemplate,
 } = require("./store");
 
 const PORT = 4000;
@@ -84,6 +84,11 @@ async function main() {
 
     router.get("/templates", async (ctx) => {
         ctx.body = await getTemplates();
+    });
+
+    router.get("/templates/:id", async (ctx) => {
+        const { id } = ctx.params;
+        ctx.body = await getTemplate({ id });
     });
 
     router.post("/templates", async (ctx) => {
@@ -179,11 +184,10 @@ async function main() {
         ctx.body = generator.concatenate([id]);
     });
 
-
     app
         .use(errorHandler)
         .use(cors())
-        .use(jsonBody({ fallback: true }))
+        .use(jsonBody({ fallback: true, limit: "10mb" }))
         .use(router.routes())
         .use(router.allowedMethods())
         .listen(PORT, () => console.log(`Listening at ${PORT}`)); // eslint-disable-line no-console

@@ -41,6 +41,7 @@ class App extends Component {
                     App.handleError(error);
                     return;
                 }
+
                 if (window.callPhantom) {
                     window.callPhantom({
                         width: this.root.offsetWidth,
