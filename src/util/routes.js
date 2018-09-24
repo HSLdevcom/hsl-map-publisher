@@ -3,6 +3,8 @@ import { getZoneName } from "./domain";
 
 const MAX_WIDTH = 6;
 const MAX_HEIGHT = 25;
+// The value to divide a pixel height by to reach the unit used for MAX_HEIGHT.
+const STOP_PX_HEIGHT = 35;
 
 function isEqual(stop, other) {
     if (stop.type !== other.type) return false;
@@ -58,7 +60,7 @@ function truncate(node) {
  * @param {Array} routes
  * @returns {Object}
  */
-function routesToTree(routes, shortId) {
+function routesToTree(routes, shortId, mapHeight = -1, containerHeight = -1) {
     const currentZone = getZoneName(shortId);
 
     const itemLists = routes.map(route => (
@@ -97,9 +99,23 @@ function routesToTree(routes, shortId) {
     }, []));
 
     const root = itemsToTree(itemsListWithZoneBorders, { isEqual, merge });
+
+    // Divide the map height into the units used here.
+    const mapHeightUnits = Math.floor(mapHeight / STOP_PX_HEIGHT);
+    // Divide the container height into the units used here.
+    const containerHeightUnits = Math.floor(containerHeight / STOP_PX_HEIGHT);
+    // mapHeight is -1 if the normal generated local map is used. Only if
+    // a static image is set will mapHeight be > -1, in which case maxHeight
+    // needs to be adjusted here to not cause overflow errors.
+    const maxHeight = mapHeight > -1 && containerHeight > -1
+        // The diagram height is whatever is left over from the map.
+        ? containerHeightUnits - (mapHeightUnits + 10)
+        : MAX_HEIGHT;
+
     generalizeTree(root, {
-        width: MAX_WIDTH, height: MAX_HEIGHT, prune, truncate,
+        width: MAX_WIDTH, height: maxHeight, prune, truncate,
     });
+
     sortBranches(root);
     return root;
 }
