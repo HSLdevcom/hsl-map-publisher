@@ -60,7 +60,7 @@ function truncate(node) {
  * @param {Array} routes
  * @returns {Object}
  */
-function routesToTree(routes, shortId, mapHeight = -1, containerHeight = -1) {
+function routesToTree(routes, shortId, height = "auto") {
     const currentZone = getZoneName(shortId);
 
     const itemLists = routes.map(route => (
@@ -100,16 +100,12 @@ function routesToTree(routes, shortId, mapHeight = -1, containerHeight = -1) {
 
     const root = itemsToTree(itemsListWithZoneBorders, { isEqual, merge });
 
-    // Divide the map height into the units used here.
-    const mapHeightUnits = Math.floor(mapHeight / STOP_PX_HEIGHT);
-    // Divide the container height into the units used here.
-    const containerHeightUnits = Math.floor(containerHeight / STOP_PX_HEIGHT);
-    // mapHeight is -1 if the normal generated local map is used. Only if
-    // a static image is set will mapHeight be > -1, in which case maxHeight
+    // height is auto if the generated local map is used. Only if
+    // a static image is set will height be a px value, in which case maxHeight
     // needs to be adjusted here to not cause overflow errors.
-    const maxHeight = mapHeight > -1 && containerHeight > -1
+    const maxHeight = height !== "auto"
         // The diagram height is whatever is left over from the map.
-        ? containerHeightUnits - (mapHeightUnits + 10)
+        ? Math.floor(height / STOP_PX_HEIGHT) - 10 // A bit of margin, both for errors and design
         : MAX_HEIGHT;
 
     generalizeTree(root, {

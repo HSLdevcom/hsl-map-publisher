@@ -262,8 +262,7 @@ class StopPoster extends Component {
                                             { this.state.hasDiagram && !this.props.isTramStop
                                               && (
                                                   <RouteDiagram
-                                                      containerHeight={this.state.rightColumnHeight}
-                                                      mapHeight={this.state.mapHeight}
+                                                      height={this.state.mapHeight > -1 ? this.state.rightColumnHeight - this.state.mapHeight : "auto"}
                                                       stopId={this.props.stopId}
                                                       date={this.props.date}
                                                   />
