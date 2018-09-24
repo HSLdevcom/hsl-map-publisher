@@ -98,7 +98,7 @@ class CustomMap extends Component {
         }
 
         const mapImageStyle = {
-            width: "100%",
+            width: mapWidth,
             height: mapWidth * aspectRatio,
         };
 
