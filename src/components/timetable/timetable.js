@@ -45,7 +45,7 @@ const Timetable = props => (
         }
         {props.showValidityPeriod
             && (
-                <div className={styles.validity}>
+                <div className={classNames(styles.validity, { [styles.printable]: props.printableAsA4 })}>
                     <div>
                         Aikataulut voimassa
                     </div>
@@ -68,7 +68,7 @@ const Timetable = props => (
                         subtitle="Måndag - Fredag"
                         printingAsA4={props.printableAsA4}
                     />
-                    <TableRows departures={props.weekdays}/>
+                    <TableRows departures={props.weekdays} printableAsA4={props.printableAsA4}/>
                 </div>
             )
         }
@@ -76,7 +76,7 @@ const Timetable = props => (
             && (
                 <div>
                     <TableHeader title="Lauantai" subtitle="Lördag" printingAsA4={props.printableAsA4}/>
-                    <TableRows departures={props.saturdays}/>
+                    <TableRows departures={props.saturdays} printableAsA4={props.printableAsA4}/>
                 </div>
             )
         }
@@ -88,13 +88,19 @@ const Timetable = props => (
                         subtitle="Söndag"
                         printingAsA4={props.printableAsA4}
                     />
-                    <TableRows departures={props.sundays}/>
+                    <TableRows departures={props.sundays} printableAsA4={props.printableAsA4}/>
                 </div>
             )
         }
         {props.showNotes && props.notes.length !== 0 && <Spacer height={20}/>}
         {props.showNotes && props.notes.map(note => (
-            <div key={note} className={styles.footnote}>
+            <div
+                key={note}
+                className={classNames(styles.footnote,
+                    {
+                        [styles.printable]: props.printableAsA4,
+                    })}
+            >
                 {note}
             </div>
         ))}

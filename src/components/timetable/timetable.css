@@ -48,6 +48,10 @@
     font-size: 13px;
 }
 
+.footnote.printable {
+    font-size: 16px;
+}
+
 .validity {
     position: absolute;
     top: calc(var(--border-radius) - 15px);
@@ -57,6 +61,11 @@
     line-height: 16px;
     letter-spacing: -0.025em;
     text-align: right;
+}
+
+.validity.printable {
+    font-size: 16px;
+    line-height: 20px;
 }
 
 .validity > *:first-child {

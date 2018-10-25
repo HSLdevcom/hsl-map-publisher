@@ -6,10 +6,10 @@ import styles from "./tableHeader.css";
 
 const TableHeader = props => (
     <div className={classNames(styles.root, {
-        [styles.largerPaddingTop]: props.printingAsA4,
+        [styles.printable]: props.printingAsA4,
     })}
     >
-        <div className={styles.title}>
+        <div className={classNames(styles.title, { [styles.printable]: props.printingAsA4 })}>
             <span className={styles.strong}>
                 {props.title}
             </span>
@@ -17,7 +17,7 @@ const TableHeader = props => (
             {props.subtitle}
         </div>
 
-        <div className={styles.subtitle}>
+        <div className={classNames(styles.subtitle, { [styles.printable]: props.printingAsA4 })}>
             <div className={styles.strong}>
                 Tunti
             </div>
@@ -30,7 +30,7 @@ const TableHeader = props => (
             </div>
         </div>
 
-        <div className={styles.subtitle}>
+        <div className={classNames(styles.subtitle, { [styles.printable]: props.printingAsA4 })}>
             <div className={styles.strong}>
                 Timme
             </div>

@@ -22,6 +22,11 @@
     margin-right: 4px;
 }
 
+.item.printable {
+    font-size: 16px;
+    line-height: 13px;
+}
+
 .minutes {
     min-width: 12px;
     font-family: GothamXNarrow-Medium;
@@ -32,3 +37,8 @@
     padding-left: 15px;
     font-family: GothamXNarrow-Medium;
 }
+
+.hours.printable {
+    font-size: 16px;
+}
+
