@@ -25,6 +25,7 @@
 .item.printable {
     font-size: 15px;
     line-height: 12px;
+    min-width: 55px;
 }
 
 .minutes {
