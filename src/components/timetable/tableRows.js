@@ -58,7 +58,6 @@ TableRow.propTypes = {
 };
 
 const TableRows = (props) => {
-    console.log(props);
     const departuresByHour = groupBy(
         props.departures,
         departure => (departure.isNextDay ? 24 : 0) + departure.hours
