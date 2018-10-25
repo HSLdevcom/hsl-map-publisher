@@ -18,6 +18,7 @@ class CustomMap extends Component {
         isSummerTimetable: PropTypes.bool,
         // eslint-disable-next-line react/require-default-props
         template: PropTypes.any,
+        setMapHeight: PropTypes.func.isRequired,
     }
 
     state = {
@@ -35,13 +36,17 @@ class CustomMap extends Component {
         this.updateTemplateImage();
     }
 
+    // Used only if a static image replaces the local map.
     onResize = ({ client: { width, height } }) => {
         const { mapWidth, mapHeight } = this.state;
+        const { setMapHeight } = this.props;
 
         // We only need one measurement
         if (mapWidth > -1 || mapHeight > -1) {
             return;
         }
+
+        setMapHeight(height);
 
         this.setState({
             mapWidth: width,
