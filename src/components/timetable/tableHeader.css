@@ -39,3 +39,7 @@
 .subtitle > *:first-child {
     width: 50px;
 }
+
+.subtitle.printable > *:first-child {
+    width: 70px;
+}

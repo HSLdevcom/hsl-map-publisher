@@ -23,8 +23,8 @@
 }
 
 .item.printable {
-    font-size: 16px;
-    line-height: 13px;
+    font-size: 15px;
+    line-height: 12px;
 }
 
 .minutes {
@@ -37,8 +37,3 @@
     padding-left: 15px;
     font-family: GothamXNarrow-Medium;
 }
-
-.hours.printable {
-    font-size: 16px;
-}
-
