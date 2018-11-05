@@ -1,12 +1,13 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 import { InlineSVG } from "components/util";
 import tramDiagramIcon from "icons/tram_diagram.svg";
 
 import styles from "./tramDiagram.css";
 
-const TramDiagram = () => (
-    <div className={styles.root}>
+const TramDiagram = ({ height }) => (
+    <div className={styles.root} style={{ height }}>
         <div className={styles.componentName}>
             <div className={styles.title}>
                 Linjojen reitit
@@ -18,5 +19,9 @@ const TramDiagram = () => (
         <InlineSVG className={styles.diagram} src={tramDiagramIcon}/>
     </div>
 );
+
+TramDiagram.propTypes = {
+    height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};
 
 export default TramDiagram;

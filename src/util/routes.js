@@ -1,4 +1,5 @@
 import { itemsToTree, generalizeTree, sortBranches } from "util/tree";
+import { get } from "lodash";
 import { getZoneName } from "./domain";
 
 const MAX_WIDTH = 6;
@@ -41,7 +42,7 @@ function truncate(node) {
     if (gap) {
         const index = items.indexOf(gap);
         const removedNode = items.splice(index + ((index > items.length / 2) ? -1 : 1), 1);
-        if (removedNode[0].destinations) {
+        if (get(removedNode, "[0].destinations")) {
             if (!gap.destinations) gap.destinations = [];
             gap.destinations = gap.destinations.concat(removedNode[0].destinations);
         }

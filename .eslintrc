@@ -30,6 +30,8 @@
     "react/jsx-tag-spacing": [ 1, { "beforeSelfClosing": "never" } ],
     "react/no-array-index-key": [ "off" ],
     "react/destructuring-assignment": "off",
+    "react/prop-types": "off",
+    "react/require-default-props": "off",
     "jsx-a11y/img-has-alt": [ "off" ],
     "jsx-a11y/alt-text": "off",
     "import/named": [ 1 ],

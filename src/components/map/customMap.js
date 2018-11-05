@@ -7,7 +7,7 @@ import StopMap from "./stopMapContainer";
 import { InlineSVG } from "../util";
 import renderQueue from "../../util/renderQueue";
 
-const MAP_MIN_HEIGHT = 500;
+const MIN_MAP_HEIGHT = 500;
 const parseAttr = attr => Math.round(parseInt(attr, 10));
 
 class CustomMap extends Component {
@@ -19,6 +19,7 @@ class CustomMap extends Component {
         // eslint-disable-next-line react/require-default-props
         template: PropTypes.any,
         setMapHeight: PropTypes.func.isRequired,
+        shouldRenderMap: PropTypes.bool.isRequired,
     }
 
     state = {
@@ -41,18 +42,17 @@ class CustomMap extends Component {
         const { mapWidth, mapHeight } = this.state;
         const { setMapHeight } = this.props;
 
-        // We only need one measurement
-        if (mapWidth > -1 || mapHeight > -1) {
-            return;
-        }
-
         setMapHeight(height);
+
+        const shouldRemoveFromRenderQueue = mapWidth === -1 || mapHeight === -1;
 
         this.setState({
             mapWidth: width,
             mapHeight: height,
         }, () => {
-            renderQueue.remove(this);
+            if (shouldRemoveFromRenderQueue) {
+                renderQueue.remove(this);
+            }
         });
     }
 
@@ -72,15 +72,19 @@ class CustomMap extends Component {
             stopId,
             date,
             isSummerTimetable,
+            shouldRenderMap,
         } = this.props;
 
         const { mapImage, mapWidth, mapHeight } = this.state;
 
-        let mapImageWidth = 0;
-        let mapImageHeight = 0;
         let aspectRatio = 0;
+        let svgHeight = 0;
+        let mapImageStyle = {};
+        let renderMap = shouldRenderMap && mapHeight >= MIN_MAP_HEIGHT ? "generated" : "none";
 
         if (mapImage) {
+            let mapImageWidth = 0;
+            let mapImageHeight = 0;
             const $svg = cheerio.load(mapImage);
 
             if ($svg("svg").attr("width")) {
@@ -95,15 +99,20 @@ class CustomMap extends Component {
             }
 
             aspectRatio = mapImageHeight / mapImageWidth;
+            svgHeight = Math.floor(mapWidth * aspectRatio);
+
+            if (svgHeight && svgHeight <= mapHeight) {
+                renderMap = "svg";
+
+                mapImageStyle = {
+                    width: mapWidth,
+                    height: svgHeight,
+                };
+            }
         }
 
-        const mapImageStyle = {
-            width: mapWidth,
-            height: mapWidth * aspectRatio,
-        };
-
         // Aspect ratio height of SVG if one is set, auto otherwise.
-        const wrapperHeight = aspectRatio > 0 ? mapWidth * aspectRatio : "auto";
+        const wrapperHeight = svgHeight !== 0 ? svgHeight : mapHeight;
 
         return (
             <Measure client onResize={this.onResize}>
@@ -116,9 +125,9 @@ class CustomMap extends Component {
                         }}
                         ref={measureRef}
                     >
-                        { mapImage ? (
+                        { renderMap === "svg" ? (
                             <InlineSVG style={mapImageStyle} src={mapImage}/>
-                        ) : mapHeight >= MAP_MIN_HEIGHT ? (
+                        ) : renderMap === "generated" ? (
                             <StopMap
                                 stopId={stopId}
                                 date={date}

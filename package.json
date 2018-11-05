@@ -4,9 +4,7 @@
   "description": "HSL Map Publisher",
   "main": "index.js",
   "scripts": {
-    "clean": "rimraf dist",
-    "bundle": "webpack --config webpack.prod.js",
-    "build": "yarn run clean && yarn run bundle",
+    "build": "webpack --config webpack.prod.js",
     "serve": "serve dist",
     "start": "webpack-serve ./webpack.dev.js",
     "server": "node scripts/server",
