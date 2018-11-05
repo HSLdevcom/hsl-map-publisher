@@ -119,7 +119,7 @@ class CustomMap extends Component {
                 {({ measureRef }) => (
                     <div
                         style={{
-                            flex: wrapperHeight === "auto" ? 1 : "none",
+                            flex: !svgHeight ? 1 : "none",
                             width: "100%",
                             height: wrapperHeight,
                         }}
