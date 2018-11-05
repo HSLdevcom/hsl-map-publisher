@@ -60,15 +60,12 @@ class AdContainer extends Component {
     }
 
     hasOverflow() {
-        return (this.root.scrollWidth > this.root.clientWidth)
-               || (this.root.scrollHeight > this.root.clientHeight);
+        return this.root.clientHeight > 0 && (this.root.scrollHeight > this.root.clientHeight);
     }
 
     render() {
         const style = {
-            width: this.props.width,
-            height: this.props.height,
-            overflow: "hidden",
+            height: "100%",
         };
         const iconStyle = {
             marginTop: 52,
@@ -84,8 +81,6 @@ class AdContainer extends Component {
 }
 
 AdContainer.propTypes = {
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
     shortId: PropTypes.string.isRequired,
     template: PropTypes.any.isRequired,
 };
