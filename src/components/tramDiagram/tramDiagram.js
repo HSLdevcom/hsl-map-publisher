@@ -24,4 +24,8 @@ TramDiagram.propTypes = {
     height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
+TramDiagram.defaultProps = {
+    height: "auto",
+};
+
 export default TramDiagram;

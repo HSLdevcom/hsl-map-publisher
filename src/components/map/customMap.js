@@ -44,15 +44,14 @@ class CustomMap extends Component {
 
         setMapHeight(height);
 
-        const shouldRemoveFromRenderQueue = mapWidth === -1 || mapHeight === -1;
+        // Only measure once
+        if (mapWidth > -1 || mapHeight > -1) {
+            return;
+        }
 
         this.setState({
             mapWidth: width,
             mapHeight: height,
-        }, () => {
-            if (shouldRemoveFromRenderQueue) {
-                renderQueue.remove(this);
-            }
         });
     }
 
@@ -65,6 +64,8 @@ class CustomMap extends Component {
                 mapImage: newMapImage,
             });
         }
+
+        renderQueue.remove(this);
     }
 
     render() {

@@ -65,7 +65,11 @@ class StopPoster extends Component {
                 templateBody = await templateReq.json();
             } catch (err) {
                 this.onError(err);
+                renderQueue.remove(this, { error: new Error(err) });
+                return;
             }
+
+            renderQueue.remove(this);
 
             this.setState({
                 template: templateBody,
@@ -77,13 +81,6 @@ class StopPoster extends Component {
 
     componentDidUpdate() {
         renderQueue.onEmpty(error => !error && this.updateLayout(), { ignore: this });
-    }
-
-    componentWillUnmount() {
-        if (this.mapMutationObserver) {
-            this.mapMutationObserver.disconnect();
-            this.mapMutationObserver = null;
-        }
     }
 
     onError(error) {
