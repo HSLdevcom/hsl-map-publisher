@@ -1,5 +1,4 @@
-
-const API_URL = "http://kartat.hsl.fi";
+const API_URL = 'http://kartat.hsl.fi';
 
 const scale = 5;
 
@@ -10,17 +9,20 @@ const scale = 5;
  */
 // eslint-disable-next-line import/prefer-default-export
 export function fetchMap(mapOptions, mapStyle) {
-    const options = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ options: { ...mapOptions, scale }, style: mapStyle }),
-    };
+  const options = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ options: { ...mapOptions, scale }, style: mapStyle }),
+  };
 
-    return fetch(`${API_URL}/generateImage`, options)
-        .then(response => response.blob())
-        .then(blob => new Promise((resolve) => {
-            const reader = new window.FileReader();
-            reader.readAsDataURL(blob);
-            reader.onloadend = () => resolve(reader.result);
-        }));
+  return fetch(`${API_URL}/generateImage`, options)
+    .then(response => response.blob())
+    .then(
+      blob =>
+        new Promise(resolve => {
+          const reader = new window.FileReader();
+          reader.readAsDataURL(blob);
+          reader.onloadend = () => resolve(reader.result);
+        }),
+    );
 }
