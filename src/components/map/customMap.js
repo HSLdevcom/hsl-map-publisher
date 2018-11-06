@@ -12,6 +12,7 @@ const parseAttr = attr => Math.round(parseInt(attr, 10));
 
 class CustomMap extends Component {
   static propTypes = {
+    shouldRenderMap: PropTypes.bool.isRequired,
     stopId: PropTypes.string.isRequired,
     date: PropTypes.string.isRequired,
     // eslint-disable-next-line react/require-default-props
@@ -71,15 +72,19 @@ class CustomMap extends Component {
   }
 
   render() {
-    const { stopId, date, isSummerTimetable } = this.props;
+    const { shouldRenderMap, stopId, date, isSummerTimetable } = this.props;
 
     const { mapImage, mapWidth, mapHeight } = this.state;
 
-    let mapImageWidth = 0;
-    let mapImageHeight = 0;
+    let svgHeight = 0;
     let aspectRatio = 0;
+    let svgSrc = '';
+    let renderMap =
+      shouldRenderMap && mapHeight >= MAP_MIN_HEIGHT ? 'local' : 'none';
 
     if (mapImage) {
+      let mapImageWidth = 0;
+      let mapImageHeight = 0;
       const $svg = cheerio.load(mapImage);
 
       if ($svg('svg').attr('width')) {
@@ -94,6 +99,17 @@ class CustomMap extends Component {
       }
 
       aspectRatio = mapImageHeight / mapImageWidth;
+      svgHeight = Math.floor(mapWidth * aspectRatio);
+
+      $svg('svg').attr('width', mapWidth);
+      $svg('svg').attr('height', svgHeight);
+
+      svgSrc = $svg.html();
+
+      // Render the svg image if the map has height and fits in the designated space.
+      if (svgHeight !== 0 && svgHeight <= mapHeight) {
+        renderMap = 'svg';
+      }
     }
 
     const mapImageStyle = {
@@ -102,21 +118,22 @@ class CustomMap extends Component {
     };
 
     // Aspect ratio height of SVG if one is set, auto otherwise.
-    const wrapperHeight = aspectRatio > 0 ? mapWidth * aspectRatio : 'auto';
+    const wrapperHeight = svgHeight !== 0 ? svgHeight : 'auto';
 
     return (
       <Measure client onResize={this.onResize}>
         {({ measureRef }) => (
           <div
             style={{
+              overflow: 'hidden',
               flex: wrapperHeight === 'auto' ? 1 : 'none',
               width: '100%',
               height: wrapperHeight,
             }}
             ref={measureRef}>
-            {mapImage ? (
-              <InlineSVG style={mapImageStyle} src={mapImage} />
-            ) : mapHeight >= MAP_MIN_HEIGHT ? (
+            {renderMap === 'svg' ? (
+              <InlineSVG style={mapImageStyle} src={svgSrc} />
+            ) : renderMap === 'local' ? (
               <StopMap
                 stopId={stopId}
                 date={date}
