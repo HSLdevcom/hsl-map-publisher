@@ -1,4 +1,4 @@
-FROM node:8
+FROM node:10
 
 RUN apt-get update && apt-get install -yq pdftk --no-install-recommends
 
@@ -16,29 +16,22 @@ RUN apt-get update \
     && apt-get purge --auto-remove -y curl \
     && rm -rf /src/*.deb
 
-ENV WORK /opt/publisher
-
-# Create app directory
-RUN mkdir -p ${WORK}
-WORKDIR ${WORK}
-
-# Add privileges for puppeteer user
 RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
     && mkdir -p /home/pptruser/Downloads \
-    && chown -R pptruser:pptruser /home/pptruser \
-    && chown -R pptruser:pptruser ${WORK}
+    && chown -R pptruser:pptruser /home/pptruser
 
-# Run user as non privileged.
-USER pptruser
+ENV WORK /opt/publisher
+
+RUN mkdir -p ${WORK}
+WORKDIR ${WORK}
 
 # Install app dependencies
 COPY yarn.lock ${WORK}
 COPY package.json ${WORK}
 RUN yarn
 
-# Bundle app source
 COPY . ${WORK}
-RUN yarn build
+RUN yarn run build
 
 EXPOSE 4000
 
