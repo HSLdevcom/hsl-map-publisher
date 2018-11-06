@@ -1,42 +1,41 @@
-
 .title {
-    font-size: 80px;
-    font-family: GothamRounded-Medium;
-    white-space: nowrap;
+  font-size: 80px;
+  font-family: GothamRounded-Medium;
+  white-space: nowrap;
 }
 
 .subtitle {
-    composes: title;
-    font-family: GothamRounded-Book;
+  composes: title;
+  font-family: GothamRounded-Book;
 }
 
 .small {
-    font-size: 24px;
+  font-size: 24px;
 }
 
 .item {
-    max-height: 160px;
-    margin: 0 15px;
+  max-height: 160px;
+  margin: 0 15px;
 }
 
 .stop {
-    composes: title;
-    margin-top: 10px;
-    padding: 0 20px;
-    font-size: 55px;
-    text-align: center;
-    border: 5px solid white;
-    border-radius: 10px;
+  composes: title;
+  margin-top: 10px;
+  padding: 0 20px;
+  font-size: 55px;
+  text-align: center;
+  border: 5px solid white;
+  border-radius: 10px;
 }
 
 .zone {
-    composes: title;
-    margin-top: 10px;
-    padding: 13px 30px;
-    font-size: 42px;
-    letter-spacing: -1px;
-    text-transform: uppercase;
-    color: var(--background);
-    background: white;
-    border-radius: 1000px;
+  composes: title;
+  margin-top: 10px;
+  padding: 13px 30px;
+  font-size: 42px;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  color: var(--background);
+  background: white;
+  border-radius: 1000px;
 }
