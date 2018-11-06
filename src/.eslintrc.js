@@ -1,10 +1,10 @@
-
 module.exports = {
-    settings: {
-        "import/resolver": {
-            "webpack": {
-                config: "webpack.dev.js",
-            },
-        }
+  extends: '../.eslintrc',
+  settings: {
+    'import/resolver': {
+      webpack: {
+        config: 'webpack.dev.js',
+      },
     },
+  },
 };
