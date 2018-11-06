@@ -1,32 +1,31 @@
-
 .root {
-    margin: 15px 0;
-    font-family: GothamRounded-Book;
-    color: var(--timetable-text-color);
-    page-break-after: avoid;
+  margin: 15px 0;
+  font-family: GothamRounded-Book;
+  color: var(--timetable-text-color);
+  page-break-after: avoid;
 }
 
 .root.largerPaddingTop {
-    padding-top: 25px;
+  padding-top: 25px;
 }
 
 .strong {
-    font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium;
 }
 
 .title {
-    padding: 5px 10px;
-    font-size: 18px;
+  padding: 5px 10px;
+  font-size: 18px;
 }
 
 .subtitle {
-    display: flex;
-    padding: 0 10px;
-    font-size: 12px;
-    line-height: 13px;
-    letter-spacing: -0.025em;
+  display: flex;
+  padding: 0 10px;
+  font-size: 12px;
+  line-height: 13px;
+  letter-spacing: -0.025em;
 }
 
 .subtitle > *:first-child {
-    width: 50px;
+  width: 50px;
 }

@@ -1,66 +1,65 @@
-
 /*
  Poster 810mm x 1210mm / 31.89in x 47.64in / 2296px x 3430px @ 72 ppi
  Bleed 5mm / 15 px @ 72 ppi
 */
 .root {
-    width: calc(2296px + 30px);
-    height: calc(3430px + 30px);
-    padding: 64px;
-    margin: -15px;
-    color: white;
-    background: var(--background);
-    box-sizing: border-box;
+  width: calc(2296px + 30px);
+  height: calc(3430px + 30px);
+  padding: 64px;
+  margin: -15px;
+  color: white;
+  background: var(--background);
+  box-sizing: border-box;
 }
 
 .content {
-    flex: 1 1 auto;
-    display: flex;
-    flex-flow: column;
-    overflow: hidden;
+  flex: 1 1 auto;
+  display: flex;
+  flex-flow: column;
+  overflow: hidden;
 }
 
 .columns {
-    flex: 1 1 auto;
-    display: flex;
-    align-items: stretch;
-    justify-content: space-between;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
 }
 
 .column {
-    display: flex;
-    flex-flow: column;
-    align-items: stretch;
+  display: flex;
+  flex-flow: column;
+  align-items: stretch;
 }
 
 .left {
-    composes: column;
-    width: 689px;
+  composes: column;
+  width: 689px;
 }
 
 .leftStretched {
-    composes: column;
-    width: 820px;
+  composes: column;
+  width: 820px;
 }
 
 .right {
-    composes: column;
-    flex: 1;
+  composes: column;
+  flex: 1;
 }
 
 .timetables {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: stretch;
-    justify-content: space-between;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
 }
 
 .timetable {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: stretch;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
 }
 
 .timetables > .timetable {
-    flex: 1 0 0;
+  flex: 1 0 0;
 }

@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "eslint-check": "eslint --print-config . | eslint-config-prettier-check",
-    "prettier": "prettier src/**/*.{js,css} scripts/**/* migrations/**/* seeds/**/* *.js --write",
-    "lint": "eslint src/**/*.js scripts/**/*.js --fix",
+    "prettier": "prettier \"src/**/*.{js,css}\" \"scripts/**/*.js\" \"migrations/**/*.js\" \"seeds/**/*.js\" \"*.js\" --write",
+    "lint": "eslint \"src/**/*.js\" \"scripts/**/*.js\" --fix",
     "build": "webpack --config webpack.prod.js",
     "serve": "serve dist",
     "start": "webpack-serve ./webpack.dev.js",
