@@ -6,6 +6,7 @@
   "scripts": {
     "eslint-check": "eslint --print-config . | eslint-config-prettier-check",
     "prettier": "prettier src/**/*.{js,css} scripts/**/* migrations/**/* seeds/**/* *.js --write",
+    "lint": "eslint src/**/*.js scripts/**/*.js --fix",
     "build": "webpack --config webpack.prod.js",
     "serve": "serve dist",
     "start": "webpack-serve ./webpack.dev.js",
