@@ -64,7 +64,8 @@ function getNotes(isSummerTimetable) {
 
           return (
             noteType.includes('Y') &&
-            (noteType.includes('V') || noteType.includes(isSummerTimetable ? 'K' : 'T'))
+            (noteType.includes('V') ||
+              noteType.includes(isSummerTimetable ? 'K' : 'T'))
           );
         })
         .map(note => {
@@ -125,7 +126,9 @@ const timetableQuery = gql`
 `;
 
 function getDuplicateRouteNote(duplicateRoutes, departure) {
-  return duplicateRoutes.includes(departure.routeId) ? '*'.repeat(departure.direction) : null;
+  return duplicateRoutes.includes(departure.routeId)
+    ? '*'.repeat(departure.direction)
+    : null;
 }
 
 function addMissingFridayNote(departure) {
@@ -137,7 +140,8 @@ function addMissingFridayNote(departure) {
 }
 
 function addMissingNonAccessibleNote(departure) {
-  return departure.isAccessible === false && (!departure.note || !departure.note.includes('e'))
+  return departure.isAccessible === false &&
+    (!departure.note || !departure.note.includes('e'))
     ? 'e'
     : null;
 }
@@ -178,9 +182,10 @@ const propsMapper = mapProps(props => {
   // Search for routes with two different destinations from the same stop and add notes for them
   Object.values(
     groupBy(
-      flatMap(props.data.stop.siblings.nodes, stop => stop.routeSegments.nodes).filter(
-        route => route.hasRegularDayDepartures && !isDropOffOnly(route),
-      ),
+      flatMap(
+        props.data.stop.siblings.nodes,
+        stop => stop.routeSegments.nodes,
+      ).filter(route => route.hasRegularDayDepartures && !isDropOffOnly(route)),
       route => route.routeId,
     ),
   )
@@ -208,7 +213,10 @@ const propsMapper = mapProps(props => {
     ),
   }));
 
-  const { weekdays, saturdays, sundays } = pick(groupDepartures(departures), props.segments);
+  const { weekdays, saturdays, sundays } = pick(
+    groupDepartures(departures),
+    props.segments,
+  );
 
   const dateBegin =
     props.dateBegin ||

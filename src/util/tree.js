@@ -30,7 +30,9 @@ const addItems = (nodes, items, options) => {
     const count = getCommonItemCount(node, items, isEqual);
 
     if (count) {
-      const commonItems = node.items.slice(0, count).map((item, i) => merge(item, items[i]));
+      const commonItems = node.items
+        .slice(0, count)
+        .map((item, i) => merge(item, items[i]));
       // Remaining items to add to node or children
       const itemsToAdd = items.slice(Math.min(items.length, count));
       // Items to remove from node if adding new items

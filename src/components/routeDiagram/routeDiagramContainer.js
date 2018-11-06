@@ -80,7 +80,9 @@ const propsMapper = mapProps(props => {
         ...routeSegment.route.nodes[0],
         routeId: trimRouteId(routeSegment.routeId),
         // List all stops (including drop-off only) for each route
-        stops: sortBy(routeSegment.nextStops.nodes, node => node.stopIndex).map(nodeToStop),
+        stops: sortBy(routeSegment.nextStops.nodes, node => node.stopIndex).map(
+          nodeToStop,
+        ),
       })),
   );
   return { tree: routesToTree(routes, props.data.stop.shortId, props.height) };

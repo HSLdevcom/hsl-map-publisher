@@ -6,7 +6,12 @@ import withProps from 'recompose/withProps';
 import flatMap from 'lodash/flatMap';
 
 import apolloWrapper from 'util/apolloWrapper';
-import { isNumberVariant, trimRouteId, isTrunkRoute, isDropOffOnly } from 'util/domain';
+import {
+  isNumberVariant,
+  trimRouteId,
+  isTrunkRoute,
+  isDropOffOnly,
+} from 'util/domain';
 
 import StopPoster from './stopPoster';
 
@@ -42,8 +47,12 @@ const propsMapper = withProps(props => {
       .filter(routeSegment => !isDropOffOnly(routeSegment)),
   );
 
-  const routeIds = routeSegments.map(routeSegment => trimRouteId(routeSegment.routeId));
-  const modes = flatMap(routeSegments, node => node.route.nodes.map(route => route.mode));
+  const routeIds = routeSegments.map(routeSegment =>
+    trimRouteId(routeSegment.routeId),
+  );
+  const modes = flatMap(routeSegments, node =>
+    node.route.nodes.map(route => route.mode),
+  );
 
   return {
     shortId: props.data.stop.shortId,

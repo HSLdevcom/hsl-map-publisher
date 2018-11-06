@@ -44,7 +44,9 @@ class Routes extends Component {
         this.setState(state => ({ columns: state.columns - 1 }));
         return;
       }
-      renderQueue.remove(this, { error: new Error('Failed to remove routes overflow') });
+      renderQueue.remove(this, {
+        error: new Error('Failed to remove routes overflow'),
+      });
       return;
     }
     renderQueue.remove(this);
@@ -83,7 +85,10 @@ class Routes extends Component {
             </Column>
             <Column>
               {routes.map((route, index) => (
-                <div key={index} className={styles.group} style={{ color: getColor(route) }}>
+                <div
+                  key={index}
+                  className={styles.group}
+                  style={{ color: getColor(route) }}>
                   <div className={styles.title}>{route.destinationFi}</div>
                   <div className={styles.subtitle}>{route.destinationSe}</div>
                 </div>

@@ -6,14 +6,18 @@ import { getZoneName } from 'util/domain';
 
 import styles from './header.css';
 
-const Group = props => <div style={{ marginLeft: 15, marginRight: 15 }}>{props.children}</div>;
+const Group = props => (
+  <div style={{ marginLeft: 15, marginRight: 15 }}>{props.children}</div>
+);
 
 Group.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
 const Title = props => (
-  <div className={classNames(styles.title, { [styles.small]: props.small })}>{props.children}</div>
+  <div className={classNames(styles.title, { [styles.small]: props.small })}>
+    {props.children}
+  </div>
 );
 
 Title.defaultProps = {

@@ -14,24 +14,32 @@ const MAX_LABEL_CHARS = 36;
 const RouteList = props => {
   if (props.routes.length > MAX_LABEL_ROWS) {
     let rowLength = 0;
-    const components = uniqBy(props.routes, route => route.routeId).map((route, index, routes) => {
-      const content = `${route.routeId}${index < routes.length - 1 ? ', ' : ''}`;
-      const isNewLine = rowLength + content.length > MAX_LABEL_CHARS;
-      rowLength = isNewLine ? content.length : rowLength + content.length;
-      return (
-        <span className={styles.route} key={index} style={{ color: getColor(route) }}>
-          {isNewLine && <br />}
-          {content}
-        </span>
-      );
-    });
+    const components = uniqBy(props.routes, route => route.routeId).map(
+      (route, index, routes) => {
+        const content = `${route.routeId}${index < routes.length - 1 ? ', ' : ''}`;
+        const isNewLine = rowLength + content.length > MAX_LABEL_CHARS;
+        rowLength = isNewLine ? content.length : rowLength + content.length;
+        return (
+          <span
+            className={styles.route}
+            key={index}
+            style={{ color: getColor(route) }}>
+            {isNewLine && <br />}
+            {content}
+          </span>
+        );
+      },
+    );
     return <div>{components}</div>;
   }
   return (
     <Row>
       <Column>
         {props.routes.map((route, index) => (
-          <div key={index} className={styles.route} style={{ color: getColor(route) }}>
+          <div
+            key={index}
+            className={styles.route}
+            style={{ color: getColor(route) }}>
             {route.routeId}
           </div>
         ))}

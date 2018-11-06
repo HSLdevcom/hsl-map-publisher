@@ -9,7 +9,8 @@
 function updatePosition(position, diff = {}) {
   if (position.isFixed) return position;
 
-  let distance = 'distance' in position ? position.distance : position.initialDistance;
+  let distance =
+    'distance' in position ? position.distance : position.initialDistance;
   let angle = 'angle' in position ? position.angle : position.initialAngle;
 
   if (diff.angle) angle = (angle + diff.angle) % 360;

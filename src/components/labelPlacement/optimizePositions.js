@@ -22,7 +22,10 @@ const diffsArray = factors.map(factor =>
   angles.reduce(
     (prev, angle) => [
       ...prev,
-      ...distances.map(distance => ({ angle: angle * factor, distance: distance * factor })),
+      ...distances.map(distance => ({
+        angle: angle * factor,
+        distance: distance * factor,
+      })),
     ],
     [],
   ),
@@ -36,7 +39,9 @@ function getCost(placement, bbox) {
   const angle = getAngleCost(positions, indexes);
   const intersection = getIntersectionCost(positions, indexes);
   const intersectionWithFixed = getFixedIntersectionCost(positions, indexes);
-  return overflow + overlap + distance + angle + intersection + intersectionWithFixed;
+  return (
+    overflow + overlap + distance + angle + intersection + intersectionWithFixed
+  );
 }
 
 function getOverlappingItem(placement, indexToOverlap) {
@@ -62,10 +67,15 @@ function getPlacements(placement, index, diffs, bbox) {
       if (!updatedPosition || hasOverflow(updatedPosition, bbox)) {
         return null;
       }
-      return positions.map((position, i) => (i === index ? updatedPosition : position));
+      return positions.map(
+        (position, i) => (i === index ? updatedPosition : position),
+      );
     })
     .filter(updatedPositions => !!updatedPositions)
-    .map(updatedPositions => ({ positions: updatedPositions, indexes: [...indexes, index] }));
+    .map(updatedPositions => ({
+      positions: updatedPositions,
+      indexes: [...indexes, index],
+    }));
 }
 
 function comparePlacements(placement, other, bbox) {
@@ -78,7 +88,12 @@ function comparePlacements(placement, other, bbox) {
 
 function getNextPlacement(initialPlacement, index, diffs, bbox) {
   // Get potential positions for item at index
-  const placements = getPlacements({ ...initialPlacement, indexes: [] }, index, diffs, bbox);
+  const placements = getPlacements(
+    { ...initialPlacement, indexes: [] },
+    index,
+    diffs,
+    bbox,
+  );
 
   // Get positions where one overlapping item is updated as well
   const placementsOverlapping = placements.reduce((prev, placement) => {
@@ -87,9 +102,11 @@ function getNextPlacement(initialPlacement, index, diffs, bbox) {
     return [...prev, ...getPlacements(placement, overlapIndex, diffs, bbox)];
   }, []);
 
-  const nextPlacement = [initialPlacement, ...placements, ...placementsOverlapping].reduce(
-    (prev, cur) => comparePlacements(prev, cur, bbox),
-  );
+  const nextPlacement = [
+    initialPlacement,
+    ...placements,
+    ...placementsOverlapping,
+  ].reduce((prev, cur) => comparePlacements(prev, cur, bbox));
 
   return nextPlacement;
 }

@@ -51,7 +51,9 @@ class ItemContainer extends Component {
 
     this.worker.addEventListener('message', event => {
       const positions = event.data;
-      refs.forEach((ref, index) => ref.setPosition(positions[index].top, positions[index].left));
+      refs.forEach((ref, index) =>
+        ref.setPosition(positions[index].top, positions[index].left),
+      );
       this.setState({ items: positions.filter(({ isFixed }) => !isFixed) });
       renderQueue.remove(this);
     });
