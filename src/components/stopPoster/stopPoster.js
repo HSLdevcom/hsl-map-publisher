@@ -121,10 +121,6 @@ class StopPoster extends Component {
       return;
     }
 
-    if (this.hasOverflow() && this.state.shouldRenderFixedContent) {
-      this.setState({ shouldRenderFixedContent: false });
-    }
-
     if (this.hasOverflow()) {
       if (!this.state.hasRoutesOnTop) {
         this.setState({ hasRoutesOnTop: true });
@@ -142,6 +138,12 @@ class StopPoster extends Component {
         this.setState({ hasStretchedLeftColumn: true });
         return;
       }
+
+      if (this.state.shouldRenderFixedContent) {
+        this.setState({ shouldRenderFixedContent: false });
+        return;
+      }
+
       this.onError('Failed to remove layout overflow');
       return;
     }
@@ -254,19 +256,18 @@ class StopPoster extends Component {
 
                       {!this.state.hasDiagram && <Spacer height={10} />}
 
-                      {this.state.shouldRenderFixedContent && (
-                        <CustomMap
-                          setMapHeight={this.setMapHeight}
-                          stopId={this.props.stopId}
-                          date={this.props.date}
-                          isSummerTimetable={this.props.isSummerTimetable}
-                          template={
-                            template
-                              ? get(template, 'areas', []).find(t => t.key === 'map')
-                              : null
-                          }
-                        />
-                      )}
+                      <CustomMap
+                        shouldRenderMap={this.state.shouldRenderFixedContent}
+                        setMapHeight={this.setMapHeight}
+                        stopId={this.props.stopId}
+                        date={this.props.date}
+                        isSummerTimetable={this.props.isSummerTimetable}
+                        template={
+                          template
+                            ? get(template, 'areas', []).find(t => t.key === 'map')
+                            : null
+                        }
+                      />
 
                       <Spacer height={10} />
 
