@@ -217,25 +217,14 @@ class StopPoster extends Component {
                   {!this.state.hasDiagram && (
                     <StopPosterTimetable segments={['weekdays']} />
                   )}
-                  <div style={{ flex: 1 }} ref={this.adContainerRef}>
-                    <Get
-                      source={this.adContainerRef.current}
-                      defaults={[0, 0]}
-                      paths={['clientWidth', 'clientHeight']}>
-                      {({ clientWidth, clientHeight }) => (
-                        <AdContainer
-                          template={
-                            template
-                              ? get(template, 'areas', []).find(t => t.key === 'ads')
-                              : {}
-                          }
-                          width={clientWidth}
-                          height={clientHeight}
-                          shortId={this.props.shortId}
-                        />
-                      )}
-                    </Get>
-                  </div>
+                  <AdContainer
+                    shortId={this.props.shortId}
+                    template={
+                      template
+                        ? get(template, 'areas', []).find(t => t.key === 'ads')
+                        : {}
+                    }
+                  />
                 </div>
 
                 <Spacer width={10} />
