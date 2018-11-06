@@ -42,12 +42,12 @@ class CustomMap extends Component {
         const { mapWidth, mapHeight } = this.state;
         const { setMapHeight } = this.props;
 
-        setMapHeight(height);
-
         // Only measure once
         if (mapWidth > -1 || mapHeight > -1) {
             return;
         }
+
+        setMapHeight(height);
 
         this.setState({
             mapWidth: width,

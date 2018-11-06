@@ -104,6 +104,8 @@ class StopPoster extends Component {
             return false;
         }
 
+        // Currently there is no mechanism to fix horizontal overflow,
+        // so checking for clientWidth is redundant.
         return (this.content.scrollHeight - this.content.clientHeight) > 1;
     }
 
@@ -174,96 +176,63 @@ class StopPoster extends Component {
 
         return (
             <CropMarks>
-                <div
-                    className={styles.root}
-                    style={this.props.isTrunkStop ? trunkStopStyle : null}
-                >
+                <div className={styles.root} style={this.props.isTrunkStop ? trunkStopStyle : null}>
                     <JustifiedColumn>
                         <Header stopId={this.props.stopId}/>
-                        <div
-                            className={styles.content}
-                            ref={(ref) => { this.content = ref; }}
-                        >
+                        <div className={styles.content} ref={(ref) => { this.content = ref; }}>
                             <Spacer width="100%" height={50}/>
-                            { this.state.hasRoutes && this.state.hasRoutesOnTop
-                                      && (
-                                          <Routes
-                                              stopId={this.props.stopId}
-                                              date={this.props.date}
-                                          />
-                                      )
-                            }
-                            { this.state.hasRoutes && this.state.hasRoutesOnTop
-                                      && <Spacer height={10}/>
-                            }
+                            { this.state.hasRoutes && this.state.hasRoutesOnTop && (
+                                <Routes
+                                    stopId={this.props.stopId}
+                                    date={this.props.date}
+                                />
+                            ) }
+                            { this.state.hasRoutes && this.state.hasRoutesOnTop && <Spacer height={10}/> }
                             <div className={styles.columns}>
-                                <div
-                                    className={this.state.hasStretchedLeftColumn ? styles.leftStretched : styles.left}
-                                >
-                                    { this.state.hasRoutes && !this.state.hasRoutesOnTop
-                                              && (
-                                                  <Routes
-                                                      stopId={this.props.stopId}
-                                                      date={this.props.date}
-                                                  />
-                                              )
-                                    }
-                                    { this.state.hasRoutes && !this.state.hasRoutesOnTop
-                                              && <Spacer height={10}/>
-                                    }
-                                    { this.state.hasDiagram
-                                              && <StopPosterTimetable/>
-                                    }
-                                    { !this.state.hasDiagram
-                                              && <StopPosterTimetable segments={["weekdays"]}/>
-                                    }
+                                <div className={this.state.hasStretchedLeftColumn ? styles.leftStretched : styles.left}>
+                                    { this.state.hasRoutes && !this.state.hasRoutesOnTop && (
+                                        <Routes
+                                            stopId={this.props.stopId}
+                                            date={this.props.date}
+                                        />
+                                    ) }
+                                    { this.state.hasRoutes && !this.state.hasRoutesOnTop && <Spacer height={10}/> }
+                                    { this.state.hasDiagram && <StopPosterTimetable/> }
+                                    { !this.state.hasDiagram && <StopPosterTimetable segments={["weekdays"]}/> }
 
-                                    <div
-                                        style={{ flex: "1 1 auto" }}
-                                    >
-                                        { this.state.shouldRenderFixedContent
-                                                  && (
-                                                      <AdContainer
-                                                          template={template
-                                                              ? get(template, "areas", [])
-                                                                  .find(t => t.key === "ads")
-                                                              : {}}
-                                                          shortId={this.props.shortId}
-                                                      />
-                                                  )
-                                        }
+                                    <div style={{ flex: "1 1 auto" }}>
+                                        { this.state.shouldRenderFixedContent && (
+                                            <AdContainer
+                                                template={template
+                                                    ? get(template, "areas", [])
+                                                        .find(t => t.key === "ads")
+                                                    : {}}
+                                                shortId={this.props.shortId}
+                                            />
+                                        ) }
                                     </div>
                                 </div>
 
                                 <Spacer width={10}/>
 
-                                <Measure
-                                    client
-                                    onResize={this.setRightColumnHeight}
-                                >
+                                <Measure client onResize={this.setRightColumnHeight}>
                                     { ({ measureRef }) => (
-                                        <div
-                                            className={styles.right}
-                                            ref={measureRef}
-                                        >
-                                            { !this.state.hasDiagram
-                                                      && (
-                                                          <div className={styles.timetables}>
-                                                              <StopPosterTimetable
-                                                                  segments={["saturdays"]}
-                                                                  hideDetails
-                                                              />
-                                                              <Spacer width={10}/>
-                                                              <StopPosterTimetable
-                                                                  segments={["sundays"]}
-                                                                  hideDetails
-                                                              />
-                                                          </div>
-                                                      )
-                                            }
+                                        <div className={styles.right} ref={measureRef}>
+                                            { !this.state.hasDiagram && (
+                                                <div className={styles.timetables}>
+                                                    <StopPosterTimetable
+                                                        segments={["saturdays"]}
+                                                        hideDetails
+                                                    />
+                                                    <Spacer width={10}/>
+                                                    <StopPosterTimetable
+                                                        segments={["sundays"]}
+                                                        hideDetails
+                                                    />
+                                                </div>
+                                            ) }
 
-                                            { !this.state.hasDiagram
-                                                      && <Spacer height={10}/> }
+                                            { !this.state.hasDiagram && <Spacer height={10}/> }
 
                                             <CustomMap
                                                 shouldRenderMap={this.state.shouldRenderFixedContent}
@@ -279,25 +248,21 @@ class StopPoster extends Component {
 
                                             <Spacer height={10}/>
 
-                                            { this.state.hasDiagram && !this.props.isTramStop
-                                                      && (
-                                                          <RouteDiagram
-                                                              height={this.state.mapHeight > -1
-                                                                  ? this.state.rightColumnHeight - this.state.mapHeight
-                                                                  : "auto"}
-                                                              stopId={this.props.stopId}
-                                                              date={this.props.date}
-                                                          />
-                                                      )
-                                            }
-                                            { this.state.hasDiagram && this.props.isTramStop
-                                                      && (
-                                                          <TramDiagram height={this.state.mapHeight > -1
-                                                              ? this.state.rightColumnHeight - this.state.mapHeight
-                                                              : "auto"}
-                                                          />
-                                                      )
-                                            }
+                                            { this.state.hasDiagram && !this.props.isTramStop && (
+                                                <RouteDiagram
+                                                    height={this.state.mapHeight > -1
+                                                        ? this.state.rightColumnHeight - this.state.mapHeight
+                                                        : "auto"}
+                                                    stopId={this.props.stopId}
+                                                    date={this.props.date}
+                                                />
+                                            ) }
+                                            { this.state.hasDiagram && this.props.isTramStop && (
+                                                <TramDiagram height={this.state.mapHeight > -1
+                                                    ? this.state.rightColumnHeight - this.state.mapHeight
+                                                    : "auto"}
+                                                />
+                                            ) }
                                         </div>
                                     ) }
                                 </Measure>
