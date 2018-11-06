@@ -1,3 +1,4 @@
+import get from 'lodash/get';
 import { itemsToTree, generalizeTree, sortBranches } from 'util/tree';
 import { getZoneName } from './domain';
 
@@ -18,14 +19,17 @@ function isEqual(stop, other) {
 }
 
 function merge(stop, other) {
-  const destinations = [...(stop.destinations || []), ...(other.destinations || [])];
+  const destinations = [
+    ...get(stop, 'destinations', []),
+    ...get(other, 'destinations', []),
+  ];
   return destinations.length > 0 ? { ...stop, destinations } : stop;
 }
 
 function prune(branch) {
   const destinations = [...branch.children]
     .reduce((prev, node) => [...prev, ...node.items], [])
-    .reduce((prev, stop) => [...prev, ...(stop.destinations || [])], []);
+    .reduce((prev, stop) => [...prev, ...get(stop, 'destinations', [])], []);
 
   // eslint-disable-next-line no-param-reassign
   branch.items = [...branch.items, { type: 'gap', destinations }];
@@ -39,7 +43,7 @@ function truncate(node) {
   if (gap) {
     const index = items.indexOf(gap);
     const removedNode = items.splice(index + (index > items.length / 2 ? -1 : 1), 1);
-    if (removedNode[0].destinations) {
+    if (get(removedNode, '[0].destinations')) {
       if (!gap.destinations) gap.destinations = [];
       gap.destinations = gap.destinations.concat(removedNode[0].destinations);
     }
@@ -47,7 +51,7 @@ function truncate(node) {
     const index = items.length - 1;
     const itemToAdd = { type: 'gap' };
     const removedItem = items.splice(index, 1, itemToAdd);
-    if (removedItem[0].destinations) {
+    if (get(removedItem, '[0].destinations')) {
       itemToAdd.destinations = removedItem[0].destinations;
     }
   }
