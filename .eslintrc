@@ -3,46 +3,29 @@
   "parserOptions": {
     "sourceType": "module"
   },
-  "extends": "airbnb",
+  "extends": ["airbnb", "plugin:prettier/recommended"],
   "rules": {
-    "indent": [ 1, 4 ],
-    "no-plusplus": [ "off" ],
-    "no-restricted-syntax": [ "off" ],
-    "comma-dangle": [
-      1, {
-        "arrays": "always-multiline",
-        "objects": "always-multiline",
-        "imports": "always-multiline",
-        "exports": "always-multiline",
-        "functions": "never"
-      }
-    ],
-    "quotes": [ 1, "double", { "avoidEscape": true } ],
+    "no-plusplus": [0],
+    "no-restricted-syntax": [0],
     "no-console": 0,
     "max-len": 0,
     "no-unused-vars": 0,
-    "no-nested-ternary": "off",
     "react/no-unused-prop-types": 0,
-    "react/jsx-indent": [ 1, 4 ],
-    "react/jsx-indent-props": [ 1, 4 ],
     "react/forbid-prop-types": 0,
-    "react/jsx-filename-extension": [ 1, { "extensions": [ ".js" ] } ],
-    "react/jsx-tag-spacing": [ 1, { "beforeSelfClosing": "never" } ],
-    "react/no-array-index-key": [ "off" ],
-    "react/destructuring-assignment": "off",
-    "jsx-a11y/img-has-alt": [ "off" ],
-    "jsx-a11y/alt-text": "off",
-    "import/named": [ 1 ],
-    "guard-for-in": "off",
-    "no-underscore-dangle": "off",
-    "import/prefer-default-export": "off"
+    "react/jsx-filename-extension": [1, { "extensions": [".js"] }],
+    "react/no-array-index-key": [0],
+    "react/destructuring-assignment": 0,
+    "jsx-a11y/img-has-alt": [0],
+    "jsx-a11y/alt-text": 0,
+    "import/named": [1],
+    "guard-for-in": 0,
+    "no-underscore-dangle": 0,
+    "import/prefer-default-export": 0
   },
   "env": {
     "browser": true,
     "node": true,
     "es6": true
   },
-  "plugins": [
-    "react"
-  ]
+  "plugins": ["react"]
 }
