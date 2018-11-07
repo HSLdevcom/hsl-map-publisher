@@ -109,8 +109,8 @@ class CustomMap extends Component {
       }
     }
 
-    // Check if the svg fits
-    if (renderMap === 'svg' && svgHeight > mapHeight) {
+    // Check if the svg fits with a 100px leeway
+    if (renderMap === 'svg' && svgHeight > mapHeight + 100) {
       // Render the local map if the svg doesn't fit but the local map would fit
       renderMap = mapHeight >= MAP_MIN_HEIGHT ? 'local' : 'none';
     }

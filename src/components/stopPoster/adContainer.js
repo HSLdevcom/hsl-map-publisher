@@ -23,6 +23,10 @@ class AdContainer extends Component {
     this.updateLayout();
   }
 
+  componentWillUnmount() {
+    renderQueue.remove(this);
+  }
+
   updateLayout() {
     const hasOverflow = this.hasOverflow();
     const { spaces } = this.state;

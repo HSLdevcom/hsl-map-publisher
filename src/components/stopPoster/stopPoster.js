@@ -211,6 +211,9 @@ class StopPoster extends Component {
                   {this.state.hasDiagram && <StopPosterTimetable />}
                   {!this.state.hasDiagram && <StopPosterTimetable segments={['weekdays']} />}
                   <AdContainer
+                    key={`poster_ads_${this.state.hasRoutes}${this.state.hasRoutesOnTop}${
+                      this.state.hasStretchedLeftColumn
+                    }${this.state.hasDiagram}`}
                     shortId={this.props.shortId}
                     template={template ? get(template, 'areas', []).find(t => t.key === 'ads') : {}}
                   />
@@ -237,6 +240,7 @@ class StopPoster extends Component {
                       {!this.state.hasDiagram && <Spacer height={10} />}
                       {this.state.shouldRenderMap && (
                         <CustomMap
+                          key={`poster_map_${this.state.hasDiagram}${this.props.isTramStop}`}
                           setMapHeight={this.setMapHeight}
                           stopId={this.props.stopId}
                           date={this.props.date}
