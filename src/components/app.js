@@ -32,7 +32,7 @@ class App extends Component {
       window.callPhantom({ error: error.message });
       return;
     }
-    console.error(error);
+    console.error(error); // eslint-disable-line no-console
   }
 
   componentDidMount() {

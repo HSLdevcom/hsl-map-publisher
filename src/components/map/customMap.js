@@ -60,7 +60,7 @@ class CustomMap extends Component {
      * template === false means that there is no template
      * template == true means that we have a template.
      *
-     * Only try to render the local map if template === false || !mapImage.
+     * Only try to render the StopMap if template === false || !mapImage.
      * We don't want to unnecessarily mount the StopMap.
      */
 

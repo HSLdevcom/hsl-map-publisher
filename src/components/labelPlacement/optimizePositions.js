@@ -22,10 +22,7 @@ const diffsArray = factors.map(factor =>
   angles.reduce(
     (prev, angle) => [
       ...prev,
-      ...distances.map(distance => ({
-        angle: angle * factor,
-        distance: distance * factor,
-      })),
+      ...distances.map(distance => ({ angle: angle * factor, distance: distance * factor })),
     ],
     [],
   ),

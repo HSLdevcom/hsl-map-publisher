@@ -15,6 +15,7 @@ export function sizedSvg(svgSource, width, height) {
   let svgOrigHeight = 0;
   const $svg = cheerio.load(svgSource);
 
+  // Figure out the aspect ratio of the svg from the width/height or the viewBox.
   if ($svg('svg').attr('width')) {
     svgOrigWidth = parseAttr($svg('svg').attr('width'));
     svgOrigHeight = parseAttr($svg('svg').attr('height'));

@@ -210,6 +210,7 @@ class StopPoster extends Component {
                   {this.state.hasRoutes && !this.state.hasRoutesOnTop && <Spacer height={10} />}
                   {this.state.hasDiagram && <StopPosterTimetable />}
                   {!this.state.hasDiagram && <StopPosterTimetable segments={['weekdays']} />}
+                  {/* The key will make sure the ad container updates its size if the layout changes */}
                   <AdContainer
                     key={`poster_ads_${this.state.hasRoutes}${this.state.hasRoutesOnTop}${
                       this.state.hasStretchedLeftColumn
@@ -238,6 +239,7 @@ class StopPoster extends Component {
                       )}
 
                       {!this.state.hasDiagram && <Spacer height={10} />}
+                      {/* The key will make sure the map updates its size if the layout changes */}
                       {this.state.shouldRenderMap && (
                         <CustomMap
                           key={`poster_map_${this.state.hasDiagram}${this.props.isTramStop}`}

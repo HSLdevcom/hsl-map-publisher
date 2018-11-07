@@ -44,9 +44,7 @@ class Routes extends Component {
         this.setState(state => ({ columns: state.columns - 1 }));
         return;
       }
-      renderQueue.remove(this, {
-        error: new Error('Failed to remove routes overflow'),
-      });
+      renderQueue.remove(this, { error: new Error('Failed to remove routes overflow') });
       return;
     }
     renderQueue.remove(this);
