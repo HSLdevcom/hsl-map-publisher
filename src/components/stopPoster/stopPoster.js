@@ -21,7 +21,6 @@ import AdContainer from './adContainer';
 
 import styles from './stopPoster.css';
 import CustomMap from '../map/customMap';
-import Get from '../../util/Get';
 
 const trunkStopStyle = {
   '--background': colorsByMode.TRUNK,
@@ -29,24 +28,21 @@ const trunkStopStyle = {
 };
 
 class StopPoster extends Component {
-  adContainerRef = React.createRef();
-
   constructor(props) {
     super(props);
 
     this.onError = this.onError.bind(this);
     this.setMapHeight = this.setMapHeight.bind(this);
-    this.setRightColumnHeight = this.setRightColumnHeight.bind(this);
 
     this.state = {
-      rightColumnHeight: -1,
       mapHeight: -1,
       template: null,
       hasRoutesOnTop: false,
       hasDiagram: true,
       hasRoutes: true,
       hasStretchedLeftColumn: false,
-      shouldRenderFixedContent: false,
+      shouldRenderMap: false,
+      triedRenderingMap: false,
     };
   }
 
@@ -71,6 +67,10 @@ class StopPoster extends Component {
       this.setState({
         template: templateBody,
       });
+    } else {
+      this.setState({
+        template: false,
+      });
     }
 
     renderQueue.onEmpty(error => !error && this.updateLayout(), {
@@ -94,12 +94,6 @@ class StopPoster extends Component {
     });
   }
 
-  setRightColumnHeight({ client: { height } }) {
-    this.setState({
-      rightColumnHeight: height,
-    });
-  }
-
   hasOverflow() {
     if (!this.content) {
       return false;
@@ -119,26 +113,37 @@ class StopPoster extends Component {
       return;
     }
 
+    if (this.hasOverflow() && this.state.triedRenderingMap) {
+      this.onError('Unsolvable layout overflow.');
+      return;
+    }
+
     if (this.hasOverflow()) {
       if (!this.state.hasRoutesOnTop) {
         this.setState({ hasRoutesOnTop: true });
         return;
       }
+
       if (this.state.hasDiagram) {
         this.setState({ hasDiagram: false });
         return;
       }
+
       if (this.state.hasRoutes) {
         this.setState({ hasRoutes: false });
         return;
       }
+
       if (!this.state.hasStretchedLeftColumn) {
         this.setState({ hasStretchedLeftColumn: true });
         return;
       }
 
-      if (this.state.shouldRenderFixedContent) {
-        this.setState({ shouldRenderFixedContent: false });
+      if (this.state.shouldRenderMap) {
+        this.setState({
+          shouldRenderMap: false,
+          triedRenderingMap: true,
+        });
         return;
       }
 
@@ -146,14 +151,12 @@ class StopPoster extends Component {
       return;
     }
 
-    if (!this.state.shouldRenderFixedContent) {
-      this.setState({ shouldRenderFixedContent: true });
+    if (!this.state.shouldRenderMap && !this.state.triedRenderingMap) {
+      this.setState({ shouldRenderMap: true });
       return;
     }
 
-    window.setTimeout(() => {
-      renderQueue.remove(this);
-    }, 1000);
+    renderQueue.remove(this);
   }
 
   render() {
@@ -215,8 +218,13 @@ class StopPoster extends Component {
 
                 <Spacer width={10} />
 
-                <Measure client onResize={this.setRightColumnHeight}>
-                  {({ measureRef }) => (
+                <Measure client>
+                  {({
+                    measureRef,
+                    contentRect: {
+                      client: { clientHeight: rightColumnHeight },
+                    },
+                  }) => (
                     <div className={styles.right} ref={measureRef}>
                       {!this.state.hasDiagram && (
                         <div className={styles.timetables}>
@@ -227,17 +235,19 @@ class StopPoster extends Component {
                       )}
 
                       {!this.state.hasDiagram && <Spacer height={10} />}
-
-                      <CustomMap
-                        shouldRenderMap={this.state.shouldRenderFixedContent}
-                        setMapHeight={this.setMapHeight}
-                        stopId={this.props.stopId}
-                        date={this.props.date}
-                        isSummerTimetable={this.props.isSummerTimetable}
-                        template={
-                          template ? get(template, 'areas', []).find(t => t.key === 'map') : null
-                        }
-                      />
+                      {this.state.shouldRenderMap && (
+                        <CustomMap
+                          setMapHeight={this.setMapHeight}
+                          stopId={this.props.stopId}
+                          date={this.props.date}
+                          isSummerTimetable={this.props.isSummerTimetable}
+                          template={
+                            template
+                              ? get(template, 'areas', []).find(t => t.key === 'map')
+                              : template // null if template is loading, false if no template
+                          }
+                        />
+                      )}
 
                       <Spacer height={10} />
 
@@ -246,7 +256,7 @@ class StopPoster extends Component {
                           <RouteDiagram
                             height={
                               this.state.mapHeight > -1
-                                ? this.state.rightColumnHeight - this.state.mapHeight
+                                ? rightColumnHeight - this.state.mapHeight
                                 : 'auto'
                             }
                             stopId={this.props.stopId}

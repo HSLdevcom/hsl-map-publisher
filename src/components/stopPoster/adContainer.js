@@ -24,8 +24,12 @@ class AdContainer extends Component {
   }
 
   updateLayout() {
-    if (this.hasOverflow()) {
-      this.setState(state => ({ spaces: state.spaces - 1 }));
+    const hasOverflow = this.hasOverflow();
+    const { spaces } = this.state;
+
+    if (hasOverflow && spaces > 0) {
+      const nextSpaces = spaces - 1;
+      this.setState({ spaces: nextSpaces });
     } else {
       renderQueue.remove(this);
     }

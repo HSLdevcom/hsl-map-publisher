@@ -12,7 +12,6 @@ const parseAttr = attr => Math.round(parseInt(attr, 10));
 
 class CustomMap extends Component {
   static propTypes = {
-    shouldRenderMap: PropTypes.bool.isRequired,
     stopId: PropTypes.string.isRequired,
     date: PropTypes.string.isRequired,
     // eslint-disable-next-line react/require-default-props
@@ -23,27 +22,20 @@ class CustomMap extends Component {
   };
 
   state = {
-    mapImage: '',
     mapWidth: -1,
     mapHeight: -1,
   };
 
   componentDidMount() {
     renderQueue.add(this);
-    this.updateTemplateImage();
   }
 
-  componentDidUpdate() {
-    this.updateTemplateImage();
-  }
-
-  // Used only if a static image replaces the local map.
   onResize = ({ client: { width, height } }) => {
     const { mapWidth, mapHeight } = this.state;
     const { setMapHeight } = this.props;
 
     // We only need one measurement
-    if (mapWidth > -1 || mapHeight > -1) {
+    if (mapWidth > -1 && mapHeight > -1) {
       return;
     }
 
@@ -54,34 +46,35 @@ class CustomMap extends Component {
         mapWidth: width,
         mapHeight: height,
       },
-      () => {
-        renderQueue.remove(this);
-      },
+      () => renderQueue.remove(this),
     );
   };
 
-  updateTemplateImage() {
-    const { mapImage } = this.state;
-    const newMapImage = get(this.props, 'template.slots[0].image.svg', '');
-
-    if (mapImage !== newMapImage) {
-      this.setState({
-        mapImage: newMapImage,
-      });
-    }
-  }
-
   render() {
-    const { shouldRenderMap, stopId, date, isSummerTimetable } = this.props;
+    const { template, stopId, date, isSummerTimetable } = this.props;
+    const { mapWidth, mapHeight } = this.state;
 
-    const { mapImage, mapWidth, mapHeight } = this.state;
+    /**
+     * The template prop is a bit special.
+     * template === null means the template hasn't loaded.
+     * template === false means that there is no template
+     * template == true means that we have a template.
+     *
+     * Only try to render the local map if template === false || !mapImage.
+     * We don't want to unnecessarily mount the StopMap.
+     */
+
+    const mapImage = get(template, 'slots[0].image.svg', '');
 
     let svgHeight = 0;
     let aspectRatio = 0;
     let svgSrc = '';
-    let renderMap = shouldRenderMap && mapHeight >= MAP_MIN_HEIGHT ? 'local' : 'none';
+    let mapImageStyle = {};
+    let renderMap =
+      (template === false || !mapImage) && mapHeight >= MAP_MIN_HEIGHT ? 'local' : 'none';
 
-    if (mapImage) {
+    // Make sure we have an svg image and a measurement before processing the svg
+    if (mapImage && mapWidth > -1) {
       let mapImageWidth = 0;
       let mapImageHeight = 0;
       const $svg = cheerio.load(mapImage);
@@ -106,25 +99,30 @@ class CustomMap extends Component {
       svgSrc = $svg.html();
 
       // Render the svg image if the map has height and fits in the designated space.
-      if (svgHeight !== 0 && svgHeight <= mapHeight) {
+      if (svgHeight !== 0) {
         renderMap = 'svg';
+
+        mapImageStyle = {
+          width: mapWidth,
+          height: svgHeight,
+        };
       }
     }
 
-    const mapImageStyle = {
-      width: mapWidth,
-      height: mapWidth * aspectRatio,
-    };
+    // Check if the svg fits
+    if (renderMap === 'svg' && svgHeight > mapHeight) {
+      // Render the local map if the svg doesn't fit but the local map would fit
+      renderMap = mapHeight >= MAP_MIN_HEIGHT ? 'local' : 'none';
+    }
 
     // Aspect ratio height of SVG if one is set, auto otherwise.
-    const wrapperHeight = svgHeight !== 0 ? svgHeight : 'auto';
+    const wrapperHeight = renderMap === 'svg' ? svgHeight : 'auto';
 
     return (
       <Measure client onResize={this.onResize}>
         {({ measureRef }) => (
           <div
             style={{
-              overflow: 'hidden',
               flex: wrapperHeight === 'auto' ? 1 : 'none',
               width: '100%',
               height: wrapperHeight,

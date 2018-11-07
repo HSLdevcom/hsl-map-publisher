@@ -32,7 +32,7 @@ class App extends Component {
       window.callPhantom({ error: error.message });
       return;
     }
-    console.error(error); // eslint-disable-line no-console
+    console.error(error);
   }
 
   componentDidMount() {
@@ -48,6 +48,8 @@ class App extends Component {
             width: this.root.offsetWidth,
             height: this.root.offsetHeight,
           });
+        } else {
+          console.log('Rendering finished');
         }
       });
     }
