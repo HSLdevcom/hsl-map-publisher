@@ -6,9 +6,9 @@ import Measure from 'react-measure';
 import StopMap from './stopMapContainer';
 import { InlineSVG } from '../util';
 import renderQueue from '../../util/renderQueue';
+import { sizedSvg } from '../../util/sizedSvg';
 
 const MAP_MIN_HEIGHT = 500;
-const parseAttr = attr => Math.round(parseInt(attr, 10));
 
 class CustomMap extends Component {
   static propTypes = {
@@ -67,43 +67,23 @@ class CustomMap extends Component {
     const mapImage = get(template, 'slots[0].image.svg', '');
 
     let svgHeight = 0;
-    let aspectRatio = 0;
-    let svgSrc = '';
+    let svgSrc = 0;
     let mapImageStyle = {};
     let renderMap =
       (template === false || !mapImage) && mapHeight >= MAP_MIN_HEIGHT ? 'local' : 'none';
 
     // Make sure we have an svg image and a measurement before processing the svg
     if (mapImage && mapWidth > -1) {
-      let mapImageWidth = 0;
-      let mapImageHeight = 0;
-      const $svg = cheerio.load(mapImage);
+      const { svg, width, height } = sizedSvg(mapImage, mapWidth);
 
-      if ($svg('svg').attr('width')) {
-        mapImageWidth = parseAttr($svg('svg').attr('width'));
-        mapImageHeight = parseAttr($svg('svg').attr('height'));
-      } else {
-        const svgViewBox = $svg('svg')
-          .attr('viewBox')
-          .split(' ');
-        mapImageWidth = parseAttr(svgViewBox[2]);
-        mapImageHeight = parseAttr(svgViewBox[3]);
-      }
+      svgHeight = height;
+      svgSrc = svg;
 
-      aspectRatio = mapImageHeight / mapImageWidth;
-      svgHeight = Math.floor(mapWidth * aspectRatio);
-
-      $svg('svg').attr('width', mapWidth);
-      $svg('svg').attr('height', svgHeight);
-
-      svgSrc = $svg.html();
-
-      // Render the svg image if the map has height and fits in the designated space.
-      if (svgHeight !== 0) {
+      if (svgSrc && svgHeight) {
         renderMap = 'svg';
 
         mapImageStyle = {
-          width: mapWidth,
+          width,
           height: svgHeight,
         };
       }
