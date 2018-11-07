@@ -20,9 +20,7 @@
   position: relative;
   height: 14px;
   margin-left: var(--left-width);
-  margin-right: calc(
-    var(--right-width) + var(--line-radius) + 2 * var(--line-width)
-  );
+  margin-right: calc(var(--right-width) + var(--line-radius) + 2 * var(--line-width));
   border-bottom: var(--line-border);
   border-left: var(--line-border);
   border-bottom-left-radius: var(--line-radius);

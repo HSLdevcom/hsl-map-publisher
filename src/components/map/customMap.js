@@ -79,8 +79,7 @@ class CustomMap extends Component {
     let svgHeight = 0;
     let aspectRatio = 0;
     let svgSrc = '';
-    let renderMap =
-      shouldRenderMap && mapHeight >= MAP_MIN_HEIGHT ? 'local' : 'none';
+    let renderMap = shouldRenderMap && mapHeight >= MAP_MIN_HEIGHT ? 'local' : 'none';
 
     if (mapImage) {
       let mapImageWidth = 0;

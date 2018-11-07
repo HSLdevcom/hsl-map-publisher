@@ -21,8 +21,7 @@ function getOverflowCost(positions, indexes, boundingBox) {
   return (
     OVERFLOW_COST *
     indexes.reduce(
-      (prev, index) =>
-        hasOverflow(positions[index], boundingBox) ? prev + 1 : prev,
+      (prev, index) => (hasOverflow(positions[index], boundingBox) ? prev + 1 : prev),
       0,
     )
   );
@@ -35,10 +34,8 @@ function getOverflowCost(positions, indexes, boundingBox) {
  * @returns {number}
  */
 function getOverlapArea(a, b) {
-  const width =
-    Math.min(a.left + a.width, b.left + b.width) - Math.max(a.left, b.left);
-  const height =
-    Math.min(a.top + a.height, b.top + b.height) - Math.max(a.top, b.top);
+  const width = Math.min(a.left + a.width, b.left + b.width) - Math.max(a.left, b.left);
+  const height = Math.min(a.top + a.height, b.top + b.height) - Math.max(a.top, b.top);
   return Math.max(0, width) * Math.max(0, height);
 }
 
@@ -68,16 +65,7 @@ function getOverlapCost(positions, indexes) {
  * @param {boolean}
  */
 function hasIntersectingLines(a, b) {
-  return !!segseg(
-    a.x,
-    a.y,
-    a.x + a.cx,
-    a.y + a.cy,
-    b.x,
-    b.y,
-    b.x + b.cx,
-    b.y + b.cy,
-  );
+  return !!segseg(a.x, a.y, a.x + a.cx, a.y + a.cy, b.x, b.y, b.x + b.cx, b.y + b.cy);
 }
 
 /**
@@ -151,8 +139,7 @@ function getDistanceCost(positions, indexes) {
   return (
     DISTANCE_COST *
     indexes.reduce(
-      (prev, index) =>
-        prev + (positions[index].distance - positions[index].initialDistance),
+      (prev, index) => prev + (positions[index].distance - positions[index].initialDistance),
       0,
     )
   );
@@ -168,8 +155,7 @@ function getAngleCost(positions, indexes) {
   return (
     ANGLE_COST *
     indexes.reduce((prev, index) => {
-      const phi =
-        Math.abs(positions[index].angle - positions[index].initialAngle) % 360;
+      const phi = Math.abs(positions[index].angle - positions[index].initialAngle) % 360;
       return prev + (phi > 180 ? 360 - phi : phi);
     }, 0)
   );

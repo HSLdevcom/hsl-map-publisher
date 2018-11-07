@@ -18,9 +18,7 @@ const Stop = props => {
       <div className={styles.left} />
       <div className={styles.separator}>
         <div className={styles.separatorTop} />
-        <div
-          className={props.isLast ? styles.separatorLastStop : styles.separatorStop}
-        />
+        <div className={props.isLast ? styles.separatorLastStop : styles.separatorStop} />
         <div
           className={styles.separatorBottom}
           style={{ visibility: props.isLast ? 'hidden' : 'visible' }}
@@ -51,9 +49,8 @@ Stop.propTypes = {
   nameFi: PropTypes.string.isRequired,
   nameSe: PropTypes.string,
   isLast: PropTypes.bool.isRequired,
-  transferModes: PropTypes.arrayOf(
-    PropTypes.oneOf(['BUS', 'TRAM', 'FERRY', 'RAIL', 'SUBWAY']),
-  ).isRequired,
+  transferModes: PropTypes.arrayOf(PropTypes.oneOf(['BUS', 'TRAM', 'FERRY', 'RAIL', 'SUBWAY']))
+    .isRequired,
 };
 
 export default Stop;

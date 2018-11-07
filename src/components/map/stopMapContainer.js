@@ -115,12 +115,8 @@ const nearbyItemsMapper = mapProps(props => {
     miniMapStartY: props.height - MINI_MAP_HEIGHT - MINI_MAP_MARGIN_BOTTOM,
   });
 
-  const currentStop = projectedStops.find(({ stopIds }) =>
-    stopIds.includes(props.stopId),
-  );
-  const nearbyStops = projectedStops.filter(
-    ({ stopIds }) => !stopIds.includes(props.stopId),
-  );
+  const currentStop = projectedStops.find(({ stopIds }) => stopIds.includes(props.stopId));
+  const nearbyStops = projectedStops.filter(({ stopIds }) => !stopIds.includes(props.stopId));
 
   const mapOptions = {
     center: [viewport.longitude, viewport.latitude],

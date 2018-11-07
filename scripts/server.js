@@ -185,9 +185,7 @@ async function main() {
     const { id } = ctx.params;
     const { title, posters } = await getBuild({ id });
 
-    const posterIds = posters
-      .filter(poster => poster.status === 'READY')
-      .map(poster => poster.id);
+    const posterIds = posters.filter(poster => poster.status === 'READY').map(poster => poster.id);
 
     ctx.type = 'application/pdf';
     ctx.set('Content-Disposition', `attachment; filename="${title}-${id}.pdf"`);

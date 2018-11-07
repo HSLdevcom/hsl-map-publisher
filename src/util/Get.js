@@ -17,11 +17,7 @@ export default function Get({
   }
 
   const values = pathsArray.reduce((allValues, currentPath, i) => {
-    set(
-      allValues,
-      currentPath,
-      get(source, currentPath, get(defaultsArray, `[${i}]`, defaults)),
-    );
+    set(allValues, currentPath, get(source, currentPath, get(defaultsArray, `[${i}]`, defaults)));
     return allValues;
   }, {});
 

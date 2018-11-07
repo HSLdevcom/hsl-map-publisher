@@ -19,10 +19,7 @@ function isEqual(stop, other) {
 }
 
 function merge(stop, other) {
-  const destinations = [
-    ...get(stop, 'destinations', []),
-    ...get(other, 'destinations', []),
-  ];
+  const destinations = [...get(stop, 'destinations', []), ...get(other, 'destinations', [])];
   return destinations.length > 0 ? { ...stop, destinations } : stop;
 }
 
@@ -91,11 +88,7 @@ function routesToTree(routes, shortId, height = 'auto') {
         prev[prev.length - 1].type === 'stop' &&
         prev[prev.length - 1].zone !== item.zone
       ) {
-        return [
-          ...prev,
-          { type: 'zone', from: prev[prev.length - 1].zone, to: item.zone },
-          item,
-        ];
+        return [...prev, { type: 'zone', from: prev[prev.length - 1].zone, to: item.zone }, item];
       }
       return [...prev, item];
     }, []),

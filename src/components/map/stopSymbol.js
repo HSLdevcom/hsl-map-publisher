@@ -24,10 +24,7 @@ const StopSymbol = props => {
   if (modes.includes('FERRY')) {
     colors.push(colorsByMode.FERRY);
   }
-  if (
-    modes.includes('BUS') &&
-    props.routes.some(({ routeId }) => !isTrunkRoute(routeId))
-  ) {
+  if (modes.includes('BUS') && props.routes.some(({ routeId }) => !isTrunkRoute(routeId))) {
     colors.push(colorsByMode.BUS);
   }
 
@@ -39,12 +36,7 @@ const StopSymbol = props => {
 
   return (
     <svg width={props.size} height={props.size} style={{ display: 'block' }}>
-      <circle
-        cx={props.size / 2}
-        cy={props.size / 2}
-        r={outlines[0].radius}
-        fill="#fff"
-      />
+      <circle cx={props.size / 2} cy={props.size / 2} r={outlines[0].radius} fill="#fff" />
       {outlines.map(({ radius, color }, index) => (
         <circle
           key={index}

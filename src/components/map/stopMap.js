@@ -26,9 +26,7 @@ const LOCATION_RADIUS_MINI = 10;
 const INFO_MARGIN_BOTTOM = 78;
 const INFO_MARGIN_LEFT = 44;
 
-const Attribution = () => (
-  <div className={styles.attribution}>&copy; OpenStreetMap</div>
-);
+const Attribution = () => <div className={styles.attribution}>&copy; OpenStreetMap</div>;
 
 const LocationSymbol = props => (
   <div style={{ width: props.size, height: props.size }}>
@@ -46,12 +44,8 @@ const StopMap = props => {
     height: props.mapOptions.height,
   };
   const miniMapStyle = {
-    left:
-      mapStyle.width - props.miniMapOptions.marginRight - props.miniMapOptions.width,
-    top:
-      mapStyle.height -
-      props.miniMapOptions.marginBottom -
-      props.miniMapOptions.height,
+    left: mapStyle.width - props.miniMapOptions.marginRight - props.miniMapOptions.width,
+    top: mapStyle.height - props.miniMapOptions.marginBottom - props.miniMapOptions.height,
     width: props.miniMapOptions.width,
     height: props.miniMapOptions.height,
   };
@@ -63,10 +57,9 @@ const StopMap = props => {
 
   const miniMapCoordinateHelper = new MapCoordinateHelper(props.miniMapOptions);
   const newPosition = miniMapCoordinateHelper.getMapCenter();
-  const [
-    miniMarkerOffsetLeft,
-    miniMarkerOffsetTop,
-  ] = miniMapCoordinateHelper.getCurrentPosition(newPosition.viewport);
+  const [miniMarkerOffsetLeft, miniMarkerOffsetTop] = miniMapCoordinateHelper.getCurrentPosition(
+    newPosition.viewport,
+  );
 
   return (
     <div className={styles.root} style={mapStyle}>
@@ -88,10 +81,7 @@ const StopMap = props => {
       <div className={styles.overlays}>
         <ItemContainer>
           {stops.map((stop, index) => (
-            <ItemFixed
-              key={index}
-              top={stop.y - STOP_RADIUS}
-              left={stop.x - STOP_RADIUS}>
+            <ItemFixed key={index} top={stop.y - STOP_RADIUS} left={stop.x - STOP_RADIUS}>
               <StopSymbol routes={stop.routes} size={STOP_RADIUS * 2} />
             </ItemFixed>
           ))}
@@ -123,9 +113,7 @@ const StopMap = props => {
             </ItemPositioned>
           ))}
 
-          <ItemFixed
-            top={mapStyle.height - INFO_MARGIN_BOTTOM}
-            left={INFO_MARGIN_LEFT}>
+          <ItemFixed top={mapStyle.height - INFO_MARGIN_BOTTOM} left={INFO_MARGIN_LEFT}>
             <div>
               <Scalebar targetWidth={250} pixelsPerMeter={props.pixelsPerMeter} />
               <Attribution />

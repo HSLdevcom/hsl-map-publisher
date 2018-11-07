@@ -62,9 +62,7 @@ class StopPoster extends Component {
       try {
         // This url will probably always be the same. If you find yourself
         // changing it, please make an .env setup while you're at it.
-        templateReq = await window.fetch(
-          `http://localhost:4000/templates/${this.props.template}`,
-        );
+        templateReq = await window.fetch(`http://localhost:4000/templates/${this.props.template}`);
         templateBody = await templateReq.json();
       } catch (err) {
         this.onError(err);
@@ -183,9 +181,7 @@ class StopPoster extends Component {
 
     return (
       <CropMarks>
-        <div
-          className={styles.root}
-          style={this.props.isTrunkStop ? trunkStopStyle : null}>
+        <div className={styles.root} style={this.props.isTrunkStop ? trunkStopStyle : null}>
           <JustifiedColumn>
             <Header stopId={this.props.stopId} />
             <div
@@ -198,32 +194,22 @@ class StopPoster extends Component {
                 this.state.hasRoutesOnTop && (
                   <Routes stopId={this.props.stopId} date={this.props.date} />
                 )}
-              {this.state.hasRoutes &&
-                this.state.hasRoutesOnTop && <Spacer height={10} />}
+              {this.state.hasRoutes && this.state.hasRoutesOnTop && <Spacer height={10} />}
               <div className={styles.columns}>
                 <div
                   className={
-                    this.state.hasStretchedLeftColumn
-                      ? styles.leftStretched
-                      : styles.left
+                    this.state.hasStretchedLeftColumn ? styles.leftStretched : styles.left
                   }>
                   {this.state.hasRoutes &&
                     !this.state.hasRoutesOnTop && (
                       <Routes stopId={this.props.stopId} date={this.props.date} />
                     )}
-                  {this.state.hasRoutes &&
-                    !this.state.hasRoutesOnTop && <Spacer height={10} />}
+                  {this.state.hasRoutes && !this.state.hasRoutesOnTop && <Spacer height={10} />}
                   {this.state.hasDiagram && <StopPosterTimetable />}
-                  {!this.state.hasDiagram && (
-                    <StopPosterTimetable segments={['weekdays']} />
-                  )}
+                  {!this.state.hasDiagram && <StopPosterTimetable segments={['weekdays']} />}
                   <AdContainer
                     shortId={this.props.shortId}
-                    template={
-                      template
-                        ? get(template, 'areas', []).find(t => t.key === 'ads')
-                        : {}
-                    }
+                    template={template ? get(template, 'areas', []).find(t => t.key === 'ads') : {}}
                   />
                 </div>
 
@@ -234,10 +220,7 @@ class StopPoster extends Component {
                     <div className={styles.right} ref={measureRef}>
                       {!this.state.hasDiagram && (
                         <div className={styles.timetables}>
-                          <StopPosterTimetable
-                            segments={['saturdays']}
-                            hideDetails
-                          />
+                          <StopPosterTimetable segments={['saturdays']} hideDetails />
                           <Spacer width={10} />
                           <StopPosterTimetable segments={['sundays']} hideDetails />
                         </div>
@@ -252,9 +235,7 @@ class StopPoster extends Component {
                         date={this.props.date}
                         isSummerTimetable={this.props.isSummerTimetable}
                         template={
-                          template
-                            ? get(template, 'areas', []).find(t => t.key === 'map')
-                            : null
+                          template ? get(template, 'areas', []).find(t => t.key === 'map') : null
                         }
                       />
 
@@ -272,8 +253,7 @@ class StopPoster extends Component {
                             date={this.props.date}
                           />
                         )}
-                      {this.state.hasDiagram &&
-                        this.props.isTramStop && <TramDiagram />}
+                      {this.state.hasDiagram && this.props.isTramStop && <TramDiagram />}
                     </div>
                   )}
                 </Measure>
@@ -282,11 +262,7 @@ class StopPoster extends Component {
             </div>
             <Footer
               onError={this.onError}
-              template={
-                template
-                  ? get(template, 'areas', []).find(t => t.key === 'footer')
-                  : {}
-              }
+              template={template ? get(template, 'areas', []).find(t => t.key === 'footer') : {}}
               shortId={this.props.shortId}
               isTrunkStop={this.props.isTrunkStop}
             />

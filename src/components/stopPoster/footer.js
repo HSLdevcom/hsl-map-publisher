@@ -26,12 +26,8 @@ function getSvgElementPosition($element, widthModifier = 0, heightModifier = 0) 
     ? parseAttr($element.attr('stroke-width'))
     : parseAttr($element.attr('height'));
 
-  const posX = isLine
-    ? parseAttr($element.attr('x1'))
-    : parseAttr($element.attr('x'));
-  const posY = isLine
-    ? parseAttr($element.attr('y1')) - height / 2
-    : parseAttr($element.attr('y'));
+  const posX = isLine ? parseAttr($element.attr('x1')) : parseAttr($element.attr('x'));
+  const posY = isLine ? parseAttr($element.attr('y1')) - height / 2 : parseAttr($element.attr('y'));
 
   return {
     top: posY - posY * widthModifier,
@@ -120,10 +116,7 @@ const Footer = props => {
   return (
     <div className={styles.footerWrapper}>
       <InlineSVG className={styles.dottedLine} src={dottedLine} />
-      <InlineSVG
-        className={classnames(styles.footerPiece, styles.hslLogo)}
-        src={hslLogo}
-      />
+      <InlineSVG className={classnames(styles.footerPiece, styles.hslLogo)} src={hslLogo} />
       <InlineSVG
         className={classnames(styles.footerPiece, styles.customerService)}
         src={customerService}
@@ -136,18 +129,13 @@ const Footer = props => {
             key={`slot_${slotIdx}_${slot.name}`}
             className={styles.dynamicSlot}
             style={slot.style}>
-            <div
-              className={styles.svgContainer}
-              dangerouslySetInnerHTML={{ __html: svg }}
-            />
+            <div className={styles.svgContainer} dangerouslySetInnerHTML={{ __html: svg }} />
             {slot.dynamicAreas.map((area, areaIdx) => {
               const url = get(urlsByType, get(area, 'data', ''), null);
 
               if (!url) {
                 props.onError(
-                  `No URL set for key '${get(area, 'data', '')}' and stop ${
-                    props.shortId
-                  }!`,
+                  `No URL set for key '${get(area, 'data', '')}' and stop ${props.shortId}!`,
                 );
                 return null;
               }

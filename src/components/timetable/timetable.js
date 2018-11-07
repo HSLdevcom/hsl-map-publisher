@@ -18,8 +18,7 @@ const Timetable = props => (
     {props.showStopInformation && (
       <div className={styles.componentName}>
         <div className={styles.title}>
-          {props.stopNameFi}{' '}
-          {props.stopShortId && `(${props.stopShortId.replace(/\s+/g, '')})`}{' '}
+          {props.stopNameFi} {props.stopShortId && `(${props.stopShortId.replace(/\s+/g, '')})`}{' '}
           &nbsp;&nbsp;
         </div>
         <div className={styles.subtitle}>{props.stopNameSe}</div>
@@ -56,22 +55,14 @@ const Timetable = props => (
     {props.saturdays &&
       props.saturdays.length > 0 && (
         <div>
-          <TableHeader
-            title="Lauantai"
-            subtitle="Lördag"
-            printingAsA4={props.printableAsA4}
-          />
+          <TableHeader title="Lauantai" subtitle="Lördag" printingAsA4={props.printableAsA4} />
           <TableRows departures={props.saturdays} />
         </div>
       )}
     {props.sundays &&
       props.sundays.length > 0 && (
         <div>
-          <TableHeader
-            title="Sunnuntai"
-            subtitle="Söndag"
-            printingAsA4={props.printableAsA4}
-          />
+          <TableHeader title="Sunnuntai" subtitle="Söndag" printingAsA4={props.printableAsA4} />
           <TableRows departures={props.sundays} />
         </div>
       )}

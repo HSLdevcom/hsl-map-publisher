@@ -85,10 +85,7 @@ class Routes extends Component {
             </Column>
             <Column>
               {routes.map((route, index) => (
-                <div
-                  key={index}
-                  className={styles.group}
-                  style={{ color: getColor(route) }}>
+                <div key={index} className={styles.group} style={{ color: getColor(route) }}>
                   <div className={styles.title}>{route.destinationFi}</div>
                   <div className={styles.subtitle}>{route.destinationSe}</div>
                 </div>

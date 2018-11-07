@@ -5,10 +5,7 @@ import styles from './scalebar.css';
 
 const values = [1, 2, 4, 8];
 const factors = [1, 10, 100, 1000, 10000];
-const scales = factors.reduce(
-  (prev, cur) => [...prev, ...values.map(val => val * cur)],
-  [],
-);
+const scales = factors.reduce((prev, cur) => [...prev, ...values.map(val => val * cur)], []);
 
 const Scalebar = props => {
   const meters = props.targetWidth / props.pixelsPerMeter;

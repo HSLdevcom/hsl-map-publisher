@@ -33,15 +33,9 @@ async function getBuilds() {
   const rows = await knex
     .select(
       'build.*',
-      knex.raw(
-        "count(case when poster.status = 'PENDING' then 1 end)::integer as pending",
-      ),
-      knex.raw(
-        "count(case when poster.status = 'FAILED' then 1 end)::integer as failed",
-      ),
-      knex.raw(
-        "count(case when poster.status = 'READY' then 1 end)::integer as ready",
-      ),
+      knex.raw("count(case when poster.status = 'PENDING' then 1 end)::integer as pending"),
+      knex.raw("count(case when poster.status = 'FAILED' then 1 end)::integer as failed"),
+      knex.raw("count(case when poster.status = 'READY' then 1 end)::integer as ready"),
     )
     .from('build')
     .whereNot('build.status', 'REMOVED')

@@ -14,13 +14,7 @@
 
 .root > *:last-child {
   height: 10px;
-  background: repeating-linear-gradient(
-    90deg,
-    black,
-    black 25%,
-    white 25%,
-    white 50%
-  );
+  background: repeating-linear-gradient(90deg, black, black 25%, white 25%, white 50%);
   border: 1px solid white;
   box-sizing: border-box;
 }

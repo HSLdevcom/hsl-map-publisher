@@ -9,19 +9,10 @@ const STOP_AMOUNT_WEIGHT = 5;
 const DISTANCES_FROM_CENTRE = [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3];
 const ANGLES = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
 
-function viewportContains(
-  viewport,
-  stop,
-  width,
-  height,
-  miniMapStartX,
-  miniMapStartY,
-) {
+function viewportContains(viewport, stop, width, height, miniMapStartX, miniMapStartY) {
   const [x, y] = viewport.project([stop.lon, stop.lat], { topLeft: true });
   const behindMiniMap = x > miniMapStartX && height - y > miniMapStartY;
-  return (
-    x >= 0 && x <= viewport.width && y >= 0 && y <= viewport.height && !behindMiniMap
-  );
+  return x >= 0 && x <= viewport.width && y >= 0 && y <= viewport.height && !behindMiniMap;
 }
 
 function toRadians(angle) {
@@ -60,9 +51,7 @@ function calculateStopsViewport(options) {
 
   const allStops = stops.map(stop => ({
     ...stop,
-    major: stop.routes.some(
-      route => route.mode === 'SUBWAY' || route.mode === 'RAIL',
-    ),
+    major: stop.routes.some(route => route.mode === 'SUBWAY' || route.mode === 'RAIL'),
   }));
 
   const defaultViewport = new PerspectiveMercatorViewport({
@@ -99,14 +88,7 @@ function calculateStopsViewport(options) {
         });
 
         const visibleStops = allStops.filter(stop =>
-          viewportContains(
-            viewport,
-            stop,
-            width,
-            height,
-            miniMapStartX,
-            miniMapStartY,
-          ),
+          viewportContains(viewport, stop, width, height, miniMapStartX, miniMapStartY),
         );
 
         const currentStopIsVisible = visibleStops.some(s =>
@@ -124,17 +106,10 @@ function calculateStopsViewport(options) {
           averagePoint.y /= visibleStops.length;
 
           const relativeAverageStopDistance =
-            getDistanceBetweenPoints(
-              averagePoint.x,
-              averagePoint.y,
-              mapMidPoint.x,
-              mapMidPoint.y,
-            ) /
+            getDistanceBetweenPoints(averagePoint.x, averagePoint.y, mapMidPoint.x, mapMidPoint.y) /
             (Math.max(width, height) / 2);
 
-          const currentStop = visibleStops.find(s =>
-            s.stopIds.some(sID => sID === currentStopId),
-          );
+          const currentStop = visibleStops.find(s => s.stopIds.some(sID => sID === currentStopId));
 
           const [tX, tY] = viewport.project([currentStop.lon, currentStop.lat]);
           const currentStopDistanceFromCenter = getDistanceBetweenPoints(
@@ -143,16 +118,13 @@ function calculateStopsViewport(options) {
             mapMidPoint.x,
             mapMidPoint.y,
           );
-          const relativeDistance =
-            currentStopDistanceFromCenter / (Math.max(height, width) / 2);
+          const relativeDistance = currentStopDistanceFromCenter / (Math.max(height, width) / 2);
 
-          const visibleMajorStationsPoints = visibleStops.filter(stop => stop.major)
-            .length;
+          const visibleMajorStationsPoints = visibleStops.filter(stop => stop.major).length;
 
           let score = (visibleStops.length / maxStops) * STOP_AMOUNT_WEIGHT;
           score += ((zoom - minZoom) / (maxZoom - minZoom)) * ZOOM_WEIGHT;
-          score +=
-            (Math.max(visibleMajorStationsPoints, 5) / 5) * MAJOR_TRANSPORT_WEIGHT;
+          score += (Math.max(visibleMajorStationsPoints, 5) / 5) * MAJOR_TRANSPORT_WEIGHT;
           score += (1 - relativeAverageStopDistance) * AVERAGE_DISTANCE_WEIGHT;
           score += (1 - relativeDistance) * CURRENT_STOP_DISTANCE_WEIGHT;
 
@@ -170,14 +142,7 @@ function calculateStopsViewport(options) {
     bestViewPort = defaultViewport;
     console.log('Setting default viewport');
     bestVisibleStops = allStops.filter(stop =>
-      viewportContains(
-        defaultViewport,
-        stop,
-        width,
-        height,
-        miniMapStartX,
-        miniMapStartY,
-      ),
+      viewportContains(defaultViewport, stop, width, height, miniMapStartX, miniMapStartY),
     );
   }
 
