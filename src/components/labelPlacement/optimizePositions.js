@@ -65,10 +65,7 @@ function getPlacements(placement, index, diffs, bbox) {
       return positions.map((position, i) => (i === index ? updatedPosition : position));
     })
     .filter(updatedPositions => !!updatedPositions)
-    .map(updatedPositions => ({
-      positions: updatedPositions,
-      indexes: [...indexes, index],
-    }));
+    .map(updatedPositions => ({ positions: updatedPositions, indexes: [...indexes, index] }));
 }
 
 function comparePlacements(placement, other, bbox) {

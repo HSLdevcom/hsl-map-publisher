@@ -24,6 +24,8 @@ class AdContainer extends Component {
   }
 
   componentWillUnmount() {
+    // This component may mount and unmount multiple times, so make sure that it
+    // doesn't stop the poster from finishing rendering by holding up the queue.
     renderQueue.remove(this);
   }
 
