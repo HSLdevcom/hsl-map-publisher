@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { JustifiedRow, CenteringColumn } from 'components/util';
-import { getZoneName } from 'util/domain';
 
 import styles from './header.css';
 
@@ -40,26 +39,32 @@ Subtitle.propTypes = {
   small: PropTypes.bool,
 };
 
+// TODO: Fix alignment of zone letter for each letter.
+
 const Header = props => {
-  const zone = getZoneName(props.shortId);
+  const zone = props.stopZone;
   return (
     <JustifiedRow style={{ margin: '0 10px' }}>
       <Group>
         <Title>{props.nameFi}</Title>
         {props.nameSe && <Subtitle>{props.nameSe}</Subtitle>}
       </Group>
-      {zone && (
-        <CenteringColumn>
-          <Title small>Lippuvyöhyke</Title>
-          <Subtitle small>Resezon</Subtitle>
-          <div className={styles.zone}>{zone}</div>
-        </CenteringColumn>
-      )}
       <CenteringColumn>
         <Title small>Pysäkkinumero</Title>
         <Subtitle small>Hållplatsnummer</Subtitle>
         <div className={styles.stop}>{props.shortId.replace(' ', '')}</div>
       </CenteringColumn>
+      {zone && (
+        <div className={styles.stopZoneColumn}>
+          <div className={styles.zoneHeading}>
+            <Title>Vyöhyke</Title>
+            <Subtitle>Zon/Zone</Subtitle>
+          </div>
+          <div className={styles.zone}>
+            <span className={styles.zoneLetter}>{zone}</span>
+          </div>
+        </div>
+      )}
     </JustifiedRow>
   );
 };
@@ -72,6 +77,7 @@ Header.propTypes = {
   nameFi: PropTypes.string.isRequired,
   nameSe: PropTypes.string,
   shortId: PropTypes.string.isRequired,
+  stopZone: PropTypes.string.isRequired,
 };
 
 export default Header;
