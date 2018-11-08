@@ -55,10 +55,8 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(calc(-50% - 4px), calc(-50% + 8px));
-  font-size: 150px;
   text-align: center;
-  line-height: 125px;
+  line-height: 1;
   font-family: GothamRounded-Medium;
   text-transform: uppercase;
 }
