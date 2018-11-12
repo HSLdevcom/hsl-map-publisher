@@ -152,7 +152,9 @@ class StopPoster extends Component {
       return;
     }
 
-    renderQueue.remove(this);
+    window.setTimeout(() => {
+      renderQueue.remove(this);
+    }, 1000);
   }
 
   render() {
