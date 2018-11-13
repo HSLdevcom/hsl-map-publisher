@@ -1,14 +1,15 @@
 .root {
   background: white;
   border-radius: var(--border-radius);
-  padding: 42px;
   overflow: hidden;
+  position: relative;
 }
 
 .componentName {
-  padding: 0px 0px 20px;
+  padding: 42px;
   font-size: 30px;
   color: var(--hsl-blue);
+  position: absolute;
 }
 
 .componentName > .title {
@@ -20,8 +21,9 @@
 }
 
 .diagram {
-  margin-top: -167px;
-  margin-bottom: -46px;
-  margin-left: -63px;
-  margin-right: -90px;
+  display: block;
+  margin-top: -80px; /* Remove extra padding from the top to make the diagram more compact */
+  margin-left: -20px; /* Align the edge of the legend box with the heading */
+  margin-right: -20px; /* Reduce some of the resulting height increase */
+  margin-bottom: -10px; /* Remove padding from the bottom to balance the layout */
 }

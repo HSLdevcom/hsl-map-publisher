@@ -48,6 +48,8 @@ class App extends Component {
             width: this.root.offsetWidth,
             height: this.root.offsetHeight,
           });
+        } else {
+          console.log('Rendering finished');
         }
       });
     }

@@ -47,6 +47,12 @@
   flex: 1;
 }
 
+.adsContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 100%;
+}
+
 .timetables {
   flex: 0 0 auto;
   display: flex;

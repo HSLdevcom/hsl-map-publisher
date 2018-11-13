@@ -33,17 +33,16 @@ class StopPoster extends Component {
 
     this.onError = this.onError.bind(this);
     this.setMapHeight = this.setMapHeight.bind(this);
-    this.setRightColumnHeight = this.setRightColumnHeight.bind(this);
 
     this.state = {
-      rightColumnHeight: -1,
       mapHeight: -1,
       template: null,
       hasRoutesOnTop: false,
       hasDiagram: true,
       hasRoutes: true,
       hasStretchedLeftColumn: false,
-      shouldRenderFixedContent: false,
+      shouldRenderMap: false,
+      triedRenderingMap: false,
     };
   }
 
@@ -53,8 +52,6 @@ class StopPoster extends Component {
 
   async componentDidMount() {
     if (this.props.template) {
-      renderQueue.add(this);
-
       let templateReq;
       let templateBody = null;
 
@@ -70,6 +67,10 @@ class StopPoster extends Component {
       this.setState({
         template: templateBody,
       });
+    } else {
+      this.setState({
+        template: false,
+      });
     }
 
     renderQueue.onEmpty(error => !error && this.updateLayout(), {
@@ -83,13 +84,6 @@ class StopPoster extends Component {
     });
   }
 
-  componentWillUnmount() {
-    if (this.mapMutationObserver) {
-      this.mapMutationObserver.disconnect();
-      this.mapMutationObserver = null;
-    }
-  }
-
   onError(error) {
     renderQueue.remove(this, { error: new Error(error) });
   }
@@ -100,21 +94,17 @@ class StopPoster extends Component {
     });
   }
 
-  setRightColumnHeight({ client: { height } }) {
-    this.setState({
-      rightColumnHeight: height,
-    });
-  }
-
   hasOverflow() {
     if (!this.content) {
       return false;
     }
 
-    return (
-      this.content.scrollWidth - this.content.clientWidth > 1 ||
-      this.content.scrollHeight - this.content.clientHeight > 1
-    );
+    // Horizontal overflow is not automatically resolvable.
+    if (this.content.scrollWidth - this.content.clientWidth > 1) {
+      this.onError('Unresolvable horizontal overflow detected.');
+    }
+
+    return this.content.scrollHeight - this.content.clientHeight > 1;
   }
 
   updateLayout() {
@@ -123,8 +113,8 @@ class StopPoster extends Component {
       return;
     }
 
-    if (this.hasOverflow() && this.state.shouldRenderFixedContent) {
-      this.onError('Fixed content caused layout overflow');
+    if (this.hasOverflow() && this.state.triedRenderingMap) {
+      this.onError('Unsolvable layout overflow.');
       return;
     }
 
@@ -145,12 +135,20 @@ class StopPoster extends Component {
         this.setState({ hasStretchedLeftColumn: true });
         return;
       }
+      if (this.state.shouldRenderMap) {
+        this.setState({
+          shouldRenderMap: false,
+          triedRenderingMap: true,
+        });
+        return;
+      }
+
       this.onError('Failed to remove layout overflow');
       return;
     }
 
-    if (!this.state.shouldRenderFixedContent) {
-      this.setState({ shouldRenderFixedContent: true });
+    if (!this.state.shouldRenderMap && !this.state.triedRenderingMap) {
+      this.setState({ shouldRenderMap: true });
       return;
     }
 
@@ -210,28 +208,25 @@ class StopPoster extends Component {
                   {this.state.hasRoutes && !this.state.hasRoutesOnTop && <Spacer height={10} />}
                   {this.state.hasDiagram && <StopPosterTimetable />}
                   {!this.state.hasDiagram && <StopPosterTimetable segments={['weekdays']} />}
-                  <div
-                    style={{ flex: 1 }}
-                    ref={ref => {
-                      this.ad = ref;
-                    }}>
-                    {this.state.shouldRenderFixedContent && (
-                      <AdContainer
-                        template={
-                          template ? get(template, 'areas', []).find(t => t.key === 'ads') : {}
-                        }
-                        width={this.ad.clientWidth}
-                        height={this.ad.clientHeight}
-                        shortId={this.props.shortId}
-                      />
-                    )}
-                  </div>
+                  {/* The key will make sure the ad container updates its size if the layout changes */}
+                  <AdContainer
+                    key={`poster_ads_${this.state.hasRoutes}${this.state.hasRoutesOnTop}${
+                      this.state.hasStretchedLeftColumn
+                    }${this.state.hasDiagram}`}
+                    shortId={this.props.shortId}
+                    template={template ? get(template, 'areas', []).find(t => t.key === 'ads') : {}}
+                  />
                 </div>
 
                 <Spacer width={10} />
 
-                <Measure client onResize={this.setRightColumnHeight}>
-                  {({ measureRef }) => (
+                <Measure client>
+                  {({
+                    measureRef,
+                    contentRect: {
+                      client: { clientHeight: rightColumnHeight },
+                    },
+                  }) => (
                     <div className={styles.right} ref={measureRef}>
                       {!this.state.hasDiagram && (
                         <div className={styles.timetables}>
@@ -242,15 +237,18 @@ class StopPoster extends Component {
                       )}
 
                       {!this.state.hasDiagram && <Spacer height={10} />}
-
-                      {this.state.shouldRenderFixedContent && (
+                      {/* The key will make sure the map updates its size if the layout changes */}
+                      {this.state.shouldRenderMap && (
                         <CustomMap
+                          key={`poster_map_${this.state.hasDiagram}${this.props.isTramStop}`}
                           setMapHeight={this.setMapHeight}
                           stopId={this.props.stopId}
                           date={this.props.date}
                           isSummerTimetable={this.props.isSummerTimetable}
                           template={
-                            template ? get(template, 'areas', []).find(t => t.key === 'map') : null
+                            template
+                              ? get(template, 'areas', []).find(t => t.key === 'map')
+                              : template // null if template is loading, false if no template
                           }
                         />
                       )}
@@ -262,7 +260,7 @@ class StopPoster extends Component {
                           <RouteDiagram
                             height={
                               this.state.mapHeight > -1
-                                ? this.state.rightColumnHeight - this.state.mapHeight
+                                ? rightColumnHeight - this.state.mapHeight
                                 : 'auto'
                             }
                             stopId={this.props.stopId}

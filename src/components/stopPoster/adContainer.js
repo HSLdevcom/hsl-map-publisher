@@ -1,19 +1,17 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
-import difference from 'lodash/difference';
 import { InlineSVG } from 'components/util';
 import renderQueue from 'util/renderQueue';
+import styles from './stopPoster.css';
 
 class AdContainer extends Component {
   constructor(props) {
     super(props);
 
-    const ads = get(props, 'template.slots', [])
-      .map(slot => get(slot, 'image.svg', '')) // get svg's from template
-      .filter(svg => !!svg); // Only non-falsy svg's allowed
-
-    this.state = { ads };
+    this.state = {
+      spaces: 3,
+    };
   }
 
   componentDidMount() {
@@ -22,38 +20,22 @@ class AdContainer extends Component {
   }
 
   componentDidUpdate() {
-    this.updateAds();
     this.updateLayout();
   }
 
-  updateAds() {
-    const currentAds = this.state.ads;
-
-    const newAds = get(this.props, 'template.slots', [])
-      .map(slot => get(slot, 'image.svg', '')) // get svg's from template
-      .filter(svg => !!svg); // Only non-falsy svg's allowed
-
-    const nextAds = currentAds.reduce((updatedAds, ad, index) => {
-      const nextAd = newAds[index];
-      if (nextAd !== ad) {
-        updatedAds.push(nextAd);
-      } else {
-        updatedAds.push(ad);
-      }
-
-      return updatedAds;
-    }, []);
-
-    if (difference(currentAds, nextAds).length !== 0) {
-      this.setState({
-        ads: nextAds,
-      });
-    }
+  componentWillUnmount() {
+    // This component may mount and unmount multiple times, so make sure that it
+    // doesn't stop the poster from finishing rendering by holding up the queue.
+    renderQueue.remove(this);
   }
 
   updateLayout() {
-    if (this.hasOverflow()) {
-      this.setState(state => ({ ads: state.ads.slice(0, -1) }));
+    const hasOverflow = this.hasOverflow();
+    const { spaces } = this.state;
+
+    if (hasOverflow && spaces > 0) {
+      const nextSpaces = spaces - 1;
+      this.setState({ spaces: nextSpaces });
     } else {
       renderQueue.remove(this);
     }
@@ -67,23 +49,23 @@ class AdContainer extends Component {
   }
 
   render() {
-    const style = {
-      width: this.props.width,
-      height: this.props.height,
-      overflow: 'hidden',
-    };
     const iconStyle = {
       marginTop: 52,
       marginLeft: 55,
       marginRight: 48,
     };
+
+    const ads = get(this.props, 'template.slots', [])
+      .map(slot => get(slot, 'image.svg', '')) // get svg's from template
+      .filter(svg => !!svg); // Only non-falsy svg's allowed
+
     return (
       <div
-        style={style}
+        className={styles.adsContainer}
         ref={ref => {
           this.root = ref;
         }}>
-        {this.state.ads.map((src, i) => (
+        {ads.slice(0, this.state.spaces).map((src, i) => (
           <InlineSVG key={i} style={iconStyle} src={src} />
         ))}
       </div>
@@ -92,8 +74,6 @@ class AdContainer extends Component {
 }
 
 AdContainer.propTypes = {
-  width: PropTypes.number.isRequired,
-  height: PropTypes.number.isRequired,
   shortId: PropTypes.string.isRequired,
   template: PropTypes.any.isRequired,
 };
