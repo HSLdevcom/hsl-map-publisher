@@ -12,7 +12,7 @@ const Timetable = props => (
   <div
     className={classNames(styles.root, {
       [styles.summer]: props.isSummerTimetable,
-      [styles.printable]: props.printableAsA4,
+      [styles.largeText]: props.printableAsA4,
       [styles.greyscale]: props.greyscale,
     })}>
     {props.showStopInformation && (
@@ -31,7 +31,7 @@ const Timetable = props => (
       </div>
     )}
     {props.showValidityPeriod && (
-      <div className={classNames(styles.validity, { [styles.printable]: props.printableAsA4 })}>
+      <div className={classNames(styles.validity, { [styles.largeText]: props.printableAsA4 })}>
         <div>Aikataulut voimassa</div>
         <div>Tidtabeller giltiga</div>
         <div>

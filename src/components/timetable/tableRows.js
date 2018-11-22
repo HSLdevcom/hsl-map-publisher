@@ -10,7 +10,7 @@ import styles from './tableRows.css';
 const Departure = props => (
   <div
     className={classNames(styles.item, {
-      [styles.printable]: props.printableAsA4,
+      [styles.largeText]: props.printableAsA4,
     })}>
     <div className={styles.minutes}>
       {props.minutes < 10 && '0'}
@@ -36,7 +36,7 @@ const TableRow = props => (
   <Row>
     <div
       className={classNames(styles.hours, {
-        [styles.printable]: props.printableAsA4,
+        [styles.largeText]: props.printableAsA4,
       })}>
       {props.hours % 24 < 10 && '0'}
       {props.hours % 24}

@@ -5,7 +5,7 @@
   page-break-after: avoid;
 }
 
-.root.printable {
+.root.largeText {
   padding-top: 25px;
 }
 
@@ -18,7 +18,7 @@
   font-size: 18px;
 }
 
-.title.printable {
+.title.largeText {
   font-size: 24px;
 }
 
@@ -30,7 +30,7 @@
   letter-spacing: -0.025em;
 }
 
-.subtitle.printable {
+.subtitle.largeText {
   font-size: 16px;
   line-height: 18px;
 }
@@ -39,6 +39,6 @@
   width: 50px;
 }
 
-.subtitle.printable > *:first-child {
+.subtitle.largeText > *:first-child {
   width: 63px;
 }

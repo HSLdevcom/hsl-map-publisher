@@ -48,7 +48,7 @@
   font-size: 13px;
 }
 
-.footnote.printable {
+.footnote.largeText {
   font-size: 16px;
 }
 
@@ -63,7 +63,7 @@
   text-align: right;
 }
 
-.validity.printable {
+.validity.largeText {
   font-size: 16px;
   line-height: 20px;
 }
