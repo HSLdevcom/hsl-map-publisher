@@ -1,42 +1,69 @@
-
-.url {
-    position: absolute;
-    font-size: 20px;
-    font-family: GothamXNarrow-Medium;
-    color: black;
+.footerWrapper {
+  position: relative;
+  height: 418px;
+  width: 100%;
 }
 
-.urlInfo {
-    composes: url;
-    top: 336px;
-    left: 500px;
+.footerPiece {
+  position: absolute;
+  height: 418px;
+  width: auto;
 }
 
-.urlFeedback {
-    composes: url;
-    top: 336px;
-    left: 936px;
+.dynamicSlot {
+  position: absolute;
+  top: 33px;
+  overflow: hidden;
+  border-radius: 25px;
+}
+
+.svgContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.svgContainer svg {
+  height: auto;
+  width: 100%;
 }
 
 .qrCode {
-    position: absolute;
-    width: 140px;
+  position: absolute;
 }
 
-.qrCodeInfo {
-    composes: qrCode;
-    top: 117px;
-    left: 730px;
+.dottedLine {
+  position: relative;
+  height: auto;
+  top: -6px;
+  left: 0;
 }
 
-.qrCodeTicketSales {
-    composes: qrCode;
-    top: 179px;
-    left: 729px;
+.hslLogo {
+  top: 69px;
+  left: 23px;
+  height: 385px;
 }
 
-.qrCodeFeedback {
-    composes: qrCode;
-    top: 117px;
-    left: 1144px;
+.hslLogo svg {
+  height: 100%;
+  width: auto;
+  fill: red;
+}
+
+.customerService {
+  top: 40px;
+  right: 11px;
+  height: auto;
+  width: 458px;
+}
+
+.url {
+  position: absolute;
+  font-size: 20px;
+  font-family: GothamXNarrow-Medium;
+  color: black;
+  padding: 2px 0;
 }

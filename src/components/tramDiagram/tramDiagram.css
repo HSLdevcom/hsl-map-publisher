@@ -1,27 +1,29 @@
 .root {
-    background: white;
-    border-radius: var(--border-radius);
-    padding: 42px;
-    overflow: hidden;
+  background: white;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  position: relative;
 }
 
 .componentName {
-    padding: 0px 0px 20px;
-    font-size: 30px;
-    color: var(--hsl-blue);
+  padding: 42px;
+  font-size: 30px;
+  color: var(--hsl-blue);
+  position: absolute;
 }
 
 .componentName > .title {
-    font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium;
 }
 
 .componentName > .subtitle {
-    font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book;
 }
 
 .diagram {
-    margin-top: -130px;
-    margin-bottom: -80px;
-    margin-left: 0px;
-    margin-right: -128px;
+  display: block;
+  margin-top: -80px; /* Remove extra padding from the top to make the diagram more compact */
+  margin-left: -20px; /* Align the edge of the legend box with the heading */
+  margin-right: -20px; /* Reduce some of the resulting height increase */
+  margin-bottom: -10px; /* Remove padding from the bottom to balance the layout */
 }

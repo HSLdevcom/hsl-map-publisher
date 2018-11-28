@@ -1,5 +1,5 @@
 .root {
-    display: flex;
-    flex-flow: column;
-    margin-left: var(--left-width);
+  display: flex;
+  flex-flow: column;
+  margin-left: var(--left-width);
 }

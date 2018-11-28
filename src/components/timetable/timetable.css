@@ -1,64 +1,64 @@
 .root {
-    position: relative;
-    width: 100%;
-    padding: var(--border-radius);
-    padding-top: calc(var(--border-radius) - 15px);
-    border-radius: var(--border-radius);
-    color: var(--hsl-blue);
-    background: var(--light-background);
-    --timetable-accent-color: white;
+  position: relative;
+  width: 100%;
+  padding: var(--border-radius);
+  padding-top: calc(var(--border-radius) - 15px);
+  border-radius: var(--border-radius);
+  color: var(--hsl-blue);
+  background: var(--light-background);
+  --timetable-accent-color: white;
 }
 
 .root > div {
-    page-break-inside: avoid;
+  page-break-inside: avoid;
 }
 
 .root.summer {
-    background: white;
-    --timetable-accent-color: var(--light-background);
+  background: white;
+  --timetable-accent-color: var(--light-background);
 }
 
 .root.greyscale {
-    background: white;
-    color: black;
-    --timetable-accent-color: #eaeaea;
+  background: white;
+  color: black;
+  --timetable-accent-color: #eaeaea;
 }
 
 .root.printable {
-    width: auto;
-    border-radius: 0;
+  width: auto;
+  border-radius: 0;
 }
 
 .componentName {
-    padding: 0px 10px;
-    font-size: 30px;
+  padding: 0px 10px;
+  font-size: 30px;
 }
 
 .title {
-    font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium;
 }
 
 .subtitle {
-    font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book;
 }
 
 .footnote {
-    padding: 2px 10px;
-    font-family: GothamXNarrow-Book;
-    font-size: 13px;
+  padding: 2px 10px;
+  font-family: GothamXNarrow-Book;
+  font-size: 13px;
 }
 
 .validity {
-    position: absolute;
-    top: calc(var(--border-radius) - 15px);
-    right: var(--border-radius);
-    font-family: GothamRounded-Book;
-    font-size: 12px;
-    line-height: 16px;
-    letter-spacing: -0.025em;
-    text-align: right;
+  position: absolute;
+  top: calc(var(--border-radius) - 15px);
+  right: var(--border-radius);
+  font-family: GothamRounded-Book;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: -0.025em;
+  text-align: right;
 }
 
 .validity > *:first-child {
-    font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium;
 }

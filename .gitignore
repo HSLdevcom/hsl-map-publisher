@@ -4,3 +4,7 @@ node_modules
 npm-debug.log
 dist
 fonts
+yarn-error.log
+/templates
+graphql.config.json
+output/*
