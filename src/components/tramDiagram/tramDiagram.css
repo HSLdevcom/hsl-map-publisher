@@ -22,8 +22,9 @@
 
 .diagram {
   display: block;
-  margin-top: -30px; /* Remove extra padding from the top to make the diagram more compact */
-  margin-left: -20px; /* Align the edge of the legend box with the heading */
-  margin-right: -20px; /* Reduce some of the resulting height increase */
-  margin-bottom: -50px; /* Remove padding from the bottom to balance the layout */
+}
+
+.diagram svg {
+  display: block;
+  margin: 0;
 }

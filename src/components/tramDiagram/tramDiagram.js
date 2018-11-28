@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { InlineSVG } from 'components/util';
-import tramDiagramIcon from 'icons/tram_diagram_late_2018.svg';
+import tramDiagramIcon from 'icons/tram_diagram.svg';
 
 import styles from './tramDiagram.css';
 
