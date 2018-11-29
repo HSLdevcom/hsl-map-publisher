@@ -1,5 +1,7 @@
 const API_URL = 'https://dev-kartat.hsldev.com';
 
+console.log(process.env.API_URL || 'No api url env');
+
 const scale = 5;
 
 /**

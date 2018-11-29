@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   entry: ['babel-polyfill', './src/index.js'],
@@ -8,6 +9,9 @@ module.exports = {
     new CleanWebpackPlugin(['dist']),
     new HtmlWebpackPlugin({
       title: 'Stop poster',
+    }),
+    new webpack.DefinePlugin({
+      'process.env.API_URL': JSON.stringify(process.env.API_URL),
     }),
   ],
   resolve: {
