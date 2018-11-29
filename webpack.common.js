@@ -10,10 +10,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Stop poster',
     }),
-    new webpack.DefinePlugin({
-      // stringify may do something weird with empty strings, ensure a clean empty string if API_URL is undefined.
-      API_URL: process.env.API_URL ? JSON.stringify(process.env.API_URL) : '',
-    }),
   ],
   resolve: {
     modules: ['node_modules', 'src'],

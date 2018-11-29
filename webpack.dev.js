@@ -1,4 +1,3 @@
-const webpack = require('webpack');
 const merge = require('webpack-merge');
 const webpackCommon = require('./webpack.common');
 
@@ -13,9 +12,4 @@ module.exports = merge.smart(webpackCommon, {
       hmr: true,
     },
   },
-  plugins: [
-    new webpack.DefinePlugin({
-      API_URL: 'https://dev-kartat.hsldev.com',
-    }),
-  ],
 });
