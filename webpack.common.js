@@ -11,7 +11,8 @@ module.exports = {
       title: 'Stop poster',
     }),
     new webpack.DefinePlugin({
-      API_URL: JSON.stringify(process.env.API_URL || ''),
+      // stringify may do something weird with empty strings, ensure a clean empty string if API_URL is undefined.
+      API_URL: process.env.API_URL ? JSON.stringify(process.env.API_URL) : '',
     }),
   ],
   resolve: {
