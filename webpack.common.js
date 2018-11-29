@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   entry: ['babel-polyfill', './src/index.js'],
@@ -8,6 +9,10 @@ module.exports = {
     new CleanWebpackPlugin(['dist']),
     new HtmlWebpackPlugin({
       title: 'Stop poster',
+    }),
+    new webpack.DefinePlugin({
+      // stringify may do something weird with empty strings, ensure a clean empty string if API_URL is undefined.
+      API_URL: process.env.API_URL ? JSON.stringify(process.env.API_URL) : '',
     }),
   ],
   resolve: {

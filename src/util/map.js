@@ -1,4 +1,6 @@
-const API_URL = 'https://dev-kartat.hsldev.com';
+// API_URL is provided by Webpack.
+// eslint-disable-next-line no-undef
+const serverUrl = API_URL || 'http://kartat.hsl.fi';
 
 const scale = 5;
 
@@ -15,7 +17,7 @@ export function fetchMap(mapOptions, mapStyle) {
     body: JSON.stringify({ options: { ...mapOptions, scale }, style: mapStyle }),
   };
 
-  return fetch(`${API_URL}/generateImage`, options)
+  return fetch(`${serverUrl}/generateImage`, options)
     .then(response => response.blob())
     .then(
       blob =>
