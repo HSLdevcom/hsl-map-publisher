@@ -4,7 +4,7 @@ const webpackCommon = require('./webpack.common');
 
 const PORT = process.env.PORT || 5000;
 
-module.exports = merge(webpackCommon, {
+module.exports = merge.smart(webpackCommon, {
   mode: 'development',
   devtool: 'cheap-module-eval-source-map',
   serve: {
@@ -13,4 +13,9 @@ module.exports = merge(webpackCommon, {
       hmr: true,
     },
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      API_URL: 'https://dev-kartat.hsldev.com',
+    }),
+  ],
 });
