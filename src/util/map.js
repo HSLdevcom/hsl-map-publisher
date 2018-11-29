@@ -1,6 +1,8 @@
-// API_URL is provided by Webpack.
-// eslint-disable-next-line no-undef
-const serverUrl = API_URL || 'http://kartat.hsl.fi';
+// Server url provided by Puppeteer
+const serverUrl =
+  typeof window.getServerUrl === 'function' ? window.getServerUrl() : 'http://kartat.hsl.fi';
+
+window.serverLog(`Generating the map with ${serverUrl}`);
 
 const scale = 5;
 
