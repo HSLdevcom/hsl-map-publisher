@@ -13,22 +13,22 @@
 
 .item {
   display: flex;
-  min-width: 60px;
-  padding: 4px 0;
+  min-width: 3.75em;
+  padding: 0.25em 0;
   font-family: GothamXNarrow-Book;
-  font-size: 12px;
+  font-size: 0.75em;
   letter-spacing: -0.025em;
-  line-height: 8px;
-  margin-right: 4px;
+  line-height: 1;
+  margin-right: 0.25em;
 }
 
 .minutes {
-  min-width: 12px;
+  min-width: 0.75em;
   font-family: GothamXNarrow-Medium;
 }
 
 .hours {
   composes: item;
-  padding-left: 15px;
+  padding-left: 0.938em;
   font-family: GothamXNarrow-Medium;
 }

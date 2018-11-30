@@ -7,6 +7,11 @@
   color: var(--hsl-blue);
   background: var(--light-background);
   --timetable-accent-color: white;
+  font-size: 16px;
+}
+
+.root.standalone {
+  font-size: 22px;
 }
 
 .root > div {
@@ -30,8 +35,8 @@
 }
 
 .componentName {
-  padding: 0px 10px;
-  font-size: 30px;
+  padding: 0 0.205em;
+  font-size: 1.875em;
 }
 
 .title {
@@ -43,9 +48,9 @@
 }
 
 .footnote {
-  padding: 2px 10px;
+  padding: 0.125em 0.625em;
   font-family: GothamXNarrow-Book;
-  font-size: 13px;
+  font-size: 0.813em;
 }
 
 .validity {
@@ -53,8 +58,8 @@
   top: calc(var(--border-radius) - 15px);
   right: var(--border-radius);
   font-family: GothamRounded-Book;
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 0.75em;
+  line-height: 1.1;
   letter-spacing: -0.025em;
   text-align: right;
 }
