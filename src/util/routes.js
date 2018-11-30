@@ -59,12 +59,12 @@ function truncate(node) {
  * @param {Array} routes
  * @returns {Object}
  */
-function routesToTree(routes, shortId, height = 'auto') {
-  const currentZone = getZoneName(shortId);
+function routesToTree(routes, { stopZone, shortId }, height = 'auto') {
+  const currentZone = stopZone;
 
   const itemLists = routes.map(route =>
     route.stops.map((stop, index, stops) => {
-      const item = { ...stop, type: 'stop', zone: getZoneName(stop.shortId) };
+      const item = { ...stop, type: 'stop', zone: stop.stopZone };
       if (index === stops.length - 1) {
         item.destinations = [
           {
