@@ -5,6 +5,7 @@ const qs = require('qs');
 const { promisify } = require('util');
 const { spawn } = require('child_process');
 const log = require('./util/log');
+const get = require('lodash/get');
 
 const writeFileAsync = promisify(fs.writeFile);
 
@@ -37,6 +38,9 @@ async function renderComponent(options) {
   const page = await browser.newPage();
 
   await page.exposeFunction('serverLog', log);
+  await page.exposeFunction('getServerUrl', () =>
+    get(process, 'env.API_URL', 'http://kartat.hsl.fi'),
+  );
 
   page.on('error', error => {
     page.close();

@@ -54,7 +54,7 @@ function isTrunkRoute(routeId) {
  */
 function trimRouteId(routeId) {
   if (isRailRoute(routeId) && isNumberVariant(routeId)) {
-    return routeId.substring(1, 5).replace(RAIL_ROUTE_ID_REGEXP, '');
+    return routeId.substring(0, 5).replace(RAIL_ROUTE_ID_REGEXP, '');
   }
   if (isRailRoute(routeId)) {
     return routeId.replace(RAIL_ROUTE_ID_REGEXP, '');

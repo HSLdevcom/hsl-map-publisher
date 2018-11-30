@@ -21,6 +21,7 @@ RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
     && chown -R pptruser:pptruser /home/pptruser
 
 ENV WORK /opt/publisher
+ENV API_URL http://kartat.hsl.fi
 
 RUN mkdir -p ${WORK}
 WORKDIR ${WORK}
