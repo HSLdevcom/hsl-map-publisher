@@ -8,6 +8,29 @@ import TableRows from './tableRows';
 
 import styles from './timetable.css';
 
+const formatDate = date => {
+  const monthNames = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  const day = date.getDate();
+  const monthIndex = date.getMonth();
+  const year = date.getFullYear();
+
+  return `${day} ${monthNames[monthIndex]} ${year}`;
+};
+
 const Timetable = props => (
   <div
     className={classNames(styles.root, {
@@ -28,16 +51,22 @@ const Timetable = props => (
       <div className={styles.componentName}>
         <div className={styles.title}>Pysäkkiaikataulu&nbsp;&nbsp;</div>
         <div className={styles.subtitle}>Hållplatstidtabell</div>
+        <div className={styles.subtitle}>Stop timetable</div>
       </div>
     )}
     {props.showValidityPeriod && (
       <div className={styles.validity}>
         <div>Aikataulut voimassa</div>
-        <div>Tidtabeller giltiga</div>
+        <div>Tidtabeller giltiga/Timetables valid</div>
         <div>
           {new Date(props.dateBegin).toLocaleDateString('fi')}
           &nbsp;-&nbsp;
           {new Date(props.dateEnd).toLocaleDateString('fi')}
+        </div>
+        <div>
+          {formatDate(new Date(props.dateBegin))}
+          &nbsp;-&nbsp;
+          {formatDate(new Date(props.dateEnd))}
         </div>
       </div>
     )}
@@ -46,7 +75,8 @@ const Timetable = props => (
         <div>
           <TableHeader
             title="Maanantai - Perjantai"
-            subtitle="Måndag - Fredag"
+            subtitleSw="Måndag - Fredag"
+            subtitleEn="Monday - Friday"
             printingAsA4={props.printableAsA4}
           />
           <TableRows departures={props.weekdays} />
@@ -55,14 +85,24 @@ const Timetable = props => (
     {props.saturdays &&
       props.saturdays.length > 0 && (
         <div>
-          <TableHeader title="Lauantai" subtitle="Lördag" printingAsA4={props.printableAsA4} />
+          <TableHeader
+            title="Lauantai"
+            subtitleSw="Lördag"
+            subtitleEn="Saturday"
+            printingAsA4={props.printableAsA4}
+          />
           <TableRows departures={props.saturdays} />
         </div>
       )}
     {props.sundays &&
       props.sundays.length > 0 && (
         <div>
-          <TableHeader title="Sunnuntai" subtitle="Söndag" printingAsA4={props.printableAsA4} />
+          <TableHeader
+            title="Sunnuntai"
+            subtitleSw="Söndag"
+            subtitleEn="Sunday"
+            printingAsA4={props.printableAsA4}
+          />
           <TableRows departures={props.sundays} />
         </div>
       )}

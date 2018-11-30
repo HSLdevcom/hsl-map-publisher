@@ -12,7 +12,9 @@ const TableHeader = props => (
     <div className={styles.title}>
       <span className={styles.strong}>{props.title}</span>
       &nbsp;&nbsp;
-      {props.subtitle}
+      {props.subtitleSw}
+      &nbsp;&nbsp;
+      {props.subtitleEn}
     </div>
 
     <div className={styles.subtitle}>
@@ -28,6 +30,13 @@ const TableHeader = props => (
         <span className={styles.strong}>min</span> / linje Tiderna är beräknade
       </div>
     </div>
+
+    <div className={styles.subtitle}>
+      <div className={styles.strong}>Hour</div>
+      <div>
+        <span className={styles.strong}>min</span> / route The times are estimates
+      </div>
+    </div>
   </div>
 );
 
@@ -37,7 +46,8 @@ TableHeader.defaultProps = {
 
 TableHeader.propTypes = {
   title: PropTypes.string.isRequired,
-  subtitle: PropTypes.string.isRequired,
+  subtitleSw: PropTypes.string.isRequired,
+  subtitleEn: PropTypes.string.isRequired,
   printingAsA4: PropTypes.bool,
 };
 
