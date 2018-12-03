@@ -1,9 +1,13 @@
-import React from "react";
-import { render } from "react-dom";
-import App from "components/app";
-import "styles/base.css";
-import "./util/mockGetTemplate";
+import React from 'react';
+import { render } from 'react-dom';
+import App from 'components/app';
+import 'styles/base.css';
+import './util/mockGetTemplate';
 
-const root = document.body.appendChild(document.createElement("div"));
+if (!window.serverLog) {
+  window.serverLog = console.log.bind(console);
+}
 
-render(<App/>, root);
+const root = document.body.appendChild(document.createElement('div'));
+
+render(<App />, root);

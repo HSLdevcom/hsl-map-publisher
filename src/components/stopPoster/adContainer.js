@@ -1,66 +1,81 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import get from "lodash/get";
-import { InlineSVG } from "components/util";
-import renderQueue from "util/renderQueue";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import get from 'lodash/get';
+import { InlineSVG } from 'components/util';
+import renderQueue from 'util/renderQueue';
+import styles from './stopPoster.css';
 
 class AdContainer extends Component {
-    constructor(props) {
-        super(props);
+  constructor(props) {
+    super(props);
 
-        const ads = get(props, "template.slots", [])
-            .map(slot => get(slot, "image.svg", "")) // get svg's from template
-            .filter(svg => !!svg); // Only non-falsy svg's allowed
+    this.state = {
+      spaces: 3,
+    };
+  }
 
-        this.state = { ads };
+  componentDidMount() {
+    renderQueue.add(this);
+    this.updateLayout();
+  }
+
+  componentDidUpdate() {
+    this.updateLayout();
+  }
+
+  componentWillUnmount() {
+    // This component may mount and unmount multiple times, so make sure that it
+    // doesn't stop the poster from finishing rendering by holding up the queue.
+    renderQueue.remove(this);
+  }
+
+  updateLayout() {
+    const hasOverflow = this.hasOverflow();
+    const { spaces } = this.state;
+
+    if (hasOverflow && spaces > 0) {
+      const nextSpaces = spaces - 1;
+      this.setState({ spaces: nextSpaces });
+    } else {
+      renderQueue.remove(this);
     }
+  }
 
-    componentDidMount() {
-        renderQueue.add(this);
-        this.updateLayout();
-    }
+  hasOverflow() {
+    return (
+      this.root.scrollWidth > this.root.clientWidth ||
+      this.root.scrollHeight > this.root.clientHeight
+    );
+  }
 
-    componentDidUpdate() {
-        this.updateLayout();
-    }
+  render() {
+    const iconStyle = {
+      marginTop: 52,
+      marginLeft: 55,
+      marginRight: 48,
+    };
 
-    updateLayout() {
-        if (this.hasOverflow()) {
-            this.setState(state => ({ ads: state.ads.slice(0, -1) }));
-        } else {
-            renderQueue.remove(this);
-        }
-    }
+    const ads = get(this.props, 'template.slots', [])
+      .map(slot => get(slot, 'image.svg', '')) // get svg's from template
+      .filter(svg => !!svg); // Only non-falsy svg's allowed
 
-    hasOverflow() {
-        return (this.root.scrollWidth > this.root.clientWidth)
-               || (this.root.scrollHeight > this.root.clientHeight);
-    }
-
-    render() {
-        const style = {
-            width: this.props.width,
-            height: this.props.height,
-            overflow: "hidden",
-        };
-        const iconStyle = {
-            marginTop: 52,
-            marginLeft: 55,
-            marginRight: 48,
-        };
-        return (
-            <div style={style} ref={(ref) => { this.root = ref; }}>
-                {this.state.ads.map((src, i) => <InlineSVG key={i} style={iconStyle} src={src}/>)}
-            </div>
-        );
-    }
+    return (
+      <div
+        className={styles.adsContainer}
+        ref={ref => {
+          this.root = ref;
+        }}>
+        {ads.slice(0, this.state.spaces).map((src, i) => (
+          <InlineSVG key={i} style={iconStyle} src={src} />
+        ))}
+      </div>
+    );
+  }
 }
 
 AdContainer.propTypes = {
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
-    shortId: PropTypes.string.isRequired,
-    template: PropTypes.any.isRequired,
+  shortId: PropTypes.string.isRequired,
+  template: PropTypes.any.isRequired,
 };
 
 export default AdContainer;

@@ -1,273 +1,310 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import { hot } from "react-hot-loader";
-import { JustifiedColumn, Spacer } from "components/util";
-import renderQueue from "util/renderQueue";
-import { colorsByMode } from "util/domain";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { hot } from 'react-hot-loader';
+import { get } from 'lodash';
+import { JustifiedColumn, Spacer } from 'components/util';
+import renderQueue from 'util/renderQueue';
+import { colorsByMode } from 'util/domain';
+import Measure from 'react-measure';
 
-import CropMarks from "components/cropMarks";
-import RouteDiagram from "components/routeDiagram/routeDiagramContainer";
-import TramDiagram from "components/tramDiagram/tramDiagram";
-import Timetable from "components/timetable/timetableContainer";
-import StopMap from "components/map/stopMapContainer";
-import Metadata from "components/metadata";
+import CropMarks from 'components/cropMarks';
+import RouteDiagram from 'components/routeDiagram/routeDiagramContainer';
+import TramDiagram from 'components/tramDiagram/tramDiagram';
+import Timetable from 'components/timetable/timetableContainer';
+import Metadata from 'components/metadata';
 
-import Header from "./headerContainer";
-import Footer from "./footer";
+import Header from './headerContainer';
+import Footer from './footer';
 
-import Routes from "./routesContainer";
-import AdContainer from "./adContainer";
+import Routes from './routesContainer';
+import AdContainer from './adContainer';
 
-import styles from "./stopPoster.css";
-
-const MAP_MIN_HEIGHT = 500;
+import styles from './stopPoster.css';
+import CustomMap from '../map/customMap';
 
 const trunkStopStyle = {
-    "--background": colorsByMode.TRUNK,
-    "--light-background": "#FFE0D1",
+  '--background': colorsByMode.TRUNK,
+  '--light-background': '#FFE0D1',
 };
 
 class StopPoster extends Component {
-    constructor(props) {
-        super(props);
+  constructor(props) {
+    super(props);
 
-        this.onError = this.onError.bind(this);
+    this.onError = this.onError.bind(this);
+    this.setMapHeight = this.setMapHeight.bind(this);
 
-        this.state = {
-            template: null,
-            hasRoutesOnTop: false,
-            hasDiagram: true,
-            hasRoutes: true,
-            hasStretchedLeftColumn: false,
-            shouldRenderFixedContent: false,
-        };
+    this.state = {
+      mapHeight: -1,
+      template: null,
+      hasRoutesOnTop: false,
+      hasDiagram: true,
+      hasRoutes: true,
+      hasStretchedLeftColumn: false,
+      shouldRenderMap: false,
+      triedRenderingMap: false,
+    };
+  }
+
+  componentWillMount() {
+    renderQueue.add(this);
+  }
+
+  async componentDidMount() {
+    if (this.props.template) {
+      let templateReq;
+      let templateBody = null;
+
+      try {
+        // This url will probably always be the same. If you find yourself
+        // changing it, please make an .env setup while you're at it.
+        templateReq = await window.fetch(`http://localhost:4000/templates/${this.props.template}`);
+        templateBody = await templateReq.json();
+      } catch (err) {
+        this.onError(err);
+      }
+
+      this.setState({
+        template: templateBody,
+      });
+    } else {
+      this.setState({
+        template: false,
+      });
     }
 
-    componentWillMount() {
-        renderQueue.add(this);
+    renderQueue.onEmpty(error => !error && this.updateLayout(), {
+      ignore: this,
+    });
+  }
+
+  componentDidUpdate() {
+    renderQueue.onEmpty(error => !error && this.updateLayout(), {
+      ignore: this,
+    });
+  }
+
+  onError(error) {
+    renderQueue.remove(this, { error: new Error(error) });
+  }
+
+  setMapHeight(mapHeight) {
+    this.setState({
+      mapHeight,
+    });
+  }
+
+  hasOverflow() {
+    if (!this.content) {
+      return false;
     }
 
-    componentDidMount() {
-        if (this.props.template) {
-            window.getTemplate(this.props.template)
-                .then((templateData) => {
-                    this.setState({
-                        template: templateData,
-                    });
-                });
-        }
-
-        renderQueue.onEmpty(error => !error && this.updateLayout(), { ignore: this });
+    // Horizontal overflow is not automatically resolvable.
+    if (this.content.scrollWidth - this.content.clientWidth > 1) {
+      this.onError('Unresolvable horizontal overflow detected.');
     }
 
-    componentDidUpdate() {
-        renderQueue.onEmpty(error => !error && this.updateLayout(), { ignore: this });
+    return this.content.scrollHeight - this.content.clientHeight > 1;
+  }
+
+  updateLayout() {
+    if (!this.props.hasRoutes) {
+      this.onError('No valid routes for stop');
+      return;
     }
 
-    onError(error) {
-        renderQueue.remove(this, { error: new Error(error) });
+    if (this.hasOverflow() && this.state.triedRenderingMap) {
+      this.onError('Unsolvable layout overflow.');
+      return;
     }
 
-    hasOverflow() {
-        if (!this.content) {
-            return false;
-        }
+    if (this.hasOverflow()) {
+      if (!this.state.hasRoutesOnTop) {
+        this.setState({ hasRoutesOnTop: true });
+        return;
+      }
+      if (this.state.hasDiagram) {
+        this.setState({ hasDiagram: false });
+        return;
+      }
+      if (this.state.hasRoutes) {
+        this.setState({ hasRoutes: false });
+        return;
+      }
+      if (!this.state.hasStretchedLeftColumn) {
+        this.setState({ hasStretchedLeftColumn: true });
+        return;
+      }
+      if (this.state.shouldRenderMap) {
+        this.setState({
+          shouldRenderMap: false,
+          triedRenderingMap: true,
+        });
+        return;
+      }
 
-        return (this.content.scrollWidth - this.content.clientWidth) > 1
-               || (this.content.scrollHeight - this.content.clientHeight) > 1;
+      this.onError('Failed to remove layout overflow');
+      return;
     }
 
-    updateLayout() {
-        if (!this.props.hasRoutes) {
-            this.onError("No valid routes for stop");
-            return;
-        }
-
-        if (this.hasOverflow() && this.state.shouldRenderFixedContent) {
-            this.onError("Fixed content caused layout overflow");
-            return;
-        }
-
-        if (this.hasOverflow()) {
-            if (!this.state.hasRoutesOnTop) {
-                this.setState({ hasRoutesOnTop: true });
-                return;
-            }
-            if (this.state.hasDiagram) {
-                this.setState({ hasDiagram: false });
-                return;
-            }
-            if (this.state.hasRoutes) {
-                this.setState({ hasRoutes: false });
-                return;
-            }
-            if (!this.state.hasStretchedLeftColumn) {
-                this.setState({ hasStretchedLeftColumn: true });
-                return;
-            }
-            this.onError("Failed to remove layout overflow");
-            return;
-        }
-
-        if (!this.state.shouldRenderFixedContent) {
-            this.setState({ shouldRenderFixedContent: true });
-            return;
-        }
-
-        renderQueue.remove(this);
+    if (!this.state.shouldRenderMap && !this.state.triedRenderingMap) {
+      this.setState({ shouldRenderMap: true });
+      return;
     }
 
-    render() {
-        if (!this.props.hasRoutes) {
-            return null;
-        }
+    window.setTimeout(() => {
+      renderQueue.remove(this);
+    }, 1000);
+  }
 
-        const { template } = this.state;
+  render() {
+    if (!this.props.hasRoutes) {
+      return null;
+    }
 
-        const StopPosterTimetable = props => (
-            <div className={styles.timetable}>
-                <Timetable
-                    stopId={this.props.stopId}
-                    date={this.props.date}
-                    isSummerTimetable={this.props.isSummerTimetable}
-                    dateBegin={this.props.dateBegin}
-                    dateEnd={this.props.dateEnd}
-                    showValidityPeriod={!props.hideDetails}
-                    showNotes={!props.hideDetails}
-                    showComponentName={!props.hideDetails}
-                    segments={props.segments}
-                />
-            </div>
-        );
+    const { template } = this.state;
 
-        return (
-            <CropMarks>
-                <div className={styles.root} style={this.props.isTrunkStop ? trunkStopStyle : null}>
-                    <JustifiedColumn>
-                        <Header stopId={this.props.stopId}/>
-                        <div className={styles.content} ref={(ref) => { this.content = ref; }}>
-                            <Spacer width="100%" height={50}/>
-                            {this.state.hasRoutes && this.state.hasRoutesOnTop
-                             && <Routes stopId={this.props.stopId} date={this.props.date}/>
-                            }
-                            {this.state.hasRoutes && this.state.hasRoutesOnTop
-                             && <Spacer height={10}/>
-                            }
-                            <div className={styles.columns}>
-                                <div
-                                    className={this.state.hasStretchedLeftColumn
-                                        ? styles.leftStretched : styles.left}
-                                >
-                                    {this.state.hasRoutes && !this.state.hasRoutesOnTop
-                                     && <Routes stopId={this.props.stopId} date={this.props.date}/>
-                                    }
-                                    {this.state.hasRoutes && !this.state.hasRoutesOnTop
-                                     && <Spacer height={10}/>
-                                    }
-                                    {this.state.hasDiagram
-                                     && <StopPosterTimetable/>
-                                    }
-                                    {!this.state.hasDiagram
-                                     && <StopPosterTimetable segments={["weekdays"]}/>
-                                    }
-                                    <div style={{ flex: 1 }} ref={(ref) => { this.ad = ref; }}>
-                                        {this.state.shouldRenderFixedContent
-                                         && (
-                                             <AdContainer
-                                                 template={template.areas.find(t => t.key === "ads")}
-                                                 width={this.ad.clientWidth}
-                                                 height={this.ad.clientHeight}
-                                                 shortId={this.props.shortId}
-                                             />
-                                         )
-                                        }
-                                    </div>
-                                </div>
+    const StopPosterTimetable = props => (
+      <div className={styles.timetable}>
+        <Timetable
+          stopId={this.props.stopId}
+          date={this.props.date}
+          isSummerTimetable={this.props.isSummerTimetable}
+          dateBegin={this.props.dateBegin}
+          dateEnd={this.props.dateEnd}
+          showValidityPeriod={!props.hideDetails}
+          showNotes={!props.hideDetails}
+          showComponentName={!props.hideDetails}
+          segments={props.segments}
+        />
+      </div>
+    );
 
-                                <Spacer width={10}/>
-
-                                <div className={styles.right}>
-                                    {!this.state.hasDiagram
-                                     && (
-                                         <div className={styles.timetables}>
-                                             <StopPosterTimetable
-                                                 segments={["saturdays"]}
-                                                 hideDetails
-                                             />
-                                             <Spacer width={10}/>
-                                             <StopPosterTimetable
-                                                 segments={["sundays"]}
-                                                 hideDetails
-                                             />
-                                         </div>
-                                     )
-                                    }
-
-                                    {!this.state.hasDiagram && <Spacer height={10}/>}
-
-                                    <div style={{ flex: 1 }} ref={(ref) => { this.map = ref; }}>
-                                        {this.state.shouldRenderFixedContent
-                                         && this.map.clientHeight >= MAP_MIN_HEIGHT
-                                         && (
-                                             <StopMap
-                                                 stopId={this.props.stopId}
-                                                 date={this.props.date}
-                                                 width={this.map.clientWidth}
-                                                 height={this.map.clientHeight}
-                                                 showCitybikes={this.props.isSummerTimetable}
-                                             />
-                                         )
-                                        }
-                                    </div>
-
-                                    <Spacer height={10}/>
-
-                                    {this.state.hasDiagram && !this.props.isTramStop
-                                     && (
-                                         <RouteDiagram
-                                             stopId={this.props.stopId}
-                                             date={this.props.date}
-                                         />
-                                     )
-                                    }
-                                    {this.state.hasDiagram && this.props.isTramStop
-                                     && <TramDiagram/>
-                                    }
-                                </div>
-                            </div>
-                            <Spacer width="100%" height={62}/>
-                        </div>
-                        <Footer
-                            onError={this.onError}
-                            template={template ? template.areas.find(t => t.key === "footer") : {}}
-                            shortId={this.props.shortId}
-                            isTrunkStop={this.props.isTrunkStop}
-                        />
-                        <Metadata date={this.props.date}/>
-                    </JustifiedColumn>
+    return (
+      <CropMarks>
+        <div className={styles.root} style={this.props.isTrunkStop ? trunkStopStyle : null}>
+          <JustifiedColumn>
+            <Header stopId={this.props.stopId} />
+            <div
+              className={styles.content}
+              ref={ref => {
+                this.content = ref;
+              }}>
+              <Spacer width="100%" height={50} />
+              {this.state.hasRoutes &&
+                this.state.hasRoutesOnTop && (
+                  <Routes stopId={this.props.stopId} date={this.props.date} />
+                )}
+              {this.state.hasRoutes && this.state.hasRoutesOnTop && <Spacer height={10} />}
+              <div className={styles.columns}>
+                <div
+                  className={
+                    this.state.hasStretchedLeftColumn ? styles.leftStretched : styles.left
+                  }>
+                  {this.state.hasRoutes &&
+                    !this.state.hasRoutesOnTop && (
+                      <Routes stopId={this.props.stopId} date={this.props.date} />
+                    )}
+                  {this.state.hasRoutes && !this.state.hasRoutesOnTop && <Spacer height={10} />}
+                  {this.state.hasDiagram && <StopPosterTimetable />}
+                  {!this.state.hasDiagram && <StopPosterTimetable segments={['weekdays']} />}
+                  {/* The key will make sure the ad container updates its size if the layout changes */}
+                  <AdContainer
+                    key={`poster_ads_${this.state.hasRoutes}${this.state.hasRoutesOnTop}${
+                      this.state.hasStretchedLeftColumn
+                    }${this.state.hasDiagram}`}
+                    shortId={this.props.shortId}
+                    template={template ? get(template, 'areas', []).find(t => t.key === 'ads') : {}}
+                  />
                 </div>
-            </CropMarks>
-        );
-    }
+
+                <Spacer width={10} />
+
+                <Measure client>
+                  {({
+                    measureRef,
+                    contentRect: {
+                      client: { clientHeight: rightColumnHeight },
+                    },
+                  }) => (
+                    <div className={styles.right} ref={measureRef}>
+                      {!this.state.hasDiagram && (
+                        <div className={styles.timetables}>
+                          <StopPosterTimetable segments={['saturdays']} hideDetails />
+                          <Spacer width={10} />
+                          <StopPosterTimetable segments={['sundays']} hideDetails />
+                        </div>
+                      )}
+
+                      {!this.state.hasDiagram && <Spacer height={10} />}
+                      {/* The key will make sure the map updates its size if the layout changes */}
+                      {this.state.shouldRenderMap && (
+                        <CustomMap
+                          key={`poster_map_${this.state.hasDiagram}${this.props.isTramStop}`}
+                          setMapHeight={this.setMapHeight}
+                          stopId={this.props.stopId}
+                          date={this.props.date}
+                          isSummerTimetable={this.props.isSummerTimetable}
+                          template={
+                            template
+                              ? get(template, 'areas', []).find(t => t.key === 'map')
+                              : template // null if template is loading, false if no template
+                          }
+                        />
+                      )}
+
+                      <Spacer height={10} />
+
+                      {this.state.hasDiagram &&
+                        !this.props.isTramStop && (
+                          <RouteDiagram
+                            height={
+                              this.state.mapHeight > -1
+                                ? rightColumnHeight - this.state.mapHeight
+                                : 'auto'
+                            }
+                            stopId={this.props.stopId}
+                            date={this.props.date}
+                          />
+                        )}
+                      {this.state.hasDiagram && this.props.isTramStop && <TramDiagram />}
+                    </div>
+                  )}
+                </Measure>
+              </div>
+              <Spacer width="100%" height={62} />
+            </div>
+            <Footer
+              onError={this.onError}
+              template={template ? get(template, 'areas', []).find(t => t.key === 'footer') : {}}
+              shortId={this.props.shortId}
+              isTrunkStop={this.props.isTrunkStop}
+            />
+            <Metadata date={this.props.date} />
+          </JustifiedColumn>
+        </div>
+      </CropMarks>
+    );
+  }
 }
 
 StopPoster.propTypes = {
-    stopId: PropTypes.string.isRequired,
-    date: PropTypes.string.isRequired,
-    isSummerTimetable: PropTypes.bool,
-    dateBegin: PropTypes.string,
-    dateEnd: PropTypes.string,
-    hasRoutes: PropTypes.bool.isRequired,
-    isTrunkStop: PropTypes.bool.isRequired,
-    isTramStop: PropTypes.bool.isRequired,
-    shortId: PropTypes.string.isRequired,
-    template: PropTypes.any.isRequired,
+  stopId: PropTypes.string.isRequired,
+  date: PropTypes.string.isRequired,
+  isSummerTimetable: PropTypes.bool,
+  dateBegin: PropTypes.string,
+  dateEnd: PropTypes.string,
+  hasRoutes: PropTypes.bool.isRequired,
+  isTrunkStop: PropTypes.bool.isRequired,
+  isTramStop: PropTypes.bool.isRequired,
+  shortId: PropTypes.string.isRequired,
+  template: PropTypes.any.isRequired,
 };
 
 StopPoster.defaultProps = {
-    isSummerTimetable: false,
-    dateBegin: null,
-    dateEnd: null,
+  isSummerTimetable: false,
+  dateBegin: null,
+  dateEnd: null,
 };
 
 export default hot(module)(StopPoster);
