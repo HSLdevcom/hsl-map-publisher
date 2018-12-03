@@ -1,6 +1,5 @@
 import get from 'lodash/get';
 import { itemsToTree, generalizeTree, sortBranches } from 'util/tree';
-import { getZoneName } from './domain';
 
 const MAX_WIDTH = 6;
 const MAX_HEIGHT = 25;

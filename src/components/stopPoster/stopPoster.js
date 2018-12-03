@@ -89,8 +89,6 @@ class StopPoster extends Component {
   }
 
   setMapHeight(mapHeight) {
-    console.log(mapHeight);
-
     this.setState({
       mapHeight,
     });
@@ -125,18 +123,22 @@ class StopPoster extends Component {
         this.setState({ hasRoutesOnTop: true });
         return;
       }
-      if (this.state.hasDiagram) {
-        this.setState({ hasDiagram: false });
-        return;
-      }
+
       if (this.state.hasRoutes) {
         this.setState({ hasRoutes: false });
         return;
       }
+
       if (!this.state.hasStretchedLeftColumn) {
         this.setState({ hasStretchedLeftColumn: true });
         return;
       }
+
+      if (this.state.hasDiagram) {
+        this.setState({ hasDiagram: false });
+        return;
+      }
+
       if (this.state.shouldRenderMap) {
         this.setState({
           shouldRenderMap: false,
@@ -185,8 +187,6 @@ class StopPoster extends Component {
       hasRoutes,
       shouldRenderMap,
     } = this.state;
-
-    console.log(mapHeight);
 
     const StopPosterTimetable = props => (
       <div className={styles.timetable}>
@@ -237,7 +237,7 @@ class StopPoster extends Component {
                   {({
                     measureRef,
                     contentRect: {
-                      client: { clientHeight: rightColumnHeight },
+                      client: { height: rightColumnHeight },
                     },
                   }) => (
                     <div className={styles.right} ref={measureRef}>
