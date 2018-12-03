@@ -89,6 +89,8 @@ class StopPoster extends Component {
   }
 
   setMapHeight(mapHeight) {
+    console.log(mapHeight);
+
     this.setState({
       mapHeight,
     });
@@ -184,6 +186,8 @@ class StopPoster extends Component {
       shouldRenderMap,
     } = this.state;
 
+    console.log(mapHeight);
+
     const StopPosterTimetable = props => (
       <div className={styles.timetable}>
         <Timetable
@@ -244,7 +248,6 @@ class StopPoster extends Component {
                           <StopPosterTimetable segments={['sundays']} hideDetails />
                         </div>
                       )}
-
                       {!hasDiagram && <Spacer height={10} />}
                       {/* The key will make sure the map updates its size if the layout changes */}
                       {shouldRenderMap && (
