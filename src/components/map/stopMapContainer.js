@@ -53,6 +53,8 @@ const nearbyItemsQuery = gql`
                 routeId
                 hasRegularDayDepartures(date: $date)
                 pickupDropoffType
+                viaFi
+                viaSe
                 route {
                   nodes {
                     destinationFi
@@ -82,6 +84,8 @@ const stopsMapper = stopGroup => ({
         routeId: trimRouteId(routeSegment.routeId),
         destinationFi: routeSegment.route.nodes[0].destinationFi,
         destinationSe: routeSegment.route.nodes[0].destinationSe,
+        viaFi: routeSegment.viaFi,
+        viaSe: routeSegment.viaSe,
         mode: routeSegment.route.nodes[0].mode,
       })),
   ).sort(routeCompare),
