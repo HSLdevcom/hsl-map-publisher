@@ -13,7 +13,12 @@ const Zone = props => (
     </div>
     <div className={styles.right}>
       {props.from ? (
-        <div className={styles.title}>{props.from}</div>
+        <div className={styles.zoneHeading}>
+          <span>
+            <strong>Vyöhyke</strong> Zon/Zone
+          </span>
+          <span className={styles.zoneIcon}>{props.from}</span>
+        </div>
       ) : (
         <div className={styles.noZone} />
       )}
@@ -21,7 +26,12 @@ const Zone = props => (
         <line x1="1" x2="98%" y1="2" y2="2" className={styles.line} fill="none" />
       </svg>
       {props.to ? (
-        <div className={styles.title}>{props.to}</div>
+        <div className={styles.zoneHeading}>
+          <span>
+            <strong>Vyöhyke</strong> Zon/Zone
+          </span>
+          <span className={styles.zoneIcon}>{props.to}</span>
+        </div>
       ) : (
         <div className={styles.noZone} />
       )}
