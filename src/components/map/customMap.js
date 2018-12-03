@@ -34,19 +34,21 @@ class CustomMap extends Component {
     const { mapWidth, mapHeight } = this.state;
     const { setMapHeight } = this.props;
 
+    setMapHeight(height);
+
     // We only need one measurement
     if (mapWidth > -1 && mapHeight > -1) {
       return;
     }
-
-    setMapHeight(height);
 
     this.setState(
       {
         mapWidth: width,
         mapHeight: height,
       },
-      () => renderQueue.remove(this),
+      () => {
+        renderQueue.remove(this);
+      },
     );
   };
 
@@ -87,12 +89,6 @@ class CustomMap extends Component {
           height: svgHeight,
         };
       }
-    }
-
-    // Check if the svg fits with a 100px leeway
-    if (renderMap === 'svg' && svgHeight > mapHeight + 100) {
-      // Render the local map if the svg doesn't fit but the local map would fit
-      renderMap = mapHeight >= MAP_MIN_HEIGHT ? 'local' : 'none';
     }
 
     // Aspect ratio height of SVG if one is set, auto otherwise.

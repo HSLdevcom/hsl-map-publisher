@@ -235,7 +235,6 @@ class StopPoster extends Component {
                           <StopPosterTimetable segments={['sundays']} hideDetails />
                         </div>
                       )}
-
                       {!this.state.hasDiagram && <Spacer height={10} />}
                       {/* The key will make sure the map updates its size if the layout changes */}
                       {this.state.shouldRenderMap && (
