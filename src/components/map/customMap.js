@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
-import cheerio from 'cheerio';
 import Measure from 'react-measure';
 import StopMap from './stopMapContainer';
 import { InlineSVG } from '../util';
@@ -34,12 +33,12 @@ class CustomMap extends Component {
     const { mapWidth, mapHeight } = this.state;
     const { setMapHeight } = this.props;
 
-    setMapHeight(height);
-
     // We only need one measurement
     if (mapWidth > -1 && mapHeight > -1) {
       return;
     }
+
+    setMapHeight(height);
 
     this.setState(
       {
@@ -92,7 +91,8 @@ class CustomMap extends Component {
     }
 
     // Aspect ratio height of SVG if one is set, auto otherwise.
-    const wrapperHeight = renderMap === 'svg' ? svgHeight : 'auto';
+    const wrapperHeight =
+      renderMap === 'svg' ? svgHeight : renderMap !== 'none' ? mapHeight : 'auto';
 
     return (
       <Measure client onResize={this.onResize}>

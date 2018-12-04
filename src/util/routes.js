@@ -3,9 +3,9 @@ import { itemsToTree, generalizeTree, sortBranches } from 'util/tree';
 import { getZoneName } from './domain';
 
 const MAX_WIDTH = 6;
-const MAX_HEIGHT = 25;
+const MAX_HEIGHT = 30;
 // The value to divide a pixel height by to reach the unit used for MAX_HEIGHT.
-const STOP_PX_HEIGHT = 35;
+const STOP_PX_HEIGHT = 34;
 
 function isEqual(stop, other) {
   if (stop.type !== other.type) return false;
@@ -102,7 +102,7 @@ function routesToTree(routes, shortId, height = 'auto') {
   const maxHeight =
     height !== 'auto'
       ? // The diagram height is whatever is left over from the map.
-        Math.floor(height / STOP_PX_HEIGHT) - 10 // A bit of margin, both for errors and design
+        Math.floor(height / STOP_PX_HEIGHT) + 4 // The 4 comes from the first node's bottom margin
       : MAX_HEIGHT;
 
   generalizeTree(root, {
