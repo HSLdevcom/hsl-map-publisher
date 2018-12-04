@@ -31,10 +31,12 @@ class CustomMap extends Component {
 
   onResize = ({ client: { width, height } }) => {
     const { mapWidth, mapHeight } = this.state;
-    const { setMapHeight } = this.props;
+    const { setMapHeight, template } = this.props;
 
-    // We only need one measurement
-    if (mapWidth > -1 && mapHeight > -1) {
+    const mapImage = get(template, 'slots[0].image.svg', '');
+
+    // We only need one measurement if no static image is set
+    if (!mapImage && mapWidth > -1 && mapHeight > -1) {
       return;
     }
 
@@ -64,7 +66,6 @@ class CustomMap extends Component {
      * Only try to render the StopMap if template === false || !mapImage.
      * We don't want to unnecessarily mount the StopMap.
      */
-
     const mapImage = get(template, 'slots[0].image.svg', '');
 
     let svgHeight = 0;
