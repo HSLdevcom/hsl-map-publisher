@@ -9,8 +9,6 @@ import { isNumberVariant, trimRouteId, isDropOffOnly } from 'util/domain';
 import apolloWrapper from 'util/apolloWrapper';
 import routeCompare from 'util/routeCompare';
 
-import Routes from './routes';
-
 const routesQuery = gql`
   query routesQuery($stopId: String!, $date: Date!) {
     stop: stopByStopId(stopId: $stopId) {
@@ -58,11 +56,13 @@ const hoc = compose(
   apolloWrapper(propsMapper),
 );
 
-const RoutesContainer = hoc(Routes);
+export default component => {
+  const RoutesContainer = hoc(component);
 
-RoutesContainer.propTypes = {
-  stopId: PropTypes.string.isRequired,
-  date: PropTypes.string.isRequired,
+  RoutesContainer.propTypes = {
+    stopId: PropTypes.string.isRequired,
+    date: PropTypes.string.isRequired,
+  };
+
+  return RoutesContainer;
 };
-
-export default RoutesContainer;

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import chunk from 'lodash/chunk';
 import sortBy from 'lodash/sortBy';
 import { Row, Column, InlineSVG } from 'components/util';
-
+import routesContainer from './routesContainer';
 import renderQueue from 'util/renderQueue';
 import { isTrunkRoute, getColor, getIcon } from 'util/domain';
 
@@ -12,6 +12,16 @@ import styles from './routes.css';
 const MAX_COLUMNS = 6;
 
 class Routes extends Component {
+  static propTypes = {
+    routes: PropTypes.arrayOf(
+      PropTypes.shape({
+        routeId: PropTypes.string.isRequired,
+        destinationFi: PropTypes.string.isRequired,
+        destinationSe: PropTypes.string,
+      }),
+    ).isRequired,
+  };
+
   constructor(props) {
     super(props);
     this.state = { columns: MAX_COLUMNS };
@@ -100,14 +110,4 @@ class Routes extends Component {
   }
 }
 
-Routes.propTypes = {
-  routes: PropTypes.arrayOf(
-    PropTypes.shape({
-      routeId: PropTypes.string.isRequired,
-      destinationFi: PropTypes.string.isRequired,
-      destinationSe: PropTypes.string,
-    }),
-  ).isRequired,
-};
-
-export default Routes;
+export default routesContainer(Routes);

@@ -5,8 +5,19 @@ import classNames from 'classnames';
 
 import TableHeader from './tableHeader';
 import TableRows from './tableRows';
-
+import SimpleRoutes from './simpleRoutes';
 import styles from './timetable.css';
+
+const getZoneLetterStyle = zone => ({
+  transform:
+    zone === 'B'
+      ? 'translate(calc(-50%), calc(-50% + 2px))'
+      : zone === 'C'
+        ? 'translate(calc(-50% - 2px), calc(-50% + 2px))'
+        : zone === 'D'
+          ? 'translate(calc(-50% + 2px), calc(-50% + 2px))'
+          : 'translate(-50%, -50%)', // No px adjustments for zone A and the "else" case.
+});
 
 const Timetable = props => (
   <div
@@ -16,30 +27,50 @@ const Timetable = props => (
       [styles.standalone]: props.standalone,
       [styles.greyscale]: props.greyscale,
     })}>
-    {props.showStopInformation && (
-      <div className={styles.componentName}>
-        <div className={styles.title}>
-          {props.stopNameFi} {props.stopShortId && `(${props.stopShortId.replace(/\s+/g, '')})`}{' '}
-          &nbsp;&nbsp;
+    <div className={styles.header}>
+      {props.showStopInformation && (
+        <div className={styles.headerTitle}>
+          <div className={styles.title}>
+            {props.stopNameFi} {props.stopShortId && `(${props.stopShortId.replace(/\s+/g, '')})`}{' '}
+            &nbsp;&nbsp;
+          </div>
+          <div className={styles.subtitle}>{props.stopNameSe}</div>
         </div>
-        <div className={styles.subtitle}>{props.stopNameSe}</div>
-      </div>
-    )}
+      )}
+      {props.standalone && (
+        <div className={styles.stopZone}>
+          <div className={styles.zoneHeading}>
+            <div className={styles.zoneTitle}>Vyöhyke</div>
+            <div className={styles.zoneSubtitle}>Zon/Zone</div>
+          </div>
+          <div className={styles.zone}>
+            <span className={styles.zoneLetter} style={getZoneLetterStyle(props.stopZone)}>
+              {props.stopZone}
+            </span>
+          </div>
+        </div>
+      )}
+      {props.showValidityPeriod && (
+        <div className={styles.validity}>
+          <div>Aikataulut voimassa</div>
+          <div>Tidtabeller giltiga</div>
+          <div>
+            {new Date(props.dateBegin).toLocaleDateString('fi')}
+            &nbsp;-&nbsp;
+            {new Date(props.dateEnd).toLocaleDateString('fi')}
+          </div>
+        </div>
+      )}
+    </div>
     {props.showComponentName && (
       <div className={styles.componentName}>
         <div className={styles.title}>Pysäkkiaikataulu&nbsp;&nbsp;</div>
         <div className={styles.subtitle}>Hållplatstidtabell</div>
       </div>
     )}
-    {props.showValidityPeriod && (
-      <div className={styles.validity}>
-        <div>Aikataulut voimassa</div>
-        <div>Tidtabeller giltiga</div>
-        <div>
-          {new Date(props.dateBegin).toLocaleDateString('fi')}
-          &nbsp;-&nbsp;
-          {new Date(props.dateEnd).toLocaleDateString('fi')}
-        </div>
+    {props.standalone && (
+      <div className={styles.routesContainer}>
+        <SimpleRoutes stopId={props.stopId} date={props.date} />
       </div>
     )}
     {props.weekdays &&
@@ -104,6 +135,9 @@ Timetable.propTypes = {
   showStopInformation: PropTypes.bool.isRequired,
   printableAsA4: PropTypes.bool,
   stopShortId: PropTypes.string.isRequired,
+  stopId: PropTypes.string.isRequired,
+  stopZone: PropTypes.string.isRequired,
+  date: PropTypes.string.isRequired,
   stopNameFi: PropTypes.string.isRequired,
   stopNameSe: PropTypes.string.isRequired,
   standalone: PropTypes.bool,

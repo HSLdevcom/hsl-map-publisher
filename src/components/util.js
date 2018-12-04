@@ -5,17 +5,19 @@ import omit from 'lodash/omit';
 import styles from './util.css';
 
 const Row = props => (
-  <div className={styles.row} style={props.style}>
+  <div className={[styles.row, props.className].join(' ')} style={props.style}>
     {props.children}
   </div>
 );
 
 Row.defaultProps = {
   style: {},
+  className: '',
 };
 
 Row.propTypes = {
   children: PropTypes.node.isRequired,
+  className: PropTypes.string,
   style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 };
 
@@ -50,17 +52,19 @@ WrappingRow.propTypes = {
 };
 
 const Column = props => (
-  <div className={styles.column} style={props.style}>
+  <div className={[styles.column, props.className].join(' ')} style={props.style}>
     {props.children}
   </div>
 );
 
 Column.defaultProps = {
   style: {},
+  className: '',
 };
 
 Column.propTypes = {
   children: PropTypes.node.isRequired,
+  className: PropTypes.string,
   style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 };
 
