@@ -154,10 +154,11 @@ function findLongestPath(root) {
 function generalizeTree(root, options) {
   const { width, height, prune, truncate } = options;
 
-  while (getWidth(root) > width) {
+  while (getWidth(root) > width && getWidth(root) > 1) {
     prune(findLowestBranch(root).root);
   }
-  while (getHeight(root) > height) {
+
+  while (getHeight(root) > height && getHeight(root) > 5) {
     truncate(findLongestPath(root));
   }
 }
