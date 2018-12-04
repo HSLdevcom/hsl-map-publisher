@@ -1,5 +1,5 @@
 .root {
-  margin: 15px 0;
+  margin: 0.938em 0;
   font-family: GothamRounded-Book;
   color: var(--timetable-text-color);
   page-break-after: avoid;
@@ -14,18 +14,18 @@
 }
 
 .title {
-  padding: 5px 10px;
-  font-size: 18px;
+  padding: 0.313em 0.45em;
+  font-size: 1.125em;
 }
 
 .subtitle {
   display: flex;
-  padding: 0 10px;
-  font-size: 12px;
-  line-height: 13px;
+  padding: 0 0.625em 0 0.65em;
+  font-size: 0.75em;
+  line-height: 1;
   letter-spacing: -0.025em;
 }
 
 .subtitle > *:first-child {
-  width: 50px;
+  min-width: 4.2em;
 }

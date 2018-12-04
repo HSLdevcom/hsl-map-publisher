@@ -238,6 +238,7 @@ const propsMapper = mapProps(props => {
     stopShortId: props.data.stop.shortId,
     printableAsA4: props.printTimetablesAsA4,
     greyscale: props.printTimetablesAsGreyscale,
+    standalone: props.standalone,
   };
 });
 
@@ -270,6 +271,7 @@ TimetableContainer.propTypes = {
   showNotes: PropTypes.bool,
   segments: PropTypes.arrayOf(PropTypes.oneOf(['weekdays', 'saturdays', 'sundays'])),
   showComponentName: PropTypes.bool,
+  standalone: PropTypes.bool,
   printTimetablesAsA4: PropTypes.bool,
   printTimetablesAsGreyscale: PropTypes.bool,
 };

@@ -13,6 +13,7 @@ const Timetable = props => (
     className={classNames(styles.root, {
       [styles.summer]: props.isSummerTimetable,
       [styles.printable]: props.printableAsA4,
+      [styles.standalone]: props.standalone,
       [styles.greyscale]: props.greyscale,
     })}>
     {props.showStopInformation && (
@@ -85,6 +86,7 @@ Timetable.defaultProps = {
   showNotes: true,
   showComponentName: true,
   printableAsA4: false,
+  standalone: false,
   greyscale: false,
 };
 
@@ -104,6 +106,7 @@ Timetable.propTypes = {
   stopShortId: PropTypes.string.isRequired,
   stopNameFi: PropTypes.string.isRequired,
   stopNameSe: PropTypes.string.isRequired,
+  standalone: PropTypes.bool,
   greyscale: PropTypes.bool,
 };
 
