@@ -57,6 +57,7 @@ const nearbyItemsQuery = gql`
                 pickupDropoffType
                 viaFi
                 viaSe
+                stopIndex
                 route {
                   nodes {
                     destinationFi
@@ -69,6 +70,7 @@ const nearbyItemsQuery = gql`
                         viaFi
                         viaSe
                         stopId
+                        stopIndex
                       }
                     }
                   }
