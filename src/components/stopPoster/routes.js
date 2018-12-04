@@ -84,8 +84,12 @@ class Routes extends Component {
             <Column>
               {routes.map((route, index) => (
                 <div key={index} className={styles.group} style={{ color: getColor(route) }}>
-                  <div className={styles.title}>{route.destinationFi}</div>
-                  <div className={styles.subtitle}>{route.destinationSe}</div>
+                  <div className={styles.title}>
+                    {route.destinationFi + (route.viaFi ? ` kautta ${route.viaFi}` : '')}
+                  </div>
+                  <div className={styles.subtitle}>
+                    {route.destinationSe + (route.viaSe ? ` via ${route.viaSe}` : '')}
+                  </div>
                 </div>
               ))}
             </Column>

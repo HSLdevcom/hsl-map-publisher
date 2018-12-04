@@ -4,6 +4,7 @@ import gql from 'graphql-tag';
 import mapProps from 'recompose/mapProps';
 import compose from 'recompose/compose';
 import flatMap from 'lodash/flatMap';
+import get from 'lodash/get';
 import { PerspectiveMercatorViewport } from 'viewport-mercator-project';
 
 import apolloWrapper from 'util/apolloWrapper';
@@ -12,6 +13,7 @@ import { calculateStopsViewport } from 'util/stopPoster';
 import routeCompare from 'util/routeCompare';
 
 import StopMap from './stopMap';
+import { mergeRouteSegments } from '../../util/mergeRouteSegments';
 
 const MAX_ZOOM = 17.5;
 const MIN_ZOOM = 14.5;
@@ -53,11 +55,24 @@ const nearbyItemsQuery = gql`
                 routeId
                 hasRegularDayDepartures(date: $date)
                 pickupDropoffType
+                viaFi
+                viaSe
+                stopIndex
                 route {
                   nodes {
                     destinationFi
                     destinationSe
                     mode
+                    routeSegments {
+                      nodes {
+                        destinationFi
+                        destinationSe
+                        viaFi
+                        viaSe
+                        stopId
+                        stopIndex
+                      }
+                    }
                   }
                 }
               }
@@ -78,12 +93,29 @@ const stopsMapper = stopGroup => ({
       .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
       .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
       .filter(routeSegment => !isDropOffOnly(routeSegment))
-      .map(routeSegment => ({
-        routeId: trimRouteId(routeSegment.routeId),
-        destinationFi: routeSegment.route.nodes[0].destinationFi,
-        destinationSe: routeSegment.route.nodes[0].destinationSe,
-        mode: routeSegment.route.nodes[0].mode,
-      })),
+      .map(routeSegment => {
+        const mergedRouteSegment = mergeRouteSegments(
+          routeSegment,
+          get(routeSegment, 'route.nodes[0].routeSegments.nodes', []),
+        );
+
+        const destinationFi = mergedRouteSegment.destinationFi
+          ? mergedRouteSegment.destinationFi
+          : get(mergedRouteSegment, 'route.nodes[0].destinationFi');
+
+        const destinationSe = mergedRouteSegment.destinationSe
+          ? mergedRouteSegment.destinationSe
+          : get(mergedRouteSegment, 'route.nodes[0].destinationSe');
+
+        return {
+          routeId: trimRouteId(mergedRouteSegment.routeId),
+          destinationFi,
+          destinationSe,
+          viaFi: mergedRouteSegment.viaFi,
+          viaSe: mergedRouteSegment.viaSe,
+          mode: mergedRouteSegment.route.nodes[0].mode,
+        };
+      }),
   ).sort(routeCompare),
 });
 
