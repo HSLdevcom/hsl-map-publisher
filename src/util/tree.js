@@ -158,7 +158,7 @@ function generalizeTree(root, options) {
     prune(findLowestBranch(root).root);
   }
 
-  while (getHeight(root) > height && getHeight(root) > 10) {
+  while (getHeight(root) > height && getHeight(root) > 5) {
     truncate(findLongestPath(root));
   }
 }

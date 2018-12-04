@@ -3,7 +3,7 @@ import { itemsToTree, generalizeTree, sortBranches } from 'util/tree';
 import { getZoneName } from './domain';
 
 const MAX_WIDTH = 6;
-const MAX_HEIGHT = 27;
+const MAX_HEIGHT = 25;
 // The value to divide a pixel height by to reach the unit used for MAX_HEIGHT.
 const STOP_PX_HEIGHT = 35;
 
