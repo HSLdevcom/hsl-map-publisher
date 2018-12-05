@@ -7,6 +7,11 @@
   color: var(--hsl-blue);
   background: var(--light-background);
   --timetable-accent-color: white;
+  font-size: 16px;
+}
+
+.root.standalone {
+  font-size: 22px;
 }
 
 .root > div {
@@ -29,13 +34,32 @@
   border-radius: 0;
 }
 
+.header {
+  padding: 0 0 0 0.205em;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.headerTitle {
+  font-size: 1.875em;
+  flex: 1 1 auto;
+  width: 44.5%;
+}
+
 .componentName {
-  padding: 0px 10px;
-  font-size: 30px;
+  padding: 0 0 0 0.205em;
+  font-size: 1.875em;
+}
+
+.routesContainer {
+  padding: 0 0 0 0.205em;
 }
 
 .title {
   font-family: GothamRounded-Medium;
+  white-space: nowrap;
 }
 
 .subtitle {
@@ -43,22 +67,70 @@
 }
 
 .footnote {
-  padding: 2px 10px;
+  padding: 0.125em 0.625em;
   font-family: GothamXNarrow-Book;
-  font-size: 13px;
+  font-size: 0.813em;
 }
 
 .validity {
-  position: absolute;
-  top: calc(var(--border-radius) - 15px);
-  right: var(--border-radius);
   font-family: GothamRounded-Book;
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 0.75em;
+  line-height: 1.1;
   letter-spacing: -0.025em;
   text-align: right;
+  margin-left: auto;
+  flex: 0 0 auto;
+  margin-top: -5px;
 }
 
 .validity > *:first-child {
   font-family: GothamRounded-Medium;
+}
+
+.stopZone {
+  margin-top: -5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 1 1 33%;
+  width: auto;
+}
+
+.zoneTitle {
+  font-size: 24px;
+  font-family: GothamRounded-Medium;
+  white-space: nowrap;
+}
+
+.zoneSubtitle {
+  font-size: 24px;
+  composes: title;
+  font-family: GothamRounded-Book;
+}
+
+.zoneHeading {
+  margin-right: 1em;
+}
+
+.zone {
+  position: relative;
+  box-sizing: border-box;
+  flex: none;
+  width: 3em;
+  height: 3em;
+  color: var(--background);
+  background: white;
+  border-radius: 50%;
+}
+
+.zoneLetter {
+  font-size: 2.25em;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  line-height: 1;
+  font-family: GothamRounded-Medium;
+  text-transform: uppercase;
 }

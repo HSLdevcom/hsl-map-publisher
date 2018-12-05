@@ -81,6 +81,8 @@ const timetableQuery = gql`
       nameFi
       nameSe
       shortId
+      stopId
+      stopZone
       siblings {
         nodes {
           routeSegments: routeSegmentsForDate(date: $date) {
@@ -228,6 +230,7 @@ const propsMapper = mapProps(props => {
     notes,
     dateBegin,
     dateEnd,
+    date: props.date,
     isSummerTimetable: props.isSummerTimetable,
     showValidityPeriod: props.showValidityPeriod,
     showNotes: props.showNotes,
@@ -236,8 +239,11 @@ const propsMapper = mapProps(props => {
     stopNameFi: props.data.stop.nameFi,
     stopNameSe: props.data.stop.nameSe,
     stopShortId: props.data.stop.shortId,
+    stopId: props.data.stop.stopId,
+    stopZone: props.data.stop.stopZone,
     printableAsA4: props.printTimetablesAsA4,
     greyscale: props.printTimetablesAsGreyscale,
+    standalone: props.standalone,
   };
 });
 
@@ -270,6 +276,7 @@ TimetableContainer.propTypes = {
   showNotes: PropTypes.bool,
   segments: PropTypes.arrayOf(PropTypes.oneOf(['weekdays', 'saturdays', 'sundays'])),
   showComponentName: PropTypes.bool,
+  standalone: PropTypes.bool,
   printTimetablesAsA4: PropTypes.bool,
   printTimetablesAsGreyscale: PropTypes.bool,
 };

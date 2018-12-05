@@ -101,7 +101,7 @@ function routesToTree(routes, { stopZone, shortId }, height = 'auto') {
   const maxHeight =
     height !== 'auto'
       ? // The diagram height is whatever is left over from the map.
-        Math.floor(height / STOP_PX_HEIGHT) - 10 // A bit of margin, both for errors and design
+        Math.min(Math.floor(height / STOP_PX_HEIGHT), MAX_HEIGHT)
       : MAX_HEIGHT;
 
   generalizeTree(root, {

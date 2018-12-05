@@ -110,7 +110,7 @@ class App extends Component {
           this.root = ref;
         }}>
         <ApolloProvider client={client}>
-          <ComponentToRender {...props} template={template} />
+          <ComponentToRender {...props} standalone template={template} />
         </ApolloProvider>
       </div>
     );

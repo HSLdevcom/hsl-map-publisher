@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
-import cheerio from 'cheerio';
 import Measure from 'react-measure';
 import StopMap from './stopMapContainer';
 import { InlineSVG } from '../util';
@@ -32,23 +31,23 @@ class CustomMap extends Component {
 
   onResize = ({ client: { width, height } }) => {
     const { mapWidth, mapHeight } = this.state;
-    const { setMapHeight } = this.props;
+    const { setMapHeight, template } = this.props;
 
-    setMapHeight(height);
+    const mapImage = get(template, 'slots[0].image.svg', '');
 
-    // We only need one measurement
-    if (mapWidth > -1 && mapHeight > -1) {
+    // We only need one measurement if no static image is set
+    if (!mapImage && mapWidth > -1 && mapHeight > -1) {
       return;
     }
+
+    setMapHeight(height);
 
     this.setState(
       {
         mapWidth: width,
         mapHeight: height,
       },
-      () => {
-        renderQueue.remove(this);
-      },
+      () => renderQueue.remove(this),
     );
   };
 
@@ -65,7 +64,6 @@ class CustomMap extends Component {
      * Only try to render the StopMap if template === false || !mapImage.
      * We don't want to unnecessarily mount the StopMap.
      */
-
     const mapImage = get(template, 'slots[0].image.svg', '');
 
     let svgHeight = 0;
@@ -92,7 +90,8 @@ class CustomMap extends Component {
     }
 
     // Aspect ratio height of SVG if one is set, auto otherwise.
-    const wrapperHeight = renderMap === 'svg' ? svgHeight : 'auto';
+    const wrapperHeight =
+      renderMap === 'svg' ? svgHeight : renderMap !== 'none' ? mapHeight : 'auto';
 
     return (
       <Measure client onResize={this.onResize}>
