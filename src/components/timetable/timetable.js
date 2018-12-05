@@ -60,19 +60,6 @@ const Timetable = props => (
           <div className={styles.subtitle}>{props.stopNameSe}</div>
         </div>
       )}
-      {props.standalone && (
-        <div className={styles.stopZone}>
-          <div className={styles.zoneHeading}>
-            <div className={styles.zoneTitle}>Vyöhyke</div>
-            <div className={styles.zoneSubtitle}>Zon/Zone</div>
-          </div>
-          <div className={styles.zone}>
-            <span className={styles.zoneLetter} style={getZoneLetterStyle(props.stopZone)}>
-              {props.stopZone}
-            </span>
-          </div>
-        </div>
-      )}
       {props.showValidityPeriod && (
         <div className={styles.validity}>
           <div>Aikataulut voimassa</div>
@@ -98,9 +85,18 @@ const Timetable = props => (
       </div>
     )}
     {props.standalone && (
-      <div className={styles.routesContainer}>
+      <React.Fragment>
+        <div className={styles.stopZone}>
+          <div className={styles.zoneTitle}>Vyöhyke</div>
+          <div className={styles.zoneSubtitle}>Zon/Zone</div>
+          <div className={styles.zone}>
+            <span className={styles.zoneLetter} style={getZoneLetterStyle(props.stopZone)}>
+              {props.stopZone}
+            </span>
+          </div>
+        </div>
         <SimpleRoutes stopId={props.stopId} date={props.date} />
-      </div>
+      </React.Fragment>
     )}
     {props.weekdays &&
       props.weekdays.length > 0 && (
