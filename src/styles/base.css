@@ -34,6 +34,7 @@ body {
 
 :root {
   --hsl-blue: rgb(0, 122, 201);
+  --timetable-text-color: rgb(0, 122, 201);
   --hsl-blue-light: rgb(213, 232, 250);
   --background: var(--hsl-blue);
   --light-background: var(--hsl-blue-light);
