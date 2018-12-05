@@ -16,17 +16,17 @@
   --line-border: var(--line-width) solid var(--line-color);
 }
 
-.headerElement {
+.componentName {
   padding: 0px 0px 20px;
   font-size: 30px;
   color: var(--hsl-blue);
 }
 
-.headerElement > .title {
+.componentName > .title {
   font-family: GothamRounded-Medium;
 }
 
-.headerElement > .subtitle {
+.componentName > .subtitle {
   font-family: GothamRounded-Book;
 }
 
