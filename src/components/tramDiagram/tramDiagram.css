@@ -5,18 +5,18 @@
   position: relative;
 }
 
-.headerElement {
+.componentName {
   padding: 42px;
   font-size: 30px;
   color: var(--hsl-blue);
   position: absolute;
 }
 
-.headerElement > .title {
+.componentName > .title {
   font-family: GothamRounded-Medium;
 }
 
-.headerElement > .subtitle {
+.componentName > .subtitle {
   font-family: GothamRounded-Book;
 }
 
