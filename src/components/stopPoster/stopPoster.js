@@ -16,7 +16,7 @@ import Metadata from 'components/metadata';
 import Header from './headerContainer';
 import Footer from './footer';
 
-import Routes from './routesContainer';
+import Routes from './routes';
 import AdContainer from './adContainer';
 
 import styles from './stopPoster.css';
@@ -123,18 +123,22 @@ class StopPoster extends Component {
         this.setState({ hasRoutesOnTop: true });
         return;
       }
-      if (this.state.hasDiagram) {
-        this.setState({ hasDiagram: false });
-        return;
-      }
+
       if (this.state.hasRoutes) {
         this.setState({ hasRoutes: false });
         return;
       }
+
       if (!this.state.hasStretchedLeftColumn) {
         this.setState({ hasStretchedLeftColumn: true });
         return;
       }
+
+      if (this.state.hasDiagram) {
+        this.setState({ hasDiagram: false });
+        return;
+      }
+
       if (this.state.shouldRenderMap) {
         this.setState({
           shouldRenderMap: false,
@@ -233,7 +237,7 @@ class StopPoster extends Component {
                   {({
                     measureRef,
                     contentRect: {
-                      client: { clientHeight: rightColumnHeight },
+                      client: { height: rightColumnHeight },
                     },
                   }) => (
                     <div className={styles.right} ref={measureRef}>
@@ -244,7 +248,6 @@ class StopPoster extends Component {
                           <StopPosterTimetable segments={['sundays']} hideDetails />
                         </div>
                       )}
-
                       {!hasDiagram && <Spacer height={10} />}
                       {/* The key will make sure the map updates its size if the layout changes */}
                       {shouldRenderMap && (
