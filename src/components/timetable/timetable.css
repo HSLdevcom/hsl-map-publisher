@@ -35,7 +35,7 @@
 }
 
 .header {
-  padding: 0 0 0 0.205em;
+  padding: 0 0 0 0.4em;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -45,16 +45,12 @@
 .headerTitle {
   font-size: 1.875em;
   flex: 1 1 auto;
-  width: 44.5%;
+  width: 45.2%; /* Align the header elements with the route columns */
 }
 
 .componentName {
   padding: 0 0 0 0.205em;
   font-size: 1.875em;
-}
-
-.routesContainer {
-  padding: 0 0 0 0.205em;
 }
 
 .title {

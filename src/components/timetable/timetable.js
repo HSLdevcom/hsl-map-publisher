@@ -68,11 +68,7 @@ const Timetable = props => (
         <div className={styles.subtitle}>Hållplatstidtabell</div>
       </div>
     )}
-    {props.standalone && (
-      <div className={styles.routesContainer}>
-        <SimpleRoutes stopId={props.stopId} date={props.date} />
-      </div>
-    )}
+    {props.standalone && <SimpleRoutes stopId={props.stopId} date={props.date} />}
     {props.weekdays &&
       props.weekdays.length > 0 && (
         <div>

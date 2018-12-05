@@ -13,12 +13,13 @@
 }
 
 .root.simple {
-  padding: 1.5rem 0 0;
+  padding: 2.05rem 0 0 0.52em;
   background: transparent;
   font-size: 22px; /* Same base as timetable standalone font size */
   border-radius: 0;
   overflow: visible;
   justify-content: flex-start;
+  color: var(--timetable-text-color);
 }
 
 .simple .column {
@@ -37,6 +38,7 @@
   margin-top: 0.25rem;
   flex-wrap: wrap;
   flex-direction: row;
+  align-items: center;
   justify-content: flex-start;
 }
 
@@ -55,8 +57,9 @@
 
 .simple .id {
   font-size: 1.2em;
+  line-height: 0.9;
   padding-right: 0.25em;
-  min-width: 2.5em;
+  min-width: 2em;
 }
 
 .title {
