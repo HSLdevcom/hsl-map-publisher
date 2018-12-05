@@ -9,6 +9,20 @@
   padding: calc(var(--border-radius) - 12px) var(--border-radius);
   white-space: nowrap;
   overflow: hidden;
+  font-size: 28px;
+}
+
+.root.simple {
+  padding: 1.5rem 0 0;
+  background: transparent;
+  font-size: 22px; /* Same base as timetable standalone font size */
+  border-radius: 0;
+  overflow: visible;
+  justify-content: flex-start;
+}
+
+.simple .column {
+  width: 50%;
 }
 
 .group {
@@ -18,16 +32,41 @@
   height: 84px;
 }
 
+.simple .group {
+  height: auto;
+  margin-top: 0.25rem;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.groupRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex: 1 0 auto;
+}
+
 .id {
-  padding: 0 12px;
+  padding: 0 0.429em 0 0;
   font-family: GothamXNarrow-Medium;
-  font-size: 70px;
+  font-size: 2.5em;
+}
+
+.simple .id {
+  font-size: 1.2em;
+  padding-right: 0.25em;
+  min-width: 2.5em;
 }
 
 .title {
-  padding-right: 25px;
+  padding-right: 0.893em;
   font-family: GothamXNarrow-Medium;
-  font-size: 28px;
+  font-size: 1em;
+}
+
+.simple .title {
+  padding-right: 0.25em;
 }
 
 .subtitle {
@@ -38,5 +77,5 @@
 .icon {
   height: 1em;
   width: 1em;
-  font-size: 60px;
+  font-size: 2.143em;
 }

@@ -15,6 +15,7 @@ const routeDiagramQuery = gql`
   query routeDiagramQuery($stopId: String!, $date: Date!) {
     stop: stopByStopId(stopId: $stopId) {
       shortId
+      stopZone
       siblings {
         nodes {
           routeSegments: routeSegmentsForDate(date: $date) {
@@ -35,6 +36,7 @@ const routeDiagramQuery = gql`
                     nameFi
                     nameSe
                     shortId
+                    stopZone
                     terminalId
                     terminalByTerminalId {
                       siblings {
