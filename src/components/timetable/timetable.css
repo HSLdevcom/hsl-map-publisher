@@ -35,7 +35,7 @@
 }
 
 .header {
-  padding: 0 0 0 0.205em;
+  padding: 0 0 0 0.4em;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -54,7 +54,7 @@
 }
 
 .routesContainer {
-  padding: 0 0 0 0.205em;
+  padding: 0 0 0 0.52em;
 }
 
 .title {

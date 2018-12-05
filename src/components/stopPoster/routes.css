@@ -13,12 +13,13 @@
 }
 
 .root.simple {
-  padding: 1.5rem 0 0;
+  padding: 2.05rem 0 0;
   background: transparent;
   font-size: 22px; /* Same base as timetable standalone font size */
   border-radius: 0;
   overflow: visible;
   justify-content: flex-start;
+  color: var(--timetable-text-color);
 }
 
 .simple .column {
