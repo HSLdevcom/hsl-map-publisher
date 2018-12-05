@@ -21,11 +21,13 @@ function SimpleRoutes(props) {
           {routes.map(route => (
             <div className={styles.group} key={`route_row_${route.routeId}`}>
               <div className={styles.id}>{route.routeId}</div>
-              <div className={styles.title}>
-                {route.destinationFi + (route.viaFi ? ` kautta ${route.viaFi}` : '')}
-              </div>
-              <div className={styles.subtitle}>
-                {route.destinationSe + (route.viaSe ? ` via ${route.viaSe}` : '')}
+              <div className={styles.routeTitles}>
+                <div className={styles.title}>
+                  {route.destinationFi + (route.viaFi ? ` kautta ${route.viaFi}` : '')}
+                </div>
+                <div className={styles.subtitle}>
+                  {route.destinationSe + (route.viaSe ? ` via ${route.viaSe}` : '')}
+                </div>
               </div>
             </div>
           ))}

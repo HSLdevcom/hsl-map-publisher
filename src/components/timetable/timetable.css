@@ -36,16 +36,10 @@
 
 .header {
   padding: 0 0 0 0.4em;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
 }
 
 .headerTitle {
-  font-size: 1.875em;
-  flex: 1 1 auto;
-  width: 45.2%; /* Align the header elements with the route columns */
+  font-size: 1.75em;
 }
 
 .componentName {
@@ -75,8 +69,10 @@
   letter-spacing: -0.025em;
   text-align: right;
   margin-left: auto;
-  flex: 0 0 auto;
+  position: absolute;
   margin-top: -5px;
+  top: calc(var(--border-radius));
+  right: var(--border-radius);
 }
 
 .validity > *:first-child {
@@ -84,44 +80,40 @@
 }
 
 .stopZone {
-  margin-top: -5px;
+  padding-left: 0.5em;
+  margin-top: 0.875em;
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-start;
-  flex: 1 1 33%;
-  width: auto;
 }
 
 .zoneTitle {
-  font-size: 24px;
+  font-size: 0.75em;
+  line-height: 1.1;
   font-family: GothamRounded-Medium;
   white-space: nowrap;
+  margin-right: 0.4em;
 }
 
 .zoneSubtitle {
-  font-size: 24px;
-  composes: title;
+  font-size: 0.75em;
+  composes: zoneTitle;
   font-family: GothamRounded-Book;
-}
-
-.zoneHeading {
-  margin-right: 1em;
 }
 
 .zone {
   position: relative;
   box-sizing: border-box;
   flex: none;
-  width: 3em;
-  height: 3em;
-  color: var(--background);
-  background: white;
+  width: 1.5em;
+  height: 1.5em;
+  color: white;
+  background: var(--hsl-blue);
   border-radius: 50%;
 }
 
 .zoneLetter {
-  font-size: 2.25em;
+  font-size: 1.25em;
   position: absolute;
   top: 50%;
   left: 50%;

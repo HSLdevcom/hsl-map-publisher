@@ -13,7 +13,7 @@
 }
 
 .root.simple {
-  padding: 2.05rem 0 0 0.52em;
+  padding: 1em 0 0 0.52em;
   background: transparent;
   font-size: 22px; /* Same base as timetable standalone font size */
   border-radius: 0;
@@ -23,7 +23,13 @@
 }
 
 .simple .column {
-  width: 50%;
+  width: calc(50% + 2em);
+  padding-right: 2em;
+}
+
+.simple .column:nth-child(even) {
+  width: calc(50% - 2em);
+  padding-right: 0;
 }
 
 .group {
@@ -36,9 +42,9 @@
 .simple .group {
   height: auto;
   margin-top: 0.25rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
 }
 
@@ -56,16 +62,23 @@
 }
 
 .simple .id {
-  font-size: 1.2em;
+  font-size: 1em;
   line-height: 0.9;
   padding-right: 0.25em;
-  min-width: 2em;
+  min-width: 1.875em;
+  margin-top: 3px;
+}
+
+.routeTitles {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .title {
   padding-right: 0.893em;
   font-family: GothamXNarrow-Medium;
-  font-size: 1em;
+  font-size: 0.875em;
 }
 
 .simple .title {
