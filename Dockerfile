@@ -1,6 +1,6 @@
 FROM node:10
 
-RUN apt-get update && apt-get install -yq pdftk --no-install-recommends
+RUN apt-get update && apt-get install -yq pdftk ttf-mscorefonts-installer --no-install-recommends
 
 # See https://crbug.com/795759
 RUN apt-get update && apt-get install -yq libgconf-2-4 --no-install-recommends
