@@ -51,6 +51,7 @@ const Header = props => (
     <CenteringColumn>
       <Title small>Pysäkkinumero</Title>
       <Subtitle small>Hållplatsnummer</Subtitle>
+      <Subtitle small>Stop number</Subtitle>
       <div className={styles.stop}>{props.shortId.replace(' ', '')}</div>
     </CenteringColumn>
     {props.stopZone && (

@@ -99,6 +99,7 @@ const StopMap = props => {
               <LocationSymbol size={LOCATION_RADIUS * 2} />
               <div className={styles.title}>Olet tässä</div>
               <div className={styles.subtitle}>Du är här</div>
+              <div className={styles.subtitle}>You are here</div>
             </Row>
           </ItemFixed>
 
