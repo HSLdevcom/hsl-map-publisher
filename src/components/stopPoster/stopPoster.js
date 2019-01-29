@@ -151,6 +151,7 @@ class StopPoster extends Component {
       return;
     }
 
+    // If there is no layout overflow and the map is not rendered, try rendering the map again.
     if (!this.state.shouldRenderMap && !this.state.triedRenderingMap) {
       this.setState({ shouldRenderMap: true });
       return;

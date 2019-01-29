@@ -14,7 +14,7 @@ import hslLogo from 'svg/hsl_logo.svg';
 import customerService from 'svg/customer_service.svg';
 import styles from './footer.css';
 
-const parseAttr = attr => Math.round(parseInt(attr, 10));
+const parseAttr = attr => Math.round(parseFloat(attr));
 
 function getSvgElementPosition($element, widthModifier = 0, heightModifier = 0) {
   const isLine = $element[0].tagName === 'line';
@@ -23,17 +23,20 @@ function getSvgElementPosition($element, widthModifier = 0, heightModifier = 0) 
     ? parseAttr($element.attr('x2')) - parseAttr($element.attr('x1'))
     : parseAttr($element.attr('width'));
   const height = isLine
-    ? parseAttr($element.attr('stroke-width'))
+    ? $element.attr('stroke-width')
+      ? // The stroke-width can be defined either as an attribute or as a style.
+        parseAttr($element.attr('stroke-width'))
+      : parseAttr($element.css('stroke-width'))
     : parseAttr($element.attr('height'));
 
   const posX = isLine ? parseAttr($element.attr('x1')) : parseAttr($element.attr('x'));
   const posY = isLine ? parseAttr($element.attr('y1')) - height / 2 : parseAttr($element.attr('y'));
 
   return {
-    top: posY - posY * widthModifier,
+    top: posY - posY * heightModifier,
     left: posX - posX * widthModifier,
     width: width - width * widthModifier,
-    height: height - height * widthModifier,
+    height: height - height * heightModifier,
   };
 }
 
