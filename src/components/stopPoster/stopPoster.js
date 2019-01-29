@@ -163,19 +163,40 @@ class StopPoster extends Component {
   }
 
   render() {
-    if (!this.props.hasRoutes) {
+    const {
+      shortId,
+      stopId,
+      isTrunkStop,
+      isTramStop,
+      hasRoutes: hasRoutesProp,
+      date,
+      isSummerTimetable,
+      dateBegin,
+      dateEnd,
+    } = this.props;
+
+    if (!hasRoutesProp) {
       return null;
     }
 
-    const { template } = this.state;
+    const {
+      template,
+      mapHeight,
+      hasRoutesOnTop,
+      hasDiagram,
+      hasStretchedLeftColumn,
+      hasRoutes,
+      shouldRenderMap,
+    } = this.state;
+
     const StopPosterTimetable = props => (
       <div className={styles.timetable}>
         <Timetable
-          stopId={this.props.stopId}
-          date={this.props.date}
-          isSummerTimetable={this.props.isSummerTimetable}
-          dateBegin={this.props.dateBegin}
-          dateEnd={this.props.dateEnd}
+          stopId={stopId}
+          date={date}
+          isSummerTimetable={isSummerTimetable}
+          dateBegin={dateBegin}
+          dateEnd={dateEnd}
           showValidityPeriod={!props.hideDetails}
           showNotes={!props.hideDetails}
           showComponentName={!props.hideDetails}
@@ -186,38 +207,27 @@ class StopPoster extends Component {
 
     return (
       <CropMarks>
-        <div className={styles.root} style={this.props.isTrunkStop ? trunkStopStyle : null}>
+        <div className={styles.root} style={isTrunkStop ? trunkStopStyle : null}>
           <JustifiedColumn>
-            <Header stopId={this.props.stopId} />
+            <Header stopId={stopId} />
             <div
               className={styles.content}
               ref={ref => {
                 this.content = ref;
               }}>
               <Spacer width="100%" height={50} />
-              {this.state.hasRoutes &&
-                this.state.hasRoutesOnTop && (
-                  <Routes stopId={this.props.stopId} date={this.props.date} />
-                )}
-              {this.state.hasRoutes && this.state.hasRoutesOnTop && <Spacer height={10} />}
+              {hasRoutes && hasRoutesOnTop && <Routes stopId={stopId} date={date} />}
+              {hasRoutes && hasRoutesOnTop && <Spacer height={10} />}
               <div className={styles.columns}>
-                <div
-                  className={
-                    this.state.hasStretchedLeftColumn ? styles.leftStretched : styles.left
-                  }>
-                  {this.state.hasRoutes &&
-                    !this.state.hasRoutesOnTop && (
-                      <Routes stopId={this.props.stopId} date={this.props.date} />
-                    )}
-                  {this.state.hasRoutes && !this.state.hasRoutesOnTop && <Spacer height={10} />}
-                  {this.state.hasDiagram && <StopPosterTimetable />}
-                  {!this.state.hasDiagram && <StopPosterTimetable segments={['weekdays']} />}
+                <div className={hasStretchedLeftColumn ? styles.leftStretched : styles.left}>
+                  {hasRoutes && !hasRoutesOnTop && <Routes stopId={stopId} date={date} />}
+                  {hasRoutes && !hasRoutesOnTop && <Spacer height={10} />}
+                  {hasDiagram && <StopPosterTimetable />}
+                  {!hasDiagram && <StopPosterTimetable segments={['weekdays']} />}
                   {/* The key will make sure the ad container updates its size if the layout changes */}
                   <AdContainer
-                    key={`poster_ads_${this.state.hasRoutes}${this.state.hasRoutesOnTop}${
-                      this.state.hasStretchedLeftColumn
-                    }${this.state.hasDiagram}`}
-                    shortId={this.props.shortId}
+                    key={`poster_ads_${hasRoutes}${hasRoutesOnTop}${hasStretchedLeftColumn}${hasDiagram}`}
+                    shortId={shortId}
                     template={template ? get(template, 'areas', []).find(t => t.key === 'ads') : {}}
                   />
                 </div>
@@ -232,22 +242,22 @@ class StopPoster extends Component {
                     },
                   }) => (
                     <div className={styles.right} ref={measureRef}>
-                      {!this.state.hasDiagram && (
+                      {!hasDiagram && (
                         <div className={styles.timetables}>
                           <StopPosterTimetable segments={['saturdays']} hideDetails />
                           <Spacer width={10} />
                           <StopPosterTimetable segments={['sundays']} hideDetails />
                         </div>
                       )}
-                      {!this.state.hasDiagram && <Spacer height={10} />}
+                      {!hasDiagram && <Spacer height={10} />}
                       {/* The key will make sure the map updates its size if the layout changes */}
-                      {this.state.shouldRenderMap && (
+                      {shouldRenderMap && (
                         <CustomMap
-                          key={`poster_map_${this.state.hasDiagram}${this.props.isTramStop}`}
+                          key={`poster_map_${hasDiagram}${isTramStop}`}
                           setMapHeight={this.setMapHeight}
-                          stopId={this.props.stopId}
-                          date={this.props.date}
-                          isSummerTimetable={this.props.isSummerTimetable}
+                          stopId={stopId}
+                          date={date}
+                          isSummerTimetable={isSummerTimetable}
                           template={
                             template
                               ? get(template, 'areas', []).find(t => t.key === 'map')
@@ -258,19 +268,15 @@ class StopPoster extends Component {
 
                       <Spacer height={10} />
 
-                      {this.state.hasDiagram &&
-                        !this.props.isTramStop && (
+                      {hasDiagram &&
+                        !isTramStop && (
                           <RouteDiagram
-                            height={
-                              this.state.mapHeight > -1
-                                ? rightColumnHeight - this.state.mapHeight
-                                : 'auto'
-                            }
-                            stopId={this.props.stopId}
-                            date={this.props.date}
+                            height={mapHeight > -1 ? rightColumnHeight - mapHeight : 'auto'}
+                            stopId={stopId}
+                            date={date}
                           />
                         )}
-                      {this.state.hasDiagram && this.props.isTramStop && <TramDiagram />}
+                      {hasDiagram && isTramStop && <TramDiagram />}
                     </div>
                   )}
                 </Measure>
@@ -280,10 +286,10 @@ class StopPoster extends Component {
             <Footer
               onError={this.onError}
               template={template ? get(template, 'areas', []).find(t => t.key === 'footer') : {}}
-              shortId={this.props.shortId}
-              isTrunkStop={this.props.isTrunkStop}
+              shortId={shortId}
+              isTrunkStop={isTrunkStop}
             />
-            <Metadata date={this.props.date} />
+            <Metadata date={date} />
           </JustifiedColumn>
         </div>
       </CropMarks>

@@ -47,9 +47,7 @@ class CustomMap extends Component {
         mapWidth: width,
         mapHeight: height,
       },
-      () => {
-        renderQueue.remove(this);
-      },
+      () => renderQueue.remove(this),
     );
   };
 

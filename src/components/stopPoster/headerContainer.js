@@ -13,6 +13,7 @@ const headerQuery = gql`
       shortId
       nameFi
       nameSe
+      stopZone
     }
   }
 `;

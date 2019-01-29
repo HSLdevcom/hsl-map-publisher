@@ -85,7 +85,8 @@ const propsMapper = mapProps(props => {
         stops: sortBy(routeSegment.nextStops.nodes, node => node.stopIndex).map(nodeToStop),
       })),
   );
-  return { tree: routesToTree(routes, props.data.stop.shortId, props.height) };
+
+  return { tree: routesToTree(routes, props.data.stop, props.height) };
 });
 
 const hoc = compose(

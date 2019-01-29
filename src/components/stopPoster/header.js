@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { JustifiedRow, CenteringColumn } from 'components/util';
-import { getZoneName } from 'util/domain';
 
 import styles from './header.css';
+import ZoneIcon from './zoneIcon';
 
 const Group = props => <div style={{ marginLeft: 15, marginRight: 15 }}>{props.children}</div>;
 
@@ -40,29 +40,30 @@ Subtitle.propTypes = {
   small: PropTypes.bool,
 };
 
-const Header = props => {
-  const zone = getZoneName(props.shortId);
-  return (
-    <JustifiedRow style={{ margin: '0 10px' }}>
-      <Group>
-        <Title>{props.nameFi}</Title>
-        {props.nameSe && <Subtitle>{props.nameSe}</Subtitle>}
-      </Group>
-      {zone && (
-        <CenteringColumn>
-          <Title small>Lippuvyöhyke</Title>
-          <Subtitle small>Resezon</Subtitle>
-          <div className={styles.zone}>{zone}</div>
-        </CenteringColumn>
-      )}
-      <CenteringColumn>
-        <Title small>Pysäkkinumero</Title>
-        <Subtitle small>Hållplatsnummer</Subtitle>
-        <div className={styles.stop}>{props.shortId.replace(' ', '')}</div>
-      </CenteringColumn>
-    </JustifiedRow>
-  );
-};
+// TODO: Fix alignment of zone letter for each letter.
+
+const Header = props => (
+  <JustifiedRow style={{ margin: '0 10px' }}>
+    <Group>
+      <Title>{props.nameFi}</Title>
+      {props.nameSe && <Subtitle>{props.nameSe}</Subtitle>}
+    </Group>
+    <CenteringColumn>
+      <Title small>Pysäkkinumero</Title>
+      <Subtitle small>Hållplatsnummer</Subtitle>
+      <div className={styles.stop}>{props.shortId.replace(' ', '')}</div>
+    </CenteringColumn>
+    {props.stopZone && (
+      <div className={styles.stopZoneColumn}>
+        <div className={styles.zoneHeading}>
+          <Title>Vyöhyke</Title>
+          <Subtitle>Zon/Zone</Subtitle>
+        </div>
+        <ZoneIcon zone={props.stopZone} />
+      </div>
+    )}
+  </JustifiedRow>
+);
 
 Header.defaultProps = {
   nameSe: null,
@@ -72,6 +73,7 @@ Header.propTypes = {
   nameFi: PropTypes.string.isRequired,
   nameSe: PropTypes.string,
   shortId: PropTypes.string.isRequired,
+  stopZone: PropTypes.string.isRequired,
 };
 
 export default Header;
