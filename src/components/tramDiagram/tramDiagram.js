@@ -7,10 +7,11 @@ import styles from './tramDiagram.css';
 
 const TramDiagram = () => (
   <div className={styles.root}>
+    {/*
     <div className={styles.componentName}>
       <div className={styles.title}>Linjojen reitit</div>
       <div className={styles.subtitle}>Linjernas rutter</div>
-    </div>
+    </div> */}
     <InlineSVG className={styles.diagram} src={tramDiagramIcon} />
   </div>
 );
