@@ -14,10 +14,6 @@
   font-size: 22px;
 }
 
-.root > div {
-  page-break-inside: avoid;
-}
-
 .root.summer {
   background: white;
   --timetable-accent-color: var(--light-background);
