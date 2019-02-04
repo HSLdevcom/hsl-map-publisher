@@ -48,6 +48,7 @@ const StopMap = props => {
     top: mapStyle.height - props.miniMapOptions.marginBottom - props.miniMapOptions.height,
     width: props.miniMapOptions.width,
     height: props.miniMapOptions.height,
+    zIndex: 20,
   };
 
   // Filter out stops that are behind the mini map
