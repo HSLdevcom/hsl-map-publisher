@@ -124,11 +124,6 @@ class StopPoster extends Component {
         return;
       }
 
-      if (this.state.hasRoutes) {
-        this.setState({ hasRoutes: false });
-        return;
-      }
-
       if (!this.state.hasStretchedLeftColumn) {
         this.setState({ hasStretchedLeftColumn: true });
         return;
@@ -136,6 +131,11 @@ class StopPoster extends Component {
 
       if (this.state.hasDiagram) {
         this.setState({ hasDiagram: false });
+        return;
+      }
+
+      if (this.state.hasRoutes) {
+        this.setState({ hasRoutes: false });
         return;
       }
 
