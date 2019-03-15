@@ -76,7 +76,7 @@ function createTemplateSlots(areaSlots) {
       return slots;
     }
 
-    const marginToWidth = size > 1 ? size * slotMargin : 0;
+    const marginToWidth = size > 1 ? (size - 1) * slotMargin : 0;
     const width = slotWidth * size + marginToWidth;
     const left = firstSlotLeft + slotWidth * idx + slotMargin * idx;
     const $svg = cheerio.load(svg);
