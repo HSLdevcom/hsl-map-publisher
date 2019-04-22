@@ -36,10 +36,10 @@ const getZoneLetterStyle = zone => ({
     zone === 'B'
       ? 'translate(calc(-50%), calc(-50% + 2px))'
       : zone === 'C'
-        ? 'translate(calc(-50% - 2px), calc(-50% + 2px))'
-        : zone === 'D'
-          ? 'translate(calc(-50% + 2px), calc(-50% + 2px))'
-          : 'translate(-50%, -50%)', // No px adjustments for zone A and the "else" case.
+      ? 'translate(calc(-50% - 2px), calc(-50% + 2px))'
+      : zone === 'D'
+      ? 'translate(calc(-50% + 2px), calc(-50% + 2px))'
+      : 'translate(-50%, -50%)', // No px adjustments for zone A and the "else" case.
 });
 
 const Timetable = props => (
@@ -98,42 +98,39 @@ const Timetable = props => (
         <SimpleRoutes stopId={props.stopId} date={props.date} />
       </React.Fragment>
     )}
-    {props.weekdays &&
-      props.weekdays.length > 0 && (
-        <div>
-          <TableHeader
-            title="Maanantai - Perjantai"
-            subtitleSw="Måndag - Fredag"
-            subtitleEn="Monday - Friday"
-            printingAsA4={props.printableAsA4}
-          />
-          <TableRows departures={props.weekdays} />
-        </div>
-      )}
-    {props.saturdays &&
-      props.saturdays.length > 0 && (
-        <div>
-          <TableHeader
-            title="Lauantai"
-            subtitleSw="Lördag"
-            subtitleEn="Saturday"
-            printingAsA4={props.printableAsA4}
-          />
-          <TableRows departures={props.saturdays} />
-        </div>
-      )}
-    {props.sundays &&
-      props.sundays.length > 0 && (
-        <div>
-          <TableHeader
-            title="Sunnuntai"
-            subtitleSw="Söndag"
-            subtitleEn="Sunday"
-            printingAsA4={props.printableAsA4}
-          />
-          <TableRows departures={props.sundays} />
-        </div>
-      )}
+    {props.weekdays && props.weekdays.length > 0 && (
+      <div>
+        <TableHeader
+          title="Maanantai - Perjantai"
+          subtitleSw="Måndag - Fredag"
+          subtitleEn="Monday - Friday"
+          printingAsA4={props.printableAsA4}
+        />
+        <TableRows departures={props.weekdays} />
+      </div>
+    )}
+    {props.saturdays && props.saturdays.length > 0 && (
+      <div>
+        <TableHeader
+          title="Lauantai"
+          subtitleSw="Lördag"
+          subtitleEn="Saturday"
+          printingAsA4={props.printableAsA4}
+        />
+        <TableRows departures={props.saturdays} />
+      </div>
+    )}
+    {props.sundays && props.sundays.length > 0 && (
+      <div>
+        <TableHeader
+          title="Sunnuntai"
+          subtitleSw="Söndag"
+          subtitleEn="Sunday"
+          printingAsA4={props.printableAsA4}
+        />
+        <TableRows departures={props.sundays} />
+      </div>
+    )}
     {props.showNotes && props.notes.length !== 0 && <Spacer height={20} />}
     {props.showNotes &&
       props.notes.map(note => (

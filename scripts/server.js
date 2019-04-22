@@ -1,9 +1,12 @@
 const Koa = require('koa');
+const session = require('koa-session');
 const Router = require('koa-router');
 const cors = require('@koa/cors');
 const jsonBody = require('koa-json-body');
 
 const generator = require('./generator');
+const authEndpoints = require('./auth/authEndpoints');
+
 const {
   migrate,
   addEvent,
@@ -198,13 +201,37 @@ async function main() {
     ctx.body = generator.concatenate([id]);
   });
 
+  router.post('/login', async ctx => {
+    const authResponse = await authEndpoints.authorize(ctx.request, ctx.response, ctx.session);
+    ctx.body = authResponse.body;
+    ctx.response.status = authResponse.status;
+  });
+
+  router.get('/logout', async ctx => {
+    const authResponse = await authEndpoints.logout(ctx.request, ctx.response, ctx.session);
+    ctx.session = null;
+    ctx.response.status = authResponse.status;
+  });
+
+  router.get('/session', async ctx => {
+    const authResponse = await authEndpoints.checkExistingSession(ctx.request, ctx.response, ctx.session);
+    ctx.body = authResponse.body;
+    ctx.response.status = authResponse.status;
+  });
+
+  app.keys = ['secret key'];
+
+  app.use(session(app));
+
   app
     .use(errorHandler)
-    .use(cors())
+    .use(cors({
+      credentials: true,
+    }))
     .use(jsonBody({ fallback: true, limit: '10mb' }))
     .use(router.routes())
     .use(router.allowedMethods())
     .listen(PORT, () => console.log(`Listening at ${PORT}`)); // eslint-disable-line no-console
 }
 
-main().catch(error => console.error(error)); // eslint-disable-line no-console
+main().catch(error => console.error(error.stack)); // eslint-disable-line no-console

@@ -268,14 +268,13 @@ class StopPoster extends Component {
 
                       <Spacer height={10} />
 
-                      {hasDiagram &&
-                        !isTramStop && (
-                          <RouteDiagram
-                            height={mapHeight > -1 ? rightColumnHeight - mapHeight : 'auto'}
-                            stopId={stopId}
-                            date={date}
-                          />
-                        )}
+                      {hasDiagram && !isTramStop && (
+                        <RouteDiagram
+                          height={mapHeight > -1 ? rightColumnHeight - mapHeight : 'auto'}
+                          stopId={stopId}
+                          date={date}
+                        />
+                      )}
                       {hasDiagram && isTramStop && <TramDiagram />}
                     </div>
                   )}
