@@ -43,6 +43,7 @@ class StopPoster extends Component {
       hasStretchedLeftColumn: false,
       shouldRenderMap: false,
       triedRenderingMap: false,
+      hasColumnTimetable: true,
     };
   }
 
@@ -98,13 +99,11 @@ class StopPoster extends Component {
     if (!this.content) {
       return false;
     }
-
     // Horizontal overflow is not automatically resolvable.
-    if (this.content.scrollWidth - this.content.clientWidth > 1) {
+    if (this.content.scrollWidth > this.content.clientWidth) {
       this.onError('Unresolvable horizontal overflow detected.');
     }
-
-    return this.content.scrollHeight - this.content.clientHeight > 1;
+    return this.content.scrollHeight > this.content.clientHeight;
   }
 
   updateLayout() {
@@ -129,8 +128,25 @@ class StopPoster extends Component {
         return;
       }
 
+
       if (this.state.hasDiagram) {
         this.setState({ hasDiagram: false });
+        return;
+      }
+
+      if (this.state.template) {
+        const ads = get(this.state.template, 'areas', []).find(t => t.key === 'ads')
+        if (ads.slots.length > 0) {
+          ads.slots.pop();
+          const template = this.state.template;
+          template.areas.find(t => t.key === 'ads').slots = ads.slots;
+          this.setState({ template });
+          return;
+        }
+      }
+
+      if (this.state.hasColumnTimetable) {
+        this.setState({ hasColumnTimetable: false });
         return;
       }
 
@@ -187,6 +203,7 @@ class StopPoster extends Component {
       hasStretchedLeftColumn,
       hasRoutes,
       shouldRenderMap,
+      hasColumnTimetable,
     } = this.state;
 
     const StopPosterTimetable = props => (
@@ -222,8 +239,8 @@ class StopPoster extends Component {
                 <div className={hasStretchedLeftColumn ? styles.leftStretched : styles.left}>
                   {hasRoutes && !hasRoutesOnTop && <Routes stopId={stopId} date={date} />}
                   {hasRoutes && !hasRoutesOnTop && <Spacer height={10} />}
-                  {hasDiagram && <StopPosterTimetable />}
-                  {!hasDiagram && <StopPosterTimetable segments={['weekdays']} />}
+                  {hasColumnTimetable && <StopPosterTimetable />}
+                  {!hasColumnTimetable && <StopPosterTimetable segments={['weekdays']} />}
                   {/* The key will make sure the ad container updates its size if the layout changes */}
                   <AdContainer
                     key={`poster_ads_${hasRoutes}${hasRoutesOnTop}${hasStretchedLeftColumn}${hasDiagram}`}
@@ -242,7 +259,7 @@ class StopPoster extends Component {
                     },
                   }) => (
                     <div className={styles.right} ref={measureRef}>
-                      {!hasDiagram && (
+                      {!hasColumnTimetable && (
                         <div className={styles.timetables}>
                           <StopPosterTimetable segments={['saturdays']} hideDetails />
                           <Spacer width={10} />
