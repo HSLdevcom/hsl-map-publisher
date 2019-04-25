@@ -128,17 +128,16 @@ class StopPoster extends Component {
         return;
       }
 
-
       if (this.state.hasDiagram) {
         this.setState({ hasDiagram: false });
         return;
       }
 
       if (this.state.template) {
-        const ads = get(this.state.template, 'areas', []).find(t => t.key === 'ads')
+        const ads = get(this.state.template, 'areas', []).find(t => t.key === 'ads');
         if (ads.slots.length > 0) {
           ads.slots.pop();
-          const template = this.state.template;
+          const { template } = this.state;
           template.areas.find(t => t.key === 'ads').slots = ads.slots;
           this.setState({ template });
           return;
