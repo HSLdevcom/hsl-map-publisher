@@ -44,6 +44,7 @@ class StopPoster extends Component {
       shouldRenderMap: false,
       triedRenderingMap: false,
       hasColumnTimetable: true,
+      removedAds: [],
     };
   }
 
@@ -106,6 +107,16 @@ class StopPoster extends Component {
     return this.content.scrollHeight > this.content.clientHeight;
   }
 
+  removeAdFromTemplate(ads) {
+    const { template, removedAds } = this.state;
+    removedAds.push(ads.slots.pop());
+    template.areas.find(t => t.key === 'ads').slots = ads.slots;
+    this.setState({
+      removedAds,
+      template,
+    });
+  }
+
   updateLayout() {
     if (!this.props.hasRoutes) {
       this.onError('No valid routes for stop');
@@ -128,26 +139,36 @@ class StopPoster extends Component {
         return;
       }
 
-
       if (this.state.hasDiagram) {
         this.setState({ hasDiagram: false });
         return;
       }
 
       if (this.state.template) {
-        const ads = get(this.state.template, 'areas', []).find(t => t.key === 'ads')
+        const ads = get(this.state.template, 'areas', []).find(t => t.key === 'ads');
         if (ads.slots.length > 0) {
-          ads.slots.pop();
-          const template = this.state.template;
-          template.areas.find(t => t.key === 'ads').slots = ads.slots;
-          this.setState({ template });
+          this.removeAdFromTemplate(ads);
           return;
         }
       }
 
       if (this.state.hasColumnTimetable) {
-        this.setState({ hasColumnTimetable: false });
+        const { template, removedAds } = this.state;
+        template.areas.find(t => t.key === 'ads').slots = removedAds;
+        this.setState({
+          hasColumnTimetable: false,
+          removedAds: [],
+          template,
+        });
         return;
+      }
+
+      if (this.state.template) {
+        const ads = get(this.state.template, 'areas', []).find(t => t.key === 'ads');
+        if (ads.slots.length > 0) {
+          this.removeAdFromTemplate(ads);
+          return;
+        }
       }
 
       if (this.state.hasRoutes) {
