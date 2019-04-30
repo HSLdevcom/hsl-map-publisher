@@ -22,12 +22,17 @@ import AdContainer from './adContainer';
 import styles from './stopPoster.css';
 import CustomMap from '../map/customMap';
 
+const ROUTE_DIAGRAM_MAX_HEIGHT = 25;
+const ROUTE_DIAGRAM_MIN_HEIGHT = 1;
+
 const trunkStopStyle = {
   '--background': colorsByMode.TRUNK,
   '--light-background': '#FFE0D1',
 };
 
 class StopPoster extends Component {
+  isDiagramSearchOngoing = false;
+
   constructor(props) {
     super(props);
 
@@ -35,6 +40,7 @@ class StopPoster extends Component {
     this.setMapHeight = this.setMapHeight.bind(this);
 
     this.state = {
+      routeDiagramStopCount: ROUTE_DIAGRAM_MAX_HEIGHT,
       mapHeight: -1,
       template: null,
       hasRoutesOnTop: false,
@@ -128,7 +134,7 @@ class StopPoster extends Component {
       return;
     }
 
-    if (this.hasOverflow()) {
+    if (this.hasOverflow() || this.isDiagramSearchOngoing) {
       if (!this.state.hasRoutesOnTop) {
         this.setState({ hasRoutesOnTop: true });
         return;
@@ -139,8 +145,35 @@ class StopPoster extends Component {
         return;
       }
 
+      if (this.state.template) {
+        const ads = get(this.state.template, 'areas', []).find(t => t.key === 'ads');
+        if (ads.slots.length > 0) {
+          this.removeAdFromTemplate(ads);
+          return;
+        }
+      }
+
       if (this.state.hasDiagram) {
-        this.setState({ hasDiagram: false });
+        if (this.state.routeDiagramStopCount > ROUTE_DIAGRAM_MIN_HEIGHT && this.hasOverflow()) {
+          // TODO: This is a dirty fix that bruteforce finds a suitable routeDiagram,
+          // should be made better since it practically breaks posters where we have a map
+          // eslint-disable-next-line
+          this.setState({ routeDiagramStopCount: this.state.routeDiagramStopCount - 1 });
+          this.isDiagramSearchOngoing = true;
+        } else {
+          if (this.hasOverflow()) {
+            this.setState({
+              hasDiagram: false,
+            });
+          }
+          this.isDiagramSearchOngoing = false;
+          const { template, removedAds } = this.state;
+          template.areas.find(t => t.key === 'ads').slots = removedAds;
+          this.setState({
+            removedAds: [],
+            template,
+          });
+        }
         return;
       }
 
@@ -305,11 +338,10 @@ class StopPoster extends Component {
                       )}
 
                       <Spacer height={10} />
-
                       {hasDiagram &&
                         !isTramStop && (
                           <RouteDiagram
-                            height={mapHeight > -1 ? rightColumnHeight - mapHeight : 'auto'}
+                            height={this.state.routeDiagramStopCount}
                             stopId={stopId}
                             date={date}
                           />

@@ -2,9 +2,6 @@ import get from 'lodash/get';
 import { itemsToTree, generalizeTree, sortBranches } from 'util/tree';
 
 const MAX_WIDTH = 6;
-const MAX_HEIGHT = 25;
-// The value to divide a pixel height by to reach the unit used for MAX_HEIGHT.
-const STOP_PX_HEIGHT = 35;
 
 function isEqual(stop, other) {
   if (stop.type !== other.type) return false;
@@ -95,18 +92,9 @@ function routesToTree(routes, { stopZone, shortId }, height = 'auto') {
 
   const root = itemsToTree(itemsListWithZoneBorders, { isEqual, merge });
 
-  // height is auto if the generated local map is used. Only if
-  // a static image is set will height be a px value, in which case maxHeight
-  // needs to be adjusted here to not cause overflow errors.
-  const maxHeight =
-    height !== 'auto'
-      ? // The diagram height is whatever is left over from the map.
-        Math.min(Math.floor(height / STOP_PX_HEIGHT), MAX_HEIGHT)
-      : MAX_HEIGHT;
-
   generalizeTree(root, {
+    height,
     width: MAX_WIDTH,
-    height: maxHeight,
     prune,
     truncate,
   });
