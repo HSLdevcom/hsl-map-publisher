@@ -1,13 +1,12 @@
 const nodeFetch = require('node-fetch');
-// import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, LOGIN_PROVIDER_URI } from '../constants'
 
-const asd = process.env.CLIENT_SECRET;
-console.log(asd);
-
-const CLIENT_ID="2507101457541763";
-const CLIENT_SECRET="QPDTcRKd7t3OR3y4TNRcK19HTgLKPRXp";
+// Move to .env
+const CLIENT_ID="0573682632536260";
+const CLIENT_SECRET="yJD0C4H4hdKVN0L9PKldWptcx1IqhVuR";
 const REDIRECT_URI="http://localhost:3000";
 const LOGIN_PROVIDER_URI="https://hslid-uat.cinfra.fi";
+
+console.log(CLIENT_ID, CLIENT_SECRET)
 
 const requestAccessToken = async (code) => {
   const url = `${LOGIN_PROVIDER_URI}/openid/token?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&grant_type=authorization_code&code=${code}&redirect_uri=${REDIRECT_URI}`
