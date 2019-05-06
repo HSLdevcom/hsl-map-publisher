@@ -23,7 +23,7 @@ import styles from './stopPoster.css';
 import CustomMap from '../map/customMap';
 
 const ROUTE_DIAGRAM_MAX_HEIGHT = 25;
-const ROUTE_DIAGRAM_MIN_HEIGHT = 1;
+const ROUTE_DIAGRAM_MIN_HEIGHT = 6;
 
 const trunkStopStyle = {
   '--background': colorsByMode.TRUNK,
