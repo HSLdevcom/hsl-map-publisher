@@ -10,7 +10,7 @@
     "build": "webpack --config webpack.prod.js",
     "serve": "serve dist",
     "start": "webpack-serve -r dotenv/config ./webpack.dev.js",
-    "server": "node scripts/server",
+    "server": "node -r dotenv/config scripts/server",
     "server:hot": "API_URL=https://dev-kartat.hsldev.com forever -w -t --killSignal=SIGTERM --watchDirectory scripts scripts/server.js",
     "knex": "PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5654/postgres knex",
     "docker:build": "docker build -t hsl-map-publisher .",
