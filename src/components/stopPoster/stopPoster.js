@@ -23,7 +23,7 @@ import styles from './stopPoster.css';
 import CustomMap from '../map/customMap';
 
 const ROUTE_DIAGRAM_MAX_HEIGHT = 25;
-const ROUTE_DIAGRAM_MIN_HEIGHT = 6;
+const ROUTE_DIAGRAM_MIN_HEIGHT = 8;
 
 const trunkStopStyle = {
   '--background': colorsByMode.TRUNK,
@@ -31,8 +31,6 @@ const trunkStopStyle = {
 };
 
 class StopPoster extends Component {
-  isDiagramSearchOngoing = false;
-
   constructor(props) {
     super(props);
 
@@ -134,7 +132,7 @@ class StopPoster extends Component {
       return;
     }
 
-    if (this.hasOverflow() || this.isDiagramSearchOngoing) {
+    if (this.hasOverflow()) {
       if (!this.state.hasRoutesOnTop) {
         this.setState({ hasRoutesOnTop: true });
         return;
@@ -154,35 +152,17 @@ class StopPoster extends Component {
       }
 
       if (this.state.hasDiagram) {
-        if (this.state.routeDiagramStopCount > ROUTE_DIAGRAM_MIN_HEIGHT && this.hasOverflow()) {
+        if (this.state.routeDiagramStopCount >= ROUTE_DIAGRAM_MIN_HEIGHT) {
           // TODO: This is a dirty fix that bruteforce finds a suitable routeDiagram,
           // should be made better since it practically breaks posters where we have a map
-          // eslint-disable-next-line
-          this.setState({ routeDiagramStopCount: this.state.routeDiagramStopCount - 1 });
-          this.isDiagramSearchOngoing = true;
-        } else {
-          if (this.hasOverflow()) {
-            this.setState({
-              hasDiagram: false,
-            });
-          }
-          this.isDiagramSearchOngoing = false;
-          const { template, removedAds } = this.state;
-          template.areas.find(t => t.key === 'ads').slots = removedAds;
           this.setState({
-            removedAds: [],
-            template,
+            // eslint-disable-next-line
+            routeDiagramStopCount: this.state.routeDiagramStopCount - 1,
           });
+        } else {
+          this.setState({ hasDiagram: false });
         }
         return;
-      }
-
-      if (this.state.template) {
-        const ads = get(this.state.template, 'areas', []).find(t => t.key === 'ads');
-        if (ads.slots.length > 0) {
-          this.removeAdFromTemplate(ads);
-          return;
-        }
       }
 
       if (this.state.hasColumnTimetable) {
