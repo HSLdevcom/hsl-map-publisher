@@ -166,22 +166,10 @@ class StopPoster extends Component {
       }
 
       if (this.state.hasColumnTimetable) {
-        const { template, removedAds } = this.state;
-        template.areas.find(t => t.key === 'ads').slots = removedAds;
         this.setState({
           hasColumnTimetable: false,
-          removedAds: [],
-          template,
         });
         return;
-      }
-
-      if (this.state.template) {
-        const ads = get(this.state.template, 'areas', []).find(t => t.key === 'ads');
-        if (ads.slots.length > 0) {
-          this.removeAdFromTemplate(ads);
-          return;
-        }
       }
 
       if (this.state.hasRoutes) {
