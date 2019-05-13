@@ -38,7 +38,6 @@ class StopPoster extends Component {
     this.setMapHeight = this.setMapHeight.bind(this);
 
     this.state = {
-      routeDiagramStopCount: ROUTE_DIAGRAM_MAX_HEIGHT,
       mapHeight: -1,
       template: null,
       hasRoutesOnTop: false,
@@ -50,9 +49,11 @@ class StopPoster extends Component {
       hasColumnTimetable: true,
       removedAds: null,
       adsPhase: false,
-      diagramConfig: {
+      diagramOptions: {
+        diagramStopCount: ROUTE_DIAGRAM_MAX_HEIGHT,
         heightValues: Array.from(Array(ROUTE_DIAGRAM_MAX_HEIGHT - ROUTE_DIAGRAM_MIN_HEIGHT).keys()),
         middleHeightValue: null,
+        binarySearching: false,
       },
     };
   }
@@ -149,7 +150,6 @@ class StopPoster extends Component {
         return;
       }
     }
-
     // Try adding ads one by one. Keep doing this untill removedAds is empty.
     // If we get overflow we remove ad from template.
     if (this.state.adsPhase) {
@@ -159,9 +159,13 @@ class StopPoster extends Component {
         ads.slots.pop();
       } else {
         ads.slots.push(removedAds.pop());
-        if (!removedAds || removedAds.length === 0) {
-          this.setState({ adsPhase: false });
-        }
+      }
+
+      if (!removedAds || removedAds.length === 0) {
+        this.setState({ adsPhase: false });
+      }
+      if (this.hasOverflow() && ads.slots.length === 0) {
+        this.setState({ adsPhase: false });
       }
       template.areas.find(t => t.key === 'ads').slots = ads.slots;
       this.setState({
@@ -171,7 +175,7 @@ class StopPoster extends Component {
       return;
     }
 
-    if (this.hasOverflow()) {
+    if (this.hasOverflow() || this.state.diagramOptions.binarySearching) {
       if (!this.state.hasRoutesOnTop) {
         this.setState({ hasRoutesOnTop: true });
         return;
@@ -183,29 +187,46 @@ class StopPoster extends Component {
       }
 
       if (this.state.hasDiagram) {
-        if (this.state.routeDiagramStopCount >= ROUTE_DIAGRAM_MIN_HEIGHT) {
-          // TODO: This is kind of dirty fix. Binarysearching first acceptable value
-          // from the possible heightValues for diagram.
+        // TODO: This is kind of dirty fix. Binarysearch to get acceptable
+        // height for routetree.
 
-          let { routeDiagramStopCount } = this.state;
-          const { diagramConfig } = this.state;
-          const len = diagramConfig.heightValues.length;
-          diagramConfig.heightValues = diagramConfig.heightValues.slice(Math.floor(len / 2), len);
-          diagramConfig.middleHeightValue =
-            diagramConfig.heightValues[Math.floor(diagramConfig.heightValues.length / 2)];
-          routeDiagramStopCount = ROUTE_DIAGRAM_MAX_HEIGHT - diagramConfig.middleHeightValue;
+        const { diagramOptions } = this.state;
+        diagramOptions.binarySearching = true;
+        diagramOptions.middleHeightValue =
+          diagramOptions.heightValues[Math.floor(diagramOptions.heightValues.length / 2)];
+        const prevCount = diagramOptions.diagramStopCount;
+        diagramOptions.diagramStopCount =
+          ROUTE_DIAGRAM_MAX_HEIGHT - diagramOptions.middleHeightValue;
 
-          if (diagramConfig.heightValues.length === 1 || !routeDiagramStopCount) {
+        if (this.hasOverflow()) {
+          if (diagramOptions.heightValues.length === 1) diagramOptions.heightValues = [];
+          diagramOptions.heightValues = diagramOptions.heightValues.slice(
+            Math.floor(diagramOptions.heightValues.length / 2),
+            diagramOptions.heightValues.length,
+          );
+        } else {
+          diagramOptions.latestFittingCount = prevCount;
+          diagramOptions.heightValues = diagramOptions.heightValues.slice(
+            0,
+            Math.floor(diagramOptions.heightValues.length / 2),
+          );
+        }
+        if (this.hasOverflow() && diagramOptions.latestFittingCount) {
+          diagramOptions.diagramStopCount = diagramOptions.latestFittingCount;
+          diagramOptions.binarySearching = false;
+        }
+
+        if (diagramOptions.heightValues.length < 1) {
+          diagramOptions.binarySearching = false;
+          if (!diagramOptions.latestFittingCount) {
             this.setState({ hasDiagram: false });
           }
-
-          this.setState({
-            routeDiagramStopCount,
-            diagramConfig,
-          });
-        } else {
-          this.setState({ hasDiagram: false });
         }
+
+        this.setState({
+          diagramOptions,
+        });
+
         return;
       }
 
@@ -360,7 +381,7 @@ class StopPoster extends Component {
                       {hasDiagram &&
                         !isTramStop && (
                           <RouteDiagram
-                            height={this.state.routeDiagramStopCount}
+                            height={this.state.diagramOptions.diagramStopCount}
                             stopId={stopId}
                             date={date}
                           />
