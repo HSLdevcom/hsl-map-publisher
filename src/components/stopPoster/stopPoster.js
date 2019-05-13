@@ -25,6 +25,11 @@ import CustomMap from '../map/customMap';
 const ROUTE_DIAGRAM_MAX_HEIGHT = 25;
 const ROUTE_DIAGRAM_MIN_HEIGHT = 10;
 
+const diagramConfig = {
+  heightValues: Array.from(Array(ROUTE_DIAGRAM_MAX_HEIGHT - ROUTE_DIAGRAM_MIN_HEIGHT).keys()),
+  middleHeightValue: null,
+};
+
 const trunkStopStyle = {
   '--background': colorsByMode.TRUNK,
   '--light-background': '#FFE0D1',
@@ -48,7 +53,8 @@ class StopPoster extends Component {
       shouldRenderMap: false,
       triedRenderingMap: false,
       hasColumnTimetable: true,
-      removedAds: [],
+      removedAds: null,
+      adsPhase: false,
     };
   }
 
@@ -111,10 +117,13 @@ class StopPoster extends Component {
     return this.content.scrollHeight > this.content.clientHeight;
   }
 
-  removeAdFromTemplate(ads) {
-    const { template, removedAds } = this.state;
-    removedAds.push(ads.slots.pop());
-    template.areas.find(t => t.key === 'ads').slots = ads.slots;
+  removeAdsFromTemplate(ads) {
+    const { template } = this.state;
+    const removedAds = [];
+    ads.slots.forEach(slot => {
+      if (slot.image) removedAds.push(slot);
+    });
+    template.areas.find(t => t.key === 'ads').slots = [];
     this.setState({
       removedAds,
       template,
@@ -132,6 +141,37 @@ class StopPoster extends Component {
       return;
     }
 
+    // Remove ads from template and try to add them later when there's no overflow.
+    // i.e when this.state.adsPhase = true
+    if (this.state.template && !this.state.removedAds) {
+      const ads = get(this.state.template, 'areas', []).find(t => t.key === 'ads');
+      if (ads.slots.length > 0) {
+        this.removeAdsFromTemplate(ads);
+        return;
+      }
+    }
+
+    // Try adding ads one by one. Keep doing this untill removedAds is empty.
+    // If we get overflow we remove ad from template.
+    if (this.state.adsPhase) {
+      const { template, removedAds } = this.state;
+      const ads = get(template, 'areas', []).find(t => t.key === 'ads');
+      if (this.hasOverflow()) {
+        ads.slots.pop();
+      } else {
+        ads.slots.push(removedAds.pop());
+        if (!removedAds || removedAds.length === 0) {
+          this.setState({ adsPhase: false });
+        }
+      }
+      template.areas.find(t => t.key === 'ads').slots = ads.slots;
+      this.setState({
+        template,
+        removedAds,
+      });
+      return;
+    }
+
     if (this.hasOverflow()) {
       if (!this.state.hasRoutesOnTop) {
         this.setState({ hasRoutesOnTop: true });
@@ -143,21 +183,22 @@ class StopPoster extends Component {
         return;
       }
 
-      if (this.state.template) {
-        const ads = get(this.state.template, 'areas', []).find(t => t.key === 'ads');
-        if (ads.slots.length > 0) {
-          this.removeAdFromTemplate(ads);
-          return;
-        }
-      }
-
       if (this.state.hasDiagram) {
         if (this.state.routeDiagramStopCount >= ROUTE_DIAGRAM_MIN_HEIGHT) {
-          // TODO: This is a dirty fix that bruteforce finds a suitable routeDiagram,
-          // should be made better since it practically breaks posters where we have a map
+          // TODO: This is kind of dirty fix. Binarysearching first acceptable value
+          // from the possible heightValues for diagram.
+          let { routeDiagramStopCount } = this.state;
+          const len = diagramConfig.heightValues.length;
+          diagramConfig.heightValues = diagramConfig.heightValues.slice(Math.floor(len / 2), len);
+          diagramConfig.middleHeightValue = diagramConfig.heightValues[Math.floor(len / 2)];
+          routeDiagramStopCount = ROUTE_DIAGRAM_MAX_HEIGHT - diagramConfig.middleHeightValue;
+
+          if (len === 1) {
+            this.setState({ hasDiagram: false });
+          }
+
           this.setState({
-            // eslint-disable-next-line
-            routeDiagramStopCount: this.state.routeDiagramStopCount - 1,
+            routeDiagramStopCount,
           });
         } else {
           this.setState({ hasDiagram: false });
@@ -178,14 +219,28 @@ class StopPoster extends Component {
       }
 
       if (this.state.shouldRenderMap) {
+        // If map doesnt fit in we try adding routetree again.
+        diagramConfig.heightValues = Array.from(
+          Array(ROUTE_DIAGRAM_MAX_HEIGHT - ROUTE_DIAGRAM_MIN_HEIGHT).keys(),
+        );
+        diagramConfig.middleHeightValue = null;
         this.setState({
           shouldRenderMap: false,
           triedRenderingMap: true,
+          hasDiagram: true,
+          routeDiagramStopCount: ROUTE_DIAGRAM_MAX_HEIGHT,
         });
         return;
       }
 
       this.onError('Failed to remove layout overflow');
+      return;
+    }
+
+    if (this.state.template && this.state.removedAds.length > 0) {
+      this.setState({
+        adsPhase: true,
+      });
       return;
     }
 
