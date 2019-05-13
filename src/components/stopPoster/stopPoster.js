@@ -25,11 +25,6 @@ import CustomMap from '../map/customMap';
 const ROUTE_DIAGRAM_MAX_HEIGHT = 25;
 const ROUTE_DIAGRAM_MIN_HEIGHT = 10;
 
-const diagramConfig = {
-  heightValues: Array.from(Array(ROUTE_DIAGRAM_MAX_HEIGHT - ROUTE_DIAGRAM_MIN_HEIGHT).keys()),
-  middleHeightValue: null,
-};
-
 const trunkStopStyle = {
   '--background': colorsByMode.TRUNK,
   '--light-background': '#FFE0D1',
@@ -55,6 +50,10 @@ class StopPoster extends Component {
       hasColumnTimetable: true,
       removedAds: null,
       adsPhase: false,
+      diagramConfig: {
+        heightValues: Array.from(Array(ROUTE_DIAGRAM_MAX_HEIGHT - ROUTE_DIAGRAM_MIN_HEIGHT).keys()),
+        middleHeightValue: null,
+      },
     };
   }
 
@@ -187,18 +186,22 @@ class StopPoster extends Component {
         if (this.state.routeDiagramStopCount >= ROUTE_DIAGRAM_MIN_HEIGHT) {
           // TODO: This is kind of dirty fix. Binarysearching first acceptable value
           // from the possible heightValues for diagram.
+
           let { routeDiagramStopCount } = this.state;
+          const { diagramConfig } = this.state;
           const len = diagramConfig.heightValues.length;
           diagramConfig.heightValues = diagramConfig.heightValues.slice(Math.floor(len / 2), len);
-          diagramConfig.middleHeightValue = diagramConfig.heightValues[Math.floor(len / 2)];
+          diagramConfig.middleHeightValue =
+            diagramConfig.heightValues[Math.floor(diagramConfig.heightValues.length / 2)];
           routeDiagramStopCount = ROUTE_DIAGRAM_MAX_HEIGHT - diagramConfig.middleHeightValue;
 
-          if (len === 1) {
+          if (diagramConfig.heightValues.length === 1 || !routeDiagramStopCount) {
             this.setState({ hasDiagram: false });
           }
 
           this.setState({
             routeDiagramStopCount,
+            diagramConfig,
           });
         } else {
           this.setState({ hasDiagram: false });
@@ -219,16 +222,9 @@ class StopPoster extends Component {
       }
 
       if (this.state.shouldRenderMap) {
-        // If map doesnt fit in we try adding routetree again.
-        diagramConfig.heightValues = Array.from(
-          Array(ROUTE_DIAGRAM_MAX_HEIGHT - ROUTE_DIAGRAM_MIN_HEIGHT).keys(),
-        );
-        diagramConfig.middleHeightValue = null;
         this.setState({
           shouldRenderMap: false,
           triedRenderingMap: true,
-          hasDiagram: true,
-          routeDiagramStopCount: ROUTE_DIAGRAM_MAX_HEIGHT,
         });
         return;
       }
