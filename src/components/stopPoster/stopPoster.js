@@ -250,7 +250,6 @@ class StopPoster extends Component {
         return;
       }
 
-      this.onError('Failed to remove layout overflow');
       return;
     }
 
@@ -265,6 +264,10 @@ class StopPoster extends Component {
     if (!this.state.shouldRenderMap && !this.state.triedRenderingMap) {
       this.setState({ shouldRenderMap: true });
       return;
+    }
+
+    if (this.hasOverflow()) {
+      this.onError('Failed to remove layout overflow');
     }
 
     window.setTimeout(() => {
