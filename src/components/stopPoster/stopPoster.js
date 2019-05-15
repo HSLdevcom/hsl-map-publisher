@@ -155,18 +155,21 @@ class StopPoster extends Component {
     if (this.state.adsPhase) {
       const { template, removedAds } = this.state;
       const ads = get(template, 'areas', []).find(t => t.key === 'ads');
+
+      if (
+        !removedAds ||
+        removedAds.length === 0 ||
+        (this.hasOverflow() && ads.slots.length === 0)
+      ) {
+        this.setState({ adsPhase: false });
+      }
+
       if (this.hasOverflow()) {
         ads.slots.pop();
       } else {
         ads.slots.push(removedAds.pop());
       }
 
-      if (!removedAds || removedAds.length === 0) {
-        this.setState({ adsPhase: false });
-      }
-      if (this.hasOverflow() && ads.slots.length === 0) {
-        this.setState({ adsPhase: false });
-      }
       template.areas.find(t => t.key === 'ads').slots = ads.slots;
       this.setState({
         template,
@@ -250,6 +253,7 @@ class StopPoster extends Component {
         return;
       }
 
+      this.onError('Failed to remove layout overflow');
       return;
     }
 
@@ -264,10 +268,6 @@ class StopPoster extends Component {
     if (!this.state.shouldRenderMap && !this.state.triedRenderingMap) {
       this.setState({ shouldRenderMap: true });
       return;
-    }
-
-    if (this.hasOverflow()) {
-      this.onError('Failed to remove layout overflow');
     }
 
     window.setTimeout(() => {
