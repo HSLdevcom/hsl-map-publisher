@@ -172,10 +172,13 @@ class StopPoster extends Component {
 
       template.areas.find(t => t.key === 'ads').slots = ads.slots;
 
-      this.setState({
-        template,
-        removedAds,
-      });
+      window.setTimeout(() => {
+        this.setState({
+          template,
+          removedAds,
+        });
+      }, 1000);
+
       return;
     }
 
@@ -193,7 +196,6 @@ class StopPoster extends Component {
       if (this.state.hasDiagram) {
         // TODO: This is kind of dirty fix. Binarysearch to get acceptable
         // height for routetree.
-
         const { diagramOptions } = this.state;
         diagramOptions.binarySearching = true;
         diagramOptions.middleHeightValue =
