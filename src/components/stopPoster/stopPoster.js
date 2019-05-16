@@ -171,6 +171,7 @@ class StopPoster extends Component {
       }
 
       template.areas.find(t => t.key === 'ads').slots = ads.slots;
+
       this.setState({
         template,
         removedAds,
@@ -257,16 +258,18 @@ class StopPoster extends Component {
       return;
     }
 
-    if (this.state.template && this.state.removedAds.length > 0) {
-      this.setState({
-        adsPhase: true,
-      });
-      return;
-    }
-
     // If there is no layout overflow and the map is not rendered, try rendering the map again.
     if (!this.state.shouldRenderMap && !this.state.triedRenderingMap) {
       this.setState({ shouldRenderMap: true });
+      return;
+    }
+
+    if (this.state.template && this.state.removedAds.length > 0) {
+      // We don't want to render map multiple times when doing the ads.
+      this.setState({
+        adsPhase: true,
+        shouldRenderMap: false,
+      });
       return;
     }
 
