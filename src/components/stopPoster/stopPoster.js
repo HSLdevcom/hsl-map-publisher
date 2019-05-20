@@ -30,6 +30,13 @@ const trunkStopStyle = {
   '--light-background': '#FFE0D1',
 };
 
+const defaultDiagramOptions = {
+  diagramStopCount: ROUTE_DIAGRAM_MAX_HEIGHT,
+  heightValues: Array.from(Array(ROUTE_DIAGRAM_MAX_HEIGHT - ROUTE_DIAGRAM_MIN_HEIGHT).keys()),
+  middleHeightValue: null,
+  binarySearching: false,
+};
+
 class StopPoster extends Component {
   constructor(props) {
     super(props);
@@ -49,12 +56,7 @@ class StopPoster extends Component {
       hasColumnTimetable: true,
       removedAds: null,
       adsPhase: false,
-      diagramOptions: {
-        diagramStopCount: ROUTE_DIAGRAM_MAX_HEIGHT,
-        heightValues: Array.from(Array(ROUTE_DIAGRAM_MAX_HEIGHT - ROUTE_DIAGRAM_MIN_HEIGHT).keys()),
-        middleHeightValue: null,
-        binarySearching: false,
-      },
+      diagramOptions: defaultDiagramOptions,
     };
   }
 
@@ -136,7 +138,7 @@ class StopPoster extends Component {
       return;
     }
 
-    if (this.hasOverflow() && this.state.triedRenderingMap) {
+    if (this.hasOverflow() && this.state.triedRenderingMap && !this.state.adsPhase) {
       this.onError('Unsolvable layout overflow.');
       return;
     }
@@ -178,7 +180,6 @@ class StopPoster extends Component {
           removedAds,
         });
       }, 1000);
-
       return;
     }
 
@@ -249,9 +250,12 @@ class StopPoster extends Component {
       }
 
       if (this.state.shouldRenderMap) {
+        //  If map don't fit try fill available space with diagram.
         this.setState({
           shouldRenderMap: false,
           triedRenderingMap: true,
+          hasDiagram: true,
+          diagramOptions: defaultDiagramOptions,
         });
         return;
       }
@@ -261,13 +265,22 @@ class StopPoster extends Component {
     }
 
     if (this.state.template && this.state.removedAds.length > 0) {
-      this.setState({
-        adsPhase: true,
-      });
-      return;
+      const { template } = this.state;
+      const svg = get(template, 'areas', []).find(t => t.key === 'map').slots[0];
+
+      //  If using svg postpone adsPhase untill we have mapHeight.
+      if (!svg.image) {
+        this.setState({ adsPhase: true });
+        return;
+      }
+
+      if (svg.image && this.state.mapHeight > -1) {
+        this.setState({ adsPhase: true });
+        return;
+      }
     }
 
-    // If there is no layout overflow and the map is not rendered, try rendering the map again.
+    //  If there is no layout overflow and the map is not rendered, try rendering the map again.
     if (!this.state.shouldRenderMap && !this.state.triedRenderingMap) {
       this.setState({ shouldRenderMap: true });
       return;
