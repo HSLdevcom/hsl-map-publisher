@@ -138,11 +138,6 @@ class StopPoster extends Component {
       return;
     }
 
-    if (this.hasOverflow() && this.state.triedRenderingMap && !this.state.adsPhase) {
-      this.onError('Unsolvable layout overflow.');
-      return;
-    }
-
     // Remove ads from template and try to add them later when there's no overflow.
     // i.e when this.state.adsPhase = true
     if (this.state.template && !this.state.removedAds) {
@@ -230,10 +225,7 @@ class StopPoster extends Component {
           }
         }
 
-        this.setState({
-          diagramOptions,
-        });
-
+        this.setState({ diagramOptions });
         return;
       }
 
@@ -261,6 +253,11 @@ class StopPoster extends Component {
       }
 
       this.onError('Failed to remove layout overflow');
+      return;
+    }
+
+    if (this.hasOverflow() && this.state.triedRenderingMap) {
+      this.onError('Unsolvable layout overflow.');
       return;
     }
 
