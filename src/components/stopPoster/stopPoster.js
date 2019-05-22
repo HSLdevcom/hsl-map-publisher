@@ -407,7 +407,7 @@ class StopPoster extends Component {
                   )}
                 </Measure>
               </div>
-              <Spacer width="100%" height={62} />
+              <Spacer width="100%" height={50} />
             </div>
             <Footer
               onError={this.onError}
