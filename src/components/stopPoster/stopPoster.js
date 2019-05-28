@@ -22,9 +22,19 @@ import AdContainer from './adContainer';
 import styles from './stopPoster.css';
 import CustomMap from '../map/customMap';
 
+const ROUTE_DIAGRAM_MAX_HEIGHT = 25;
+const ROUTE_DIAGRAM_MIN_HEIGHT = 10;
+
 const trunkStopStyle = {
   '--background': colorsByMode.TRUNK,
   '--light-background': '#FFE0D1',
+};
+
+const defaultDiagramOptions = {
+  diagramStopCount: ROUTE_DIAGRAM_MAX_HEIGHT,
+  heightValues: Array.from(Array(ROUTE_DIAGRAM_MAX_HEIGHT - ROUTE_DIAGRAM_MIN_HEIGHT).keys()),
+  middleHeightValue: null,
+  binarySearching: false,
 };
 
 class StopPoster extends Component {
@@ -43,6 +53,10 @@ class StopPoster extends Component {
       hasStretchedLeftColumn: false,
       shouldRenderMap: false,
       triedRenderingMap: false,
+      hasColumnTimetable: true,
+      removedAds: null,
+      adsPhase: false,
+      diagramOptions: defaultDiagramOptions,
     };
   }
 
@@ -98,13 +112,24 @@ class StopPoster extends Component {
     if (!this.content) {
       return false;
     }
-
     // Horizontal overflow is not automatically resolvable.
-    if (this.content.scrollWidth - this.content.clientWidth > 1) {
+    if (this.content.scrollWidth > this.content.clientWidth) {
       this.onError('Unresolvable horizontal overflow detected.');
     }
+    return this.content.scrollHeight > this.content.clientHeight;
+  }
 
-    return this.content.scrollHeight - this.content.clientHeight > 1;
+  removeAdsFromTemplate(ads) {
+    const { template } = this.state;
+    const removedAds = [];
+    ads.slots.forEach(slot => {
+      if (slot.image) removedAds.push(slot);
+    });
+    template.areas.find(t => t.key === 'ads').slots = [];
+    this.setState({
+      removedAds,
+      template,
+    });
   }
 
   updateLayout() {
@@ -113,12 +138,47 @@ class StopPoster extends Component {
       return;
     }
 
-    if (this.hasOverflow() && this.state.triedRenderingMap) {
-      this.onError('Unsolvable layout overflow.');
+    // Remove ads from template and try to add them later when there's no overflow.
+    // i.e when this.state.adsPhase = true
+    if (this.state.template && !this.state.removedAds) {
+      const ads = get(this.state.template, 'areas', []).find(t => t.key === 'ads');
+      if (ads.slots.length > 0) {
+        this.removeAdsFromTemplate(ads);
+        return;
+      }
+    }
+    // Try adding ads one by one. Keep doing this untill removedAds is empty.
+    // If we get overflow we remove ad from template.
+    if (this.state.adsPhase) {
+      const { template, removedAds } = this.state;
+      const ads = get(template, 'areas', []).find(t => t.key === 'ads');
+
+      if (
+        !removedAds ||
+        removedAds.length === 0 ||
+        (this.hasOverflow() && ads.slots.length === 0)
+      ) {
+        this.setState({ adsPhase: false });
+      }
+
+      if (this.hasOverflow()) {
+        ads.slots.pop();
+      } else {
+        ads.slots.push(removedAds.pop());
+      }
+
+      template.areas.find(t => t.key === 'ads').slots = ads.slots;
+
+      window.setTimeout(() => {
+        this.setState({
+          template,
+          removedAds,
+        });
+      }, 1000);
       return;
     }
 
-    if (this.hasOverflow()) {
+    if (this.hasOverflow() || this.state.diagramOptions.binarySearching) {
       if (!this.state.hasRoutesOnTop) {
         this.setState({ hasRoutesOnTop: true });
         return;
@@ -130,7 +190,49 @@ class StopPoster extends Component {
       }
 
       if (this.state.hasDiagram) {
-        this.setState({ hasDiagram: false });
+        // TODO: This is kind of dirty fix. Binarysearch to get acceptable
+        // height for routetree.
+        const { diagramOptions } = this.state;
+        diagramOptions.binarySearching = true;
+        diagramOptions.middleHeightValue =
+          diagramOptions.heightValues[Math.floor(diagramOptions.heightValues.length / 2)];
+        const prevCount = diagramOptions.diagramStopCount;
+        diagramOptions.diagramStopCount =
+          ROUTE_DIAGRAM_MAX_HEIGHT - diagramOptions.middleHeightValue;
+
+        if (this.hasOverflow()) {
+          if (diagramOptions.heightValues.length === 1) diagramOptions.heightValues = [];
+          diagramOptions.heightValues = diagramOptions.heightValues.slice(
+            Math.floor(diagramOptions.heightValues.length / 2),
+            diagramOptions.heightValues.length,
+          );
+        } else {
+          diagramOptions.latestFittingCount = prevCount;
+          diagramOptions.heightValues = diagramOptions.heightValues.slice(
+            0,
+            Math.floor(diagramOptions.heightValues.length / 2),
+          );
+        }
+        if (this.hasOverflow() && diagramOptions.latestFittingCount) {
+          diagramOptions.diagramStopCount = diagramOptions.latestFittingCount;
+          diagramOptions.binarySearching = false;
+        }
+
+        if (diagramOptions.heightValues.length < 1) {
+          diagramOptions.binarySearching = false;
+          if (!diagramOptions.latestFittingCount) {
+            this.setState({ hasDiagram: false });
+          }
+        }
+
+        this.setState({ diagramOptions });
+        return;
+      }
+
+      if (this.state.hasColumnTimetable) {
+        this.setState({
+          hasColumnTimetable: false,
+        });
         return;
       }
 
@@ -140,9 +242,12 @@ class StopPoster extends Component {
       }
 
       if (this.state.shouldRenderMap) {
+        //  If map don't fit try fill available space with diagram.
         this.setState({
           shouldRenderMap: false,
           triedRenderingMap: true,
+          hasDiagram: true,
+          diagramOptions: defaultDiagramOptions,
         });
         return;
       }
@@ -151,7 +256,28 @@ class StopPoster extends Component {
       return;
     }
 
-    // If there is no layout overflow and the map is not rendered, try rendering the map again.
+    if (this.hasOverflow() && this.state.triedRenderingMap) {
+      this.onError('Unsolvable layout overflow.');
+      return;
+    }
+
+    if (this.state.template && this.state.removedAds.length > 0) {
+      const { template } = this.state;
+      const svg = get(template, 'areas', []).find(t => t.key === 'map').slots[0];
+
+      //  If using svg postpone adsPhase untill we have mapHeight.
+      if (!svg.image) {
+        this.setState({ adsPhase: true });
+        return;
+      }
+
+      if (svg.image && this.state.mapHeight > -1) {
+        this.setState({ adsPhase: true });
+        return;
+      }
+    }
+
+    //  If there is no layout overflow and the map is not rendered, try rendering the map again.
     if (!this.state.shouldRenderMap && !this.state.triedRenderingMap) {
       this.setState({ shouldRenderMap: true });
       return;
@@ -187,6 +313,7 @@ class StopPoster extends Component {
       hasStretchedLeftColumn,
       hasRoutes,
       shouldRenderMap,
+      hasColumnTimetable,
     } = this.state;
 
     const StopPosterTimetable = props => (
@@ -222,8 +349,8 @@ class StopPoster extends Component {
                 <div className={hasStretchedLeftColumn ? styles.leftStretched : styles.left}>
                   {hasRoutes && !hasRoutesOnTop && <Routes stopId={stopId} date={date} />}
                   {hasRoutes && !hasRoutesOnTop && <Spacer height={10} />}
-                  {hasDiagram && <StopPosterTimetable />}
-                  {!hasDiagram && <StopPosterTimetable segments={['weekdays']} />}
+                  {hasColumnTimetable && <StopPosterTimetable />}
+                  {!hasColumnTimetable && <StopPosterTimetable segments={['weekdays']} />}
                   {/* The key will make sure the ad container updates its size if the layout changes */}
                   <AdContainer
                     key={`poster_ads_${hasRoutes}${hasRoutesOnTop}${hasStretchedLeftColumn}${hasDiagram}`}
@@ -242,7 +369,7 @@ class StopPoster extends Component {
                     },
                   }) => (
                     <div className={styles.right} ref={measureRef}>
-                      {!hasDiagram && (
+                      {!hasColumnTimetable && (
                         <div className={styles.timetables}>
                           <StopPosterTimetable segments={['saturdays']} hideDetails />
                           <Spacer width={10} />
@@ -267,11 +394,10 @@ class StopPoster extends Component {
                       )}
 
                       <Spacer height={10} />
-
                       {hasDiagram &&
                         !isTramStop && (
                           <RouteDiagram
-                            height={mapHeight > -1 ? rightColumnHeight - mapHeight : 'auto'}
+                            height={this.state.diagramOptions.diagramStopCount}
                             stopId={stopId}
                             date={date}
                           />
@@ -281,7 +407,7 @@ class StopPoster extends Component {
                   )}
                 </Measure>
               </div>
-              <Spacer width="100%" height={62} />
+              <Spacer width="100%" height={50} />
             </div>
             <Footer
               onError={this.onError}
