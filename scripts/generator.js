@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const puppeteer = require('puppeteer');
 const qs = require('qs');
@@ -17,7 +17,9 @@ const SCALE = 96 / 72;
 let browser = null;
 let previous = Promise.resolve();
 
-const pdfPath = id => path.join(__dirname, '..', 'output', `${id}.pdf`);
+const pdfOutputDir = path.join(__dirname, '..', 'output');
+const concatOutputDir = path.join(pdfOutputDir, 'concatenated');
+const pdfPath = id => path.join(pdfOutputDir, `${id}.pdf`);
 
 async function initialize() {
   browser = await puppeteer.launch({
@@ -142,22 +144,37 @@ function generate(options) {
 
 /**
  * Concatenates posters to a multi-page PDF
- * @param {string[]} options.ids - Ids to concatate
+ * @param {string[]} ids - Ids to concatate
  * @returns {Readable} - PDF stream
  * @param ids
- * @param onError
+ * @param title
  */
-function concatenate(ids, onError) {
+async function concatenate(ids, title) {
   const filenames = ids.map(id => pdfPath(id));
-  const pdftk = spawn('pdftk', [...filenames, 'cat', 'output', '-']);
+  await fs.ensureDir(concatOutputDir);
 
-  pdftk.stderr.on('data', data => {
-    const message = data.toString();
-    onError(message);
-    pdftk.stdout.emit('error', new Error(message));
-  });
+  const filepath = path.join(concatOutputDir, `${title}.pdf`);
+  const fileExists = await fs.pathExists(filepath);
 
-  return pdftk.stdout;
+  if (!fileExists) {
+    return new Promise((resolve, reject) => {
+      const pdftk = spawn('pdftk', [...filenames, 'cat', 'output', filepath]);
+
+      pdftk.on('error', err => {
+        reject(err);
+      });
+
+      pdftk.on('close', code => {
+        if (code === 0) {
+          resolve(filepath);
+        } else {
+          reject(new Error(`PDFTK closed with code ${code}`));
+        }
+      });
+    });
+  }
+
+  return filepath;
 }
 
 module.exports = {

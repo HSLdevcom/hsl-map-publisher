@@ -2,6 +2,7 @@ const Koa = require('koa');
 const Router = require('koa-router');
 const cors = require('@koa/cors');
 const jsonBody = require('koa-json-body');
+const fs = require('fs-extra');
 
 const generator = require('./generator');
 const {
@@ -184,18 +185,34 @@ async function main() {
   router.get('/downloadBuild/:id', async ctx => {
     const { id } = ctx.params;
     const { title, posters } = await getBuild({ id });
+    let filename;
     const posterIds = posters.filter(poster => poster.status === 'READY').map(poster => poster.id);
+
+    try {
+      filename = await generator.concatenate(posterIds, title);
+    } catch (err) {
+      ctx.throw(500, err.message || 'PDF concatenation failed.');
+    }
+
     ctx.type = 'application/pdf';
     ctx.set('Content-Disposition', `attachment; filename="${title}-${id}.pdf"`);
-    ctx.body = generator.concatenate(posterIds, err => ctx.throw(500, err));
+    ctx.body = fs.createReadStream(filename);
   });
 
   router.get('/downloadPoster/:id', async ctx => {
     const { id } = ctx.params;
+    let filename;
     const { component } = await getPoster({ id });
+
+    try {
+      filename = await generator.concatenate([id], `${component}-${id}`);
+    } catch (err) {
+      ctx.throw(500, err.message || 'PDF concatenation failed.');
+    }
+
     ctx.type = 'application/pdf';
     ctx.set('Content-Disposition', `attachment; filename="${component}-${id}.pdf"`);
-    ctx.body = generator.concatenate([id], err => ctx.throw(500, err));
+    ctx.body = fs.createReadStream(filename);
   });
 
   app

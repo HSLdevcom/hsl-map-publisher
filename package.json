@@ -92,6 +92,7 @@
     "classnames": "^2.2.5",
     "clean-webpack-plugin": "^0.1.19",
     "csv": "^2.0.0",
+    "fs-extra": "^8.1.0",
     "graphql": "^0.11.7",
     "graphql-tag": "^2.5.0",
     "hsl-map-style": "HSLdevcom/hsl-map-style#8ae7c4fbb76d518360bf67dee36b7b60c0e7acea",
