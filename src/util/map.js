@@ -11,7 +11,7 @@ export async function fetchMap(mapOptions, mapStyle) {
   const serverUrl =
     typeof window.getServerUrl === 'function'
       ? await window.getServerUrl()
-      : 'https://dev-kartat.hsldev.com';
+      : 'http://localhost:8000';
 
   window.serverLog(`Generating the map with ${serverUrl}`);
 

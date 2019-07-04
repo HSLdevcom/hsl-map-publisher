@@ -187,7 +187,7 @@ async function main() {
     const posterIds = posters.filter(poster => poster.status === 'READY').map(poster => poster.id);
     ctx.type = 'application/pdf';
     ctx.set('Content-Disposition', `attachment; filename="${title}-${id}.pdf"`);
-    ctx.body = generator.concatenate(posterIds);
+    ctx.body = generator.concatenate(posterIds, err => ctx.throw(500, err));
   });
 
   router.get('/downloadPoster/:id', async ctx => {
@@ -195,7 +195,7 @@ async function main() {
     const { component } = await getPoster({ id });
     ctx.type = 'application/pdf';
     ctx.set('Content-Disposition', `attachment; filename="${component}-${id}.pdf"`);
-    ctx.body = generator.concatenate([id]);
+    ctx.body = generator.concatenate([id], err => ctx.throw(500, err));
   });
 
   app

@@ -142,16 +142,21 @@ function generate(options) {
 
 /**
  * Concatenates posters to a multi-page PDF
- * @param {Object} options
  * @param {string[]} options.ids - Ids to concatate
  * @returns {Readable} - PDF stream
+ * @param ids
+ * @param onError
  */
-function concatenate(ids) {
+function concatenate(ids, onError) {
   const filenames = ids.map(id => pdfPath(id));
   const pdftk = spawn('pdftk', [...filenames, 'cat', 'output', '-']);
+
   pdftk.stderr.on('data', data => {
-    pdftk.stdout.emit('error', new Error(data.toString()));
+    const message = data.toString();
+    onError(message);
+    pdftk.stdout.emit('error', new Error(message));
   });
+
   return pdftk.stdout;
 }
 
