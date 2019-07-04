@@ -194,6 +194,8 @@ async function main() {
       ctx.throw(500, err.message || 'PDF concatenation failed.');
     }
 
+    console.log('PDF concatenation succeeded.');
+
     ctx.type = 'application/pdf';
     ctx.set('Content-Disposition', `attachment; filename="${title}-${id}.pdf"`);
     ctx.body = fs.createReadStream(filename);
@@ -209,6 +211,8 @@ async function main() {
     } catch (err) {
       ctx.throw(500, err.message || 'PDF concatenation failed.');
     }
+
+    console.log('PDF concatenation succeeded.');
 
     ctx.type = 'application/pdf';
     ctx.set('Content-Disposition', `attachment; filename="${component}-${id}.pdf"`);
