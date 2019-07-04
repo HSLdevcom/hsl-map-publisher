@@ -152,8 +152,8 @@ function generate(options) {
 async function concatenate(ids, title) {
   const filenames = ids.map(id => pdfPath(id));
   await fs.ensureDir(concatOutputDir);
-
-  const filepath = path.join(concatOutputDir, `${title}.pdf`);
+  const parsedTitle = title.replace('/', '');
+  const filepath = path.join(concatOutputDir, `${parsedTitle}.pdf`);
   const fileExists = await fs.pathExists(filepath);
 
   if (!fileExists) {
