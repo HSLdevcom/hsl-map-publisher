@@ -95,7 +95,7 @@
     "fs-extra": "^8.1.0",
     "graphql": "^0.11.7",
     "graphql-tag": "^2.5.0",
-    "hsl-map-style": "HSLdevcom/hsl-map-style#8ae7c4fbb76d518360bf67dee36b7b60c0e7acea",
+    "hsl-map-style": "HSLdevcom/hsl-map-style#cbfb2ea3180fb9c36db65f1a827d8b07163005ed",
     "html-webpack-plugin": "^4.0.0-alpha",
     "iconv-lite": "^0.4.19",
     "knex": "^0.14.6",
