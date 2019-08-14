@@ -6,6 +6,7 @@ const { promisify } = require('util');
 const { spawn } = require('child_process');
 const log = require('./util/log');
 const get = require('lodash/get');
+const { uploadToBlob } = require('./cloudService');
 
 const writeFileAsync = promisify(fs.writeFile);
 
@@ -13,7 +14,6 @@ const CLIENT_URL = 'http://localhost:5000';
 const RENDER_TIMEOUT = 10 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
 const SCALE = 96 / 72;
-
 let browser = null;
 let previous = Promise.resolve();
 
@@ -98,6 +98,7 @@ async function renderComponent(options) {
   const contents = await page.pdf(printOptions);
 
   await writeFileAsync(pdfPath(id), contents);
+  await uploadToBlob(pdfPath(id));
   await page.close();
 }
 
