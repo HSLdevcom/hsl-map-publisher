@@ -41,7 +41,7 @@ async function renderComponent(options) {
 
   await page.exposeFunction('serverLog', log);
   await page.exposeFunction('getServerUrl', () =>
-    get(process, 'env.API_URL', 'https://kartat.hsl.fi'),
+    get(process, 'env.GENERATE_API_URL', 'https://kartat.hsl.fi'),
   );
 
   page.on('error', error => {

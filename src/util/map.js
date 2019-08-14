@@ -9,6 +9,8 @@ const scale = 5;
 export async function fetchMap(mapOptions, mapStyle) {
   // Server url provided by Puppeteer
   const serverUrl =
+    // Fallback to local instance, since getServerUrl is undefined if running
+    // without the Puppeteer server. Locally, run the generator-server on port 8000.
     typeof window.getServerUrl === 'function'
       ? await window.getServerUrl()
       : 'http://localhost:8000';
