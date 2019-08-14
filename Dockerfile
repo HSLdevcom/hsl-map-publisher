@@ -21,7 +21,6 @@ RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
     && chown -R pptruser:pptruser /home/pptruser
 
 ENV WORK /opt/publisher
-ENV API_URL https://kartat.hsl.fi
 
 RUN mkdir -p ${WORK}
 WORKDIR ${WORK}
@@ -32,9 +31,11 @@ COPY package.json ${WORK}
 RUN yarn
 
 COPY . ${WORK}
-RUN yarn run build
 
-EXPOSE 4000
+ARG BUILD_ENV=production
+COPY .env.${BUILD_ENV} ${WORK}/.env
+
+RUN yarn run build
 
 CMD \
   mkdir -p ~/.local/share/fonts/opentype && \

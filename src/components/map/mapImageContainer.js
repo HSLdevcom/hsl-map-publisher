@@ -10,7 +10,7 @@ import MapImage from './mapImage';
 const propsMapper = mapProps(({ options, components, date, extraLayers }) => {
   const mapStyle = hslMapStyle.generateStyle({
     components,
-    glyphsUrl: 'https://kartat.hsl.fi/',
+    glyphsUrl: process.env.GLYPHS_URL || 'https://kartat.hsl.fi/',
   });
 
   // Set date for which to show stops and routes
