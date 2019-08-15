@@ -19,9 +19,12 @@ let previous = Promise.resolve();
 
 const pdfOutputDir = path.join(__dirname, '..', 'output');
 const concatOutputDir = path.join(pdfOutputDir, 'concatenated');
+
 const pdfPath = id => path.join(pdfOutputDir, `${id}.pdf`);
 
 async function initialize() {
+  await fs.ensureDir(concatOutputDir);
+
   browser = await puppeteer.launch({
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security'],
   });
