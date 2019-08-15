@@ -7,8 +7,6 @@ const { spawn } = require('child_process');
 const log = require('./util/log');
 const get = require('lodash/get');
 
-const writeFileAsync = promisify(fs.writeFile);
-
 const CLIENT_URL = 'http://localhost:5000';
 const RENDER_TIMEOUT = 10 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
@@ -16,15 +14,17 @@ const SCALE = 96 / 72;
 
 let browser = null;
 let previous = Promise.resolve();
+const cwd = process.cwd();
 
-const pdfOutputDir = path.join(__dirname, '..', 'output');
+const pdfOutputDir = path.join(cwd, 'output');
 const concatOutputDir = path.join(pdfOutputDir, 'concatenated');
+
+fs.ensureDirSync(pdfOutputDir);
+fs.ensureDirSync(concatOutputDir);
 
 const pdfPath = id => path.join(pdfOutputDir, `${id}.pdf`);
 
 async function initialize() {
-  await fs.ensureDir(concatOutputDir);
-
   browser = await puppeteer.launch({
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security'],
   });
@@ -100,7 +100,7 @@ async function renderComponent(options) {
 
   const contents = await page.pdf(printOptions);
 
-  await writeFileAsync(pdfPath(id), contents);
+  await fs.writeFile(pdfPath(id), contents);
   await page.close();
 }
 
@@ -154,7 +154,6 @@ function generate(options) {
  */
 async function concatenate(ids, title) {
   const filenames = ids.map(id => pdfPath(id));
-  await fs.ensureDir(concatOutputDir);
   const parsedTitle = title.replace('/', '');
   const filepath = path.join(concatOutputDir, `${parsedTitle}.pdf`);
   const fileExists = await fs.pathExists(filepath);
