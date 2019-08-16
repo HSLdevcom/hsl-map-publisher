@@ -1,24 +1,21 @@
 FROM node:10
 
-RUN apt-get update && apt-get install -yq pdftk --no-install-recommends
-
-# See https://crbug.com/795759
-RUN apt-get update && apt-get install -yq libgconf-2-4 --no-install-recommends
-
 # This installs the necessary libs to make the bundled version of Chromium that Pupppeteer installs work
 RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -yq wget --no-install-recommends \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -yq wget curl pdftk libgconf-2-4 --no-install-recommends \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -yq $(apt-cache depends google-chrome-unstable | awk '/Depends:/{print$2}') --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
-    && apt-get purge --auto-remove -y curl \
     && rm -rf /src/*.deb
 
 RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
     && mkdir -p /home/pptruser/Downloads \
     && chown -R pptruser:pptruser /home/pptruser
+
+# Install Azure CLI to download the fonts
+RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 
 ENV WORK /opt/publisher
 
@@ -38,8 +35,7 @@ COPY .env.${BUILD_ENV} ${WORK}/.env
 RUN yarn run build
 
 CMD \
-  mkdir -p ~/.local/share/fonts/opentype && \
-  cp /fonts/* ~/.local/share/fonts/opentype && \
+  ./fonts.sh && \
   fc-cache -f -v && \
   ln -s /output . && \
   yarn run start:production && \
