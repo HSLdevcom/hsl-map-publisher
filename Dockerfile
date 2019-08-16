@@ -37,7 +37,6 @@ RUN yarn run build
 CMD \
   ./fonts.sh && \
   fc-cache -f -v && \
-  ln -s /output . && \
   yarn run start:production && \
   yarn run server:production && \
   sleep 3 && \
