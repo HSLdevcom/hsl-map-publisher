@@ -19,7 +19,6 @@ const cwd = process.cwd();
 const pdfOutputDir = path.join(cwd, 'output');
 const concatOutputDir = path.join(pdfOutputDir, 'concatenated');
 
-fs.ensureDirSync(pdfOutputDir);
 fs.ensureDirSync(concatOutputDir);
 
 const pdfPath = id => path.join(pdfOutputDir, `${id}.pdf`);
@@ -97,7 +96,7 @@ async function renderComponent(options) {
 
   const contents = await page.pdf(printOptions);
 
-  await fs.writeFile(pdfPath(id), contents);
+  await fs.outputFile(pdfPath(id), contents);
   await page.close();
 }
 
