@@ -1,0 +1,30 @@
+.root {
+  background: white;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  position: relative;
+}
+
+.componentName {
+  padding: 42px;
+  font-size: 30px;
+  color: var(--hsl-blue);
+  position: absolute;
+}
+
+.componentName > .title {
+  font-family: GothamRounded-Medium;
+}
+
+.componentName > .subtitle {
+  font-family: GothamRounded-Book;
+}
+
+.diagram {
+  display: block;
+}
+
+.diagram svg {
+  display: block;
+  margin: 0 0 0 0px;
+}

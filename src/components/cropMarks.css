@@ -1,0 +1,30 @@
+.root {
+  position: relative;
+  background: white;
+  border: 40px solid white;
+  z-index: 1;
+}
+
+.root:before {
+  position: absolute;
+  content: '';
+  top: 0;
+  bottom: 0;
+  left: -40px;
+  right: -40px;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  z-index: -1000;
+}
+
+.root:after {
+  position: absolute;
+  content: '';
+  top: -40px;
+  bottom: -40px;
+  left: 0;
+  right: 0;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  z-index: -1000;
+}

@@ -1,0 +1,40 @@
+.row {
+  display: flex;
+  align-items: center;
+  page-break-inside: avoid;
+}
+
+.justifiedRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wrappingRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  max-width: 100%;
+}
+
+.column {
+  display: flex;
+  flex-flow: column wrap;
+  align-items: flex-start;
+  max-height: 100%;
+}
+
+.centeringColumn {
+  display: flex;
+  flex-flow: column wrap;
+  align-items: center;
+  max-height: 100%;
+}
+
+.justifiedColumn {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  justify-content: space-between;
+  height: 100%;
+}

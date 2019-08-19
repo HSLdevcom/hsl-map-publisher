@@ -1,0 +1,36 @@
+.label {
+  padding: 10px 7px 7px 10px;
+  margin: 5px;
+  white-space: nowrap;
+  color: black;
+  background: hsla(0, 0%, 100%, 0.8);
+}
+
+.title {
+  font-size: 16px;
+  font-family: GothamRounded-Medium;
+  line-height: 16px;
+}
+
+.subtitle {
+  font-size: 16px;
+  font-family: GothamRounded-Book;
+}
+
+.content {
+  font-size: 15px;
+  line-height: 16px;
+  padding: 5px 0 0;
+}
+
+.route {
+  font-family: GothamXNarrow-Medium;
+}
+
+.destination {
+  font-family: GothamRounded-Medium;
+}
+
+.destinationLight {
+  font-family: GothamRounded-Book;
+}

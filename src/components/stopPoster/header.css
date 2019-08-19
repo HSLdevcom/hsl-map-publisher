@@ -1,0 +1,62 @@
+.title {
+  font-size: 80px;
+  font-family: GothamRounded-Medium;
+  white-space: nowrap;
+}
+
+.subtitle {
+  composes: title;
+  font-family: GothamRounded-Book;
+}
+
+.small {
+  font-size: 24px;
+}
+
+.item {
+  max-height: 160px;
+  margin: 0 15px;
+}
+
+.stop {
+  composes: title;
+  margin-top: 10px;
+  padding: 0 20px;
+  font-size: 55px;
+  text-align: center;
+  border: 5px solid white;
+  border-radius: 10px;
+}
+
+.stopZoneColumn {
+  display: flex;
+  flex-direction: row;
+}
+
+.zoneHeading {
+  margin-right: 50px;
+}
+
+.zone {
+  position: relative;
+  box-sizing: border-box;
+  flex: none;
+  margin-top: 8px;
+  width: 170px;
+  height: 170px;
+  color: var(--background);
+  background: white;
+  border-radius: 50%;
+}
+
+/* TODO: Fix each letter. Current is best for C. */
+
+.zoneLetter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  line-height: 1;
+  font-family: GothamRounded-Medium;
+  text-transform: uppercase;
+}

@@ -1,0 +1,71 @@
+.root {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+.left {
+  width: var(--left-width);
+}
+
+.right {
+  display: flex;
+  padding-left: 10px;
+  width: var(--right-width);
+  box-sizing: border-box;
+}
+
+.title {
+  font-family: GothamRounded-Medium;
+  font-size: 11px;
+}
+
+.subtitle {
+  font-family: GothamRounded-Book;
+  font-size: 11px;
+}
+
+.iconContainer {
+  display: flex;
+  align-items: center;
+  margin-left: 6px;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  margin-left: 2px;
+}
+
+.separator {
+  display: flex;
+  flex-flow: column;
+  align-items: flex-start;
+}
+
+.separatorTop {
+  height: 12px;
+  border-left: var(--line-border);
+}
+
+.separatorBottom {
+  height: 12px;
+  border-left: var(--line-border);
+}
+
+.separatorStop {
+  width: calc(4 * var(--line-width));
+  height: calc(4 * var(--line-width));
+  border: var(--line-border);
+  border-radius: calc(4 * var(--line-width));
+  margin-top: calc(var(--line-width) / -2);
+  margin-bottom: calc(var(--line-width) / -2);
+  margin-left: calc(-2.5 * var(--line-width));
+}
+
+.separatorLastStop {
+  composes: separatorStop;
+  background: var(--line-color);
+  border-radius: 0;
+}

@@ -1,0 +1,56 @@
+.root {
+  display: flex;
+  flex-flow: column nowrap;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  padding: 42px;
+  background: white;
+  border-radius: var(--border-radius);
+
+  --left-width: 10px;
+  --right-width: 200px;
+
+  --line-color: var(--hsl-blue);
+  --line-width: 2px;
+  --line-radius: 10px;
+  --line-border: var(--line-width) solid var(--line-color);
+}
+
+.componentName {
+  padding: 0px 0px 20px;
+  font-size: 30px;
+  color: var(--hsl-blue);
+}
+
+.componentName > .title {
+  font-family: GothamRounded-Medium;
+}
+
+.componentName > .subtitle {
+  font-family: GothamRounded-Book;
+}
+
+.start {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: black;
+  margin-left: var(--left-width);
+  margin-bottom: calc(var(--line-width) * 2);
+}
+
+.start .icon {
+  width: 30px;
+  margin-left: -14px;
+  margin-right: 5px;
+}
+
+.start .title {
+  font-family: GothamRounded-Medium;
+  font-size: 18px;
+  line-height: 22px;
+}
+
+.start .subtitle {
+  font-family: GothamRounded-Book;
+}

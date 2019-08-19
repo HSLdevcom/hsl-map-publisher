@@ -1,0 +1,40 @@
+.root {
+  position: relative;
+  color: var(--line-color);
+}
+
+.header {
+  width: var(--left-width);
+  border-right: var(--line-border);
+  height: var(--line-radius);
+  margin-top: calc(0px - var(--line-width));
+}
+
+.root ~ .root > .header {
+  width: var(--left-width);
+  border-top: var(--line-border);
+  border-top-right-radius: var(--line-radius);
+}
+
+.footer {
+  position: relative;
+  height: 14px;
+  margin-left: var(--left-width);
+  margin-right: calc(var(--right-width) + var(--line-radius) + 2 * var(--line-width));
+  border-bottom: var(--line-border);
+  border-left: var(--line-border);
+  border-bottom-left-radius: var(--line-radius);
+}
+
+.footer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: calc(0px - var(--line-width));
+  left: calc(0px - var(--line-width));
+  border-left: var(--line-border);
+}
+
+.children {
+  display: flex;
+}
