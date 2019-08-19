@@ -6,7 +6,7 @@ const { promisify } = require('util');
 const { spawn } = require('child_process');
 const log = require('./util/log');
 const get = require('lodash/get');
-const { uploadToBlob } = require('./cloudService');
+const { uploadPosterToCloud } = require('./cloudService');
 
 const writeFileAsync = promisify(fs.writeFile);
 
@@ -98,7 +98,7 @@ async function renderComponent(options) {
   const contents = await page.pdf(printOptions);
 
   await writeFileAsync(pdfPath(id), contents);
-  await uploadToBlob(pdfPath(id));
+  await uploadPosterToCloud(pdfPath(id));
   await page.close();
 }
 

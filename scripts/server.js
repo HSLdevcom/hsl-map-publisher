@@ -26,6 +26,8 @@ const {
   getTemplate,
 } = require('./store');
 
+const { downloadPosterFromCloud, downloadBuildFromCloud } = require('./cloudService');
+
 const PORT = 4000;
 
 async function generatePoster(buildId, component, template, props) {
@@ -199,6 +201,36 @@ async function main() {
     ctx.type = 'application/pdf';
     ctx.set('Content-Disposition', `attachment; filename="${title}-${id}.pdf"`);
     ctx.body = fs.createReadStream(filename);
+  });
+
+  router.get('/downloadPosterFromCloud/:id', async ctx => {
+    const { id } = ctx.params;
+    const poster = await downloadPosterFromCloud(id);
+
+    ctx.type = 'application/pdf';
+    ctx.set('Content-Disposition', `attachment; filename="${id}.pdf"`);
+    ctx.body = poster;
+  });
+
+  router.get('/downloadBuildFromCloud/:id', async ctx => {
+    const { id } = ctx.params;
+    const { title, posters } = await getBuild({ id });
+    let filename;
+    const posterIds = posters.filter(poster => poster.status === 'READY').map(poster => poster.id);
+
+    console.log(posterIds);
+
+    // try {
+    //   filename = await generator.concatenate(posterIds, title);
+    // } catch (err) {
+    //   ctx.throw(500, err.message || 'PDF concatenation failed.');
+    // }
+
+    const poster = await downloadBuildFromCloud(id);
+
+    ctx.type = 'application/pdf';
+    ctx.set('Content-Disposition', `attachment; filename="${id}.pdf"`);
+    ctx.body = 'poster';
   });
 
   router.get('/downloadPoster/:id', async ctx => {
