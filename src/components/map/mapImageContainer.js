@@ -6,20 +6,20 @@ import hslMapStyle from 'hsl-map-style';
 import { fetchMap } from 'util/map';
 import promiseWrapper from 'util/promiseWrapper';
 import MapImage from './mapImage';
+import { mapValues } from 'lodash';
 
 const propsMapper = mapProps(({ options, components, date, extraLayers }) => {
   const mapStyle = hslMapStyle.generateStyle({
     components,
-    glyphsUrl: process.env.GLYPHS_URL || 'https://kartat.hsl.fi/',
   });
 
-  // Set date for which to show stops and routes
-  if (components.routes && components.routes.enabled && date) {
-    mapStyle.sources.routes.url += `?date=${date}`;
-  }
-  if (components.stops && components.stops.enabled && date) {
-    mapStyle.sources.stops.url += `?date=${date}`;
-  }
+  const sources = mapValues(mapStyle.sources, (value, key) => {
+    // eslint-disable-next-line no-param-reassign
+    value.url += `?date=${date}`;
+    return value;
+  });
+
+  mapStyle.sources = sources;
 
   // Remove source containing bus routes (rail and subway routes have separate sources)
   if (components.routes && components.routes.enabled && components.routes.hideBusRoutes) {
