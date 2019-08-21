@@ -11,7 +11,7 @@
     "serve": "serve dist",
     "start": "webpack-serve ./webpack.dev.js",
     "start:production": "forever start -c \"serve\" dist",
-    "server": "node scripts/server",
+    "server": "node -r dotenv/config scripts/server",
     "server:production": "forever start -c \"node --max_old_space_size=4096\" scripts/server.js",
     "server:hot": "API_URL=https://dev-kartat.hsldev.com forever -w -t --killSignal=SIGTERM --watchDirectory scripts scripts/server.js",
     "knex": "PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres knex",
@@ -80,7 +80,7 @@
     "worker-loader": "^2.0.0"
   },
   "dependencies": {
-    "@azure/storage-blob": "12.0.0-preview.2",
+    "@azure/storage-blob": "^10.4.0",
     "@koa/cors": "^2.2.1",
     "apollo-cache-inmemory": "^1.1.1",
     "apollo-client": "^2.0.3",
@@ -93,6 +93,7 @@
     "classnames": "^2.2.5",
     "clean-webpack-plugin": "^0.1.19",
     "csv": "^2.0.0",
+    "dotenv": "^8.1.0",
     "fs-extra": "^8.1.0",
     "graphql": "^0.11.7",
     "graphql-tag": "^2.5.0",
