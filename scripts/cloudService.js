@@ -17,11 +17,7 @@ const writeFileAsync = promisify(fs.writeFile);
 const pdfOutputDir = path.join(__dirname, '..', 'output');
 const pdfPath = id => path.join(pdfOutputDir, `${id}.pdf`);
 
-const {
-  AZURE_STORAGE_ACCOUNT,
-  AZURE_STORAGE_KEY,
-  AZURE_UPLOAD_CONTAINER,
-} = process.env.AZURE_STORAGE_ACCOUNT;
+const { AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_KEY, AZURE_UPLOAD_CONTAINER } = process.env;
 
 async function uploadStream(containerURL, filePath, aborter) {
   const fp = path.resolve(filePath);
@@ -110,7 +106,7 @@ async function downloadPostersFromCloud(posterIds) {
   const account = AZURE_STORAGE_ACCOUNT;
   const accountKey = AZURE_STORAGE_KEY;
   const containerName = AZURE_UPLOAD_CONTAINER;
-  console.log(StorageURL, ServiceURL, Aborter);
+
   const credentials = new SharedKeyCredential(account, accountKey);
   const pipeline = StorageURL.newPipeline(credentials);
   const serviceURL = new ServiceURL(`https://${account}.blob.core.windows.net`, pipeline);
