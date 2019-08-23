@@ -97,9 +97,11 @@ async function renderComponent(options) {
 
   const contents = await page.pdf(printOptions);
 
-  await fs.outputFile(pdfPath(id), contents);
-  await uploadPosterToCloud(pdfPath(id));
+  const pdfFilePath = pdfPath(id);
+  await fs.outputFile(pdfFilePath, contents);
   await page.close();
+
+  await uploadPosterToCloud(pdfFilePath);
 }
 
 async function renderComponentRetry(options) {

@@ -1,8 +1,6 @@
 const {
   Aborter,
-  BlobURL,
   BlockBlobURL,
-  BlobServiceClient,
   ContainerURL,
   ServiceURL,
   SharedKeyCredential,
@@ -12,12 +10,14 @@ const {
 const path = require('path');
 const fs = require('fs-extra');
 const { promisify } = require('util');
+const {
+  AZURE_STORAGE_ACCOUNT,
+  AZURE_STORAGE_KEY,
+  AZURE_UPLOAD_CONTAINER,
+} = require('../constants');
 
-const writeFileAsync = promisify(fs.writeFile);
 const pdfOutputDir = path.join(__dirname, '..', 'output');
 const pdfPath = id => path.join(pdfOutputDir, `${id}.pdf`);
-
-const { AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_KEY, AZURE_UPLOAD_CONTAINER } = process.env;
 
 async function uploadStream(containerURL, filePath, aborter) {
   const fp = path.resolve(filePath);
@@ -61,20 +61,13 @@ async function uploadPosterToCloud(filePath) {
   }
 
   console.log(`Uploading Pdf ${filePath} to Azure.`);
-  const fileStat = await fs.stat(filePath);
-
-  const getFileStream = () => fs.createReadStream(filePath);
-
-  const stream = fs.createReadStream(filePath);
 
   const credentials = new SharedKeyCredential(account, accountKey);
   const pipeline = StorageURL.newPipeline(credentials);
   const serviceURL = new ServiceURL(`https://${account}.blob.core.windows.net`, pipeline);
   const aborter = Aborter.timeout(5 * 60000);
-  const blobName = path.basename(filePath);
 
   const containerURL = ContainerURL.fromServiceURL(serviceURL, containerName);
-  const blockBlobURL = BlockBlobURL.fromContainerURL(containerURL, blobName);
 
   try {
     await uploadStream(containerURL, filePath, aborter);
@@ -113,15 +106,29 @@ async function downloadPostersFromCloud(posterIds) {
   const aborter = Aborter.timeout(5 * 60000);
 
   const containerURL = ContainerURL.fromServiceURL(serviceURL, containerName);
+  const posterPromises = [];
 
-  posterIds.forEach(async id => {
-    const blockBlobURL = BlockBlobURL.fromContainerURL(containerURL, `${id}.pdf`);
-    const downloadResponse = await blockBlobURL.download(aborter, 0);
-    const content = await streamToString(downloadResponse.readableStreamBody);
-    await writeFileAsync(pdfPath(id), content);
-    console.log(`Downloaded blob "${id}"`);
-    console.log(`Saved locally to "${pdfPath(id)}"`);
+  posterIds.forEach(id => {
+    const createPromise = async () => {
+      const pdfFilePath = pdfPath(id);
+
+      if (await fs.pathExists(pdfFilePath)) {
+        return;
+      }
+
+      const blockBlobURL = BlockBlobURL.fromContainerURL(containerURL, `${id}.pdf`);
+      const downloadResponse = await blockBlobURL.download(aborter, 0);
+      const content = await streamToString(downloadResponse.readableStreamBody);
+      await fs.outputFile(pdfPath(id), content);
+
+      console.log(`Downloaded blob "${id}"`);
+      console.log(`Saved locally to "${pdfPath(id)}"`);
+    };
+
+    posterPromises.push(createPromise());
   });
+
+  await Promise.all(posterPromises);
   console.log('Poster downloading done.');
 }
 
