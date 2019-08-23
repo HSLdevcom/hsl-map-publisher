@@ -6,6 +6,7 @@ const { promisify } = require('util');
 const { spawn } = require('child_process');
 const log = require('./util/log');
 const get = require('lodash/get');
+const { uploadPosterToCloud } = require('./cloudService');
 
 const CLIENT_URL = 'http://localhost:5000';
 const RENDER_TIMEOUT = 10 * 60 * 1000;
@@ -96,8 +97,11 @@ async function renderComponent(options) {
 
   const contents = await page.pdf(printOptions);
 
-  await fs.outputFile(pdfPath(id), contents);
+  const pdfFilePath = pdfPath(id);
+  await fs.outputFile(pdfFilePath, contents);
   await page.close();
+
+  await uploadPosterToCloud(pdfFilePath);
 }
 
 async function renderComponentRetry(options) {
