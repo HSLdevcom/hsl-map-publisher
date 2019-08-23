@@ -9,7 +9,6 @@ const {
 } = require('@azure/storage-blob');
 const path = require('path');
 const fs = require('fs-extra');
-const { promisify } = require('util');
 const {
   AZURE_STORAGE_ACCOUNT,
   AZURE_STORAGE_KEY,
