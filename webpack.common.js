@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
   entry: ['babel-polyfill', './src/index.js'],
@@ -9,6 +10,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Stop poster',
     }),
+    new Dotenv(),
   ],
   resolve: {
     modules: ['node_modules', 'src'],

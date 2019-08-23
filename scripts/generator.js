@@ -8,17 +8,20 @@ const log = require('./util/log');
 const get = require('lodash/get');
 const { uploadPosterToCloud } = require('./cloudService');
 
-const writeFileAsync = promisify(fs.writeFile);
-
 const CLIENT_URL = 'http://localhost:5000';
 const RENDER_TIMEOUT = 10 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
 const SCALE = 96 / 72;
+
 let browser = null;
 let previous = Promise.resolve();
+const cwd = process.cwd();
 
-const pdfOutputDir = path.join(__dirname, '..', 'output');
+const pdfOutputDir = path.join(cwd, 'output');
 const concatOutputDir = path.join(pdfOutputDir, 'concatenated');
+
+fs.ensureDirSync(concatOutputDir);
+
 const pdfPath = id => path.join(pdfOutputDir, `${id}.pdf`);
 
 async function initialize() {
@@ -40,9 +43,6 @@ async function renderComponent(options) {
   const page = await browser.newPage();
 
   await page.exposeFunction('serverLog', log);
-  await page.exposeFunction('getServerUrl', () =>
-    get(process, 'env.API_URL', 'https://kartat.hsl.fi'),
-  );
 
   page.on('error', error => {
     page.close();
@@ -97,7 +97,7 @@ async function renderComponent(options) {
 
   const contents = await page.pdf(printOptions);
 
-  await writeFileAsync(pdfPath(id), contents);
+  await fs.outputFile(pdfPath(id), contents);
   await uploadPosterToCloud(pdfPath(id));
   await page.close();
 }
@@ -152,7 +152,6 @@ function generate(options) {
  */
 async function concatenate(ids, title) {
   const filenames = ids.map(id => pdfPath(id));
-  await fs.ensureDir(concatOutputDir);
   const parsedTitle = title.replace('/', '');
   const filepath = path.join(concatOutputDir, `${parsedTitle}.pdf`);
   const fileExists = await fs.pathExists(filepath);
