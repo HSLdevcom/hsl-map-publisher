@@ -193,6 +193,7 @@ async function main() {
 
     try {
       filename = await generator.concatenate([id], `${component}-${id}`);
+      await generator.removeFiles([id]);
     } catch (err) {
       ctx.throw(500, err.message || 'PDF concatenation failed.');
     }
@@ -202,6 +203,8 @@ async function main() {
     ctx.type = 'application/pdf';
     ctx.set('Content-Disposition', `attachment; filename="${component}-${id}.pdf"`);
     ctx.body = fs.createReadStream(filename);
+
+    await fs.remove(filename);
   });
 
   router.get('/downloadBuild/:id', async ctx => {
@@ -213,6 +216,7 @@ async function main() {
 
     try {
       filename = await generator.concatenate(posterIds, title);
+      await generator.removeFiles(posterIds);
     } catch (err) {
       ctx.throw(500, err.message || 'PDF concatenation failed.');
     }
@@ -220,6 +224,8 @@ async function main() {
     ctx.type = 'application/pdf';
     ctx.set('Content-Disposition', `attachment; filename="${title}-${id}.pdf"`);
     ctx.body = fs.createReadStream(filename);
+
+    await fs.remove(filename);
   });
 
   app

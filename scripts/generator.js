@@ -179,7 +179,30 @@ async function concatenate(ids, title) {
   return filepath;
 }
 
+async function removeFiles(ids) {
+  const filenames = ids.map(id => pdfPath(id));
+  const removePromises = [];
+  console.log('removing ');
+
+  filenames.forEach(filename => {
+    const createPromise = async () => {
+      try {
+        console.log('removing ', filename);
+        await fs.remove(filename);
+      } catch (err) {
+        console.log(`Pdf ${filename} removal unsuccessful.`);
+        console.error(err);
+      }
+    };
+
+    removePromises.push(createPromise());
+  });
+
+  await Promise.all(removePromises);
+}
+
 module.exports = {
   generate,
   concatenate,
+  removeFiles,
 };

@@ -75,8 +75,15 @@ async function uploadPosterToCloud(filePath) {
     console.error(err);
     return false;
   }
-
   console.log('Pdf upload successful.');
+
+  try {
+    await fs.remove(filePath);
+  } catch (err) {
+    console.log(`Pdf ${filePath} removal unsuccessful.`);
+    console.error(err);
+  }
+
   return true;
 }
 
@@ -115,13 +122,16 @@ async function downloadPostersFromCloud(posterIds) {
         return;
       }
 
-      const blockBlobURL = BlockBlobURL.fromContainerURL(containerURL, `${id}.pdf`);
-      const downloadResponse = await blockBlobURL.download(aborter, 0);
-      const content = await streamToString(downloadResponse.readableStreamBody);
-      await fs.outputFile(pdfPath(id), content);
-
-      console.log(`Downloaded blob "${id}"`);
-      console.log(`Saved locally to "${pdfPath(id)}"`);
+      try {
+        const blockBlobURL = BlockBlobURL.fromContainerURL(containerURL, `${id}.pdf`);
+        const downloadResponse = await blockBlobURL.download(aborter, 0);
+        const content = await streamToString(downloadResponse.readableStreamBody);
+        await fs.outputFile(pdfPath(id), content);
+        console.log(`Downloaded blob "${id}"`);
+        console.log(`Saved locally to "${pdfPath(id)}"`);
+      } catch (err) {
+        console.log(`Something went wrong downloading blob "${id}".`);
+      }
     };
 
     posterPromises.push(createPromise());
