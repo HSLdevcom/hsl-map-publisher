@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:12
 
 # This installs the necessary libs to make the bundled version of Chromium that Pupppeteer installs work
 RUN apt-get update \
