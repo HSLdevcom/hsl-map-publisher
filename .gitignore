@@ -8,3 +8,5 @@ yarn-error.log
 /templates
 graphql.config.json
 output/*
+.env
+secrets

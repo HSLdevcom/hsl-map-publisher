@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const puppeteer = require('puppeteer');
 const qs = require('qs');
@@ -6,8 +6,7 @@ const { promisify } = require('util');
 const { spawn } = require('child_process');
 const log = require('./util/log');
 const get = require('lodash/get');
-
-const writeFileAsync = promisify(fs.writeFile);
+const { uploadPosterToCloud } = require('./cloudService');
 
 const CLIENT_URL = 'http://localhost:5000';
 const RENDER_TIMEOUT = 10 * 60 * 1000;
@@ -16,8 +15,14 @@ const SCALE = 96 / 72;
 
 let browser = null;
 let previous = Promise.resolve();
+const cwd = process.cwd();
 
-const pdfPath = id => path.join(__dirname, '..', 'output', `${id}.pdf`);
+const pdfOutputDir = path.join(cwd, 'output');
+const concatOutputDir = path.join(pdfOutputDir, 'concatenated');
+
+fs.ensureDirSync(concatOutputDir);
+
+const pdfPath = id => path.join(pdfOutputDir, `${id}.pdf`);
 
 async function initialize() {
   browser = await puppeteer.launch({
@@ -38,9 +43,6 @@ async function renderComponent(options) {
   const page = await browser.newPage();
 
   await page.exposeFunction('serverLog', log);
-  await page.exposeFunction('getServerUrl', () =>
-    get(process, 'env.API_URL', 'https://kartat.hsl.fi'),
-  );
 
   page.on('error', error => {
     page.close();
@@ -95,8 +97,11 @@ async function renderComponent(options) {
 
   const contents = await page.pdf(printOptions);
 
-  await writeFileAsync(pdfPath(id), contents);
+  const pdfFilePath = pdfPath(id);
+  await fs.outputFile(pdfFilePath, contents);
   await page.close();
+
+  await uploadPosterToCloud(pdfFilePath);
 }
 
 async function renderComponentRetry(options) {
@@ -142,20 +147,60 @@ function generate(options) {
 
 /**
  * Concatenates posters to a multi-page PDF
- * @param {Object} options
- * @param {string[]} options.ids - Ids to concatate
+ * @param {string[]} ids - Ids to concatate
  * @returns {Readable} - PDF stream
+ * @param ids
+ * @param title
  */
-function concatenate(ids) {
+async function concatenate(ids, title) {
   const filenames = ids.map(id => pdfPath(id));
-  const pdftk = spawn('pdftk', [...filenames, 'cat', 'output', '-']);
-  pdftk.stderr.on('data', data => {
-    pdftk.stdout.emit('error', new Error(data.toString()));
+  const parsedTitle = title.replace('/', '');
+  const filepath = path.join(concatOutputDir, `${parsedTitle}.pdf`);
+  const fileExists = await fs.pathExists(filepath);
+
+  if (!fileExists) {
+    return new Promise((resolve, reject) => {
+      const pdftk = spawn('pdftk', [...filenames, 'cat', 'output', filepath]);
+
+      pdftk.on('error', err => {
+        reject(err);
+      });
+
+      pdftk.on('close', code => {
+        if (code === 0) {
+          resolve(filepath);
+        } else {
+          reject(new Error(`PDFTK closed with code ${code}`));
+        }
+      });
+    });
+  }
+
+  return filepath;
+}
+
+async function removeFiles(ids) {
+  const filenames = ids.map(id => pdfPath(id));
+  const removePromises = [];
+
+  filenames.forEach(filename => {
+    const createPromise = async () => {
+      try {
+        await fs.remove(filename);
+      } catch (err) {
+        console.log(`Pdf ${filename} removal unsuccessful.`);
+        console.error(err);
+      }
+    };
+
+    removePromises.push(createPromise());
   });
-  return pdftk.stdout;
+
+  await Promise.all(removePromises);
 }
 
 module.exports = {
   generate,
   concatenate,
+  removeFiles,
 };

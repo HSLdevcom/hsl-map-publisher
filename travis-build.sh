@@ -6,7 +6,7 @@ DOCKER_TAG=${TRAVIS_BUILD_NUMBER:-latest}
 DOCKER_IMAGE=$ORG/hsl-map-publisher:${DOCKER_TAG}
 DOCKER_IMAGE_LATEST=$ORG/hsl-map-publisher:latest
 
-docker build --tag=$DOCKER_IMAGE .
+docker build --build-arg BUILD_ENV=latest --tag=$DOCKER_IMAGE .
 
 if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then
   docker login -u $DOCKER_USER -p $DOCKER_AUTH

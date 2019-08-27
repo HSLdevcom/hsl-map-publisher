@@ -16,10 +16,7 @@ const components = {
   Timetable,
 };
 
-const graphqlUrl =
-  process.env.NODE_ENV === 'development'
-    ? 'https://dev-kartat.hsldev.com/jore/graphql'
-    : 'https://kartat.hsl.fi/jore/graphql';
+const graphqlUrl = process.env.JORE_GRAPHQL_URL || 'https://kartat.hsl.fi/jore/graphql';
 
 const client = new ApolloClient({
   link: createHttpLink({ uri: graphqlUrl }),

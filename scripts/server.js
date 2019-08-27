@@ -3,6 +3,7 @@ const session = require('koa-session');
 const Router = require('koa-router');
 const cors = require('@koa/cors');
 const jsonBody = require('koa-json-body');
+const fs = require('fs-extra');
 
 const generator = require('./generator');
 const authEndpoints = require('./auth/authEndpoints');
@@ -27,6 +28,8 @@ const {
   removeTemplate,
   getTemplate,
 } = require('./store');
+
+const { downloadPostersFromCloud } = require('./cloudService');
 
 const PORT = 4000;
 
@@ -184,21 +187,48 @@ async function main() {
     ctx.body = poster;
   });
 
-  router.get('/downloadBuild/:id', async ctx => {
-    const { id } = ctx.params;
-    const { title, posters } = await getBuild({ id });
-    const posterIds = posters.filter(poster => poster.status === 'READY').map(poster => poster.id);
-    ctx.type = 'application/pdf';
-    ctx.set('Content-Disposition', `attachment; filename="${title}-${id}.pdf"`);
-    ctx.body = generator.concatenate(posterIds);
-  });
-
   router.get('/downloadPoster/:id', async ctx => {
     const { id } = ctx.params;
     const { component } = await getPoster({ id });
+    let filename;
+
+    await downloadPostersFromCloud([id]);
+
+    try {
+      filename = await generator.concatenate([id], `${component}-${id}`);
+      await generator.removeFiles([id]);
+    } catch (err) {
+      ctx.throw(500, err.message || 'PDF concatenation failed.');
+    }
+
+    console.log('PDF concatenation succeeded.');
+
     ctx.type = 'application/pdf';
     ctx.set('Content-Disposition', `attachment; filename="${component}-${id}.pdf"`);
-    ctx.body = generator.concatenate([id]);
+    ctx.body = fs.createReadStream(filename);
+
+    await fs.remove(filename);
+  });
+
+  router.get('/downloadBuild/:id', async ctx => {
+    const { id } = ctx.params;
+    const { title, posters } = await getBuild({ id });
+    let filename;
+    const posterIds = posters.filter(poster => poster.status === 'READY').map(poster => poster.id);
+    await downloadPostersFromCloud(posterIds);
+
+    try {
+      filename = await generator.concatenate(posterIds, title);
+      await generator.removeFiles(posterIds);
+    } catch (err) {
+      ctx.throw(500, err.message || 'PDF concatenation failed.');
+    }
+
+    ctx.type = 'application/pdf';
+    ctx.set('Content-Disposition', `attachment; filename="${title}-${id}.pdf"`);
+    ctx.body = fs.createReadStream(filename);
+
+    await fs.remove(filename);
   });
 
   router.post('/login', async ctx => {
@@ -214,7 +244,11 @@ async function main() {
   });
 
   router.get('/session', async ctx => {
-    const authResponse = await authEndpoints.checkExistingSession(ctx.request, ctx.response, ctx.session);
+    const authResponse = await authEndpoints.checkExistingSession(
+      ctx.request,
+      ctx.response,
+      ctx.session,
+    );
     ctx.body = authResponse.body;
     ctx.response.status = authResponse.status;
   });
@@ -225,9 +259,11 @@ async function main() {
 
   app
     .use(errorHandler)
-    .use(cors({
-      credentials: true,
-    }))
+    .use(
+      cors({
+        credentials: true,
+      }),
+    )
     .use(jsonBody({ fallback: true, limit: '10mb' }))
     .use(router.routes())
     .use(router.allowedMethods())

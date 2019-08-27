@@ -7,12 +7,7 @@ const scale = 5;
  */
 // eslint-disable-next-line import/prefer-default-export
 export async function fetchMap(mapOptions, mapStyle) {
-  // Server url provided by Puppeteer
-  const serverUrl =
-    typeof window.getServerUrl === 'function'
-      ? await window.getServerUrl()
-      : 'https://dev-kartat.hsldev.com';
-
+  const serverUrl = process.env.GENERATE_API_URL || 'https://kartat.hsl.fi';
   window.serverLog(`Generating the map with ${serverUrl}`);
 
   const options = {
