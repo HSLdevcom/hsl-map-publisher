@@ -136,8 +136,8 @@ function findLongestPath(root) {
   }
 
   // Find child node that is part of longest path
-  const child = root.children.reduce(
-    (prev, cur) => (getHeight(cur) > getHeight(prev) ? cur : prev),
+  const child = root.children.reduce((prev, cur) =>
+    getHeight(cur) > getHeight(prev) ? cur : prev,
   );
 
   // Find descendant with the most items from longest path

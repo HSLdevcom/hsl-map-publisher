@@ -113,20 +113,23 @@ async function downloadPostersFromCloud(posterIds) {
 
   const containerURL = ContainerURL.fromServiceURL(serviceURL, containerName);
   const posterPromises = [];
+  const downloadedPosterIds = [];
 
   posterIds.forEach(id => {
     const createPromise = async () => {
       const pdfFilePath = pdfPath(id);
 
       if (await fs.pathExists(pdfFilePath)) {
+        console.log(`Poster "${id}" already exists locally. Skipping download.`);
+        downloadedPosterIds.push(id);
         return;
       }
-
       try {
         const blockBlobURL = BlockBlobURL.fromContainerURL(containerURL, `${id}.pdf`);
         const downloadResponse = await blockBlobURL.download(aborter, 0);
         const content = await streamToString(downloadResponse.readableStreamBody);
         await fs.outputFile(pdfPath(id), content);
+        downloadedPosterIds.push(id);
         console.log(`Downloaded blob "${id}"`);
         console.log(`Saved locally to "${pdfPath(id)}"`);
       } catch (err) {
@@ -138,7 +141,8 @@ async function downloadPostersFromCloud(posterIds) {
   });
 
   await Promise.all(posterPromises);
-  console.log('Poster downloading done.');
+  console.log('Posters downloaded: ', downloadedPosterIds);
+  return downloadedPosterIds;
 }
 
 module.exports = {
