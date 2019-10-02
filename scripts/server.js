@@ -189,11 +189,13 @@ async function main() {
     const { component } = await getPoster({ id });
     let filename;
 
-    await downloadPostersFromCloud([id]);
-
+    const downloadedPosterIds = await downloadPostersFromCloud([id]);
+    if (downloadedPosterIds.length < 1) {
+      ctx.throw(404, 'Poster ids not found.');
+    }
     try {
-      filename = await generator.concatenate([id], `${component}-${id}`);
-      await generator.removeFiles([id]);
+      filename = await generator.concatenate(downloadedPosterIds, `${component}-${id}`);
+      await generator.removeFiles(downloadedPosterIds);
     } catch (err) {
       ctx.throw(500, err.message || 'PDF concatenation failed.');
     }
@@ -212,11 +214,15 @@ async function main() {
     const { title, posters } = await getBuild({ id });
     let filename;
     const posterIds = posters.filter(poster => poster.status === 'READY').map(poster => poster.id);
-    await downloadPostersFromCloud(posterIds);
+    const downloadedPosterIds = await downloadPostersFromCloud(posterIds);
+
+    if (downloadedPosterIds.length < 1) {
+      ctx.throw(404, 'Poster ids not found.');
+    }
 
     try {
-      filename = await generator.concatenate(posterIds, title);
-      await generator.removeFiles(posterIds);
+      filename = await generator.concatenate(downloadedPosterIds, title);
+      await generator.removeFiles(downloadedPosterIds);
     } catch (err) {
       ctx.throw(500, err.message || 'PDF concatenation failed.');
     }
