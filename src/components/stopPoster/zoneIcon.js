@@ -9,10 +9,10 @@ function ZoneIcon({ zone }) {
       zone === 'B'
         ? 'translate(calc(-50% + 3px), calc(-50% + 6px))'
         : zone === 'C'
-          ? 'translate(calc(-50% - 4px), calc(-50% + 7px))'
-          : zone === 'D'
-            ? 'translate(calc(-50% + 6px), calc(-50% + 7px))'
-            : 'translate(-50%, -50%)', // No px adjustments for zone A and the "else" case.
+        ? 'translate(calc(-50% - 4px), calc(-50% + 7px))'
+        : zone === 'D'
+        ? 'translate(calc(-50% + 6px), calc(-50% + 7px))'
+        : 'translate(-50%, -50%)', // No px adjustments for zone A and the "else" case.
     fontSize: '140px',
   };
 
