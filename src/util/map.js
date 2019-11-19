@@ -20,9 +20,9 @@ export async function fetchMap(mapOptions, mapStyle) {
 
   const response = await fetch(`${serverUrl}/generateImage`, options);
   const blob = await response.blob();
-  if (response && response.status === 500) {
+  if (response && response.status >= 500) {
     renderQueue.remove(this, {
-      error: new Error(`Received status code 500 from generator-server`),
+      error: new Error(`Received status code ${response.status} from generator-server`),
     });
   }
   return new Promise(resolve => {
