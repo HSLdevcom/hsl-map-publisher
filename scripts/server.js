@@ -173,10 +173,20 @@ async function main() {
 
   router.post('/posters', async ctx => {
     const { buildId, component, props, template } = ctx.request.body;
+    const build = await getBuild({ id: buildId });
     const posters = [];
 
     for (let i = 0; i < props.length; i++) {
-      posters.push(generatePoster(buildId, component, template, props[i], i));
+      const currentProps = props[i];
+      let orderNumber = get(
+        build.posters.find(
+          poster => poster.props.stopId === currentProps.stopId && poster.status === 'FAILED',
+        ),
+        'order',
+        null,
+      );
+      if (!orderNumber) orderNumber = i + build.posters.length;
+      posters.push(generatePoster(buildId, component, template, currentProps, orderNumber));
     }
 
     try {
