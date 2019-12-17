@@ -68,6 +68,7 @@ async function getBuild({ id }) {
       'poster.props',
       'poster.created_at',
       'poster.updated_at',
+      'poster.order',
       knex.raw(`json_agg(
                 json_build_object(
                     'type', event.type,
