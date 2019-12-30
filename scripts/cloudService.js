@@ -141,7 +141,6 @@ async function downloadPostersFromCloud(posterIds) {
   });
 
   await Promise.all(posterPromises);
-  console.log('Posters downloaded: ', downloadedPosterIds);
   return downloadedPosterIds;
 }
 
