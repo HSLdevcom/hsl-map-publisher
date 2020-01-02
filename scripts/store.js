@@ -68,6 +68,7 @@ async function getBuild({ id }) {
       'poster.props',
       'poster.created_at',
       'poster.updated_at',
+      'poster.order',
       knex.raw(`json_agg(
                 json_build_object(
                     'type', event.type,
@@ -126,10 +127,10 @@ async function getPoster({ id }) {
   return convertKeys(row, camelCase);
 }
 
-async function addPoster({ buildId, component, props }) {
+async function addPoster({ buildId, component, props, order }) {
   const id = uuidv1();
-  await knex('poster').insert(
-    convertKeys(
+  await knex('poster').insert({
+    ...convertKeys(
       {
         id,
         buildId,
@@ -138,7 +139,8 @@ async function addPoster({ buildId, component, props }) {
       },
       snakeCase,
     ),
-  );
+    order,
+  });
   return { id };
 }
 
