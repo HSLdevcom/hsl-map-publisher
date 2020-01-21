@@ -135,11 +135,12 @@ async function downloadPostersFromCloud(posterIds) {
       }
     };
 
-    console.log(`Posters downloaded: ${downloadedPosterIds.length}.`);
     posterPromises.push(createPromise());
   });
 
   await Promise.all(posterPromises);
+  console.log(`Posters downloaded: ${downloadedPosterIds.length}.`);
+
   return downloadedPosterIds;
 }
 
