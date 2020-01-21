@@ -130,10 +130,8 @@ async function downloadPostersFromCloud(posterIds) {
         const content = await streamToString(downloadResponse.readableStreamBody);
         await fs.outputFile(pdfPath(id), content);
         downloadedPosterIds.push(id);
-        console.log(`Downloaded blob "${id}"`);
-        console.log(`Saved locally to "${pdfPath(id)}"`);
       } catch (err) {
-        console.log(`Something went wrong downloading blob "${id}".`);
+        console.log(`Something went wrong downloading blob ${id}.`);
       }
     };
 
@@ -141,7 +139,8 @@ async function downloadPostersFromCloud(posterIds) {
   });
 
   await Promise.all(posterPromises);
-  console.log('Posters downloaded: ', downloadedPosterIds);
+  console.log(`Posters downloaded: ${downloadedPosterIds.length}.`);
+
   return downloadedPosterIds;
 }
 

@@ -229,10 +229,15 @@ async function main() {
 
   router.get('/downloadBuild/:id', async ctx => {
     const { id } = ctx.params;
+    const { first, last } = ctx.query;
     const { title, posters } = await getBuild({ id });
+    const parsedTitle = first && last ? `${title}-${parseInt(first, 10) + 1}-${last}` : title;
     let filename;
-
-    const posterIds = posters.filter(poster => poster.status === 'READY').map(poster => poster.id);
+    let orderedPosters = posters.sort((a, b) => (a.order > b.order ? 1 : -1));
+    const slicedPosters = orderedPosters.slice(first, last);
+    const posterIds = slicedPosters
+      .filter(poster => poster.status === 'READY')
+      .map(poster => poster.id);
     const downloadedPosterIds = await downloadPostersFromCloud(posterIds);
 
     if (downloadedPosterIds.length < 1) {
@@ -241,7 +246,7 @@ async function main() {
 
     try {
       // Get the order of the downloaded posters and sort the posters before concatenation.
-      const orderedPosters = orderBy(
+      orderedPosters = orderBy(
         downloadedPosterIds.map(downloadedId => ({
           id: downloadedId,
           order: get(posters.find(({ id: posterId }) => posterId === downloadedId), 'order', 0),
@@ -250,14 +255,14 @@ async function main() {
         'asc',
       );
 
-      filename = await generator.concatenate(orderedPosters.map(poster => poster.id), title);
+      filename = await generator.concatenate(orderedPosters.map(poster => poster.id), parsedTitle);
       await generator.removeFiles(downloadedPosterIds);
     } catch (err) {
       ctx.throw(500, err.message || 'PDF concatenation failed.');
     }
 
     ctx.type = 'application/pdf';
-    ctx.set('Content-Disposition', `attachment; filename="${title}-${id}.pdf"`);
+    ctx.set('Content-Disposition', `attachment; filename="${parsedTitle}-${id}.pdf"`);
     ctx.body = fs.createReadStream(filename);
 
     await fs.remove(filename);
