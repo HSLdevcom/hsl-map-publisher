@@ -1,3 +1,5 @@
+const orderBy = require('lodash/orderBy');
+const get = require('lodash/get');
 const Koa = require('koa');
 const session = require('koa-session');
 const Router = require('koa-router');
@@ -33,12 +35,13 @@ const { downloadPostersFromCloud } = require('./cloudService');
 
 const PORT = 4000;
 
-async function generatePoster(buildId, component, template, props) {
+async function generatePoster(buildId, component, template, props, index) {
   const { id } = await addPoster({
     buildId,
     component,
     template,
     props,
+    order: index,
   });
 
   const onInfo = (message = 'No message.') => {
@@ -173,12 +176,27 @@ async function main() {
 
   router.post('/posters', async ctx => {
     const { buildId, component, props, template } = ctx.request.body;
+    const build = await getBuild({ id: buildId });
     const posters = [];
+
     for (let i = 0; i < props.length; i++) {
-      // eslint-disable-next-line no-await-in-loop
-      posters.push(await generatePoster(buildId, component, template, props[i]));
+      const currentProps = props[i];
+      let orderNumber = get(
+        build.posters.find(
+          poster => poster.props.stopId === currentProps.stopId && poster.status === 'FAILED',
+        ),
+        'order',
+        null,
+      );
+      if (!orderNumber) orderNumber = i + build.posters.length;
+      posters.push(generatePoster(buildId, component, template, currentProps, orderNumber));
     }
-    ctx.body = posters;
+
+    try {
+      ctx.body = await Promise.all(posters);
+    } catch (err) {
+      ctx.throw(500, err.message || 'Poster generation failed.');
+    }
   });
 
   router.delete('/posters/:id', async ctx => {
@@ -192,11 +210,13 @@ async function main() {
     const { component } = await getPoster({ id });
     let filename;
 
-    await downloadPostersFromCloud([id]);
-
+    const downloadedPosterIds = await downloadPostersFromCloud([id]);
+    if (downloadedPosterIds.length < 1) {
+      ctx.throw(404, 'Poster ids not found.');
+    }
     try {
-      filename = await generator.concatenate([id], `${component}-${id}`);
-      await generator.removeFiles([id]);
+      filename = await generator.concatenate(downloadedPosterIds, `${component}-${id}`);
+      await generator.removeFiles(downloadedPosterIds);
     } catch (err) {
       ctx.throw(500, err.message || 'PDF concatenation failed.');
     }
@@ -212,20 +232,47 @@ async function main() {
 
   router.get('/downloadBuild/:id', async ctx => {
     const { id } = ctx.params;
+    const { first, last } = ctx.query;
     const { title, posters } = await getBuild({ id });
+    const parsedTitle = first && last ? `${title}-${parseInt(first, 10) + 1}-${last}` : title;
     let filename;
-    const posterIds = posters.filter(poster => poster.status === 'READY').map(poster => poster.id);
-    await downloadPostersFromCloud(posterIds);
+    let orderedPosters = posters.sort((a, b) => (a.order > b.order ? 1 : -1));
+    const slicedPosters = orderedPosters.slice(first, last);
+    const posterIds = slicedPosters
+      .filter(poster => poster.status === 'READY')
+      .map(poster => poster.id);
+    const downloadedPosterIds = await downloadPostersFromCloud(posterIds);
+
+    if (downloadedPosterIds.length < 1) {
+      ctx.throw(404, 'Poster ids not found.');
+    }
 
     try {
-      filename = await generator.concatenate(posterIds, title);
-      await generator.removeFiles(posterIds);
+      // Get the order of the downloaded posters and sort the posters before concatenation.
+      orderedPosters = orderBy(
+        downloadedPosterIds.map(downloadedId => ({
+          id: downloadedId,
+          order: get(
+            posters.find(({ id: posterId }) => posterId === downloadedId),
+            'order',
+            0,
+          ),
+        })),
+        'order',
+        'asc',
+      );
+
+      filename = await generator.concatenate(
+        orderedPosters.map(poster => poster.id),
+        parsedTitle,
+      );
+      await generator.removeFiles(downloadedPosterIds);
     } catch (err) {
       ctx.throw(500, err.message || 'PDF concatenation failed.');
     }
 
     ctx.type = 'application/pdf';
-    ctx.set('Content-Disposition', `attachment; filename="${title}-${id}.pdf"`);
+    ctx.set('Content-Disposition', `attachment; filename="${parsedTitle}-${id}.pdf"`);
     ctx.body = fs.createReadStream(filename);
 
     await fs.remove(filename);
@@ -233,6 +280,7 @@ async function main() {
 
   router.post('/login', async ctx => {
     const authResponse = await authEndpoints.authorize(ctx.request, ctx.response, ctx.session);
+    ctx.session = authResponse.modifiedSession;
     ctx.body = authResponse.body;
     ctx.response.status = authResponse.status;
   });
