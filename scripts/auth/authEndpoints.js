@@ -9,14 +9,18 @@ const hasAllowedGroup = async userInfo => {
   const groups = get(userInfo, 'groups');
   const domain = last(userInfo.email.toLowerCase().split('@')) || '';
 
+  if (groups.includes(allowedGroup)) {
+    return true;
+  }
+
   if (!allowedDomains.includes(domain)) {
-    console.log(`User does not have allowed group in hsl-id. Logging out.`);
+    console.log(`User does not have allowed domain. Logging out.`);
     return false;
   }
 
   if (allowedDomains.includes(domain) && !groups.includes(allowedGroup)) {
     groups.push(allowedGroup);
-    const response = await AuthService.setGroup(userInfo.userId, groups);
+    await AuthService.setGroup(userInfo.userId, groups);
   }
   return true;
 };
@@ -24,6 +28,23 @@ const hasAllowedGroup = async userInfo => {
 const authorize = async (req, res, session) => {
   const authRequest = req.body;
   const modifiedSession = clone(session);
+  const { isTesting } = authRequest;
+
+  if (modifiedSession && isTesting) {
+    // When testing, code is already an access token (because tests fetched code with password grant request that gives you the correct access token)
+    modifiedSession.accessToken = authRequest.code;
+    const userInfo = await AuthService.requestUserInfo(authRequest.code);
+    modifiedSession.email = userInfo.email;
+    modifiedSession.groups = userInfo.groups;
+    return {
+      status: 200,
+      body: {
+        isOk: true,
+        email: userInfo.email,
+      },
+      modifiedSession,
+    };
+  }
 
   if (!authRequest.code) {
     console.log('No authorization code');
