@@ -51,10 +51,7 @@ const propsMapper = mapProps(props => ({
   ).sort(routeCompare),
 }));
 
-const hoc = compose(
-  graphql(routesQuery),
-  apolloWrapper(propsMapper),
-);
+const hoc = compose(graphql(routesQuery), apolloWrapper(propsMapper));
 
 export default component => {
   const RoutesContainer = hoc(component);

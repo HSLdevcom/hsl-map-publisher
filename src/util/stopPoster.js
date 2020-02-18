@@ -1,4 +1,5 @@
 import { PerspectiveMercatorViewport } from 'viewport-mercator-project';
+import FixedZoneSymbols from '../components/map/hsl-zone-symbols-publisher-v3.json';
 
 const STOPS_PER_PIXEL = 0.000006;
 const MAJOR_TRANSPORT_WEIGHT = 5;
@@ -35,6 +36,7 @@ function calculateStopsViewport(options) {
     stops,
     miniMapStartX,
     miniMapStartY,
+    useProjectedSymbols,
   } = options;
   // Nearby stops with labels plus current stop (no label)
   const maxStops = width * height * STOPS_PER_PIXEL + 1;
@@ -162,6 +164,19 @@ function calculateStopsViewport(options) {
     y,
   };
 
+  const projectedSymbols = [];
+  if (useProjectedSymbols) {
+    FixedZoneSymbols.features.forEach(feature => {
+      feature.geometry.coordinates.forEach(coordinates => {
+        const [sLon, sLat] = coordinates;
+        if (sLat > maxLat && sLat < minLat && sLon > minLon && sLon < maxLon) {
+          const [sy, sx] = bestViewPort.project([sLon, sLat]);
+          projectedSymbols.push({ zone: feature.properties.Zone, sx, sy });
+        }
+      });
+    });
+  }
+
   return {
     projectedStops,
     viewport: bestViewPort,
@@ -170,6 +185,7 @@ function calculateStopsViewport(options) {
     minLat,
     maxLon,
     maxLat,
+    projectedSymbols,
   };
 }
 
