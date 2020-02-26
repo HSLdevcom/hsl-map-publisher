@@ -54,8 +54,19 @@ const getZoneIcon = zone => {
   }
 };
 
+const ZoneLabel = props => (
+  <div className={styles.zoneHeading}>
+    <span>
+      <strong>Vyöhyke</strong> Zon/Zone
+    </span>
+  </div>
+);
+
 const ZoneSymbol = props => (
-  <div style={{ width: props.size, height: props.size }}>{getZoneIcon(props.zone)}</div>
+  <Row>
+    <div className={styles.zoneSymbol}>{getZoneIcon(props.zone)}</div>
+    <ZoneLabel />
+  </Row>
 );
 
 LocationSymbol.propTypes = {
@@ -65,6 +76,38 @@ LocationSymbol.propTypes = {
 ZoneSymbol.propTypes = {
   size: PropTypes.number.isRequired,
   zone: PropTypes.string.isRequired,
+};
+
+const getSymbolForEachZone = projectedSymbolsWithDistance => {
+  const zones = [];
+  const uniqueSymbols = [];
+  projectedSymbolsWithDistance.forEach(symbol => {
+    if (!zones || !zones.includes(symbol.zone)) {
+      zones.push(symbol.zone);
+      uniqueSymbols.push(symbol);
+    }
+  });
+  return uniqueSymbols;
+};
+
+const calculateSymbolDistancesFromStops = (stops, symbols) => {
+  const symbolsWithStopDistances = symbols.map(symbol => {
+    const stopDistances = stops.map(stop => {
+      const xDif = Math.abs(symbol.sy - stop.x);
+      const yDif = Math.abs(symbol.sx - stop.y);
+      return yDif + xDif;
+    });
+    stopDistances.sort((a, b) => a - b);
+    const newSymbol = symbol;
+    const distanceToNearestStop = stopDistances[0];
+    newSymbol.distanceToClosestStop = distanceToNearestStop;
+    return newSymbol;
+  });
+  symbolsWithStopDistances.sort((a, b) =>
+    a.distanceToClosestStop < b.distanceToClosestStop ? 1 : -1,
+  );
+
+  return symbolsWithStopDistances;
 };
 
 const StopMap = props => {
@@ -87,6 +130,14 @@ const StopMap = props => {
   const stops = props.nearbyStops.filter(
     stop => stop.x < miniMapStyle.left || stop.y < miniMapStyle.top,
   );
+
+  // Filter out zone symbols that are behind the mini map
+  const projectedSymbols = props.projectedSymbols.filter(
+    symbol => symbol.sx < miniMapStyle.left || symbol.sy < miniMapStyle.top,
+  );
+
+  const symbolsWithStopDistances = calculateSymbolDistancesFromStops(stops, projectedSymbols);
+  const symbolForEachZone = getSymbolForEachZone(symbolsWithStopDistances);
 
   const miniMapCoordinateHelper = new MapCoordinateHelper(props.miniMapOptions);
   const newPosition = miniMapCoordinateHelper.getMapCenter();
@@ -137,9 +188,9 @@ const StopMap = props => {
             </Row>
           </ItemFixed>
 
-          {props.projectedSymbols &&
-            props.projectedSymbols.length > 0 &&
-            props.projectedSymbols.map((symbol, index) => (
+          {symbolForEachZone &&
+            symbolForEachZone.length > 0 &&
+            symbolForEachZone.map((symbol, index) => (
               <ItemPositioned key={index} x={symbol.sy} y={symbol.sx}>
                 <ZoneSymbol zone={symbol.zone} size={LOCATION_RADIUS * 2} />
               </ItemPositioned>
