@@ -14,7 +14,7 @@ const Departure = props => (
       {props.minutes}
     </div>
     /&#x202F;
-    {trimRouteId(props.routeId)}
+    {trimRouteId(props.routeId, true)}
     {props.note}
   </div>
 );
