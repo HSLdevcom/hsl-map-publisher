@@ -1,5 +1,5 @@
 import { PerspectiveMercatorViewport } from 'viewport-mercator-project';
-import FixedZoneSymbols from '../components/map/hsl-zone-symbols-publisher-v3.json';
+import FixedZoneSymbols from '../components/map/hsl-zones-publisher-v6.json';
 
 const STOPS_PER_PIXEL = 0.000006;
 const MAJOR_TRANSPORT_WEIGHT = 5;
