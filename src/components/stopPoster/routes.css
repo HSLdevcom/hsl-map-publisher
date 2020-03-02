@@ -13,7 +13,7 @@
 }
 
 .root.simple {
-  padding: 1em 0 0 0.52em;
+  padding: 1em 0 0 0;
   background: transparent;
   font-size: 22px; /* Same base as timetable standalone font size */
   border-radius: 0;
@@ -39,6 +39,12 @@
   height: 84px;
 }
 
+.routeIdsContainer {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .simple .group {
   height: auto;
   margin-top: 0.25rem;
@@ -62,11 +68,20 @@
 }
 
 .simple .id {
-  font-size: 1em;
+  font-size: 0.83em;
+  line-height: 0.9;
+  padding: 0 0.25em 0 0;
+  margin-top: 2px;
+  font-weight: bold;
+}
+
+.simple .singleId {
+  font-size: 0.83em;
   line-height: 0.9;
   padding: 0 0.25em 0 0;
   min-width: 1.875em;
-  margin-top: 3px;
+  margin-top: 2px;
+  font-weight: bold;
 }
 
 .routeTitles {
@@ -78,7 +93,8 @@
 .title {
   padding-right: 0.893em;
   font-family: GothamXNarrow-Medium;
-  font-size: 0.875em;
+  font-size: 0.83em;
+  font-weight: bold;
 }
 
 .simple .title {
@@ -88,6 +104,7 @@
 .subtitle {
   composes: title;
   font-family: GothamXNarrow-Book;
+  font-weight: normal;
 }
 
 .icon {
