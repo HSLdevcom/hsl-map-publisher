@@ -7,6 +7,11 @@ import { Row, InlineSVG } from 'components/util';
 
 import locationIcon from 'icons/marker.svg';
 
+import aZone from 'icons/icon-Zone-A.svg';
+import bZone from 'icons/icon-Zone-B.svg';
+import cZone from 'icons/icon-Zone-C.svg';
+import dZone from 'icons/icon-Zone-D.svg';
+
 import MapCoordinateHelper from '../../util/mapCoordinateHelper';
 import MapImage from './mapImageContainer';
 import Scalebar from './scalebar';
@@ -34,14 +39,82 @@ const LocationSymbol = props => (
   </div>
 );
 
+const getZoneIcon = zone => {
+  switch (zone) {
+    case 'A':
+      return <InlineSVG src={aZone} style={{ width: '100%' }} />;
+    case 'B':
+      return <InlineSVG src={bZone} style={{ width: '100%' }} />;
+    case 'C':
+      return <InlineSVG src={cZone} style={{ width: '100%' }} />;
+    case 'D':
+      return <InlineSVG src={dZone} style={{ width: '100%' }} />;
+    default:
+      return <div />;
+  }
+};
+
+const ZoneLabel = props => (
+  <div className={styles.zoneHeading}>
+    <span>
+      <strong>Vyöhyke</strong> Zon/Zone
+    </span>
+  </div>
+);
+
+const ZoneSymbol = props => (
+  <Row>
+    <div className={styles.zoneSymbol}>{getZoneIcon(props.zone)}</div>
+    <ZoneLabel />
+  </Row>
+);
+
 LocationSymbol.propTypes = {
   size: PropTypes.number.isRequired,
+};
+
+ZoneSymbol.propTypes = {
+  size: PropTypes.number.isRequired,
+  zone: PropTypes.string.isRequired,
+};
+
+const getSymbolForEachZone = projectedSymbolsWithDistance => {
+  const zones = [];
+  const uniqueSymbols = [];
+  projectedSymbolsWithDistance.forEach(symbol => {
+    if (!zones || !zones.includes(symbol.zone)) {
+      zones.push(symbol.zone);
+      uniqueSymbols.push(symbol);
+    }
+  });
+  return uniqueSymbols;
+};
+
+const calculateSymbolDistancesFromStops = (stops, symbols) => {
+  const symbolsWithStopDistances = symbols.map(symbol => {
+    const stopDistances = stops.map(stop => {
+      const xDif = Math.abs(symbol.sy - stop.x);
+      const yDif = Math.abs(symbol.sx - stop.y);
+      return yDif + xDif;
+    });
+    stopDistances.sort((a, b) => a - b);
+    const newSymbol = symbol;
+    const distanceToNearestStop = stopDistances[0];
+    newSymbol.distanceToClosestStop = distanceToNearestStop;
+    return newSymbol;
+  });
+  symbolsWithStopDistances.sort((a, b) =>
+    a.distanceToClosestStop < b.distanceToClosestStop ? 1 : -1,
+  );
+
+  return symbolsWithStopDistances;
 };
 
 const StopMap = props => {
   const mapStyle = {
     width: props.mapOptions.width,
     height: props.mapOptions.height,
+    mapZones: props.mapOptions.mapZones,
   };
   const miniMapStyle = {
     left: mapStyle.width - props.miniMapOptions.marginRight - props.miniMapOptions.width,
@@ -49,12 +122,22 @@ const StopMap = props => {
     width: props.miniMapOptions.width,
     height: props.miniMapOptions.height,
     zIndex: 20,
+    minimapZones: props.miniMapOptions.minimapZones,
+    minimapZoneSymbols: props.miniMapOptions.minimapZoneSymbols,
   };
 
   // Filter out stops that are behind the mini map
   const stops = props.nearbyStops.filter(
     stop => stop.x < miniMapStyle.left || stop.y < miniMapStyle.top,
   );
+
+  // Filter out zone symbols that are behind the mini map
+  const projectedSymbols = props.projectedSymbols.filter(
+    symbol => symbol.sx < miniMapStyle.left || symbol.sy < miniMapStyle.top,
+  );
+
+  const symbolsWithStopDistances = calculateSymbolDistancesFromStops(stops, projectedSymbols);
+  const symbolForEachZone = getSymbolForEachZone(symbolsWithStopDistances);
 
   const miniMapCoordinateHelper = new MapCoordinateHelper(props.miniMapOptions);
   const newPosition = miniMapCoordinateHelper.getMapCenter();
@@ -74,6 +157,7 @@ const StopMap = props => {
             print: { enabled: true },
             ticket_sales: { enabled: true },
             municipal_borders: { enabled: true },
+            ticket_zones: { enabled: mapStyle.mapZones },
           }}
           date={props.date}
         />
@@ -103,6 +187,14 @@ const StopMap = props => {
               <div className={styles.subtitle}>You are here</div>
             </Row>
           </ItemFixed>
+
+          {symbolForEachZone &&
+            symbolForEachZone.length > 0 &&
+            symbolForEachZone.map((symbol, index) => (
+              <ItemPositioned key={index} x={symbol.sy} y={symbol.sx}>
+                <ZoneSymbol zone={symbol.zone} size={LOCATION_RADIUS * 2} />
+              </ItemPositioned>
+            ))}
 
           {stops.map((stop, index) => (
             <ItemPositioned
@@ -139,6 +231,8 @@ const StopMap = props => {
             print: { enabled: true },
             routes: { enabled: true, hideBusRoutes: true },
             municipal_borders: { enabled: true },
+            ticket_zone_labels_minimap: { enabled: miniMapStyle.minimapZoneSymbols },
+            ticket_zones: { enabled: miniMapStyle.minimapZones },
           }}
           extraLayers={[placeLabelCity]}
         />
@@ -169,6 +263,10 @@ const StopType = PropTypes.shape({
   calculatedHeading: PropTypes.number,
 });
 
+StopMap.defaultProps = {
+  projectedSymbols: null,
+};
+
 StopMap.propTypes = {
   mapOptions: PropTypes.shape(MapImage.optionsShape).isRequired,
   miniMapOptions: PropTypes.shape(MapImage.optionsShape).isRequired,
@@ -177,6 +275,7 @@ StopMap.propTypes = {
   pixelsPerMeter: PropTypes.number.isRequired,
   date: PropTypes.string.isRequired,
   showCitybikes: PropTypes.bool.isRequired,
+  projectedSymbols: PropTypes.arrayOf(Object),
 };
 
 export default StopMap;

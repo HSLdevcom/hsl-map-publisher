@@ -89,10 +89,7 @@ const propsMapper = mapProps(props => {
   return { tree: routesToTree(routes, props.data.stop, props.height) };
 });
 
-const hoc = compose(
-  graphql(routeDiagramQuery),
-  apolloWrapper(propsMapper),
-);
+const hoc = compose(graphql(routeDiagramQuery), apolloWrapper(propsMapper));
 
 const RouteDiagramContainer = hoc(RouteDiagram);
 
