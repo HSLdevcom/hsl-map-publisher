@@ -36,6 +36,18 @@ module.exports = function createEmptyTemplate(label, id) {
         ],
       },
       {
+        key: 'tram',
+        orientation: 'vertical',
+        background: '#0077C7',
+        resizeable: false,
+        slots: [
+          {
+            image: null,
+            size: 1,
+          },
+        ],
+      },
+      {
         key: 'footer',
         orientation: 'horizontal',
         background: '#0077C7',

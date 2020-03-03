@@ -264,7 +264,6 @@ class StopPoster extends Component {
     if (this.state.template && this.state.removedAds.length > 0) {
       const { template } = this.state;
       const svg = get(template, 'areas', []).find(t => t.key === 'map').slots[0];
-
       //  If using svg postpone adsPhase untill we have mapHeight.
       if (!svg.image) {
         this.setState({ adsPhase: true });
@@ -401,7 +400,9 @@ class StopPoster extends Component {
                           date={date}
                         />
                       )}
-                      {hasDiagram && isTramStop && <TramDiagram />}
+                      {hasDiagram && isTramStop && (
+                        <TramDiagram src={get(template, 'areas', []).find(t => t.key === 'tram')} />
+                      )}
                     </div>
                   )}
                 </Measure>
