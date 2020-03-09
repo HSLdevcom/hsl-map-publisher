@@ -292,13 +292,14 @@ class StopPoster extends Component {
       shortId,
       stopId,
       isTrunkStop,
-      isTramStop,
       hasRoutes: hasRoutesProp,
       date,
       isSummerTimetable,
       dateBegin,
       dateEnd,
     } = this.props;
+
+    let { isTramStop } = this.props;
 
     if (!hasRoutesProp) {
       return null;
@@ -330,6 +331,12 @@ class StopPoster extends Component {
         />
       </div>
     );
+
+    const src = get(template, 'areas', []).find(t => t.key === 'tram');
+    const tramImage = get(src, 'slots[0].image.svg', '');
+    if (tramImage) {
+      isTramStop = true;
+    }
 
     return (
       <CropMarks>
@@ -379,7 +386,7 @@ class StopPoster extends Component {
                       {/* The key will make sure the map updates its size if the layout changes */}
                       {shouldRenderMap && (
                         <CustomMap
-                          key={`poster_map_${hasDiagram}${isTramStop}`}
+                          key={`poster_map_${hasDiagram}${isTramStop}${hasStretchedLeftColumn}${hasColumnTimetable}`}
                           setMapHeight={this.setMapHeight}
                           stopId={stopId}
                           date={date}
@@ -393,16 +400,14 @@ class StopPoster extends Component {
                       )}
 
                       <Spacer height={10} />
-                      {hasDiagram && !isTramStop && (
+                      {hasDiagram && !tramImage && (
                         <RouteDiagram
                           height={this.state.diagramOptions.diagramStopCount}
                           stopId={stopId}
                           date={date}
                         />
                       )}
-                      {hasDiagram && isTramStop && (
-                        <TramDiagram src={get(template, 'areas', []).find(t => t.key === 'tram')} />
-                      )}
+                      {isTramStop && tramImage && <TramDiagram svg={tramImage} />}
                     </div>
                   )}
                 </Measure>
