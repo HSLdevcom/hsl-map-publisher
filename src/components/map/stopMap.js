@@ -231,7 +231,9 @@ const StopMap = props => {
             print: { enabled: true },
             routes: { enabled: true, hideBusRoutes: true },
             municipal_borders: { enabled: true },
+            zone-labels-and-borders
             ticket_zone_labels_fixed: { enabled: miniMapStyle.minimapZoneSymbols },
+
             ticket_zones: { enabled: miniMapStyle.minimapZones },
           }}
           extraLayers={[placeLabelCity]}
