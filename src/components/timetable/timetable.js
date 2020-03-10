@@ -42,6 +42,15 @@ const getZoneLetterStyle = zone => ({
       : 'translate(-50%, -50%)', // No px adjustments for zone A and the "else" case.
 });
 
+const getNotes = (notes, symbols) => {
+  const parsedNotes = [];
+  notes.forEach(note => {
+    const symbol = note.substring(0, 1);
+    if (symbols.includes(symbol)) parsedNotes.push(note);
+  });
+  return parsedNotes;
+};
+
 const Timetable = props => (
   <div
     className={classNames(styles.root, {
@@ -133,7 +142,7 @@ const Timetable = props => (
     )}
     {props.showNotes && props.notes.length !== 0 && <Spacer height={20} />}
     {props.showNotes &&
-      props.notes.map(note => (
+      getNotes(props.notes, props.specialSymbols).map(note => (
         <div key={note} className={styles.footnote}>
           {note}
         </div>
@@ -152,6 +161,7 @@ Timetable.defaultProps = {
   printableAsA4: false,
   standalone: false,
   greyscale: false,
+  specialSymbols: [],
 };
 
 Timetable.propTypes = {
@@ -175,6 +185,7 @@ Timetable.propTypes = {
   stopNameSe: PropTypes.string.isRequired,
   standalone: PropTypes.bool,
   greyscale: PropTypes.bool,
+  specialSymbols: PropTypes.array,
 };
 
 export default Timetable;

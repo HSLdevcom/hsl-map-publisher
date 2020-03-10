@@ -198,6 +198,17 @@ const propsMapper = mapProps(props => {
       }),
     );
 
+  const specialSymbols = [];
+  departures.forEach(departure => {
+    if (departure.note && !specialSymbols.includes(departure.note)) {
+      specialSymbols.push(departure.note);
+    }
+  });
+
+  if (departures.some(departure => departure.note && departure.note.includes('H'))) {
+    specialSymbols.push('H');
+  }
+
   departures = departures.map(departure => ({
     ...departure,
     note: modifyNote(
@@ -244,13 +255,11 @@ const propsMapper = mapProps(props => {
     printableAsA4: props.printTimetablesAsA4,
     greyscale: props.printTimetablesAsGreyscale,
     standalone: props.standalone,
+    specialSymbols,
   };
 });
 
-const hoc = compose(
-  graphql(timetableQuery),
-  apolloWrapper(propsMapper),
-);
+const hoc = compose(graphql(timetableQuery), apolloWrapper(propsMapper));
 
 const TimetableContainer = hoc(Timetable);
 
@@ -264,6 +273,7 @@ TimetableContainer.defaultProps = {
   showComponentName: true,
   printTimetablesAsA4: false,
   printTimetablesAsGreyscale: false,
+  specialSymbols: [],
 };
 
 TimetableContainer.propTypes = {
@@ -279,6 +289,7 @@ TimetableContainer.propTypes = {
   standalone: PropTypes.bool,
   printTimetablesAsA4: PropTypes.bool,
   printTimetablesAsGreyscale: PropTypes.bool,
+  specialSymbols: PropTypes.array,
 };
 
 export default TimetableContainer;
