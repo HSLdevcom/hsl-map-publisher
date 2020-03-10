@@ -35,13 +35,13 @@
 .group {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: left;
   height: 84px;
 }
 
 .routeIdsContainer {
   display: flex;
-  justify-content: center;
+  justify-content: left;
   flex-wrap: wrap;
 }
 

@@ -83,7 +83,10 @@ async function renderComponent(options) {
     printOptions = {
       printBackground: true,
       format: 'A4',
-      margin: 0,
+      margin: {
+        top: 20,
+        bottom: 20,
+      },
     };
   } else {
     printOptions = {
