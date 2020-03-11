@@ -222,7 +222,6 @@ const propsMapper = mapProps(props => {
   }));
 
   const { weekdays, saturdays, sundays } = pick(groupDepartures(departures), props.segments);
-
   const dateBegin =
     props.dateBegin ||
     flatMap(props.data.stop.siblings.nodes, stop =>
