@@ -176,7 +176,7 @@ const propsMapper = mapProps(props => {
   notes = uniq(notes).sort();
 
   const duplicateRoutes = [];
-
+  const specialSymbols = [];
   // Search for routes with two different destinations from the same stop and add notes for them
   Object.values(
     groupBy(
@@ -189,6 +189,10 @@ const propsMapper = mapProps(props => {
     .filter(routes => routes.length > 1)
     .forEach(directions =>
       directions.forEach(direction => {
+        const noteSymbol = `${trimRouteId(direction.routeId)}${'*'.repeat(direction.direction)}`;
+        if (!specialSymbols.includes(noteSymbol)) {
+          specialSymbols.push(noteSymbol);
+        }
         notes.push(
           `${trimRouteId(direction.routeId)}${'*'.repeat(direction.direction)} ${
             direction.route.nodes[0].destinationFi
@@ -198,14 +202,13 @@ const propsMapper = mapProps(props => {
       }),
     );
 
-  const specialSymbols = [];
   departures.forEach(departure => {
     if (departure.note && !specialSymbols.includes(departure.note)) {
       specialSymbols.push(departure.note);
     }
   });
 
-  if (departures.some(departure => departure.note && departure.note.includes('H'))) {
+  if (departures.some(departure => departure.note && departure.routeId.includes('H'))) {
     specialSymbols.push('H');
   }
 

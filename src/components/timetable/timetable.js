@@ -44,11 +44,14 @@ const getZoneLetterStyle = zone => ({
 
 const getNotes = (notes, symbols) => {
   const parsedNotes = [];
-  notes.forEach(note => {
-    const symbol = note.substring(0, 1);
-    if (symbols.includes(symbol)) parsedNotes.push(note);
+  symbols.forEach(symbol => {
+    notes.forEach(note => {
+      if (note.substring(0, symbol.length) === symbol && !parsedNotes.includes(note)) {
+        parsedNotes.push(note);
+      }
+    });
   });
-  return parsedNotes;
+  return parsedNotes.reverse();
 };
 
 const Timetable = props => (
