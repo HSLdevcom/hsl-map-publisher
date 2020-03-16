@@ -11,6 +11,23 @@ import styles from './stopLabel.css';
 const MAX_LABEL_ROWS = 6;
 const MAX_LABEL_CHARS = 36;
 
+const mapRoutesByDestination = routes => {
+  const routeSet = {};
+  routes.forEach(route => {
+    const key = `${route.destinationFi}${route.viaFi}`;
+    if (!routeSet[key]) {
+      const newRoute = route;
+      newRoute.routeIds = [route.routeId];
+      routeSet[key] = newRoute;
+    } else {
+      const newRouteIds = routeSet[key].routeIds;
+      newRouteIds.push(route.routeId);
+      routeSet[key].routeIds = newRouteIds;
+    }
+  });
+  return Object.values(routeSet);
+};
+
 const RouteList = props => {
   if (props.routes.length > MAX_LABEL_ROWS) {
     let rowLength = 0;
@@ -28,29 +45,45 @@ const RouteList = props => {
     return <div>{components}</div>;
   }
   return (
-    <Row>
-      <Column>
-        {props.routes.map((route, index) => (
-          <div key={index} className={styles.route} style={{ color: getColor(route) }}>
-            {route.routeId}
+    <div>
+      {mapRoutesByDestination(props.routes).map((route, index) => (
+        <div className={styles.flexContainer} key={`route_row_${route.routeId}${index}`}>
+          <div
+            key={index}
+            className={
+              route.routeIds.length > 2 ? styles.routeIdsContainerWide : styles.routeIdsContainer
+            }>
+            {route.routeIds.map((routeId, i) => {
+              const routeIdDiv = (
+                <span key={`route_id_${routeId}${i}`} style={{ color: getColor(route) }}>
+                  {routeId}
+                </span>
+              );
+              return i === route.routeIds.length - 1 ? (
+                routeIdDiv
+              ) : (
+                <div style={{ 'white-space': 'pre' }}>
+                  {routeIdDiv}
+                  {', '}
+                </div>
+              );
+            })}
           </div>
-        ))}
-      </Column>
-      <Spacer width={6} />
-      <Column>
-        {props.routes.map((route, index) => (
-          <div key={index}>
-            <span className={styles.destination}>
-              {route.destinationFi + (route.viaFi ? ` kautta ${route.viaFi}` : '')}
-            </span>
-            {'\xa0'}
-            <span className={styles.destinationLight}>
-              {route.destinationSe + (route.viaSe ? ` via ${route.viaSe}` : '')}
-            </span>
+          <Spacer width={6} />
+          <div className={styles.flexContainer}>
+            <div className={styles.destinationContainer}>
+              <span className={styles.destination}>
+                {route.destinationFi + (route.viaFi ? ` kautta ${route.viaFi}` : '')}
+              </span>
+              {'\xa0'}
+              <span className={styles.destinationLight}>
+                {route.destinationSe + (route.viaSe ? ` via ${route.viaSe}` : '')}
+              </span>
+            </div>
           </div>
-        ))}
-      </Column>
-    </Row>
+        </div>
+      ))}
+    </div>
   );
 };
 

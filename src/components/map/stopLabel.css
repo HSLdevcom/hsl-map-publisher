@@ -34,3 +34,27 @@
 .destinationLight {
   font-family: GothamRounded-Book;
 }
+
+.routeIdsContainer {
+  display: flex;
+  justify-content: left;
+  flex-wrap: wrap;
+}
+
+.routeIdsContainerWide {
+  display: flex;
+  justify-content: left;
+  flex-wrap: wrap;
+  width: auto;
+  max-width: 90px;
+}
+
+.flexContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+}
+
+.destinationContainer {
+  align-self: flex-end;
+}
