@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { hot } from 'react-hot-loader';
-import { get } from 'lodash';
+import { get, cloneDeep } from 'lodash';
 import { JustifiedColumn, Spacer } from 'components/util';
 import renderQueue from 'util/renderQueue';
 import { colorsByMode } from 'util/domain';
@@ -241,6 +241,22 @@ class StopPoster extends Component {
         return;
       }
 
+      const template = cloneDeep(this.state.template);
+      const mapTemplate = template
+        ? get(template, 'areas', []).find(t => t.key === 'map' || t.key === 'tram')
+        : null;
+      if (mapTemplate) {
+        for (let i = 0; i < template.areas.length; i++) {
+          const area = template.areas[i];
+          if (area.key === 'map' || area.key === 'tram') {
+            template.areas.splice(i, 1);
+            break;
+          }
+        }
+        this.setState({ template });
+        return;
+      }
+
       if (this.state.shouldRenderMap) {
         //  If map don't fit try fill available space with diagram.
         this.setState({
@@ -384,7 +400,7 @@ class StopPoster extends Component {
                       {/* The key will make sure the map updates its size if the layout changes */}
                       {shouldRenderMap && (
                         <CustomMap
-                          key={`poster_map_${hasDiagram}${isTramStop}`}
+                          key={`poster_map_${hasDiagram}${isTramStop}${hasRoutes}`}
                           setMapHeight={this.setMapHeight}
                           stopId={stopId}
                           date={date}
