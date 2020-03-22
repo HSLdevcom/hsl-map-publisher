@@ -41,7 +41,7 @@ const RouteList = props => {
         {props.routes.map((route, index) => (
           <div key={index}>
             <span className={styles.destination}>
-              {route.destinationFi + (route.viaFi ? ` kautta ${route.viaFi}` : '')}
+              {route.destinationFi + (route.viaFi ? ` via ${route.viaFi}` : '')}
             </span>
             {'\xa0'}
             <span className={styles.destinationLight}>

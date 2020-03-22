@@ -90,6 +90,16 @@
   font-family: GothamXNarrow-Book;
 }
 
+.viaTitle {
+  font-family: GothamXNarrow-Medium;
+  font-size: 0.58em;
+}
+
+.viaSubtitle {
+  font-family: GothamXNarrow-Book;
+  font-size: 0.58em;
+}
+
 .icon {
   height: 1em;
   width: 1em;

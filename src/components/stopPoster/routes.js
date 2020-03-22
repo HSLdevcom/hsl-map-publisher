@@ -43,13 +43,33 @@ class Routes extends Component {
     renderQueue.remove(this);
   }
 
-  hasOverflow() {
-    return this.root.scrollWidth > this.root.clientWidth;
-  }
+  routeContent = route =>
+    route.multiline ? (
+      <Row>
+        <Column>
+          <div className={styles.title}>{route.destinationFi}</div>
+          <div className={styles.subtitle}>{route.destinationSe}</div>
+        </Column>
+        <Column>
+          <div className={styles.viaTitle}>via</div>
+          <div className={styles.viaTitle}>{route.viaFi}</div>
+          <div className={styles.viaSubtitle}>{route.viaSe}</div>
+        </Column>
+      </Row>
+    ) : (
+      <div>
+        <div className={styles.title}>
+          {route.destinationFi + (route.viaFi ? ` via ${route.viaFi}` : '')}
+        </div>
+        <div className={styles.subtitle}>
+          {route.destinationSe + (route.viaSe ? ` via ${route.viaSe}` : '')}
+        </div>
+      </div>
+    );
 
   updateLayout() {
     if (this.hasOverflow()) {
-      if (this.state.columns > 1) {
+      if (this.state.columns > 0) {
         renderQueue.add(this);
         this.setState(state => ({ columns: state.columns - 1 }));
         return;
@@ -60,30 +80,40 @@ class Routes extends Component {
     renderQueue.remove(this);
   }
 
+  hasOverflow() {
+    return this.root.scrollWidth > this.root.clientWidth;
+  }
+
   render() {
-    const routesPerColumn = Math.ceil(this.props.routes.length / this.state.columns);
+    const routes = this.props.routes.map(route => {
+      const newRoute = route;
+      if (this.state.columns === 0 && (route.viaFi || route.viaSe)) {
+        newRoute.multiline = true;
+      }
+      return newRoute;
+    });
+    const routesPerColumn = Math.ceil(routes.length / this.state.columns);
     const routeColumns = chunk(
-      sortBy(this.props.routes, route => !isTrunkRoute(route.routeId)),
+      sortBy(routes, route => !isTrunkRoute(route.routeId)),
       routesPerColumn,
     );
-
     return (
       <div
         className={styles.root}
         ref={ref => {
           this.root = ref;
         }}>
-        {routeColumns.map((routes, i) => (
+        {routeColumns.map((routeColumn, i) => (
           <Row key={i}>
             <Column>
-              {routes.map((route, index) => (
+              {routeColumn.map((route, index) => (
                 <div key={index} className={styles.group}>
                   <InlineSVG className={styles.icon} src={getIcon(route)} />
                 </div>
               ))}
             </Column>
             <Column>
-              {routes.map((route, index) => (
+              {routeColumn.map((route, index) => (
                 <div key={index} className={styles.group}>
                   <div className={styles.id} style={{ color: getColor(route) }}>
                     {route.routeId}
@@ -92,14 +122,9 @@ class Routes extends Component {
               ))}
             </Column>
             <Column>
-              {routes.map((route, index) => (
+              {routeColumn.map((route, index) => (
                 <div key={index} className={styles.group} style={{ color: getColor(route) }}>
-                  <div className={styles.title}>
-                    {route.destinationFi + (route.viaFi ? ` kautta ${route.viaFi}` : '')}
-                  </div>
-                  <div className={styles.subtitle}>
-                    {route.destinationSe + (route.viaSe ? ` via ${route.viaSe}` : '')}
-                  </div>
+                  {this.routeContent(route)}
                 </div>
               ))}
             </Column>
