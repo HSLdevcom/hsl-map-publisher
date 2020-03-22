@@ -35,6 +35,13 @@
 .group {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  height: 84px;
+}
+
+.groupA4 {
+  display: flex;
+  flex-direction: column;
   justify-content: left;
   height: 84px;
 }
@@ -45,7 +52,7 @@
   flex-wrap: wrap;
 }
 
-.simple .group {
+.simple .groupA4 {
   height: auto;
   margin-top: 0.25rem;
   flex-wrap: nowrap;
@@ -72,7 +79,7 @@
   line-height: 0.9;
   padding: 0 0.25em 0 0;
   margin-top: 2px;
-  font-weight: bold;
+  font-family: GothamXNarrow-Medium;
 }
 
 .simple .singleId {
@@ -81,7 +88,7 @@
   padding: 0 0.25em 0 0;
   min-width: 1.875em;
   margin-top: 2px;
-  font-weight: bold;
+  font-family: GothamXNarrow-Medium;
 }
 
 .routeTitles {
@@ -94,7 +101,6 @@
   padding-right: 0.893em;
   font-family: GothamXNarrow-Medium;
   font-size: 0.83em;
-  font-weight: bold;
 }
 
 .simple .title {
@@ -104,7 +110,6 @@
 .subtitle {
   composes: title;
   font-family: GothamXNarrow-Book;
-  font-weight: normal;
 }
 
 .icon {

@@ -11,7 +11,7 @@ import routesContainer from '../stopPoster/routesContainer';
 const mapRoutesByDestination = routes => {
   const routeSet = {};
   routes.forEach(route => {
-    const key = `${route.destinationFi}`;
+    const key = `${route.destinationFi}${route.viaFi}`;
     if (!routeSet[key]) {
       const newRoute = route;
       newRoute.routeIds = [route.routeId];
@@ -38,7 +38,7 @@ function SimpleRoutes(props) {
       {routeColumns.map((routeColumn, i) => (
         <Column className={styles.column} key={i}>
           {routeColumn.map(route => (
-            <div className={styles.group} key={`route_row_${route.routeId}`}>
+            <div className={styles.groupA4} key={`route_row_${route.routeId}`}>
               <div className={styles.routeIdsContainer}>
                 {route.routeIds.map((routeId, index) =>
                   index === route.routeIds.length - 1 ? (
