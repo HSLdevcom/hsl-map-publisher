@@ -76,18 +76,14 @@
 
 .simple .id {
   font-size: 0.83em;
-  line-height: 0.9;
   padding: 0 0.25em 0 0;
-  margin-top: 2px;
   font-family: GothamXNarrow-Medium;
 }
 
 .simple .singleId {
   font-size: 0.83em;
-  line-height: 0.9;
   padding: 0 0.25em 0 0;
   min-width: 1.875em;
-  margin-top: 2px;
   font-family: GothamXNarrow-Medium;
 }
 
