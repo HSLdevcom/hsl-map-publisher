@@ -18,17 +18,6 @@ class CustomMap extends Component {
     // eslint-disable-next-line react/require-default-props
     template: PropTypes.any,
     setMapHeight: PropTypes.func.isRequired,
-    mapZoneSymbols: PropTypes.bool,
-    mapZones: PropTypes.bool,
-    minimapZoneSymbols: PropTypes.bool,
-    minimapZones: PropTypes.bool,
-  };
-
-  static defaultProps = {
-    mapZoneSymbols: false,
-    mapZones: false,
-    minimapZoneSymbols: false,
-    minimapZones: false,
   };
 
   state = {
@@ -63,16 +52,7 @@ class CustomMap extends Component {
   };
 
   render() {
-    const {
-      template,
-      stopId,
-      date,
-      isSummerTimetable,
-      mapZoneSymbols,
-      mapZones,
-      minimapZoneSymbols,
-      minimapZones,
-    } = this.props;
+    const { template, stopId, date, isSummerTimetable } = this.props;
     const { mapWidth, mapHeight } = this.state;
 
     /**
@@ -132,10 +112,6 @@ class CustomMap extends Component {
                 width={mapWidth}
                 height={mapHeight}
                 showCitybikes={isSummerTimetable}
-                mapZoneSymbols={mapZoneSymbols}
-                mapZones={mapZones}
-                minimapZoneSymbols={minimapZoneSymbols}
-                minimapZones={minimapZones}
               />
             ) : null}
           </div>

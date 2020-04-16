@@ -39,13 +39,12 @@ class ItemPositioned extends Component {
 
 ItemPositioned.defaultProps = {
   angle: 0,
-  distance: 0,
 };
 
 ItemPositioned.propTypes = {
   x: PropTypes.number.isRequired,
   y: PropTypes.number.isRequired,
-  distance: PropTypes.number,
+  distance: PropTypes.number.isRequired,
   angle: PropTypes.number,
   children: PropTypes.element.isRequired,
 };

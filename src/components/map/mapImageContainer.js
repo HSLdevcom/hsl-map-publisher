@@ -35,10 +35,14 @@ const propsMapper = mapProps(({ options, components, date, extraLayers }) => {
   if (extraLayers) {
     mapStyle.layers = [...mapStyle.layers, ...extraLayers];
   }
+
   return { src: fetchMap(options, mapStyle) };
 });
 
-const hoc = compose(propsMapper, promiseWrapper('src'));
+const hoc = compose(
+  propsMapper,
+  promiseWrapper('src'),
+);
 
 const MapImageContainer = hoc(MapImage);
 

@@ -73,23 +73,17 @@ class ItemContainer extends Component {
       };
       return child ? React.cloneElement(child, props) : null;
     });
-
-    let overLayItems;
-    if (this.state.items) {
-      overLayItems = this.state.items.filter(item => item.initialDistance);
-    }
-
     return (
       <div
         className={styles.root}
         ref={ref => {
           this.root = ref;
         }}>
-        {overLayItems && (
+        {this.state.items && (
           <ItemOverlay
             width={this.root.offsetWidth}
             height={this.root.offsetHeight}
-            items={overLayItems}
+            items={this.state.items}
           />
         )}
         {children}

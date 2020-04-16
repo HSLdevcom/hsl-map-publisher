@@ -247,7 +247,10 @@ const propsMapper = mapProps(props => {
   };
 });
 
-const hoc = compose(graphql(timetableQuery), apolloWrapper(propsMapper));
+const hoc = compose(
+  graphql(timetableQuery),
+  apolloWrapper(propsMapper),
+);
 
 const TimetableContainer = hoc(Timetable);
 

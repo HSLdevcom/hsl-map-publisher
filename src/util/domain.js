@@ -10,7 +10,6 @@ import zoneByShortId from 'data/zoneByShortId';
 const TRUNK_ROUTES = ['550', '560', '500', '510', '200', '570'];
 const RAIL_ROUTE_ID_REGEXP = /^300[12]/;
 const SUBWAY_ROUTE_ID_REGEXP = /^31/;
-const U_LINE_REGEX = /^7/;
 
 /**
  * Returns whether a route id is a so called number variant
@@ -48,16 +47,12 @@ function isTrunkRoute(routeId) {
   return TRUNK_ROUTES.includes(routeId);
 }
 
-function isULine(routeId) {
-  return U_LINE_REGEX.test(routeId);
-}
-
 /**
  * Returns route id without area code or leading zeros
  * @param {String} routeId - Route id
  * @returns {String}
  */
-function trimRouteId(routeId, skipULine) {
+function trimRouteId(routeId) {
   if (isRailRoute(routeId) && isNumberVariant(routeId)) {
     return routeId.substring(0, 5).replace(RAIL_ROUTE_ID_REGEXP, '');
   }
@@ -70,16 +65,10 @@ function trimRouteId(routeId, skipULine) {
   if (isSubwayRoute(routeId)) {
     return routeId.replace(SUBWAY_ROUTE_ID_REGEXP, '');
   }
-
-  if (isULine(routeId) && !skipULine) {
-    return routeId.substring(0, 5).replace(U_LINE_REGEX, 'U');
-  }
-
   if (isNumberVariant(routeId)) {
     // Do not show number variants
     return routeId.substring(1, 5).replace(/^[0]+/g, '');
   }
-
   return routeId.substring(1).replace(/^[0]+/g, '');
 }
 
@@ -142,7 +131,6 @@ export {
   isRailRoute,
   isSubwayRoute,
   isTrunkRoute,
-  isULine,
   trimRouteId,
   isDropOffOnly,
   getZoneName,

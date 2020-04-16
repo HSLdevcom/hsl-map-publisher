@@ -87,11 +87,9 @@ function getNextPlacement(initialPlacement, index, diffs, bbox) {
     return [...prev, ...getPlacements(placement, overlapIndex, diffs, bbox)];
   }, []);
 
-  const nextPlacement = [
-    initialPlacement,
-    ...placements,
-    ...placementsOverlapping,
-  ].reduce((prev, cur) => comparePlacements(prev, cur, bbox));
+  const nextPlacement = [initialPlacement, ...placements, ...placementsOverlapping].reduce(
+    (prev, cur) => comparePlacements(prev, cur, bbox),
+  );
 
   return nextPlacement;
 }

@@ -134,7 +134,6 @@ const nearbyItemsMapper = mapProps(props => {
     minLat,
     maxLon,
     maxLat,
-    projectedSymbols,
   } = calculateStopsViewport({
     longitude: props.longitude,
     latitude: props.latitude,
@@ -146,7 +145,6 @@ const nearbyItemsMapper = mapProps(props => {
     currentStopId: props.stopId,
     miniMapStartX: props.width - MINI_MAP_WIDTH - MINI_MAP_MARGIN_RIGHT,
     miniMapStartY: props.height - MINI_MAP_HEIGHT - MINI_MAP_MARGIN_BOTTOM,
-    useProjectedSymbols: props.mapZoneSymbols,
   });
 
   const currentStop = projectedStops.find(({ stopIds }) => stopIds.includes(props.stopId));
@@ -157,8 +155,6 @@ const nearbyItemsMapper = mapProps(props => {
     width: props.width,
     height: props.height,
     zoom: viewport.zoom,
-    mapZoneSymbols: props.mapZoneSymbols,
-    mapZones: props.mapZones,
   };
 
   const miniMapOptions = {
@@ -168,8 +164,6 @@ const nearbyItemsMapper = mapProps(props => {
     zoom: MINI_MAP_ZOOM,
     marginRight: MINI_MAP_MARGIN_RIGHT,
     marginBottom: MINI_MAP_MARGIN_BOTTOM,
-    minimapZoneSymbols: props.minimapZoneSymbols,
-    minimapZones: props.minimapZones,
   };
 
   return {
@@ -187,7 +181,6 @@ const nearbyItemsMapper = mapProps(props => {
     minLat,
     maxLon,
     maxLat,
-    projectedSymbols,
   };
 });
 
