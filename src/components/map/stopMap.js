@@ -133,7 +133,7 @@ const StopMap = props => {
 
   // Filter out zone symbols that are behind the mini map
   const projectedSymbols = props.projectedSymbols.filter(
-    symbol => symbol.sx < miniMapStyle.left || symbol.sy < miniMapStyle.top,
+    symbol => symbol.sy < miniMapStyle.left && symbol.sx < miniMapStyle.top,
   );
 
   const symbolsWithStopDistances = calculateSymbolDistancesFromStops(stops, projectedSymbols);
