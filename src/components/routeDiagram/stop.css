@@ -12,8 +12,15 @@
 .right {
   display: flex;
   padding-left: 10px;
-  width: var(--right-width);
   box-sizing: border-box;
+  width: var(--right-width);
+}
+
+.rightWide {
+  display: flex;
+  padding-left: 10px;
+  box-sizing: border-box;
+  width: 240px;
 }
 
 .title {
@@ -30,6 +37,26 @@
   display: flex;
   align-items: center;
   margin-left: 6px;
+  margin-right: 6px;
+}
+
+.routeContainer {
+  display: flex;
+  justify-content: left;
+  font-size: 0.88em;
+  padding: 0 0.3em 0 0;
+}
+
+.titleContainer {
+  display: flex;
+  align-items: center;
+}
+
+.terminalAreaRoutesContainer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 5px;
 }
 
 .icon {
