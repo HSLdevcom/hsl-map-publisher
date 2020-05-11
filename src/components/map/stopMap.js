@@ -191,9 +191,9 @@ const StopMap = props => {
           {symbolForEachZone &&
             symbolForEachZone.length > 0 &&
             symbolForEachZone.map((symbol, index) => (
-              <ItemPositioned key={index} x={symbol.sy} y={symbol.sx}>
+              <ItemFixed key={index} left={symbol.sy} top={symbol.sx}>
                 <ZoneSymbol zone={symbol.zone} size={LOCATION_RADIUS * 2} />
-              </ItemPositioned>
+              </ItemFixed>
             ))}
 
           {stops.map((stop, index) => (
