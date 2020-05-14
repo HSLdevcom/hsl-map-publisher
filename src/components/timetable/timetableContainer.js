@@ -208,7 +208,7 @@ const propsMapper = mapProps(props => {
     }
   });
 
-  if (departures.some(departure => departure.note && departure.routeId.includes('H'))) {
+  if (departures.some(departure => departure.routeId.includes('H'))) {
     specialSymbols.push('H');
   }
 
