@@ -317,7 +317,8 @@ class StopPoster extends Component {
     let { isTramStop } = this.props;
     const src = get(template, 'areas', []).find(t => t.key === 'tram');
     const tramImage = get(src, 'slots[0].image.svg', '');
-    const useDiagram = hasDiagram || (hasDiagram && isTramStop && !tramImage);
+    let useDiagram = hasDiagram || (hasDiagram && isTramStop && !tramImage);
+    if (isTramStop && tramImage) useDiagram = false;
     
     const StopPosterTimetable = props => (
       <div className={styles.timetable}>
