@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import uniqBy from 'lodash/uniqBy';
 
-import { Row, Column, Spacer } from 'components/util';
+import { Spacer } from 'components/util';
 import { getColor } from 'util/domain';
 
 import styles from './stopLabel.css';
@@ -55,14 +55,16 @@ const RouteList = props => {
             }>
             {route.routeIds.map((routeId, i) => {
               const routeIdDiv = (
-                <span key={`route_id_${routeId}${i}`} style={{ color: getColor(route) }}>
+                <span
+                  key={`route_id_${routeId}${i}`}
+                  style={{ color: getColor({ routeId, mode: route.mode }) }}>
                   {routeId}
                 </span>
               );
               return i === route.routeIds.length - 1 ? (
                 routeIdDiv
               ) : (
-                <div style={{ 'white-space': 'pre' }}>
+                <div style={{ whiteSpace: 'pre' }} key={`routeId_div_${routeId}`}>
                   {routeIdDiv}
                   {', '}
                 </div>
