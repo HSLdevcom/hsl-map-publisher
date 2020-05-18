@@ -42,7 +42,7 @@ class Stop extends Component {
     this.props.transferModes.forEach(mode => modes.add(mode));
 
     const terminalAreaRoutes = this.getTerminalAreaRoutes(this.props);
-    if (terminalAreaRoutes.length > MAX_TERMINAL_ROUTE_DIVS) {
+    if (terminalAreaRoutes.length - 1 >= MAX_TERMINAL_ROUTE_DIVS) {
       terminalAreaRoutes.length = MAX_TERMINAL_ROUTE_DIVS;
       terminalAreaRoutes.push('...');
     }

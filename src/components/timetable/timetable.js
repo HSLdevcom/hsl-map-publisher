@@ -133,8 +133,8 @@ const Timetable = props => (
     )}
     {props.showNotes && props.notes.length !== 0 && <Spacer height={20} />}
     {props.showNotes &&
-      props.notes.map(note => (
-        <div key={note} className={styles.footnote}>
+      props.notes.map((note, index) => (
+        <div key={`${note}${index}`} className={styles.footnote}>
           {note}
         </div>
       ))}

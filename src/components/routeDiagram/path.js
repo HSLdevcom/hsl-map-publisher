@@ -10,7 +10,7 @@ import styles from './path.css';
 
 // Must match width and radius values in CSS
 const PATH_WIDTH = 224;
-const PATH_WIDTH_WIDER = 258;
+const PATH_WIDTH_WIDER = 248;
 const LINE_RADIUS = 10;
 
 class Path extends Component {
