@@ -9,7 +9,7 @@ import Zone from './zone';
 import styles from './path.css';
 
 // Must match width and radius values in CSS
-const PATH_WIDTH = 224;
+const PATH_WIDTH = 225;
 const PATH_WIDTH_WIDER = 248;
 const LINE_RADIUS = 10;
 
