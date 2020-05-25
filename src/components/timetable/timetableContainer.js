@@ -198,7 +198,6 @@ const propsMapper = mapProps(props => {
       }),
     );
 
-  console.log(notes);
   departures = departures.map(departure => ({
     ...departure,
     note: modifyNote(
