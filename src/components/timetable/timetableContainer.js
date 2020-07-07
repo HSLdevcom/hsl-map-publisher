@@ -69,7 +69,7 @@ function getNotes(isSummerTimetable) {
         })
         .map(note => {
           const noteText = note.noteText || '';
-          return noteText.replace(/^(p|pe)(\s=)?\s/, 'pe = ');
+          return noteText.replace(/^(p|pe)(\s=)?\s/, 'pe = ').replace('s', `'s`);
         })
     );
   };
@@ -247,10 +247,7 @@ const propsMapper = mapProps(props => {
   };
 });
 
-const hoc = compose(
-  graphql(timetableQuery),
-  apolloWrapper(propsMapper),
-);
+const hoc = compose(graphql(timetableQuery), apolloWrapper(propsMapper));
 
 const TimetableContainer = hoc(Timetable);
 

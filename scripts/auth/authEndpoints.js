@@ -4,6 +4,7 @@ const AuthService = require('./authService');
 // TODO: Envify
 const allowedDomains = ['cgi.com', 'hsl.fi'];
 const allowedGroup = 'Karttajulkaisin';
+const testGroup = 'Karttajulkaisin-test';
 
 const hasAllowedGroup = async userInfo => {
   const groups = get(userInfo, 'groups');
@@ -13,7 +14,7 @@ const hasAllowedGroup = async userInfo => {
     return true;
   }
 
-  if (!allowedDomains.includes(domain)) {
+  if (!allowedDomains.includes(domain) && !groups.includes(testGroup)) {
     console.log(`User does not have allowed domain. Logging out.`);
     return false;
   }

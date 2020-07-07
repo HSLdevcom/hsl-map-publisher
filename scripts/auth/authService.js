@@ -48,8 +48,27 @@ const logoutFromIdentityProvider = async accessToken => {
   });
 };
 
-const setGroup = async (userId, groups) => {
+const requestGroups = async () => {
+  const url = `${LOGIN_PROVIDER_URI}/api/rest/v1/group`;
+  const groupsResponse = await nodeFetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Basic ${authHash}`,
+    },
+  });
+
+  return groupsResponse.json();
+};
+
+const setGroup = async (userId, groupNames) => {
   const url = `${LOGIN_PROVIDER_URI}/api/rest/v1/user/${userId}`;
+  const groups = await requestGroups();
+  const groupIds = [];
+  groups.resources.forEach(group => {
+    if (groupNames.includes(group.name)) {
+      groupIds.push(group.id);
+    }
+  });
   const response = await nodeFetch(url, {
     method: 'PUT',
     headers: {
@@ -58,7 +77,7 @@ const setGroup = async (userId, groups) => {
       Authorization: `Basic ${authHash}`,
     },
     body: JSON.stringify({
-      memberOf: groups,
+      memberOf: groupIds,
     }),
   });
 

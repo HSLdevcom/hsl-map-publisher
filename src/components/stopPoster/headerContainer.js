@@ -20,10 +20,7 @@ const headerQuery = gql`
 
 const propsMapper = mapProps(props => props.data.stop);
 
-const hoc = compose(
-  graphql(headerQuery),
-  apolloWrapper(propsMapper),
-);
+const hoc = compose(graphql(headerQuery), apolloWrapper(propsMapper));
 
 const HeaderContainer = hoc(Header);
 
