@@ -10,6 +10,8 @@ const fs = require('fs-extra');
 const generator = require('./generator');
 const authEndpoints = require('./auth/authEndpoints');
 
+const allowedDomains = process.env.DOMAINS_ALLOWED_TO_GENERATE || 'hsl.fi';
+
 const {
   migrate,
   addEvent,
@@ -90,6 +92,12 @@ const errorHandler = async (ctx, next) => {
     ctx.body = { message: error.message };
     console.error(error); // eslint-disable-line no-console
   }
+};
+
+const allowedToGenerate = user => {
+  const domain = user.split('@')[1];
+  const parsedAllowedDomains = allowedDomains.split(',');
+  return parsedAllowedDomains.includes(domain);
 };
 
 async function main() {
@@ -181,6 +189,10 @@ async function main() {
 
     for (let i = 0; i < props.length; i++) {
       const currentProps = props[i];
+      const isAllowedUser = allowedToGenerate(currentProps.user);
+      if (!isAllowedUser) {
+        ctx.throw(401, 'User not allowed to generate posters.');
+      }
       let orderNumber = get(
         build.posters.find(
           poster => poster.props.stopId === currentProps.stopId && poster.status === 'FAILED',
