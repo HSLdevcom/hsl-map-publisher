@@ -10,7 +10,7 @@ const fs = require('fs-extra');
 const generator = require('./generator');
 const authEndpoints = require('./auth/authEndpoints');
 
-const allowedDomains = process.env.DOMAINS_ALLOWED_TO_GENERATE;
+const { DOMAINS_ALLOWED_TO_GENERATE } = require('../constants');
 
 const {
   migrate,
@@ -96,7 +96,7 @@ const errorHandler = async (ctx, next) => {
 
 const allowedToGenerate = user => {
   const domain = user.split('@')[1];
-  const parsedAllowedDomains = allowedDomains.split(',');
+  const parsedAllowedDomains = DOMAINS_ALLOWED_TO_GENERATE.split(',');
   return parsedAllowedDomains.includes(domain);
 };
 
