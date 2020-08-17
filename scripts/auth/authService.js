@@ -1,13 +1,9 @@
 const nodeFetch = require('node-fetch');
 
-const {
-  CLIENT_ID,
-  CLIENT_SECRET,
-  REDIRECT_URI,
-  LOGIN_PROVIDER_URI,
-  API_CLIENT_ID,
-  API_CLIENT_SECRET,
-} = process.env;
+const { CLIENT_ID, REDIRECT_URI, LOGIN_PROVIDER_URI, API_CLIENT_ID } = process.env;
+
+const { CLIENT_SECRET, API_CLIENT_SECRET } = require('../../constants');
+
 const authHash = Buffer.from(`${API_CLIENT_ID}:${API_CLIENT_SECRET}`).toString('base64');
 
 const requestAccessToken = async code => {
