@@ -2,7 +2,7 @@ const { get, last, clone } = require('lodash');
 const AuthService = require('./authService');
 
 // TODO: Envify
-const allowedDomains = ['cgi.com', 'hsl.fi'];
+const allowedDomains = process.env.DOMAINS_ALLOWED_TO_LOGIN.split(',');
 const allowedGroup = 'Karttajulkaisin';
 const testGroup = 'Karttajulkaisin-test';
 
