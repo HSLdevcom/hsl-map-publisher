@@ -101,7 +101,8 @@ async function renderComponent(options) {
   await fs.outputFile(pdfFilePath, contents);
   await page.close();
 
-  await uploadPosterToCloud(pdfFilePath);
+  const posterUploaded = await uploadPosterToCloud(pdfFilePath);
+  return posterUploaded;
 }
 
 async function renderComponentRetry(options) {
@@ -118,9 +119,15 @@ async function renderComponentRetry(options) {
       const timeout = new Promise((resolve, reject) =>
         setTimeout(reject, RENDER_TIMEOUT, new Error('Render timeout')),
       );
-      await Promise.race([renderComponent(options), timeout]);
-      onInfo('Rendered successfully');
-      return { success: true };
+      const posterUploaded = await Promise.race([renderComponent(options), timeout]);
+      if (posterUploaded) {
+        onInfo('Rendered successfully.');
+      } else {
+        const err = { message: 'Rendered successfully but uploading poster failed.', stack: '' };
+        throw err;
+      }
+
+      return { success: true, uploaded: posterUploaded };
     } catch (error) {
       onError(error);
     }
