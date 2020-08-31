@@ -1,8 +1,9 @@
 const { get, last, clone } = require('lodash');
 const AuthService = require('./authService');
 
-// TODO: Envify
-const allowedDomains = process.env.DOMAINS_ALLOWED_TO_LOGIN.split(',');
+const { DOMAINS_ALLOWED_TO_LOGIN } = require('../../constants');
+
+const allowedDomains = DOMAINS_ALLOWED_TO_LOGIN.split(',');
 const allowedGroup = 'Karttajulkaisin';
 const testGroup = 'Karttajulkaisin-test';
 
