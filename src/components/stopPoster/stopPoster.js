@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { hot } from 'react-hot-loader';
-import { get } from 'lodash';
+import { get, cloneDeep } from 'lodash';
 import { JustifiedColumn, Spacer } from 'components/util';
 import renderQueue from 'util/renderQueue';
 import { colorsByMode } from 'util/domain';
@@ -238,6 +238,22 @@ class StopPoster extends Component {
 
       if (this.state.hasRoutes) {
         this.setState({ hasRoutes: false });
+        return;
+      }
+
+      const template = cloneDeep(this.state.template);
+      const mapTemplate = template
+        ? get(template, 'areas', []).find(t => t.key === 'map' || t.key === 'tram')
+        : null;
+      if (mapTemplate) {
+        for (let i = 0; i < template.areas.length; i++) {
+          const area = template.areas[i];
+          if (area.key === 'map' || area.key === 'tram') {
+            template.areas.splice(i, 1);
+            break;
+          }
+        }
+        this.setState({ template });
         return;
       }
 
