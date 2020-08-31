@@ -49,7 +49,7 @@ const propsMapper = withProps(props => {
     shortId: props.data.stop.shortId,
     hasRoutes: routeIds.length > 0,
     isTrunkStop: routeIds.some(routeId => isTrunkRoute(routeId)),
-    isTramStop: modes.every(mode => mode === 'TRAM'),
+    isTramStop: modes.some(mode => mode === 'TRAM'),
   };
 });
 

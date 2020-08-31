@@ -280,7 +280,6 @@ class StopPoster extends Component {
     if (this.state.template && this.state.removedAds.length > 0) {
       const { template } = this.state;
       const svg = get(template, 'areas', []).find(t => t.key === 'map').slots[0];
-
       //  If using svg postpone adsPhase untill we have mapHeight.
       if (!svg.image) {
         this.setState({ adsPhase: true });
@@ -309,7 +308,6 @@ class StopPoster extends Component {
       shortId,
       stopId,
       isTrunkStop,
-      isTramStop,
       hasRoutes: hasRoutesProp,
       date,
       isSummerTimetable,
@@ -335,6 +333,12 @@ class StopPoster extends Component {
       shouldRenderMap,
       hasColumnTimetable,
     } = this.state;
+
+    const { isTramStop } = this.props;
+    const src = get(template, 'areas', []).find(t => t.key === 'tram');
+    const tramImage = get(src, 'slots[0].image.svg', '');
+    let useDiagram = hasDiagram || (hasDiagram && isTramStop && !tramImage);
+    if (isTramStop && tramImage) useDiagram = false;
 
     const StopPosterTimetable = props => (
       <div className={styles.timetable}>
@@ -373,7 +377,7 @@ class StopPoster extends Component {
                   {!hasColumnTimetable && <StopPosterTimetable segments={['weekdays']} />}
                   {/* The key will make sure the ad container updates its size if the layout changes */}
                   <AdContainer
-                    key={`poster_ads_${hasRoutes}${hasRoutesOnTop}${hasStretchedLeftColumn}${hasDiagram}`}
+                    key={`poster_ads_${hasRoutes}${hasRoutesOnTop}${hasStretchedLeftColumn}${useDiagram}`}
                     shortId={shortId}
                     template={template ? get(template, 'areas', []).find(t => t.key === 'ads') : {}}
                   />
@@ -396,11 +400,11 @@ class StopPoster extends Component {
                           <StopPosterTimetable segments={['sundays']} hideDetails />
                         </div>
                       )}
-                      {!hasDiagram && <Spacer height={10} />}
+                      {!useDiagram && <Spacer height={10} />}
                       {/* The key will make sure the map updates its size if the layout changes */}
                       {shouldRenderMap && (
                         <CustomMap
-                          key={`poster_map_${hasDiagram}${isTramStop}${hasRoutes}`}
+                          key={`poster_map_${useDiagram}${isTramStop}${hasStretchedLeftColumn}${hasColumnTimetable}`}
                           setMapHeight={this.setMapHeight}
                           stopId={stopId}
                           date={date}
@@ -418,14 +422,14 @@ class StopPoster extends Component {
                       )}
 
                       <Spacer height={10} />
-                      {hasDiagram && !isTramStop && (
+                      {useDiagram && (
                         <RouteDiagram
                           height={this.state.diagramOptions.diagramStopCount}
                           stopId={stopId}
                           date={date}
                         />
                       )}
-                      {hasDiagram && isTramStop && <TramDiagram />}
+                      {isTramStop && tramImage && <TramDiagram svg={tramImage} />}
                     </div>
                   )}
                 </Measure>
