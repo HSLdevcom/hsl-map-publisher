@@ -1,19 +1,18 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { InlineSVG } from 'components/util';
-import tramDiagramIcon from 'icons/tram_diagram.svg';
 
 import styles from './tramDiagram.css';
 
-const TramDiagram = () => (
+const TramDiagram = props => (
   <div className={styles.root}>
-    {/*
-    <div className={styles.componentName}>
-      <div className={styles.title}>Linjojen reitit</div>
-      <div className={styles.subtitle}>Linjernas rutter</div>
-    </div> */}
-    <InlineSVG className={styles.diagram} src={tramDiagramIcon} />
+    <InlineSVG className={styles.diagram} src={props.svg} />
   </div>
 );
+
+TramDiagram.propTypes = {
+  svg: PropTypes.any.isRequired,
+};
 
 export default TramDiagram;
