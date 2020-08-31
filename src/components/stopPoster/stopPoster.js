@@ -297,6 +297,10 @@ class StopPoster extends Component {
       isSummerTimetable,
       dateBegin,
       dateEnd,
+      mapZoneSymbols,
+      mapZones,
+      minimapZoneSymbols,
+      minimapZones,
     } = this.props;
 
     if (!hasRoutesProp) {
@@ -314,12 +318,12 @@ class StopPoster extends Component {
       hasColumnTimetable,
     } = this.state;
 
-    let { isTramStop } = this.props;
+    const { isTramStop } = this.props;
     const src = get(template, 'areas', []).find(t => t.key === 'tram');
     const tramImage = get(src, 'slots[0].image.svg', '');
     let useDiagram = hasDiagram || (hasDiagram && isTramStop && !tramImage);
     if (isTramStop && tramImage) useDiagram = false;
-    
+
     const StopPosterTimetable = props => (
       <div className={styles.timetable}>
         <Timetable
@@ -394,6 +398,10 @@ class StopPoster extends Component {
                               ? get(template, 'areas', []).find(t => t.key === 'map')
                               : template // null if template is loading, false if no template
                           }
+                          mapZoneSymbols={mapZoneSymbols}
+                          mapZones={mapZones}
+                          minimapZoneSymbols={minimapZoneSymbols}
+                          minimapZones={minimapZones}
                         />
                       )}
 
@@ -437,12 +445,20 @@ StopPoster.propTypes = {
   isTramStop: PropTypes.bool.isRequired,
   shortId: PropTypes.string.isRequired,
   template: PropTypes.any.isRequired,
+  mapZoneSymbols: PropTypes.bool,
+  mapZones: PropTypes.bool,
+  minimapZoneSymbols: PropTypes.bool,
+  minimapZones: PropTypes.bool,
 };
 
 StopPoster.defaultProps = {
   isSummerTimetable: false,
   dateBegin: null,
   dateEnd: null,
+  mapZoneSymbols: false,
+  mapZones: false,
+  minimapZoneSymbols: false,
+  minimapZones: false,
 };
 
 export default hot(module)(StopPoster);
