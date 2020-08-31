@@ -35,20 +35,6 @@
   font-family: GothamRounded-Book;
 }
 
-.routeIdsContainer {
-  display: flex;
-  justify-content: left;
-  flex-wrap: wrap;
-}
-
-.routeIdsContainerWide {
-  display: flex;
-  justify-content: left;
-  flex-wrap: wrap;
-  width: auto;
-  max-width: 90px;
-}
-
 .flexContainer {
   display: flex;
   flex-direction: row;
@@ -57,4 +43,8 @@
 
 .destinationContainer {
   align-self: center;
+}
+
+.comma {
+  margin-right: 3px;
 }
