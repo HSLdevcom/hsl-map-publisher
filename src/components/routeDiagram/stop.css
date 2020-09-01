@@ -20,7 +20,7 @@
   display: flex;
   padding-left: 10px;
   box-sizing: border-box;
-  width: 230px;
+  width: 233px;
 }
 
 .title {
@@ -43,8 +43,8 @@
 .routeContainer {
   display: flex;
   justify-content: left;
-  font-size: 0.88em;
-  padding: 0 0.3em 0 0;
+  font-size: 0.7em;
+  padding: 0 0.285em 0 0;
 }
 
 .titleContainer {
@@ -56,7 +56,6 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  padding: 5px;
 }
 
 .icon {
