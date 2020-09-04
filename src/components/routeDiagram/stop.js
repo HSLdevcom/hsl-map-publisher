@@ -32,8 +32,15 @@ class Stop extends Component {
       if (!props.destinationRouteIds.includes(routeId) && segment.hasRegularDayDepartures)
         routes.push({ routeId, routeIdNumber });
     });
-    const sortedRoutes = routes.sort((a, b) => a.routeIdNumber - b.routeIdNumber);
-    return sortedRoutes.map(route => route.routeId);
+    const routeIds = [];
+    routes
+      .sort((a, b) => a.routeIdNumber - b.routeIdNumber)
+      .forEach(route => {
+        const { routeId } = route;
+        if (!routeIds.includes(routeId)) routeIds.push(routeId);
+      });
+
+    return routeIds;
   };
 
   render() {
