@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { iconsByMode, trimRouteId } from 'util/domain';
+import { iconsByMode, trimRouteId, routeGeneralizer } from 'util/domain';
 import { Column, InlineSVG } from 'components/util';
 import styles from './stop.css';
 
@@ -15,32 +15,21 @@ class Stop extends Component {
   }
 
   componentDidMount() {
-    const height = this.divElement.clientHeight - 10;
+    const height = this.divElement.clientHeight - 8;
     this.setState({ height });
   }
-
-  extractNumbers = routeId => {
-    const matches = routeId.match(/(\d+)/);
-    return matches[0];
-  };
 
   getTerminalAreaRoutes = props => {
     const routes = [];
     props.routeSegments.nodes.forEach(segment => {
       const routeId = trimRouteId(segment.routeId);
-      const routeIdNumber = this.extractNumbers(routeId);
-      if (!props.destinationRouteIds.includes(routeId) && segment.hasRegularDayDepartures)
-        routes.push({ routeId, routeIdNumber });
+      if (!props.destinationRouteIds.includes(routeId) && segment.hasRegularDayDepartures) {
+        if (!routes.includes(routeId)) {
+          routes.push(routeId);
+        }
+      }
     });
-    const routeIds = [];
-    routes
-      .sort((a, b) => a.routeIdNumber - b.routeIdNumber)
-      .forEach(route => {
-        const { routeId } = route;
-        if (!routeIds.includes(routeId)) routeIds.push(routeId);
-      });
-
-    return routeIds;
+    return routeGeneralizer(routes);
   };
 
   render() {
@@ -51,13 +40,13 @@ class Stop extends Component {
     const terminalAreaRoutes = this.getTerminalAreaRoutes(this.props);
     if (terminalAreaRoutes.length - 1 >= MAX_TERMINAL_ROUTE_DIVS) {
       terminalAreaRoutes.length = MAX_TERMINAL_ROUTE_DIVS;
-      terminalAreaRoutes.push('...');
+      terminalAreaRoutes.push({ text: '...' });
     }
 
-    const terminalAreaRouteDivs = terminalAreaRoutes.map((route, index) => (
-      <div key={index} className={styles.routeContainer}>
-        {route}
-      </div>
+    const terminalAreaRouteDivs = terminalAreaRoutes.map((item, index) => (
+      <span key={index} className={styles.routeContainer}>
+        {item.text}
+      </span>
     ));
 
     const showTerminalAreaRoutesContainer =
@@ -101,7 +90,10 @@ class Stop extends Component {
             ))}
           </div>
           {showTerminalAreaRoutesContainer && (
-            <div className={styles.terminalAreaRoutesContainer}>{terminalAreaRouteDivs}</div>
+            <div>
+              <div className={styles.terminalAreaRoutesTitle}>Linjat / Linjerna / Lines</div>
+              <div className={styles.terminalAreaRoutesContainer}>{terminalAreaRouteDivs}</div>
+            </div>
           )}
         </div>
       </div>

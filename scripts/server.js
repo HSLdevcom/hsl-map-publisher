@@ -73,12 +73,12 @@ async function generatePoster(buildId, component, template, props, index) {
   };
   generator
     .generate(options)
-    .then(({ success }) =>
+    .then(({ success, uploaded }) => {
       updatePoster({
         id,
-        status: success ? 'READY' : 'FAILED',
-      }),
-    )
+        status: success && uploaded ? 'READY' : 'FAILED',
+      });
+    })
     .catch(error => console.error(error)); // eslint-disable-line no-console
 
   return { id };
@@ -95,6 +95,7 @@ const errorHandler = async (ctx, next) => {
 };
 
 const allowedToGenerate = user => {
+  if (!user) return false;
   const domain = user.split('@')[1];
   const parsedAllowedDomains = DOMAINS_ALLOWED_TO_GENERATE.split(',');
   return parsedAllowedDomains.includes(domain);
@@ -189,9 +190,12 @@ async function main() {
 
     for (let i = 0; i < props.length; i++) {
       const currentProps = props[i];
-      const isAllowedUser = allowedToGenerate(currentProps.user);
+      const isAllowedUser = allowedToGenerate(ctx.session.email);
       if (!isAllowedUser) {
-        ctx.throw(401, 'User not allowed to generate posters.');
+        ctx.throw(
+          401,
+          'User not allowed to generate posters. Session might have expired. Try refreshing the page and signing in again.',
+        );
       }
       let orderNumber = get(
         build.posters.find(

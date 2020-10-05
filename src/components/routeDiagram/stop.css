@@ -58,6 +58,12 @@
   align-items: center;
 }
 
+.terminalAreaRoutesTitle {
+  font-size: 0.7em;
+  white-space: initial;
+  padding-bottom: 2px;
+}
+
 .icon {
   width: 20px;
   height: 20px;
