@@ -190,7 +190,9 @@ async function main() {
 
     for (let i = 0; i < props.length; i++) {
       const currentProps = props[i];
-      const isAllowedUser = allowedToGenerate(ctx.session.email);
+      const isAllowedUser = process.env.REDIRECT_URI.includes('localhost')
+        ? allowedToGenerate(props[i].user)
+        : allowedToGenerate(ctx.session.email);
       if (!isAllowedUser) {
         ctx.throw(
           401,
@@ -268,20 +270,13 @@ async function main() {
       orderedPosters = orderBy(
         downloadedPosterIds.map(downloadedId => ({
           id: downloadedId,
-          order: get(
-            posters.find(({ id: posterId }) => posterId === downloadedId),
-            'order',
-            0,
-          ),
+          order: get(posters.find(({ id: posterId }) => posterId === downloadedId), 'order', 0),
         })),
         'order',
         'asc',
       );
 
-      filename = await generator.concatenate(
-        orderedPosters.map(poster => poster.id),
-        parsedTitle,
-      );
+      filename = await generator.concatenate(orderedPosters.map(poster => poster.id), parsedTitle);
       await generator.removeFiles(downloadedPosterIds);
     } catch (err) {
       ctx.throw(500, err.message || 'PDF concatenation failed.');
