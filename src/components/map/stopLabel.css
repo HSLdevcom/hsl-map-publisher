@@ -34,3 +34,17 @@
 .destinationLight {
   font-family: GothamRounded-Book;
 }
+
+.flexContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+}
+
+.destinationContainer {
+  align-self: center;
+}
+
+.comma {
+  margin-right: 3px;
+}

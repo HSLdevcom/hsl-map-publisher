@@ -133,9 +133,8 @@ const StopMap = props => {
 
   // Filter out zone symbols that are behind the mini map
   const projectedSymbols = props.projectedSymbols.filter(
-    symbol => symbol.sx < miniMapStyle.left || symbol.sy < miniMapStyle.top,
+    symbol => symbol.sy < miniMapStyle.left || symbol.sx < miniMapStyle.top,
   );
-
   const symbolsWithStopDistances = calculateSymbolDistancesFromStops(stops, projectedSymbols);
   const symbolForEachZone = getSymbolForEachZone(symbolsWithStopDistances);
 
@@ -191,9 +190,9 @@ const StopMap = props => {
           {symbolForEachZone &&
             symbolForEachZone.length > 0 &&
             symbolForEachZone.map((symbol, index) => (
-              <ItemPositioned key={index} x={symbol.sy} y={symbol.sx}>
+              <ItemFixed key={index} left={symbol.sy} top={symbol.sx}>
                 <ZoneSymbol zone={symbol.zone} size={LOCATION_RADIUS * 2} />
-              </ItemPositioned>
+              </ItemFixed>
             ))}
 
           {stops.map((stop, index) => (
@@ -232,7 +231,6 @@ const StopMap = props => {
             routes: { enabled: true, hideBusRoutes: true },
             municipal_borders: { enabled: true },
             ticket_zone_labels_fixed: { enabled: miniMapStyle.minimapZoneSymbols },
-
             ticket_zones: { enabled: miniMapStyle.minimapZones },
           }}
           extraLayers={[placeLabelCity]}

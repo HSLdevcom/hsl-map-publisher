@@ -110,9 +110,10 @@ class CustomMap extends Component {
     }
 
     // Aspect ratio height of SVG if one is set, auto otherwise.
-    const wrapperHeight =
-      renderMap === 'svg' ? svgHeight : renderMap !== 'none' ? mapHeight : 'auto';
+    let wrapperHeight = renderMap === 'svg' ? svgHeight : renderMap !== 'none' ? mapHeight : 'auto';
 
+    // Make sure wrapper is hidden if map is not rendered.
+    if (svgHeight === 0 && mapHeight > -1 && renderMap === 'none') wrapperHeight = 'none';
     return (
       <Measure client onResize={this.onResize}>
         {({ measureRef }) => (

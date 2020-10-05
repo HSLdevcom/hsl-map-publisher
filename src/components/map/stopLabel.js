@@ -2,55 +2,102 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import uniqBy from 'lodash/uniqBy';
 
-import { Row, Column, Spacer } from 'components/util';
+import { Spacer } from 'components/util';
 import { getColor } from 'util/domain';
 
 import styles from './stopLabel.css';
 
-// Max rows in label
 const MAX_LABEL_ROWS = 6;
 const MAX_LABEL_CHARS = 36;
+const MAX_ROUTEID_CHARS = 15;
+const PIXELS_PER_CHAR = 7;
+
+const mapRoutesByDestination = routes => {
+  const routeSet = {};
+  routes.forEach(route => {
+    const key = `${route.destinationFi}${route.viaFi}`;
+    if (!routeSet[key]) {
+      const newRoute = route;
+      newRoute.routeIds = [route.routeId];
+      routeSet[key] = newRoute;
+    } else {
+      const newRouteIds = routeSet[key].routeIds;
+      newRouteIds.push(route.routeId);
+      routeSet[key].routeIds = newRouteIds;
+    }
+  });
+  return Object.values(routeSet);
+};
+
+const routeIdsComponent = (routeId, mode, isNewLine, content) => (
+  <span className={styles.route} key={routeId} style={{ color: getColor({ routeId, mode }) }}>
+    {isNewLine && <br />}
+    {content}
+  </span>
+);
+
+const routeIdComponentWidth = routes => {
+  let chars = 0;
+  routes.forEach(route => {
+    const routeId = route.routeIds[0];
+    if (route.routeIds.length < 2 && routeId.length > chars) {
+      chars = routeId.length;
+    }
+  });
+
+  const width = chars * PIXELS_PER_CHAR;
+  return width;
+};
 
 const RouteList = props => {
   if (props.routes.length > MAX_LABEL_ROWS) {
     let rowLength = 0;
-    const components = uniqBy(props.routes, route => route.routeId).map((route, index, routes) => {
-      const content = `${route.routeId}${index < routes.length - 1 ? ', ' : ''}`;
-      const isNewLine = rowLength + content.length > MAX_LABEL_CHARS;
-      rowLength = isNewLine ? content.length : rowLength + content.length;
-      return (
-        <span className={styles.route} key={index} style={{ color: getColor(route) }}>
-          {isNewLine && <br />}
-          {content}
-        </span>
-      );
-    });
-    return <div>{components}</div>;
+    return (
+      <div>
+        {uniqBy(props.routes, route => route.routeId).map((route, index, routes) => {
+          const content = `${route.routeId}${index < routes.length - 1 ? ', ' : ''}`;
+          const isNewLine = rowLength + content.length > MAX_LABEL_CHARS;
+          rowLength = isNewLine ? content.length : rowLength + content.length;
+          return routeIdsComponent(route.routeId, route.mode, isNewLine, content);
+        })}
+      </div>
+    );
   }
+  const combinedMapRoutes = mapRoutesByDestination(props.routes);
+  const width = routeIdComponentWidth(combinedMapRoutes);
+
   return (
-    <Row>
-      <Column>
-        {props.routes.map((route, index) => (
-          <div key={index} className={styles.route} style={{ color: getColor(route) }}>
-            {route.routeId}
+    <div>
+      {combinedMapRoutes.map((route, index) => {
+        let rowLength = 0;
+        return (
+          <div className={styles.flexContainer} key={`route_row_${route.routeId}${index}`}>
+            <div
+              key={index}
+              style={route.routeIds.length > 1 ? { width: 'auto' } : { width: `${width}px` }}>
+              {route.routeIds.map((routeId, i) => {
+                const content = `${routeId}${i < route.routeIds.length - 1 ? ', ' : ''}`;
+                const isNewLine = rowLength + content.length > MAX_ROUTEID_CHARS;
+                rowLength = isNewLine ? content.length : rowLength + content.length;
+                return routeIdsComponent(routeId, route.mode, isNewLine, content);
+              })}
+            </div>
+            <Spacer width={6} />
+            <div className={styles.flexContainer}>
+              <div className={styles.destinationContainer}>
+                <span className={styles.destination}>
+                  {route.destinationFi + (route.viaFi ? ` kautta ${route.viaFi}` : '')}
+                </span>
+                {'\xa0'}
+                <span className={styles.destinationLight}>
+                  {route.destinationSe + (route.viaSe ? ` via ${route.viaSe}` : '')}
+                </span>
+              </div>
+            </div>
           </div>
-        ))}
-      </Column>
-      <Spacer width={6} />
-      <Column>
-        {props.routes.map((route, index) => (
-          <div key={index}>
-            <span className={styles.destination}>
-              {route.destinationFi + (route.viaFi ? ` kautta ${route.viaFi}` : '')}
-            </span>
-            {'\xa0'}
-            <span className={styles.destinationLight}>
-              {route.destinationSe + (route.viaSe ? ` via ${route.viaSe}` : '')}
-            </span>
-          </div>
-        ))}
-      </Column>
-    </Row>
+        );
+      })}
+    </div>
   );
 };
 
