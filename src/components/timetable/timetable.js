@@ -51,7 +51,7 @@ const getNotes = (notes, symbols) => {
       }
     });
   });
-  return parsedNotes.reverse();
+  return parsedNotes;
 };
 
 const Timetable = props => (
