@@ -1,12 +1,17 @@
 const orderBy = require('lodash/orderBy');
 const get = require('lodash/get');
 const Koa = require('koa');
+const session = require('koa-session');
 const Router = require('koa-router');
 const cors = require('@koa/cors');
 const jsonBody = require('koa-json-body');
 const fs = require('fs-extra');
 
 const generator = require('./generator');
+const authEndpoints = require('./auth/authEndpoints');
+
+const { DOMAINS_ALLOWED_TO_GENERATE } = require('../constants');
+
 const {
   migrate,
   addEvent,
@@ -68,12 +73,12 @@ async function generatePoster(buildId, component, template, props, index) {
   };
   generator
     .generate(options)
-    .then(({ success }) =>
+    .then(({ success, uploaded }) => {
       updatePoster({
         id,
-        status: success ? 'READY' : 'FAILED',
-      }),
-    )
+        status: success && uploaded ? 'READY' : 'FAILED',
+      });
+    })
     .catch(error => console.error(error)); // eslint-disable-line no-console
 
   return { id };
@@ -87,6 +92,13 @@ const errorHandler = async (ctx, next) => {
     ctx.body = { message: error.message };
     console.error(error); // eslint-disable-line no-console
   }
+};
+
+const allowedToGenerate = user => {
+  if (!user) return false;
+  const domain = user.split('@')[1];
+  const parsedAllowedDomains = DOMAINS_ALLOWED_TO_GENERATE.split(',');
+  return parsedAllowedDomains.includes(domain);
 };
 
 async function main() {
@@ -178,6 +190,17 @@ async function main() {
 
     for (let i = 0; i < props.length; i++) {
       const currentProps = props[i];
+      // For some reason this is not working in prod but does work in dev
+      // const isAllowedUser = process.env.REDIRECT_URI.includes('localhost')
+      //   ? allowedToGenerate(props[i].user)
+      //   : allowedToGenerate(ctx.session.email);
+      const isAllowedUser = allowedToGenerate(props[i].user);
+      if (!isAllowedUser) {
+        ctx.throw(
+          401,
+          `Generointi epäonnistui. Istunto on saattanut vanhentua. Päivitä sivu ja kirjaudu uudelleen.`,
+        );
+      }
       let orderNumber = get(
         build.posters.find(
           poster => poster.props.stopId === currentProps.stopId && poster.status === 'FAILED',
@@ -249,13 +272,20 @@ async function main() {
       orderedPosters = orderBy(
         downloadedPosterIds.map(downloadedId => ({
           id: downloadedId,
-          order: get(posters.find(({ id: posterId }) => posterId === downloadedId), 'order', 0),
+          order: get(
+            posters.find(({ id: posterId }) => posterId === downloadedId),
+            'order',
+            0,
+          ),
         })),
         'order',
         'asc',
       );
 
-      filename = await generator.concatenate(orderedPosters.map(poster => poster.id), parsedTitle);
+      filename = await generator.concatenate(
+        orderedPosters.map(poster => poster.id),
+        parsedTitle,
+      );
       await generator.removeFiles(downloadedPosterIds);
     } catch (err) {
       ctx.throw(500, err.message || 'PDF concatenation failed.');
@@ -268,13 +298,44 @@ async function main() {
     await fs.remove(filename);
   });
 
+  router.post('/login', async ctx => {
+    const authResponse = await authEndpoints.authorize(ctx.request, ctx.response, ctx.session);
+    ctx.session = authResponse.modifiedSession;
+    ctx.body = authResponse.body;
+    ctx.response.status = authResponse.status;
+  });
+
+  router.get('/logout', async ctx => {
+    const authResponse = await authEndpoints.logout(ctx.request, ctx.response, ctx.session);
+    ctx.session = null;
+    ctx.response.status = authResponse.status;
+  });
+
+  router.get('/session', async ctx => {
+    const authResponse = await authEndpoints.checkExistingSession(
+      ctx.request,
+      ctx.response,
+      ctx.session,
+    );
+    ctx.body = authResponse.body;
+    ctx.response.status = authResponse.status;
+  });
+
+  app.keys = ['secret key'];
+
+  app.use(session(app));
+
   app
     .use(errorHandler)
-    .use(cors())
+    .use(
+      cors({
+        credentials: true,
+      }),
+    )
     .use(jsonBody({ fallback: true, limit: '10mb' }))
     .use(router.routes())
     .use(router.allowedMethods())
     .listen(PORT, () => console.log(`Listening at ${PORT}`)); // eslint-disable-line no-console
 }
 
-main().catch(error => console.error(error)); // eslint-disable-line no-console
+main().catch(error => console.error(error.stack)); // eslint-disable-line no-console
