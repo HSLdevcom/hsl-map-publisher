@@ -53,10 +53,7 @@ const propsMapper = withProps(props => {
   };
 });
 
-const hoc = compose(
-  graphql(stopPosterQuery),
-  apolloWrapper(propsMapper),
-);
+const hoc = compose(graphql(stopPosterQuery), apolloWrapper(propsMapper));
 
 const StopPosterContainer = hoc(StopPoster);
 
