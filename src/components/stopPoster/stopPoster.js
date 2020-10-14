@@ -404,7 +404,7 @@ class StopPoster extends Component {
                       {/* The key will make sure the map updates its size if the layout changes */}
                       {shouldRenderMap && (
                         <CustomMap
-                          key={`poster_map_${useDiagram}${isTramStop}${hasStretchedLeftColumn}${hasColumnTimetable}`}
+                          key={`poster_map_${hasRoutes}${hasRoutesOnTop}${useDiagram}${isTramStop}${hasStretchedLeftColumn}${hasColumnTimetable}`}
                           setMapHeight={this.setMapHeight}
                           stopId={stopId}
                           date={date}

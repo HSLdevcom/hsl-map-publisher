@@ -38,6 +38,13 @@ const routeDiagramQuery = gql`
                     shortId
                     stopZone
                     terminalId
+                    stopId
+                    routeSegments: routeSegmentsForDate(date: $date) {
+                      nodes {
+                        routeId
+                        hasRegularDayDepartures(date: $date)
+                      }
+                    }
                     terminalByTerminalId {
                       siblings {
                         nodes {

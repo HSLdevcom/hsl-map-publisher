@@ -176,7 +176,7 @@ const propsMapper = mapProps(props => {
   notes = uniq(notes).sort();
 
   const duplicateRoutes = [];
-
+  const specialSymbols = [];
   // Search for routes with two different destinations from the same stop and add notes for them
   Object.values(
     groupBy(
@@ -189,6 +189,10 @@ const propsMapper = mapProps(props => {
     .filter(routes => routes.length > 1)
     .forEach(directions =>
       directions.forEach(direction => {
+        const noteSymbol = `${trimRouteId(direction.routeId)}${'*'.repeat(direction.direction)}`;
+        if (!specialSymbols.includes(noteSymbol)) {
+          specialSymbols.push(noteSymbol);
+        }
         notes.push(
           `${trimRouteId(direction.routeId)}${'*'.repeat(direction.direction)} ${
             direction.route.nodes[0].destinationFi
@@ -197,6 +201,16 @@ const propsMapper = mapProps(props => {
         duplicateRoutes.push(direction.routeId);
       }),
     );
+
+  departures.forEach(departure => {
+    if (departure.note && !specialSymbols.includes(departure.note)) {
+      specialSymbols.push(departure.note);
+    }
+  });
+
+  if (departures.some(departure => departure.routeId.includes('H'))) {
+    specialSymbols.push('H');
+  }
 
   departures = departures.map(departure => ({
     ...departure,
@@ -211,7 +225,6 @@ const propsMapper = mapProps(props => {
   }));
 
   const { weekdays, saturdays, sundays } = pick(groupDepartures(departures), props.segments);
-
   const dateBegin =
     props.dateBegin ||
     flatMap(props.data.stop.siblings.nodes, stop =>
@@ -244,6 +257,7 @@ const propsMapper = mapProps(props => {
     printableAsA4: props.printTimetablesAsA4,
     greyscale: props.printTimetablesAsGreyscale,
     standalone: props.standalone,
+    specialSymbols,
   };
 });
 
@@ -261,6 +275,7 @@ TimetableContainer.defaultProps = {
   showComponentName: true,
   printTimetablesAsA4: false,
   printTimetablesAsGreyscale: false,
+  specialSymbols: [],
 };
 
 TimetableContainer.propTypes = {
@@ -276,6 +291,7 @@ TimetableContainer.propTypes = {
   standalone: PropTypes.bool,
   printTimetablesAsA4: PropTypes.bool,
   printTimetablesAsGreyscale: PropTypes.bool,
+  specialSymbols: PropTypes.array,
 };
 
 export default TimetableContainer;

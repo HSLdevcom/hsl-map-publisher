@@ -3,7 +3,7 @@
   flex-flow: column nowrap;
   flex: 0 0 auto;
   align-items: flex-start;
-  padding: 42px;
+  padding: 42px 32px 42px 42px;
   background: white;
   border-radius: var(--border-radius);
 
