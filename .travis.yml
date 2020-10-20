@@ -2,6 +2,8 @@ sudo: required
 
 branches:
   only:
+    - development
+    - stage
     - master
 
 services: docker
