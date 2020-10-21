@@ -191,16 +191,17 @@ async function main() {
     for (let i = 0; i < props.length; i++) {
       const currentProps = props[i];
       // For some reason this is not working in prod but does work in dev
+      // Update: actually there should be a session check to UAT
+      // TODO in task MM-147
       // const isAllowedUser = process.env.REDIRECT_URI.includes('localhost')
       //   ? allowedToGenerate(props[i].user)
       //   : allowedToGenerate(ctx.session.email);
-      const isAllowedUser = allowedToGenerate(props[i].user);
-      if (!isAllowedUser) {
-        ctx.throw(
-          401,
-          `Generointi epäonnistui. Istunto on saattanut vanhentua. Päivitä sivu ja kirjaudu uudelleen.`,
-        );
-      }
+      // if (!isAllowedUser) {
+      //   ctx.throw(
+      //     401,
+      //     `Generointi epäonnistui. Istunto on saattanut vanhentua. Päivitä sivu ja kirjaudu uudelleen.`,
+      //   );
+      // }
       let orderNumber = get(
         build.posters.find(
           poster => poster.props.stopId === currentProps.stopId && poster.status === 'FAILED',
