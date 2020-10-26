@@ -113,7 +113,7 @@ class StopPoster extends Component {
       return false;
     }
     // Horizontal overflow is not automatically resolvable.
-    if (this.content.scrollWidth > this.content.clientWidth) {
+    if (this.content.scrollWidth > this.content.clientWidth && this.state.hasRoutesOnTop) {
       this.onError('Unresolvable horizontal overflow detected.');
     }
     return this.content.scrollHeight > this.content.clientHeight;
