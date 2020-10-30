@@ -1,11 +1,10 @@
 const { get, last, clone } = require('lodash');
 const AuthService = require('./authService');
 
-const { DOMAINS_ALLOWED_TO_LOGIN } = require('../../constants');
+const { DOMAINS_ALLOWED_TO_LOGIN, PUBLISHER_TEST_GROUP } = require('../../constants');
 
 const allowedDomains = DOMAINS_ALLOWED_TO_LOGIN.split(',');
 const allowedGroup = 'Karttajulkaisin';
-const testGroup = 'Karttajulkaisin-test';
 
 const hasAllowedGroup = async userInfo => {
   const groups = get(userInfo, 'groups');
@@ -15,7 +14,7 @@ const hasAllowedGroup = async userInfo => {
     return true;
   }
 
-  if (!allowedDomains.includes(domain) && !groups.includes(testGroup)) {
+  if (!allowedDomains.includes(domain) && !groups.includes(PUBLISHER_TEST_GROUP)) {
     console.log(`User does not have allowed domain. Logging out.`);
     return false;
   }
@@ -110,6 +109,7 @@ const checkExistingSession = async (req, res, session) => {
     const response = {
       isOk: true,
       email: session.email,
+      groups: session.groups,
     };
     return {
       status: 200,
