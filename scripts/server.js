@@ -95,7 +95,7 @@ const errorHandler = async (ctx, next) => {
 };
 
 const allowedToGenerate = user => {
-  if (!user) return false;
+  if (!user || !user.email) return false;
   const domain = user.email.split('@')[1];
   const parsedAllowedDomains = DOMAINS_ALLOWED_TO_GENERATE.split(',');
   if (user.groups && user.groups.includes(PUBLISHER_TEST_GROUP)) {
