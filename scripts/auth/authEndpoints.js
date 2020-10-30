@@ -4,13 +4,12 @@ const AuthService = require('./authService');
 const { DOMAINS_ALLOWED_TO_LOGIN, PUBLISHER_TEST_GROUP } = require('../../constants');
 
 const allowedDomains = DOMAINS_ALLOWED_TO_LOGIN.split(',');
-const allowedGroup = 'Karttajulkaisin';
 
-const hasAllowedGroup = async userInfo => {
+const hasAllowedDomain = async userInfo => {
   const groups = get(userInfo, 'groups');
   const domain = last(userInfo.email.toLowerCase().split('@')) || '';
 
-  if (groups.includes(allowedGroup)) {
+  if (groups.includes(PUBLISHER_TEST_GROUP)) {
     return true;
   }
 
@@ -19,10 +18,6 @@ const hasAllowedGroup = async userInfo => {
     return false;
   }
 
-  if (allowedDomains.includes(domain) && !groups.includes(allowedGroup)) {
-    groups.push(allowedGroup);
-    await AuthService.setGroup(userInfo.userId, groups);
-  }
   return true;
 };
 
@@ -61,7 +56,7 @@ const authorize = async (req, res, session) => {
   if (session && tokenResponse.access_token) {
     modifiedSession.accessToken = tokenResponse.access_token;
     const userInfo = await AuthService.requestUserInfo(modifiedSession.accessToken);
-    const isAllowed = await hasAllowedGroup(userInfo);
+    const isAllowed = await hasAllowedDomain(userInfo);
     if (!isAllowed) {
       return {
         status: 401,
@@ -98,7 +93,7 @@ const authorize = async (req, res, session) => {
 
 const checkExistingSession = async (req, res, session) => {
   if (session && session.accessToken) {
-    const isAllowed = await hasAllowedGroup(session);
+    const isAllowed = await hasAllowedDomain(session);
     if (!isAllowed) {
       await AuthService.logoutFromIdentityProvider(session.accessToken);
       return {
