@@ -101,8 +101,11 @@ async function renderComponent(options) {
   await fs.outputFile(pdfFilePath, contents);
   await page.close();
 
-  const posterUploaded = await uploadPosterToCloud(pdfFilePath);
-  return posterUploaded;
+  // HOTFIX
+  // This will be fixed in MM-171
+  // const posterUploaded = await uploadPosterToCloud(pdfFilePath);
+  // return posterUploaded;
+  await uploadPosterToCloud(pdfFilePath);
 }
 
 async function renderComponentRetry(options) {
@@ -119,15 +122,21 @@ async function renderComponentRetry(options) {
       const timeout = new Promise((resolve, reject) =>
         setTimeout(reject, RENDER_TIMEOUT, new Error('Render timeout')),
       );
-      const posterUploaded = await Promise.race([renderComponent(options), timeout]);
-      if (posterUploaded) {
-        onInfo('Rendered successfully.');
-      } else {
-        const err = { message: 'Rendered successfully but uploading poster failed.', stack: '' };
-        throw err;
-      }
+      // HOTFIX
+      // This will be fixed in MM-171
+      // const posterUploaded = await Promise.race([renderComponent(options), timeout]);
+      // if (posterUploaded) {
+      //   onInfo('Rendered successfully.');
+      // } else {
+      //   const err = { message: 'Rendered successfully but uploading poster failed.', stack: '' };
+      //   throw err;
+      // }
 
-      return { success: true, uploaded: posterUploaded };
+      // return { success: true, uploaded: posterUploaded };
+
+      await Promise.race([renderComponent(options), timeout]);
+      onInfo('Rendered successfully');
+      return { success: true };
     } catch (error) {
       onError(error);
     }
