@@ -82,7 +82,7 @@ Now you can use the UI with the server, or open a poster separately in your brow
 
 You will have to create a template using the Publisher UI. The poster app will download the template from the Publisher server.
 
-If Azure credentials are not set the posters will be stored locally.
+If Azure credentials are not set in the .env file the posters will be stored locally.
 
 ### Running in Docker
 
