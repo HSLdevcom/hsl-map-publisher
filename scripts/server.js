@@ -73,10 +73,10 @@ async function generatePoster(buildId, component, template, props, index) {
   };
   generator
     .generate(options)
-    .then(({ success }) => {
+    .then(({ success, uploaded }) => {
       updatePoster({
         id,
-        status: success ? 'READY' : 'FAILED',
+        status: success && uploaded ? 'READY' : 'FAILED',
       });
     })
     .catch(error => console.error(error)); // eslint-disable-line no-console

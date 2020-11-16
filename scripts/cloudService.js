@@ -47,7 +47,7 @@ async function uploadPosterToCloud(filePath) {
 
   if (!account || !accountKey) {
     console.log(
-      'Azure credentials not set. Set the AZURE_STORAGE_ACCOUNT and AZURE_STORAGE_KEY env variables.',
+      'Azure credentials not set. Set the AZURE_STORAGE_ACCOUNT and AZURE_STORAGE_KEY env variables. Upload canceled and poster will not be removed locally.',
     );
     return false;
   }
