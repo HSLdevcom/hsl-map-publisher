@@ -8,6 +8,8 @@ const log = require('./util/log');
 const get = require('lodash/get');
 const { uploadPosterToCloud } = require('./cloudService');
 
+const { AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_KEY } = require('../constants');
+
 const CLIENT_URL = 'http://localhost:5000';
 const RENDER_TIMEOUT = 10 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
@@ -101,11 +103,8 @@ async function renderComponent(options) {
   await fs.outputFile(pdfFilePath, contents);
   await page.close();
 
-  // HOTFIX
-  // This will be fixed in MM-171
-  // const posterUploaded = await uploadPosterToCloud(pdfFilePath);
-  // return posterUploaded;
-  await uploadPosterToCloud(pdfFilePath);
+  const posterUploaded = await uploadPosterToCloud(pdfFilePath);
+  return posterUploaded;
 }
 
 async function renderComponentRetry(options) {
@@ -122,21 +121,18 @@ async function renderComponentRetry(options) {
       const timeout = new Promise((resolve, reject) =>
         setTimeout(reject, RENDER_TIMEOUT, new Error('Render timeout')),
       );
-      // HOTFIX
-      // This will be fixed in MM-171
-      // const posterUploaded = await Promise.race([renderComponent(options), timeout]);
-      // if (posterUploaded) {
-      //   onInfo('Rendered successfully.');
-      // } else {
-      //   const err = { message: 'Rendered successfully but uploading poster failed.', stack: '' };
-      //   throw err;
-      // }
 
-      // return { success: true, uploaded: posterUploaded };
+      const posterUploaded = await Promise.race([renderComponent(options), timeout]);
+      const uploadFailed = !posterUploaded && AZURE_STORAGE_ACCOUNT && AZURE_STORAGE_KEY;
 
-      await Promise.race([renderComponent(options), timeout]);
-      onInfo('Rendered successfully');
-      return { success: true };
+      if (!uploadFailed) {
+        onInfo('Rendered successfully.');
+      } else {
+        const err = { message: 'Rendered successfully but uploading poster failed.', stack: '' };
+        throw err;
+      }
+
+      return { success: true, uploaded: !uploadFailed };
     } catch (error) {
       onError(error);
     }
@@ -201,6 +197,10 @@ async function concatenate(ids, title) {
 }
 
 async function removeFiles(ids) {
+  if (!AZURE_STORAGE_ACCOUNT || !AZURE_STORAGE_KEY) {
+    console.log('Azure credentials not set. Not removing files.');
+    return;
+  }
   const filenames = ids.map(id => pdfPath(id));
   const removePromises = [];
 
