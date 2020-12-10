@@ -320,7 +320,12 @@ async function main() {
 
   app.keys = ['secret key'];
 
-  app.use(session(app));
+  const CONFIG = {
+    renew: true,
+    maxAge: 86400000 * 30,
+  };
+
+  app.use(session(CONFIG, app));
 
   app
     .use(errorHandler)
