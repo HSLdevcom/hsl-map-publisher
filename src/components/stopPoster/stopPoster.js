@@ -352,6 +352,7 @@ class StopPoster extends Component {
           showNotes={!props.hideDetails}
           showComponentName={!props.hideDetails}
           segments={props.segments}
+          routeFilter={props.routeFilter}
         />
       </div>
     );
@@ -367,14 +368,25 @@ class StopPoster extends Component {
                 this.content = ref;
               }}>
               <Spacer width="100%" height={50} />
-              {hasRoutes && hasRoutesOnTop && <Routes stopId={stopId} date={date} />}
+              {hasRoutes && hasRoutesOnTop && (
+                <Routes stopId={stopId} date={date} routeFilter={this.props.routeFilter} />
+              )}
               {hasRoutes && hasRoutesOnTop && <Spacer height={10} />}
               <div className={styles.columns}>
                 <div className={hasStretchedLeftColumn ? styles.leftStretched : styles.left}>
-                  {hasRoutes && !hasRoutesOnTop && <Routes stopId={stopId} date={date} />}
+                  {hasRoutes && !hasRoutesOnTop && (
+                    <Routes stopId={stopId} date={date} routeFilter={this.props.routeFilter} />
+                  )}
                   {hasRoutes && !hasRoutesOnTop && <Spacer height={10} />}
-                  {hasColumnTimetable && <StopPosterTimetable />}
-                  {!hasColumnTimetable && <StopPosterTimetable segments={['weekdays']} />}
+                  {hasColumnTimetable && (
+                    <StopPosterTimetable routeFilter={this.props.routeFilter} />
+                  )}
+                  {!hasColumnTimetable && (
+                    <StopPosterTimetable
+                      segments={['weekdays']}
+                      routeFilter={this.props.routeFilter}
+                    />
+                  )}
                   {/* The key will make sure the ad container updates its size if the layout changes */}
                   <AdContainer
                     key={`poster_ads_${hasRoutes}${hasRoutesOnTop}${hasStretchedLeftColumn}${useDiagram}`}
@@ -395,9 +407,17 @@ class StopPoster extends Component {
                     <div className={styles.right} ref={measureRef}>
                       {!hasColumnTimetable && (
                         <div className={styles.timetables}>
-                          <StopPosterTimetable segments={['saturdays']} hideDetails />
+                          <StopPosterTimetable
+                            segments={['saturdays']}
+                            hideDetails
+                            routeFilter={this.props.routeFilter}
+                          />
                           <Spacer width={10} />
-                          <StopPosterTimetable segments={['sundays']} hideDetails />
+                          <StopPosterTimetable
+                            segments={['sundays']}
+                            hideDetails
+                            routeFilter={this.props.routeFilter}
+                          />
                         </div>
                       )}
                       {!useDiagram && <Spacer height={10} />}
@@ -427,6 +447,7 @@ class StopPoster extends Component {
                           height={this.state.diagramOptions.diagramStopCount}
                           stopId={stopId}
                           date={date}
+                          routeFilter={this.props.routeFilter}
                         />
                       )}
                       {isTramStop && tramImage && <TramDiagram svg={tramImage} />}
@@ -465,6 +486,7 @@ StopPoster.propTypes = {
   mapZones: PropTypes.bool,
   minimapZoneSymbols: PropTypes.bool,
   minimapZones: PropTypes.bool,
+  routeFilter: PropTypes.string,
 };
 
 StopPoster.defaultProps = {
@@ -475,6 +497,7 @@ StopPoster.defaultProps = {
   mapZones: false,
   minimapZoneSymbols: false,
   minimapZones: false,
+  routeFilter: '',
 };
 
 export default hot(module)(StopPoster);
