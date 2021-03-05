@@ -237,6 +237,14 @@ function labelAsComponents(routes) {
         type,
       };
     }
+    if (routeGroup.versions.length === 1) {
+      return {
+        text: `${routeGroup.routes[0]}${letterString}-${
+          routeGroup.routes[routeGroup.routes.length - 1]
+        }${letterString}`,
+        type,
+      };
+    }
     return {
       text: `${routeGroup.routes[0]}-${
         routeGroup.routes[routeGroup.routes.length - 1]
