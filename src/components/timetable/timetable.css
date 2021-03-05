@@ -73,7 +73,7 @@
   right: var(--border-radius);
 }
 
-.validity > *:first-child {
+.validity .title {
   font-family: GothamRounded-Medium;
 }
 

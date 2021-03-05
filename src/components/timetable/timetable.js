@@ -74,8 +74,10 @@ const Timetable = props => (
       )}
       {props.showValidityPeriod && (
         <div className={styles.validity}>
-          <div>{props.stopShortId && `${props.stopShortId.replace(/\s+/g, '')}`}</div>
-          <div>Aikataulut voimassa</div>
+          <div className={styles.title}>
+            {props.stopShortId && `${props.stopShortId.replace(/\s+/g, '')}`}
+          </div>
+          <div className={styles.title}>Aikataulut voimassa</div>
           <div>Tidtabeller giltiga/Timetables valid</div>
           <div>
             {new Date(props.dateBegin).toLocaleDateString('fi')}
