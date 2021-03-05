@@ -74,7 +74,7 @@ const Timetable = props => (
       )}
       {props.showValidityPeriod && (
         <div className={styles.validity}>
-          <div className={styles.title}>
+          <div className={styles.shortId}>
             {props.stopShortId && `${props.stopShortId.replace(/\s+/g, '')}`}
           </div>
           <div className={styles.title}>Aikataulut voimassa</div>
