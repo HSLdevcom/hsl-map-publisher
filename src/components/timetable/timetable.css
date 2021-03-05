@@ -46,10 +46,12 @@
 .title {
   font-family: GothamRounded-Medium;
   white-space: nowrap;
+  font-size: 0.9em;
 }
 
 .subtitle {
   font-family: GothamRounded-Book;
+  font-size: 0.9em;
 }
 
 .footnote {
@@ -59,7 +61,7 @@
 }
 
 .validity {
-  font-family: GothamRounded-Book;
+  font-family: GothamXNarrow-Book;
   font-size: 0.75em;
   line-height: 1.1;
   letter-spacing: -0.025em;
