@@ -5,7 +5,7 @@ import compose from 'recompose/compose';
 import mapProps from 'recompose/mapProps';
 import flatMap from 'lodash/flatMap';
 
-import { isNumberVariant, trimRouteId, isDropOffOnly } from 'util/domain';
+import { isNumberVariant, trimRouteId, isDropOffOnly, filterRoute } from 'util/domain';
 import apolloWrapper from 'util/apolloWrapper';
 import routeCompare from 'util/routeCompare';
 
@@ -42,16 +42,23 @@ const propsMapper = mapProps(props => ({
       .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
       .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
       .filter(routeSegment => !isDropOffOnly(routeSegment))
+      .filter(routeSegment =>
+        filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter }),
+      )
       .map(routeSegment => ({
         ...routeSegment.route.nodes[0],
         viaFi: routeSegment.viaFi,
         viaSe: routeSegment.viaSe,
         routeId: trimRouteId(routeSegment.routeId),
+        fullRouteId: routeSegment.routeId,
       })),
   ).sort(routeCompare),
 }));
 
-const hoc = compose(graphql(routesQuery), apolloWrapper(propsMapper));
+const hoc = compose(
+  graphql(routesQuery),
+  apolloWrapper(propsMapper),
+);
 
 export default component => {
   const RoutesContainer = hoc(component);

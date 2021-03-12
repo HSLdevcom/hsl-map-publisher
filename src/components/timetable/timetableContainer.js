@@ -10,20 +10,22 @@ import uniq from 'lodash/uniq';
 import pick from 'lodash/pick';
 
 import apolloWrapper from 'util/apolloWrapper';
-import { isDropOffOnly, trimRouteId } from 'util/domain';
+import { isDropOffOnly, trimRouteId, filterRoute } from 'util/domain';
 
 import Timetable from './timetable';
 
-function filterDepartures(departures, routeSegments) {
-  return departures.filter(
-    departure =>
-      !isDropOffOnly(
-        find(routeSegments, {
-          routeId: departure.routeId,
-          direction: departure.direction,
-        }),
-      ),
-  );
+function filterDepartures(departures, routeSegments, routeFilter) {
+  return departures
+    .filter(
+      departure =>
+        !isDropOffOnly(
+          find(routeSegments, {
+            routeId: departure.routeId,
+            direction: departure.direction,
+          }),
+        ),
+    )
+    .filter(departure => filterRoute({ routeId: departure.routeId, filter: routeFilter }));
 }
 
 function groupDepartures(departures) {
@@ -162,7 +164,7 @@ function modifyNote(departureNote) {
 
 const propsMapper = mapProps(props => {
   let departures = flatMap(props.data.stop.siblings.nodes, stop =>
-    filterDepartures(stop.departures.nodes, stop.routeSegments.nodes),
+    filterDepartures(stop.departures.nodes, stop.routeSegments.nodes, props.routeFilter),
   );
 
   let notes = flatMap(props.data.stop.siblings.nodes, stop =>
@@ -261,7 +263,10 @@ const propsMapper = mapProps(props => {
   };
 });
 
-const hoc = compose(graphql(timetableQuery), apolloWrapper(propsMapper));
+const hoc = compose(
+  graphql(timetableQuery),
+  apolloWrapper(propsMapper),
+);
 
 const TimetableContainer = hoc(Timetable);
 

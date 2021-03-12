@@ -287,6 +287,21 @@ function routeGeneralizer(routes) {
   return labelAsComponents(flatListOnConsecutiveRouteNumbers);
 }
 
+function filterRoute(props) {
+  const { filter } = props;
+  const { routeId } = props;
+  if (!filter) {
+    return true;
+  }
+  for (let i = 0; i < filter.length; i++) {
+    const char = filter[i];
+    if (char !== '*' && char === routeId[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export {
   isNumberVariant,
   isRailRoute,
@@ -301,4 +316,5 @@ export {
   getColor,
   getIcon,
   routeGeneralizer,
+  filterRoute,
 };

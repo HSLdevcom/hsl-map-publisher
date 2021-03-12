@@ -6,7 +6,13 @@ import withProps from 'recompose/withProps';
 import flatMap from 'lodash/flatMap';
 
 import apolloWrapper from 'util/apolloWrapper';
-import { isNumberVariant, trimRouteId, isTrunkRoute, isDropOffOnly } from 'util/domain';
+import {
+  isNumberVariant,
+  trimRouteId,
+  isTrunkRoute,
+  isDropOffOnly,
+  filterRoute,
+} from 'util/domain';
 
 import StopPoster from './stopPoster';
 
@@ -39,7 +45,10 @@ const propsMapper = withProps(props => {
     node.routeSegments.nodes
       .filter(routeSegment => routeSegment.hasRegularDayDepartures)
       .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
-      .filter(routeSegment => !isDropOffOnly(routeSegment)),
+      .filter(routeSegment => !isDropOffOnly(routeSegment))
+      .filter(routeSegment =>
+        filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter }),
+      ),
   );
 
   const routeIds = routeSegments.map(routeSegment => trimRouteId(routeSegment.routeId));
@@ -53,7 +62,10 @@ const propsMapper = withProps(props => {
   };
 });
 
-const hoc = compose(graphql(stopPosterQuery), apolloWrapper(propsMapper));
+const hoc = compose(
+  graphql(stopPosterQuery),
+  apolloWrapper(propsMapper),
+);
 
 const StopPosterContainer = hoc(StopPoster);
 
