@@ -5,7 +5,7 @@ import compose from 'recompose/compose';
 import mapProps from 'recompose/mapProps';
 import flatMap from 'lodash/flatMap';
 import sortBy from 'lodash/sortBy';
-import { isNumberVariant, trimRouteId, isDropOffOnly } from 'util/domain';
+import { isNumberVariant, trimRouteId, isDropOffOnly, filterRoute } from 'util/domain';
 import apolloWrapper from 'util/apolloWrapper';
 import { routesToTree } from 'util/routes';
 
@@ -85,6 +85,9 @@ const propsMapper = mapProps(props => {
       .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
       .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
       .filter(routeSegment => !isDropOffOnly(routeSegment))
+      .filter(routeSegment =>
+        filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter }),
+      )
       .map(routeSegment => ({
         ...routeSegment.route.nodes[0],
         routeId: trimRouteId(routeSegment.routeId),
@@ -96,7 +99,10 @@ const propsMapper = mapProps(props => {
   return { tree: routesToTree(routes, props.data.stop, props.height) };
 });
 
-const hoc = compose(graphql(routeDiagramQuery), apolloWrapper(propsMapper));
+const hoc = compose(
+  graphql(routeDiagramQuery),
+  apolloWrapper(propsMapper),
+);
 
 const RouteDiagramContainer = hoc(RouteDiagram);
 

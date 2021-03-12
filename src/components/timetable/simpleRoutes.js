@@ -1,26 +1,66 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import chunk from 'lodash/chunk';
-import sortBy from 'lodash/sortBy';
+import { chunk, cloneDeep, sortBy } from 'lodash';
+import { routeGeneralizer, isTrunkRoute } from 'util/domain';
+
 import { Column } from '../util';
-import { isTrunkRoute } from '../../util/domain';
+
 import styles from '../stopPoster/routes.css';
 import routesContainer from '../stopPoster/routesContainer';
 
+const mapRoutesByDestination = routes => {
+  const routeSet = {};
+  routes.forEach(route => {
+    const key = `${route.destinationFi}${route.viaFi}`;
+    if (!routeSet[key]) {
+      const newRoute = route;
+      newRoute.routeIds = [route.routeId];
+      routeSet[key] = newRoute;
+    } else {
+      const newRouteIds = routeSet[key].routeIds;
+      newRouteIds.push(route.routeId);
+      routeSet[key].routeIds = newRouteIds;
+    }
+  });
+  const generalizedRouteSet = Object.values(routeSet).map(route => {
+    const newRoute = cloneDeep(route);
+    const generalizedRouteIds = routeGeneralizer(newRoute.routeIds);
+    const routeIds = generalizedRouteIds.map(routeId => routeId.text);
+    newRoute.routeIds = routeIds;
+    return newRoute;
+  });
+  return generalizedRouteSet;
+};
+
 function SimpleRoutes(props) {
-  const routesPerColumn = Math.ceil(props.routes.length / 2);
+  const routes = mapRoutesByDestination(props.routes);
+  const routesPerColumn = Math.ceil(routes.length / 2);
   const routeColumns = chunk(
-    sortBy(props.routes, route => !isTrunkRoute(route.routeId)),
+    sortBy(routes, route => !isTrunkRoute(route.routeId)),
     routesPerColumn,
   );
 
   return (
     <div className={[styles.root, styles.simple].join(' ')}>
-      {routeColumns.map((routes, i) => (
+      {routeColumns.map((routeColumn, i) => (
         <Column className={styles.column} key={i}>
-          {routes.map(route => (
-            <div className={styles.group} key={`route_row_${route.routeId}`}>
-              <div className={styles.id}>{route.routeId}</div>
+          {routeColumn.map(route => (
+            <div className={styles.groupA4} key={`route_row_${route.routeId}`}>
+              <div className={styles.routeIdsContainer}>
+                {route.routeIds.map((routeId, index) =>
+                  index === route.routeIds.length - 1 ? (
+                    <div
+                      key={routeId}
+                      className={route.routeIds.length > 1 ? styles.id : styles.singleId}>
+                      {routeId}
+                    </div>
+                  ) : (
+                    <div key={routeId} className={styles.id}>
+                      {`${routeId}, `}
+                    </div>
+                  ),
+                )}
+              </div>
               <div className={styles.routeTitles}>
                 <div className={styles.title}>
                   {route.destinationFi + (route.viaFi ? ` kautta ${route.viaFi}` : '')}

@@ -237,6 +237,14 @@ function labelAsComponents(routes) {
         type,
       };
     }
+    if (routeGroup.versions.length === 1) {
+      return {
+        text: `${routeGroup.routes[0]}${letterString}-${
+          routeGroup.routes[routeGroup.routes.length - 1]
+        }${letterString}`,
+        type,
+      };
+    }
     return {
       text: `${routeGroup.routes[0]}-${
         routeGroup.routes[routeGroup.routes.length - 1]
@@ -279,6 +287,21 @@ function routeGeneralizer(routes) {
   return labelAsComponents(flatListOnConsecutiveRouteNumbers);
 }
 
+function filterRoute(props) {
+  const { filter } = props;
+  const { routeId } = props;
+  if (!filter) {
+    return true;
+  }
+  for (let i = 0; i < filter.length; i++) {
+    const char = filter[i];
+    if (char !== '*' && char === routeId[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export {
   isNumberVariant,
   isRailRoute,
@@ -293,4 +316,5 @@ export {
   getColor,
   getIcon,
   routeGeneralizer,
+  filterRoute,
 };

@@ -10,12 +10,14 @@
 }
 
 .strong {
-  font-family: GothamRounded-Medium;
+  font-family: GothamXNarrow-Medium;
+  font-size: 1.115em;
 }
 
 .title {
   padding: 0.313em 0.45em;
   font-size: 1.125em;
+  font-family: GothamXNarrow-Book;
 }
 
 .subtitle {

@@ -66,7 +66,7 @@ const Timetable = props => (
       {props.showStopInformation && (
         <div className={styles.headerTitle}>
           <div className={styles.title}>
-            {props.stopNameFi} {props.stopShortId && `(${props.stopShortId.replace(/\s+/g, '')})`}{' '}
+            {props.stopNameFi}
             &nbsp;&nbsp;
           </div>
           <div className={styles.subtitle}>{props.stopNameSe}</div>
@@ -74,7 +74,10 @@ const Timetable = props => (
       )}
       {props.showValidityPeriod && (
         <div className={styles.validity}>
-          <div>Aikataulut voimassa</div>
+          <div className={styles.shortId}>
+            {props.stopShortId && `${props.stopShortId.replace(/\s+/g, '')}`}
+          </div>
+          <div className={styles.title}>Aikataulut voimassa</div>
           <div>Tidtabeller giltiga/Timetables valid</div>
           <div>
             {new Date(props.dateBegin).toLocaleDateString('fi')}
