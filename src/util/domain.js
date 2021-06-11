@@ -213,8 +213,8 @@ function groupOnConsecutive(groupedOnVersion) {
 }
 
 function getListOfVersionsAsString(versions) {
-  const alsoBasic = versions.some(version => version.trim() === '');
-  const letters = versions.filter(version => version.trim() !== '').sort();
+  const alsoBasic = versions.some(version => version && version.trim() === '');
+  const letters = versions.filter(version => version && version.trim() !== '').sort();
   if (letters.length === 0) return '';
   const letterString = letters.join(',');
   if (alsoBasic) return `(${letterString})`;
