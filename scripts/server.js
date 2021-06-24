@@ -31,6 +31,7 @@ const {
   removeImage,
   removeTemplate,
   getTemplate,
+  getStopInfo,
 } = require('./store');
 
 const { downloadPostersFromCloud } = require('./cloudService');
@@ -45,6 +46,15 @@ async function generatePoster(buildId, component, template, props, index) {
     props,
     order: index,
   });
+
+  const { stopId, date } = props;
+
+  const templates = await getTemplates();
+  const data = await getStopInfo({ stopId, date });
+
+  // Todo: Continue with rule comparison
+  console.log(templates);
+  console.log(data);
 
   const onInfo = (message = 'No message.') => {
     console.log(`${id}: ${message}`); // eslint-disable-line no-console
@@ -276,13 +286,20 @@ async function main() {
       orderedPosters = orderBy(
         downloadedPosterIds.map(downloadedId => ({
           id: downloadedId,
-          order: get(posters.find(({ id: posterId }) => posterId === downloadedId), 'order', 0),
+          order: get(
+            posters.find(({ id: posterId }) => posterId === downloadedId),
+            'order',
+            0,
+          ),
         })),
         'order',
         'asc',
       );
 
-      filename = await generator.concatenate(orderedPosters.map(poster => poster.id), parsedTitle);
+      filename = await generator.concatenate(
+        orderedPosters.map(poster => poster.id),
+        parsedTitle,
+      );
       await generator.removeFiles(downloadedPosterIds);
     } catch (err) {
       ctx.throw(500, err.message || 'PDF concatenation failed.');
