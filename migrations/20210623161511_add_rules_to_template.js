@@ -1,6 +1,6 @@
 exports.up = async knex => {
   await knex.schema.table('template', table => {
-    table.string('rules');
+    table.json('rules');
   });
 };
 
