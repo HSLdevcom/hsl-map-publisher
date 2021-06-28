@@ -38,23 +38,22 @@ const { downloadPostersFromCloud } = require('./cloudService');
 
 const PORT = 4000;
 
-async function generatePoster(buildId, component, template, props, index) {
-  const { id } = await addPoster({
-    buildId,
-    component,
-    template,
-    props,
-    order: index,
-  });
-
-  const { stopId, date } = props;
+async function generatePoster(buildId, component, props, index) {
+  const { stopId, date, template, selectedRuleTemplates } = props;
 
   const templates = await getTemplates();
   const data = await getStopInfo({ stopId, date });
 
   // Todo: Continue with rule comparison
-  console.log(templates);
-  console.log(data);
+  const chosenTemplate = template;
+
+  const { id } = await addPoster({
+    buildId,
+    component,
+    chosenTemplate,
+    props,
+    order: index,
+  });
 
   const onInfo = (message = 'No message.') => {
     console.log(`${id}: ${message}`); // eslint-disable-line no-console
@@ -77,7 +76,7 @@ async function generatePoster(buildId, component, template, props, index) {
     id,
     component,
     props,
-    template,
+    chosenTemplate,
     onInfo,
     onError,
   };
@@ -198,7 +197,7 @@ async function main() {
   });
 
   router.post('/posters', async ctx => {
-    const { buildId, component, props, template } = ctx.request.body;
+    const { buildId, component, props } = ctx.request.body;
     const build = await getBuild({ id: buildId });
     const posters = [];
 
@@ -223,7 +222,7 @@ async function main() {
         null,
       );
       if (!orderNumber) orderNumber = i + build.posters.length;
-      posters.push(generatePoster(buildId, component, template, currentProps, orderNumber));
+      posters.push(generatePoster(buildId, component, currentProps, orderNumber));
     }
 
     try {

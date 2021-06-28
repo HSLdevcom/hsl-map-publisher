@@ -132,7 +132,7 @@ async function getPoster({ id }) {
   return convertKeys(row, camelCase);
 }
 
-async function addPoster({ buildId, component, props, order }) {
+async function addPoster({ buildId, component, template, props, order }) {
   const id = uuidv1();
   await knex('poster').insert({
     ...convertKeys(
@@ -140,6 +140,7 @@ async function addPoster({ buildId, component, props, order }) {
         id,
         buildId,
         component,
+        template,
         props,
       },
       snakeCase,
