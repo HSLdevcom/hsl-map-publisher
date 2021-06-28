@@ -354,7 +354,6 @@ async function removeImage({ name }) {
 }
 
 async function getStopInfo({ stopId, date }) {
-  console.log(stopId, date);
   const query = `
     query stopInfoQuery($stopId: String!, $date: Date!) {
       stop: stopByStopId(stopId: $stopId) {
@@ -389,19 +388,20 @@ async function getStopInfo({ stopId, date }) {
     body: JSON.stringify({ query, variables: { stopId, date } }),
   });
 
-  const stops = await response.json();
+  const stopData = await response.json();
+  const { stop } = stopData.data;
 
-  const routeSegments = flatMap(stops.data.stop.siblings.nodes, node => node.routeSegments.nodes);
-
+  const routeSegments = flatMap(stop.siblings.nodes, node => node.routeSegments.nodes);
   const routeIds = routeSegments.map(routeSegment => trimRouteId(routeSegment.routeId));
   const modes = flatMap(routeSegments, node => node.route.nodes.map(route => route.mode));
-  const city = stops.data.stop.shortId.match(/^\D*/)[0];
+  const city = stop.shortId.match(/^\D*/)[0];
+  const { stopZone } = stop;
 
   return {
-    routeSegments,
     routeIds,
     modes,
     city,
+    stopZone,
   };
 }
 
