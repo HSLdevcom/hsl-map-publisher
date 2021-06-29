@@ -9,6 +9,7 @@ const fs = require('fs-extra');
 
 const generator = require('./generator');
 const authEndpoints = require('./auth/authEndpoints');
+const { matchStopDataToRules } = require('./util/rules');
 
 const { DOMAINS_ALLOWED_TO_GENERATE, PUBLISHER_TEST_GROUP } = require('../constants');
 
@@ -40,17 +41,29 @@ const PORT = 4000;
 
 async function generatePoster(buildId, component, props, index) {
   const { stopId, date, template, selectedRuleTemplates } = props;
-
-  const templates = await getTemplates();
   const data = await getStopInfo({ stopId, date });
 
-  // Todo: Continue with rule comparison
-  const chosenTemplate = template;
+  // Checks if any rule template will match the stop, and returns *the first one*.
+  // If no match, returns the default template.
+  /* eslint-disable no-await-in-loop */
+  const selectTemplate = async () => {
+    for (const t of selectedRuleTemplates) {
+      const tData = await getTemplate({ id: t }, false);
+      if (matchStopDataToRules(tData.rules, data)) return t;
+    }
+    return template;
+  };
+  /* eslint-enable no-await-in-loop */
+
+  const chosenTemplate = await selectTemplate();
+  const renderProps = { ...props };
+  delete renderProps.template;
+  delete renderProps.selectedRuleTemplates;
 
   const { id } = await addPoster({
     buildId,
     component,
-    chosenTemplate,
+    template: chosenTemplate,
     props,
     order: index,
   });
@@ -75,8 +88,8 @@ async function generatePoster(buildId, component, props, index) {
   const options = {
     id,
     component,
-    props,
-    chosenTemplate,
+    props: renderProps,
+    template: chosenTemplate,
     onInfo,
     onError,
   };

@@ -395,7 +395,7 @@ async function getStopInfo({ stopId, date }) {
   const routeSegments = flatMap(stop.siblings.nodes, node => node.routeSegments.nodes);
   const routeIds = routeSegments.map(routeSegment => trimRouteId(routeSegment.routeId));
   const modes = flatMap(routeSegments, node => node.route.nodes.map(route => route.mode));
-  const city = stop.shortId.match(/^\D*/)[0];
+  const city = stop.shortId.match(/^[a-zA-Z]*/)[0]; // Get the first letters of the id.
   const { stopZone } = stop;
 
   return {
