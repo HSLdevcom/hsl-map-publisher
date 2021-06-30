@@ -81,7 +81,7 @@ function matchStopDataToRules(rules, data) {
       case 'OR':
         return ruleset.value.some(checkSubRules);
       case 'NOT':
-        return !checkSubRules(ruleset.value);
+        return !checkSubRules(ruleset.value[0]);
       default:
         throw new Error(`Invalid operand name: ${ruleset.name}`);
     }
