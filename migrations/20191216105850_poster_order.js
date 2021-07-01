@@ -4,4 +4,6 @@ exports.up = async function(knex) {
   });
 };
 
-exports.down = function() {};
+exports.down = async knex => {
+  await knex.schema.dropTable('order');
+};

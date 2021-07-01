@@ -9,6 +9,7 @@ const fs = require('fs-extra');
 
 const generator = require('./generator');
 const authEndpoints = require('./auth/authEndpoints');
+const { matchStopDataToRules } = require('./util/rules');
 
 const { DOMAINS_ALLOWED_TO_GENERATE, PUBLISHER_TEST_GROUP } = require('../constants');
 
@@ -31,17 +32,38 @@ const {
   removeImage,
   removeTemplate,
   getTemplate,
+  getStopInfo,
 } = require('./store');
 
 const { downloadPostersFromCloud } = require('./cloudService');
 
 const PORT = 4000;
 
-async function generatePoster(buildId, component, template, props, index) {
+async function generatePoster(buildId, component, props, index) {
+  const { stopId, date, template, selectedRuleTemplates } = props;
+  const data = await getStopInfo({ stopId, date });
+
+  // Checks if any rule template will match the stop, and returns *the first one*.
+  // If no match, returns the default template.
+  /* eslint-disable no-await-in-loop */
+  const selectTemplate = async () => {
+    for (const t of selectedRuleTemplates) {
+      const tData = await getTemplate({ id: t }, false);
+      if (matchStopDataToRules(tData.rules, data)) return t;
+    }
+    return template;
+  };
+  /* eslint-enable no-await-in-loop */
+
+  const chosenTemplate = await selectTemplate();
+  const renderProps = { ...props };
+  delete renderProps.template;
+  delete renderProps.selectedRuleTemplates;
+
   const { id } = await addPoster({
     buildId,
     component,
-    template,
+    template: chosenTemplate,
     props,
     order: index,
   });
@@ -66,8 +88,8 @@ async function generatePoster(buildId, component, template, props, index) {
   const options = {
     id,
     component,
-    props,
-    template,
+    props: renderProps,
+    template: chosenTemplate,
     onInfo,
     onError,
   };
@@ -188,7 +210,7 @@ async function main() {
   });
 
   router.post('/posters', async ctx => {
-    const { buildId, component, props, template } = ctx.request.body;
+    const { buildId, component, props } = ctx.request.body;
     const build = await getBuild({ id: buildId });
     const posters = [];
 
@@ -213,7 +235,7 @@ async function main() {
         null,
       );
       if (!orderNumber) orderNumber = i + build.posters.length;
-      posters.push(generatePoster(buildId, component, template, currentProps, orderNumber));
+      posters.push(generatePoster(buildId, component, currentProps, orderNumber));
     }
 
     try {
@@ -276,13 +298,20 @@ async function main() {
       orderedPosters = orderBy(
         downloadedPosterIds.map(downloadedId => ({
           id: downloadedId,
-          order: get(posters.find(({ id: posterId }) => posterId === downloadedId), 'order', 0),
+          order: get(
+            posters.find(({ id: posterId }) => posterId === downloadedId),
+            'order',
+            0,
+          ),
         })),
         'order',
         'asc',
       );
 
-      filename = await generator.concatenate(orderedPosters.map(poster => poster.id), parsedTitle);
+      filename = await generator.concatenate(
+        orderedPosters.map(poster => poster.id),
+        parsedTitle,
+      );
       await generator.removeFiles(downloadedPosterIds);
     } catch (err) {
       ctx.throw(500, err.message || 'PDF concatenation failed.');
