@@ -7,7 +7,8 @@ import trunkIcon from 'icons/icon_trunk.svg';
 
 import zoneByShortId from 'data/zoneByShortId';
 
-const TRUNK_ROUTES = ['550', '560', '500', '510', '200', '570'];
+// TODO: Get routes from api?
+const TRUNK_ROUTES = ['20', '30', '40', '200', '500', '510', '550', '560', '570'];
 const RAIL_ROUTE_ID_REGEXP = /^300[12]/;
 const SUBWAY_ROUTE_ID_REGEXP = /^31/;
 const U_LINE_REGEX = /^7/;
