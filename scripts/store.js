@@ -15,7 +15,6 @@ const createEmptyTemplate = require('./util/createEmptyTemplate');
 const cleanup = require('./util/cleanup');
 
 const { JORE_GRAPHQL_URL } = require('../constants');
-const { trimRouteId } = require('./util/rules');
 
 // Must cleanup knex, otherwise the process keeps going.
 cleanup(() => {
@@ -393,7 +392,7 @@ async function getStopInfo({ stopId, date }) {
   const { stop } = stopData.data;
 
   const routeSegments = flatMap(stop.siblings.nodes, node => node.routeSegments.nodes);
-  const routeIds = routeSegments.map(routeSegment => trimRouteId(routeSegment.routeId));
+  const routeIds = routeSegments.map(routeSegment => routeSegment.routeId);
   const modes = flatMap(routeSegments, node => node.route.nodes.map(route => route.mode));
   const city = stop.shortId.match(/^[a-zA-Z]*/)[0]; // Get the first letters of the id.
   const { stopZone } = stop;
