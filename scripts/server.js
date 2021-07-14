@@ -49,7 +49,7 @@ async function generatePoster(buildId, component, props, index) {
   const selectTemplate = async () => {
     for (const t of selectedRuleTemplates) {
       const tData = await getTemplate({ id: t }, false);
-      if (matchStopDataToRules(tData.rules, data)) return t;
+      if (tData && matchStopDataToRules(tData.rules, data)) return t;
     }
     return template;
   };
