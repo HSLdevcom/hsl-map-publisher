@@ -6,11 +6,15 @@ const pReduce = require('p-reduce');
 const merge = require('lodash/merge');
 const get = require('lodash/get');
 const pick = require('lodash/pick');
+const flatMap = require('lodash/flatMap');
+
 const config = require('../knexfile');
 // eslint-disable-next-line import/order
 const knex = require('knex')(config);
 const createEmptyTemplate = require('./util/createEmptyTemplate');
 const cleanup = require('./util/cleanup');
+
+const { JORE_GRAPHQL_URL } = require('../constants');
 
 // Must cleanup knex, otherwise the process keeps going.
 cleanup(() => {
@@ -127,7 +131,7 @@ async function getPoster({ id }) {
   return convertKeys(row, camelCase);
 }
 
-async function addPoster({ buildId, component, props, order }) {
+async function addPoster({ buildId, component, template, props, order }) {
   const id = uuidv1();
   await knex('poster').insert({
     ...convertKeys(
@@ -135,6 +139,7 @@ async function addPoster({ buildId, component, props, order }) {
         id,
         buildId,
         component,
+        template,
         props,
       },
       snakeCase,
@@ -348,6 +353,58 @@ async function removeImage({ name }) {
   return { name };
 }
 
+async function getStopInfo({ stopId, date }) {
+  const query = `
+    query stopInfoQuery($stopId: String!, $date: Date!) {
+      stop: stopByStopId(stopId: $stopId) {
+        shortId
+        stopZone
+        siblings {
+          nodes {
+            routeSegments: routeSegmentsForDate(date: $date) {
+              nodes {
+                routeId
+                hasRegularDayDepartures(date: $date)
+                pickupDropoffType
+                route {
+                  nodes {
+                    mode
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const response = await fetch(JORE_GRAPHQL_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({ query, variables: { stopId, date } }),
+  });
+
+  const stopData = await response.json();
+  const { stop } = stopData.data;
+
+  const routeSegments = flatMap(stop.siblings.nodes, node => node.routeSegments.nodes);
+  const routeIds = routeSegments.map(routeSegment => routeSegment.routeId);
+  const modes = flatMap(routeSegments, node => node.route.nodes.map(route => route.mode));
+  const city = stop.shortId.match(/^[a-zA-Z]*/)[0]; // Get the first letters of the id.
+  const { stopZone } = stop;
+
+  return {
+    routeIds,
+    modes,
+    city,
+    stopZone,
+  };
+}
+
 module.exports = {
   migrate,
   getBuilds,
@@ -367,4 +424,5 @@ module.exports = {
   removeTemplate,
   getImages,
   removeImage,
+  getStopInfo,
 };
