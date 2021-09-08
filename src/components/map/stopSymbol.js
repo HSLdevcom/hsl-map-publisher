@@ -28,8 +28,9 @@ const StopSymbol = props => {
     colors.push(colorsByMode.BUS);
   }
 
+  const maxRadius = props.size / 2 - (strokeWidth / 2) * (4 - colors.length);
+
   const outlines = colors.map((color, index) => {
-    const maxRadius = props.size / 2 - (strokeWidth / 2) * (4 - colors.length);
     const radius = maxRadius - index * (strokeWidth + 1);
     return { color, radius };
   });
@@ -48,12 +49,27 @@ const StopSymbol = props => {
           fill="none"
         />
       ))}
+      <text
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fontWeight="bold"
+        x={props.size / 2}
+        y={props.size / 2 + 1}
+        fill={colors.pop()}
+        fontSize={maxRadius - 2}>
+        {props.platform}
+      </text>
     </svg>
   );
 };
 
+StopSymbol.defaultProps = {
+  platform: null,
+};
+
 StopSymbol.propTypes = {
   size: PropTypes.number.isRequired,
+  platform: PropTypes.string,
   routes: PropTypes.arrayOf(
     PropTypes.shape({
       routeId: PropTypes.string.isRequired,
