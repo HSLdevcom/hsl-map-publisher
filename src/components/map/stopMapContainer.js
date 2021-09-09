@@ -8,6 +8,7 @@ import get from 'lodash/get';
 import { PerspectiveMercatorViewport } from 'viewport-mercator-project';
 
 import apolloWrapper from 'util/apolloWrapper';
+import promiseWrapper from 'util/promiseWrapper';
 import { isNumberVariant, trimRouteId, isDropOffOnly } from 'util/domain';
 import { calculateStopsViewport } from 'util/stopPoster';
 import routeCompare from 'util/routeCompare';
@@ -135,6 +136,7 @@ const nearbyItemsMapper = mapProps(props => {
     maxLon,
     maxLat,
     projectedSymbols,
+    projectedSalePoints,
   } = calculateStopsViewport({
     longitude: props.longitude,
     latitude: props.latitude,
@@ -143,6 +145,7 @@ const nearbyItemsMapper = mapProps(props => {
     minZoom: MIN_ZOOM,
     maxZoom: MAX_ZOOM,
     stops,
+    salePoints: props.salePoints,
     currentStopId: props.stopId,
     miniMapStartX: props.width - MINI_MAP_WIDTH - MINI_MAP_MARGIN_RIGHT,
     miniMapStartY: props.height - MINI_MAP_HEIGHT - MINI_MAP_MARGIN_BOTTOM,
@@ -151,6 +154,17 @@ const nearbyItemsMapper = mapProps(props => {
 
   const currentStop = projectedStops.find(({ stopIds }) => stopIds.includes(props.stopId));
   const nearbyStops = projectedStops.filter(({ stopIds }) => !stopIds.includes(props.stopId));
+
+  // Calculate distances to sale points and get the nearest one
+  const nearestSalePoint = projectedSalePoints
+    .map(sp => {
+      // Euclidean distance
+      const distance = Math.sqrt(
+        (sp.x - projectedCurrentLocation.x) ** 2 + (sp.y - projectedCurrentLocation.y) ** 2,
+      );
+      return { ...sp, distance };
+    })
+    .reduce((prev, curr) => (prev && curr.distance > prev.distance ? prev : curr), null);
 
   const mapOptions = {
     center: [viewport.longitude, viewport.latitude],
@@ -188,6 +202,7 @@ const nearbyItemsMapper = mapProps(props => {
     maxLon,
     maxLat,
     projectedSymbols,
+    nearestSalePoint,
   };
 });
 
@@ -233,10 +248,35 @@ const mapInterestsMapper = mapProps(props => {
   };
 });
 
+const getSalePoints = async () => {
+  // TODO: Get url from env
+  const response = await fetch('https://content.hsl.fi/api/v1/point-of-sale?language=fi', {
+    method: 'GET',
+  });
+  const data = await response.json();
+  const result = data.results.map(sp => ({
+    id: sp.id,
+    type: sp.type,
+    lat: sp.latitude,
+    lon: sp.longitude,
+  }));
+  return result;
+};
+
+const salePointsMapper = mapProps(props => {
+  const salePoints = getSalePoints();
+  return {
+    ...props,
+    salePoints,
+  };
+});
+
 const hoc = compose(
   graphql(mapPositionQuery),
   apolloWrapper(mapInterestsMapper),
   graphql(nearbyItemsQuery),
+  salePointsMapper,
+  promiseWrapper('salePoints'),
   apolloWrapper(nearbyItemsMapper),
 );
 
