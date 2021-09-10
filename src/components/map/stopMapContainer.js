@@ -283,7 +283,8 @@ const getSalePoints = async () => {
 };
 
 const salePointsMapper = mapProps(props => {
-  const salePoints = getSalePoints();
+  // If sales points are not configured, do not fetch them but return empty array
+  const salePoints = props.salesPoint ? getSalePoints() : Promise.resolve([]);
   return {
     ...props,
     salePoints,

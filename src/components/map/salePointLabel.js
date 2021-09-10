@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import styles from './stopLabel.css';
 
 const SalePointLabel = props => {
+  // Round the distance to the next 50 meter
   const roundedDistance = Math.ceil(props.distance / 50) * 50;
   return (
     <div className={styles.label}>
