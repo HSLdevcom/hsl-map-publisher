@@ -17,6 +17,7 @@ import MapImage from './mapImageContainer';
 import Scalebar from './scalebar';
 import StopSymbol from './stopSymbol';
 import StopLabel from './stopLabel';
+import SalePointLabel from './salePointLabel';
 
 import styles from './stopMap.css';
 
@@ -144,6 +145,8 @@ const StopMap = props => {
     newPosition.viewport,
   );
 
+  const { nearestSalePoint } = props;
+
   return (
     <div className={styles.root} style={mapStyle}>
       <div className={styles.map}>
@@ -206,6 +209,14 @@ const StopMap = props => {
             </ItemPositioned>
           ))}
 
+          {nearestSalePoint && (
+            <ItemPositioned x={nearestSalePoint.x} y={nearestSalePoint.y} distance={25} angle={0}>
+              <Row>
+                <SalePointLabel {...nearestSalePoint} />
+              </Row>
+            </ItemPositioned>
+          )}
+
           <ItemFixed top={mapStyle.height - INFO_MARGIN_BOTTOM} left={INFO_MARGIN_LEFT}>
             <div>
               <Scalebar targetWidth={250} pixelsPerMeter={props.pixelsPerMeter} />
@@ -262,8 +273,19 @@ const StopType = PropTypes.shape({
   calculatedHeading: PropTypes.number,
 });
 
+const nearestSalePointType = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  type: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  address: PropTypes.string.isRequired,
+  lat: PropTypes.number.isRequired,
+  lon: PropTypes.number.isRequired,
+  distance: PropTypes.number.isRequired,
+});
+
 StopMap.defaultProps = {
   projectedSymbols: null,
+  nearestSalePoint: null,
 };
 
 StopMap.propTypes = {
@@ -275,6 +297,7 @@ StopMap.propTypes = {
   date: PropTypes.string.isRequired,
   showCitybikes: PropTypes.bool.isRequired,
   projectedSymbols: PropTypes.arrayOf(Object),
+  nearestSalePoint: nearestSalePointType,
 };
 
 export default StopMap;
