@@ -27,6 +27,13 @@ const MINI_MAP_ZOOM = 9;
 const MINI_MAP_MARGIN_RIGHT = 60;
 const MINI_MAP_MARGIN_BOTTOM = -40;
 
+const SALE_POINT_TYPES = [
+  'Kertalippuautomaatti',
+  'Monilippuautomaatti',
+  'myyntipiste', // yes, there is one in lowercase
+  'Myyntipiste',
+];
+
 const nearbyItemsQuery = gql`
   query nearbyItemsQuery(
     $minInterestLat: Float!
@@ -250,16 +257,28 @@ const mapInterestsMapper = mapProps(props => {
 
 const getSalePoints = async () => {
   // TODO: Get url from env
-  const response = await fetch('https://content.hsl.fi/api/v1/point-of-sale?language=fi', {
-    method: 'GET',
-  });
+  const response = await fetch(
+    'https://data-hslhrt.opendata.arcgis.com/datasets/f9388fc8a8f848fda3bc584b607afe97_0.geojson',
+    {
+      method: 'GET',
+    },
+  );
   const data = await response.json();
-  const result = data.results.map(sp => ({
-    id: sp.id,
-    type: sp.type,
-    lat: sp.latitude,
-    lon: sp.longitude,
-  }));
+  const result = data.features
+    .filter(sp => SALE_POINT_TYPES.includes(sp.properties.Tyyppi))
+    .map(sp => {
+      const { properties } = sp;
+      const { coordinates } = sp.geometry;
+      const [lon, lat] = coordinates;
+      return {
+        id: properties.ID,
+        type: properties.Tyyppi,
+        title: properties.Nimi,
+        address: properties.Osoite,
+        lat,
+        lon,
+      };
+    });
   return result;
 };
 
