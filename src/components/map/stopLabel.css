@@ -35,6 +35,10 @@
   font-family: GothamRounded-Book;
 }
 
+.salesPoint {
+  font-family: GothamRounded-Book;
+}
+
 .flexContainer {
   display: flex;
   flex-direction: row;

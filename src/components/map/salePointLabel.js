@@ -10,16 +10,17 @@ const SalePointLabel = props => {
     <div className={styles.label}>
       <div className={styles.title}>{props.title}</div>
       <div className={styles.subtitle}>{props.address}</div>
+      <div className={styles.subtitle}>{`(${roundedDistance} metriä / meter / meters)`}</div>
       <div className={styles.content}>
-        <p>
-          Lähin myyntipiste
-          <br />
-          Det närmaste försäljningsstället
-          <br />
-          The closest sales point
-          <br />
-          {`Etäisyys / Avståndet / Distance: ${roundedDistance} m`}
-        </p>
+        <div className={styles.flexContainer}>
+          <span className={styles.salesPoint}>
+            Lähin myyntipiste
+            <br />
+            Det närmaste försäljningsstället
+            <br />
+            The closest sales point
+          </span>
+        </div>
       </div>
     </div>
   );
