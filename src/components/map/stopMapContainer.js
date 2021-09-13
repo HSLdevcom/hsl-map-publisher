@@ -256,13 +256,7 @@ const mapInterestsMapper = mapProps(props => {
 });
 
 const getSalePoints = async () => {
-  // TODO: Get url from env
-  const response = await fetch(
-    'https://data-hslhrt.opendata.arcgis.com/datasets/f9388fc8a8f848fda3bc584b607afe97_0.geojson',
-    {
-      method: 'GET',
-    },
-  );
+  const response = await fetch(process.env.SALES_POINT_DATA_URL, { method: 'GET' });
   const data = await response.json();
   const result = data.features
     .filter(sp => SALE_POINT_TYPES.includes(sp.properties.Tyyppi))
