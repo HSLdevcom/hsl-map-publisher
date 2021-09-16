@@ -56,7 +56,7 @@ const StopSymbol = props => {
         x={props.size / 2}
         y={props.size / 2 + 1}
         fill={colors.pop()}
-        fontSize={maxRadius - 2}>
+        fontSize="10.5">
         {props.platform}
       </text>
     </svg>
