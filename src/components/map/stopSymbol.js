@@ -31,7 +31,7 @@ const StopSymbol = props => {
   const maxRadius = props.size / 2 - (strokeWidth / 2) * (4 - colors.length);
 
   const outlines = colors.map((color, index) => {
-    const radius = maxRadius - index * strokeWidth;
+    const radius = maxRadius - index * (strokeWidth + 1);
     return { color, radius };
   });
 
