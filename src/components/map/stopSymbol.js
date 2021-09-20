@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 
 import { isTrunkRoute, colorsByMode } from 'util/domain';
 
+import styles from './stopLabel.css';
+
 const strokeWidth = 5;
 
 const StopSymbol = props => {
@@ -53,6 +55,7 @@ const StopSymbol = props => {
         textAnchor="middle"
         dominantBaseline="middle"
         fontWeight="bold"
+        className={styles.route}
         x={props.size / 2}
         y={props.size / 2 + 1}
         fill={colors.pop()}
