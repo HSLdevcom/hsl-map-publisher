@@ -26,7 +26,7 @@ import styles from './stopMap.css';
 import placeLabelCity from './city-layer.json';
 
 // Map symbol size
-const SALES_POINT_RADIUS = 8;
+const SALES_POINT_RADIUS = 9;
 const STOP_RADIUS = 20;
 const LOCATION_RADIUS = 30;
 const LOCATION_RADIUS_MINI = 10;
