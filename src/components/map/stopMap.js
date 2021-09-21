@@ -6,6 +6,8 @@ import ItemPositioned from 'components/labelPlacement/itemPositioned';
 import { Row, InlineSVG } from 'components/util';
 
 import locationIcon from 'icons/marker.svg';
+import ticketMachineIcon from 'icons/icon-ticket-machine.svg';
+import ticketSalesPointIcon from 'icons/icon-tickets-sales-point.svg';
 
 import aZone from 'icons/icon-Zone-A.svg';
 import bZone from 'icons/icon-Zone-B.svg';
@@ -24,6 +26,7 @@ import styles from './stopMap.css';
 import placeLabelCity from './city-layer.json';
 
 // Map symbol size
+const SALES_POINT_RADIUS = 8;
 const STOP_RADIUS = 20;
 const LOCATION_RADIUS = 30;
 const LOCATION_RADIUS_MINI = 10;
@@ -38,6 +41,12 @@ const LocationSymbol = props => (
   <div style={{ width: props.size, height: props.size }}>
     <InlineSVG src={locationIcon} style={{ width: '100%' }} />
   </div>
+);
+
+const getSalesPointIcon = type => (
+  <InlineSVG
+    src={type.toLowerCase() === 'myyntipiste' ? ticketSalesPointIcon : ticketMachineIcon}
+  />
 );
 
 const getZoneIcon = zone => {
@@ -146,6 +155,7 @@ const StopMap = props => {
   );
 
   const { nearestSalePoint } = props;
+  const salesPointIcon = nearestSalePoint && getSalesPointIcon(nearestSalePoint.type);
 
   return (
     <div className={styles.root} style={mapStyle}>
@@ -210,9 +220,21 @@ const StopMap = props => {
           ))}
 
           {nearestSalePoint && (
+            <ItemFixed
+              top={nearestSalePoint.y - SALES_POINT_RADIUS}
+              left={nearestSalePoint.x - SALES_POINT_RADIUS}>
+              <Row>
+                <div style={{ width: SALES_POINT_RADIUS * 2, height: SALES_POINT_RADIUS * 2 }}>
+                  {salesPointIcon}
+                </div>
+              </Row>
+            </ItemFixed>
+          )}
+
+          {nearestSalePoint && (
             <ItemPositioned x={nearestSalePoint.x} y={nearestSalePoint.y} distance={25} angle={0}>
               <Row>
-                <SalePointLabel {...nearestSalePoint} />
+                <SalePointLabel {...nearestSalePoint} icon={salesPointIcon} />
               </Row>
             </ItemPositioned>
           )}

@@ -1,24 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { InlineSVG } from 'components/util';
-import iconTicketSales from 'icons/icon-tickets-sales-point.svg';
-import iconTicketMachine from 'icons/icon-ticket-machine.svg';
-
 import styles from './stopLabel.css';
 
 const SalePointLabel = props => {
   // Round the distance to the next 50 meter
   const roundedDistance = Math.ceil(props.distance / 50) * 50;
 
-  const ticketIcon =
-    props.type.toLowerCase() === 'myyntipiste' ? iconTicketSales : iconTicketMachine;
-
   return (
     <div className={styles.label}>
       <div className={styles.flexContainer}>
-        <div className={styles.comma}>
-          <InlineSVG src={ticketIcon} />
+        <div className={styles.comma} style={{ width: 32, height: 32 }}>
+          {props.icon}
         </div>
         <div>
           <div className={styles.title}>{props.title}</div>
@@ -46,6 +39,7 @@ SalePointLabel.propTypes = {
   title: PropTypes.string.isRequired,
   address: PropTypes.string.isRequired,
   distance: PropTypes.number.isRequired,
+  icon: PropTypes.element.isRequired,
 };
 
 export default SalePointLabel;
