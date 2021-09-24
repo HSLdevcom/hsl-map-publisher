@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import styles from './stopLabel.css';
 
 const SalePointLabel = props => {
-  // Round the distance to the next 50 meter
-  const roundedDistance = Math.ceil(props.distance / 50) * 50;
+  // Round the distance to the next 10 meter
+  const roundedDistance = Math.ceil(props.distance / 10) * 10;
 
   return (
     <div className={styles.label}>
@@ -18,7 +18,6 @@ const SalePointLabel = props => {
           <div className={styles.subtitle}>{props.address}</div>
         </div>
       </div>
-      <div className={styles.subtitle}>{`(${roundedDistance} metriä / meter / meters)`}</div>
       <div className={styles.content}>
         <div className={styles.flexContainer}>
           <span className={styles.salesPoint}>
@@ -27,6 +26,8 @@ const SalePointLabel = props => {
             Det närmaste försäljningsstället
             <br />
             The closest sales point
+            <br />
+            {`${roundedDistance} m`}
           </span>
         </div>
       </div>
