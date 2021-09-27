@@ -6,6 +6,7 @@ import compose from 'recompose/compose';
 import flatMap from 'lodash/flatMap';
 import get from 'lodash/get';
 import { PerspectiveMercatorViewport } from 'viewport-mercator-project';
+import haversine from 'haversine';
 
 import apolloWrapper from 'util/apolloWrapper';
 import promiseWrapper from 'util/promiseWrapper';
@@ -167,8 +168,10 @@ const nearbyItemsMapper = mapProps(props => {
   const nearestSalePoint = projectedSalePoints
     .map(sp => {
       // Euclidean distance
-      const distance = Math.sqrt(
-        (sp.x - projectedCurrentLocation.x) ** 2 + (sp.y - projectedCurrentLocation.y) ** 2,
+      const distance = haversine(
+        { latitude: sp.lat, longitude: sp.lon },
+        { latitude: projectedCurrentLocation.lat, longitude: projectedCurrentLocation.lon },
+        { unit: 'meter' },
       );
       return { ...sp, distance };
     })

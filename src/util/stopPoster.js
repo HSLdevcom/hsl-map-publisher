@@ -172,6 +172,8 @@ function calculateStopsViewport(options) {
   const projectedCurrentLocation = {
     x,
     y,
+    lon: longitude,
+    lat: latitude,
   };
 
   const projectedSymbols = [];
