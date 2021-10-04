@@ -29,6 +29,5 @@ jobs:
         with:
           context: .
           push: true
-          name: hsldevcom/hsl-map-publisher
-          tags: 'dev'
+          tags: hsldevcom/hsl-map-publisher:dev
           labels: ${{ steps.meta.outputs.labels }}
