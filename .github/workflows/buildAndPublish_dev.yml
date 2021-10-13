@@ -23,6 +23,21 @@ jobs:
         uses: docker/metadata-action@v3
         with:
           images: hsldevcom/hsl-map-publisher
+      
+      - name: Get commit hash
+        id: commit_hash
+        run: echo "::set-output name=hash::$(git rev-parse --short "$GITHUB_SHA")"
+
+      - name: Get image timestamp
+        id: timestamp
+        run: echo "::set-output name=timestamp::$(date +'%Y-%m-%d')"
+
+      - name: Build and push timestamped tag
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ${{ format('hsldevcom/hsl-map-publisher:dev-{0}-{1}', steps.timestamp.outputs.timestamp, steps.commit_hash.outputs.hash)
 
       - name: Build and push
         uses: docker/build-push-action@v2
@@ -30,4 +45,3 @@ jobs:
           context: .
           push: true
           tags: hsldevcom/hsl-map-publisher:dev
-          labels: ${{ steps.meta.outputs.labels }}
