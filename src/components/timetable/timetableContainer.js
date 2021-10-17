@@ -257,6 +257,7 @@ const propsMapper = mapProps(props => {
     stopId: props.data.stop.stopId,
     stopZone: props.data.stop.stopZone,
     printableAsA4: props.printTimetablesAsA4,
+    printAsA3: props.printAsA3,
     greyscale: props.printTimetablesAsGreyscale,
     standalone: props.standalone,
     specialSymbols,

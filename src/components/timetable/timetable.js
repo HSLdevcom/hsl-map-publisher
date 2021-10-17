@@ -54,107 +54,122 @@ const getNotes = (notes, symbols) => {
   return parsedNotes;
 };
 
-const Timetable = props => (
-  <div
-    className={classNames(styles.root, {
-      [styles.summer]: props.isSummerTimetable,
-      [styles.printable]: props.printableAsA4,
-      [styles.standalone]: props.standalone,
-      [styles.greyscale]: props.greyscale,
-    })}>
-    <div className={styles.header}>
-      {props.showStopInformation && (
-        <div className={styles.headerTitle}>
-          <div className={styles.title}>
-            {props.stopNameFi}
-            &nbsp;&nbsp;
-          </div>
-          <div className={styles.subtitle}>{props.stopNameSe}</div>
+const nullOrEmpty = arr => !arr || arr.length === 0;
+
+const Timetable = props => {
+  const allNullOrEmpty =
+    nullOrEmpty(props.weekdays) && nullOrEmpty(props.saturdays) && nullOrEmpty(props.sundays);
+  if (allNullOrEmpty) {
+    return null;
+  }
+  return (
+    <div
+      className={classNames(styles.root, {
+        [styles.summer]: props.isSummerTimetable,
+        [styles.a3]: props.printAsA3,
+        [styles.printable]: props.printableAsA4,
+        [styles.standalone]: props.standalone,
+        [styles.greyscale]: props.greyscale,
+      })}>
+      {!props.printAsA3 && (
+        <div className={styles.header}>
+          {props.showStopInformation && (
+            <div className={styles.headerTitle}>
+              <div className={styles.title}>
+                {props.stopNameFi}
+                &nbsp;&nbsp;
+              </div>
+              <div className={styles.subtitle}>{props.stopNameSe}</div>
+            </div>
+          )}
+          {props.showValidityPeriod && (
+            <div className={styles.validity}>
+              <div className={styles.shortId}>
+                {props.stopShortId && `${props.stopShortId.replace(/\s+/g, '')}`}
+              </div>
+              <div className={styles.title}>Aikataulut voimassa</div>
+              <div>Tidtabeller giltiga/Timetables valid</div>
+              <div>
+                {new Date(props.dateBegin).toLocaleDateString('fi')}
+                &nbsp;-&nbsp;
+                {new Date(props.dateEnd).toLocaleDateString('fi')}
+              </div>
+              <div>
+                {formatDate(new Date(props.dateBegin))}
+                &nbsp;-&nbsp;
+                {formatDate(new Date(props.dateEnd))}
+              </div>
+            </div>
+          )}
         </div>
       )}
-      {props.showValidityPeriod && (
-        <div className={styles.validity}>
-          <div className={styles.shortId}>
-            {props.stopShortId && `${props.stopShortId.replace(/\s+/g, '')}`}
-          </div>
-          <div className={styles.title}>Aikataulut voimassa</div>
-          <div>Tidtabeller giltiga/Timetables valid</div>
-          <div>
-            {new Date(props.dateBegin).toLocaleDateString('fi')}
-            &nbsp;-&nbsp;
-            {new Date(props.dateEnd).toLocaleDateString('fi')}
-          </div>
-          <div>
-            {formatDate(new Date(props.dateBegin))}
-            &nbsp;-&nbsp;
-            {formatDate(new Date(props.dateEnd))}
-          </div>
+      {!props.printAsA3 && props.showComponentName && (
+        <div className={styles.componentName}>
+          <div className={styles.title}>Pysäkkiaikataulu&nbsp;&nbsp;</div>
+          <div className={styles.subtitle}>Hållplatstidtabell</div>
+          <div className={styles.subtitle}>Stop timetable</div>
         </div>
       )}
+      {props.standalone && (
+        <React.Fragment>
+          <div className={styles.stopZone}>
+            <div className={styles.zoneTitle}>Vyöhyke</div>
+            <div className={styles.zoneSubtitle}>Zon/Zone</div>
+            <div className={styles.zone}>
+              <span className={styles.zoneLetter} style={getZoneLetterStyle(props.stopZone)}>
+                {props.stopZone}
+              </span>
+            </div>
+          </div>
+          <SimpleRoutes stopId={props.stopId} date={props.date} />
+        </React.Fragment>
+      )}
+      {props.weekdays && props.weekdays.length > 0 && (
+        <div>
+          <TableHeader
+            title="Maanantai - Perjantai"
+            subtitleSw="Måndag - Fredag"
+            subtitleEn="Monday - Friday"
+            printingAsA4={props.printableAsA4}
+            printAsA3={props.printAsA3}
+          />
+          <TableRows departures={props.weekdays} printAsA3={props.printAsA3} />
+        </div>
+      )}
+      {props.saturdays && props.saturdays.length > 0 && (
+        <div>
+          <TableHeader
+            title="Lauantai"
+            subtitleSw="Lördag"
+            subtitleEn="Saturday"
+            printingAsA4={props.printableAsA4}
+            printAsA3={props.printAsA3}
+          />
+          <TableRows departures={props.saturdays} printAsA3={props.printAsA3} />
+        </div>
+      )}
+      {props.sundays && props.sundays.length > 0 && (
+        <div>
+          <TableHeader
+            title="Sunnuntai"
+            subtitleSw="Söndag"
+            subtitleEn="Sunday"
+            printingAsA4={props.printableAsA4}
+            printAsA3={props.printAsA3}
+          />
+          <TableRows departures={props.sundays} printAsA3={props.printAsA3} />
+        </div>
+      )}
+      {props.showNotes && props.notes.length !== 0 && <Spacer height={20} />}
+      {props.showNotes &&
+        getNotes(props.notes, props.specialSymbols).map(note => (
+          <div key={note} className={styles.footnote}>
+            {note}
+          </div>
+        ))}
     </div>
-    {props.showComponentName && (
-      <div className={styles.componentName}>
-        <div className={styles.title}>Pysäkkiaikataulu&nbsp;&nbsp;</div>
-        <div className={styles.subtitle}>Hållplatstidtabell</div>
-        <div className={styles.subtitle}>Stop timetable</div>
-      </div>
-    )}
-    {props.standalone && (
-      <React.Fragment>
-        <div className={styles.stopZone}>
-          <div className={styles.zoneTitle}>Vyöhyke</div>
-          <div className={styles.zoneSubtitle}>Zon/Zone</div>
-          <div className={styles.zone}>
-            <span className={styles.zoneLetter} style={getZoneLetterStyle(props.stopZone)}>
-              {props.stopZone}
-            </span>
-          </div>
-        </div>
-        <SimpleRoutes stopId={props.stopId} date={props.date} />
-      </React.Fragment>
-    )}
-    {props.weekdays && props.weekdays.length > 0 && (
-      <div>
-        <TableHeader
-          title="Maanantai - Perjantai"
-          subtitleSw="Måndag - Fredag"
-          subtitleEn="Monday - Friday"
-          printingAsA4={props.printableAsA4}
-        />
-        <TableRows departures={props.weekdays} />
-      </div>
-    )}
-    {props.saturdays && props.saturdays.length > 0 && (
-      <div>
-        <TableHeader
-          title="Lauantai"
-          subtitleSw="Lördag"
-          subtitleEn="Saturday"
-          printingAsA4={props.printableAsA4}
-        />
-        <TableRows departures={props.saturdays} />
-      </div>
-    )}
-    {props.sundays && props.sundays.length > 0 && (
-      <div>
-        <TableHeader
-          title="Sunnuntai"
-          subtitleSw="Söndag"
-          subtitleEn="Sunday"
-          printingAsA4={props.printableAsA4}
-        />
-        <TableRows departures={props.sundays} />
-      </div>
-    )}
-    {props.showNotes && props.notes.length !== 0 && <Spacer height={20} />}
-    {props.showNotes &&
-      getNotes(props.notes, props.specialSymbols).map(note => (
-        <div key={note} className={styles.footnote}>
-          {note}
-        </div>
-      ))}
-  </div>
-);
+  );
+};
 
 Timetable.defaultProps = {
   weekdays: null,
@@ -168,6 +183,7 @@ Timetable.defaultProps = {
   standalone: false,
   greyscale: false,
   specialSymbols: [],
+  printAsA3: false,
 };
 
 Timetable.propTypes = {
@@ -192,6 +208,7 @@ Timetable.propTypes = {
   standalone: PropTypes.bool,
   greyscale: PropTypes.bool,
   specialSymbols: PropTypes.array,
+  printAsA3: PropTypes.bool,
 };
 
 export default Timetable;

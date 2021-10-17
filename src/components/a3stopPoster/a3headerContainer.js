@@ -12,6 +12,8 @@ import routeCompare from 'util/routeCompare';
 const routesQuery = gql`
   query routesQuery($stopId: String!, $date: Date!) {
     stop: stopByStopId(stopId: $stopId) {
+      nameFi
+      nameSe
       siblings {
         nodes {
           routeSegments: routeSegmentsForDate(date: $date) {
@@ -37,7 +39,8 @@ const routesQuery = gql`
 `;
 
 const propsMapper = mapProps(props => ({
-  printAsA3: props.printAsA3,
+  variables: props.data.variables,
+  stop: props.data.stop,
   routes: flatMap(props.data.stop.siblings.nodes, node =>
     node.routeSegments.nodes
       .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
@@ -62,12 +65,12 @@ const hoc = compose(
 );
 
 export default component => {
-  const RoutesContainer = hoc(component);
+  const A3HeaderContainer = hoc(component);
 
-  RoutesContainer.propTypes = {
+  A3HeaderContainer.propTypes = {
     stopId: PropTypes.string.isRequired,
     date: PropTypes.string.isRequired,
   };
 
-  return RoutesContainer;
+  return A3HeaderContainer;
 };

@@ -54,12 +54,16 @@ const TableRows = props => {
   );
 
   return (
-    <div className={styles.root}>
+    <div className={!props.printAsA3 ? styles.root : styles.a3root}>
       {Object.entries(departuresByHour).map(([hours, departures]) => (
         <TableRow key={hours} hours={hours} departures={departures} />
       ))}
     </div>
   );
+};
+
+TableRows.defaultProps = {
+  printAsA3: false,
 };
 
 TableRows.propTypes = {
@@ -69,6 +73,7 @@ TableRows.propTypes = {
       ...Departure.propTypes,
     }),
   ).isRequired,
+  printAsA3: PropTypes.bool,
 };
 
 export default TableRows;
