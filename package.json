@@ -98,6 +98,7 @@
     "fs-extra": "^8.1.0",
     "graphql": "^0.11.7",
     "graphql-tag": "^2.5.0",
+    "haversine": "^1.1.1",
     "hsl-map-style": "HSLdevcom/hsl-map-style#master",
     "html-webpack-plugin": "^4.0.0-alpha",
     "iconv-lite": "^0.4.19",

@@ -30,10 +30,7 @@ Departure.propTypes = {
 
 const TableRow = props => (
   <Row>
-    <div className={styles.hours}>
-      {props.hours % 24 < 10 && '0'}
-      {props.hours % 24}
-    </div>
+    <div className={styles.hours}>{props.hours}</div>
     <WrappingRow>
       {sortBy(props.departures, a => a.minutes).map((departure, index) => (
         <Departure key={index} {...departure} />
@@ -47,16 +44,79 @@ TableRow.propTypes = {
   departures: PropTypes.arrayOf(PropTypes.shape(Departure.propTypes)).isRequired,
 };
 
+const isEqualDepartureHour = (a, b) => {
+  if (!a || !b) {
+    return false;
+  }
+  if (a.length !== b.length) {
+    return false;
+  }
+
+  for (let i = 0; i < a.length; i++) {
+    const curA = a[i];
+    const curB = b[i];
+
+    if (!curA || !curB) {
+      return false;
+    }
+
+    if (curA.minutes !== curB.minutes) {
+      return false;
+    }
+    if (curA.note !== curB.note) {
+      return false;
+    }
+  }
+  return true;
+};
+
+const getDuplicateCutOff = (startIndex, rows) => {
+  const startRow = rows[startIndex];
+  let cutOffIndex = startIndex;
+  for (let i = startIndex; i < rows.length; i++) {
+    const cur = rows[i];
+    if (!isEqualDepartureHour(startRow.departures, cur.departures)) {
+      return cutOffIndex;
+    }
+    cutOffIndex = i;
+  }
+  return cutOffIndex;
+};
+
 const TableRows = props => {
   const departuresByHour = groupBy(
     props.departures,
     departure => (departure.isNextDay ? 24 : 0) + departure.hours,
   );
+  const rows = Object.entries(departuresByHour).map(([hours, departures]) => ({
+    hour: hours,
+    departures,
+  }));
+
+  const formatHour = hour => `${hour % 24 < 10 ? '0' : ''}${hour % 24}`;
+
+  const rowsByHour = [];
+  for (let i = 0; i < rows.length; i++) {
+    const cutOff = getDuplicateCutOff(i, rows);
+    const hours =
+      rows[i].hour === rows[cutOff].hour
+        ? `${formatHour(rows[i].hour)}`
+        : `${formatHour(rows[i].hour)}-${formatHour(rows[cutOff].hour)}`;
+    rowsByHour.push({
+      hour: hours,
+      departures: rows[i].departures,
+    });
+    i = cutOff;
+  }
 
   return (
     <div className={!props.printAsA3 ? styles.root : styles.a3root}>
-      {Object.entries(departuresByHour).map(([hours, departures]) => (
-        <TableRow key={hours} hours={hours} departures={departures} />
+      {rowsByHour.map(departuresHour => (
+        <TableRow
+          key={departuresHour.hour}
+          hours={departuresHour.hour}
+          departures={departuresHour.departures}
+        />
       ))}
     </div>
   );

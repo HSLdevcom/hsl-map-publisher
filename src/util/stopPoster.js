@@ -10,8 +10,8 @@ const STOP_AMOUNT_WEIGHT = 5;
 const DISTANCES_FROM_CENTRE = [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3];
 const ANGLES = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
 
-function viewportContains(viewport, stop, width, height, miniMapStartX, miniMapStartY) {
-  const [x, y] = viewport.project([stop.lon, stop.lat], { topLeft: true });
+function viewportContains(viewport, place, width, height, miniMapStartX, miniMapStartY) {
+  const [x, y] = viewport.project([place.lon, place.lat], { topLeft: true });
   const behindMiniMap = x > miniMapStartX && height - y > miniMapStartY;
   return x >= 0 && x <= viewport.width && y >= 0 && y <= viewport.height && !behindMiniMap;
 }
@@ -34,6 +34,7 @@ function calculateStopsViewport(options) {
     minZoom,
     maxZoom,
     stops,
+    salePoints,
     miniMapStartX,
     miniMapStartY,
     useProjectedSymbols,
@@ -154,6 +155,15 @@ function calculateStopsViewport(options) {
     return { ...stop, x, y };
   });
 
+  // Filter sale points that are in the map and calculate pixel coordinates for tem.
+  const visibleSalePoints = salePoints.filter(sp =>
+    viewportContains(bestViewPort, sp, width, height, miniMapStartX, miniMapStartY),
+  );
+  const projectedSalePoints = visibleSalePoints.map(sp => {
+    const [x, y] = bestViewPort.project([sp.lon, sp.lat]);
+    return { ...sp, x, y };
+  });
+
   const [minLon, minLat] = bestViewPort.unproject([0, 0]);
 
   const [maxLon, maxLat] = bestViewPort.unproject([options.width, options.height]);
@@ -162,6 +172,8 @@ function calculateStopsViewport(options) {
   const projectedCurrentLocation = {
     x,
     y,
+    lon: longitude,
+    lat: latitude,
   };
 
   const projectedSymbols = [];
@@ -186,6 +198,7 @@ function calculateStopsViewport(options) {
     maxLon,
     maxLat,
     projectedSymbols,
+    projectedSalePoints,
   };
 }
 

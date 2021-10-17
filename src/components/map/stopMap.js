@@ -6,6 +6,8 @@ import ItemPositioned from 'components/labelPlacement/itemPositioned';
 import { Row, InlineSVG } from 'components/util';
 
 import locationIcon from 'icons/marker.svg';
+import ticketMachineIcon from 'icons/icon-ticket-machine.svg';
+import ticketSalesPointIcon from 'icons/icon-tickets-sales-point.svg';
 
 import aZone from 'icons/icon-Zone-A.svg';
 import bZone from 'icons/icon-Zone-B.svg';
@@ -17,12 +19,14 @@ import MapImage from './mapImageContainer';
 import Scalebar from './scalebar';
 import StopSymbol from './stopSymbol';
 import StopLabel from './stopLabel';
+import SalePointLabel from './salePointLabel';
 
 import styles from './stopMap.css';
 
 import placeLabelCity from './city-layer.json';
 
 // Map symbol size
+const SALES_POINT_RADIUS = 9;
 const STOP_RADIUS = 20;
 const LOCATION_RADIUS = 30;
 const LOCATION_RADIUS_MINI = 10;
@@ -37,6 +41,12 @@ const LocationSymbol = props => (
   <div style={{ width: props.size, height: props.size }}>
     <InlineSVG src={locationIcon} style={{ width: '100%' }} />
   </div>
+);
+
+const getSalesPointIcon = type => (
+  <InlineSVG
+    src={type.toLowerCase() === 'myyntipiste' ? ticketSalesPointIcon : ticketMachineIcon}
+  />
 );
 
 const getZoneIcon = zone => {
@@ -144,6 +154,9 @@ const StopMap = props => {
     newPosition.viewport,
   );
 
+  const { nearestSalePoint } = props;
+  const salesPointIcon = nearestSalePoint && getSalesPointIcon(nearestSalePoint.type);
+
   return (
     <div className={styles.root} style={mapStyle}>
       <div className={styles.map}>
@@ -166,18 +179,26 @@ const StopMap = props => {
         <ItemContainer>
           {stops.map((stop, index) => (
             <ItemFixed key={index} top={stop.y - STOP_RADIUS} left={stop.x - STOP_RADIUS}>
-              <StopSymbol routes={stop.routes} size={STOP_RADIUS * 2} />
+              <StopSymbol
+                platform={stop.stops.nodes[0].platform}
+                routes={stop.routes}
+                size={STOP_RADIUS * 2}
+              />
             </ItemFixed>
           ))}
 
           <ItemFixed
             top={props.currentStop.y - STOP_RADIUS}
             left={props.currentStop.x - STOP_RADIUS}>
-            <StopSymbol routes={props.currentStop.routes} size={STOP_RADIUS * 2} />
+            <StopSymbol
+              platform={props.currentStop.stops.nodes[0].platform}
+              routes={props.currentStop.routes}
+              size={STOP_RADIUS * 2}
+            />
           </ItemFixed>
 
           <ItemFixed
-            top={props.currentStop.y - 2 * LOCATION_RADIUS}
+            top={props.currentStop.y - 2.2 * LOCATION_RADIUS}
             left={props.currentStop.x - LOCATION_RADIUS}>
             <Row style={{ height: LOCATION_RADIUS * 2 }}>
               <LocationSymbol size={LOCATION_RADIUS * 2} />
@@ -205,6 +226,26 @@ const StopMap = props => {
               <StopLabel {...stop} />
             </ItemPositioned>
           ))}
+
+          {nearestSalePoint && (
+            <ItemFixed
+              top={nearestSalePoint.y - SALES_POINT_RADIUS}
+              left={nearestSalePoint.x - SALES_POINT_RADIUS}>
+              <Row>
+                <div style={{ width: SALES_POINT_RADIUS * 2, height: SALES_POINT_RADIUS * 2 }}>
+                  {salesPointIcon}
+                </div>
+              </Row>
+            </ItemFixed>
+          )}
+
+          {nearestSalePoint && (
+            <ItemPositioned x={nearestSalePoint.x} y={nearestSalePoint.y} distance={25} angle={0}>
+              <Row>
+                <SalePointLabel {...nearestSalePoint} icon={salesPointIcon} />
+              </Row>
+            </ItemPositioned>
+          )}
 
           <ItemFixed top={mapStyle.height - INFO_MARGIN_BOTTOM} left={INFO_MARGIN_LEFT}>
             <div>
@@ -262,8 +303,19 @@ const StopType = PropTypes.shape({
   calculatedHeading: PropTypes.number,
 });
 
+const nearestSalePointType = PropTypes.shape({
+  id: PropTypes.number.isRequired,
+  type: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  address: PropTypes.string.isRequired,
+  lat: PropTypes.number.isRequired,
+  lon: PropTypes.number.isRequired,
+  distance: PropTypes.number.isRequired,
+});
+
 StopMap.defaultProps = {
   projectedSymbols: null,
+  nearestSalePoint: null,
 };
 
 StopMap.propTypes = {
@@ -275,6 +327,7 @@ StopMap.propTypes = {
   date: PropTypes.string.isRequired,
   showCitybikes: PropTypes.bool.isRequired,
   projectedSymbols: PropTypes.arrayOf(Object),
+  nearestSalePoint: nearestSalePointType,
 };
 
 export default StopMap;
