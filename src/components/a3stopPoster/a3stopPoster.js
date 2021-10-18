@@ -282,10 +282,6 @@ A3StopPoster.propTypes = {
   isTramStop: PropTypes.bool.isRequired,
   shortId: PropTypes.string.isRequired,
   template: PropTypes.any.isRequired,
-  mapZoneSymbols: PropTypes.bool,
-  mapZones: PropTypes.bool,
-  minimapZoneSymbols: PropTypes.bool,
-  minimapZones: PropTypes.bool,
   routeFilter: PropTypes.string,
 };
 
@@ -293,10 +289,6 @@ A3StopPoster.defaultProps = {
   isSummerTimetable: false,
   dateBegin: null,
   dateEnd: null,
-  mapZoneSymbols: false,
-  mapZones: false,
-  minimapZoneSymbols: false,
-  minimapZones: false,
   routeFilter: '',
 };
 
