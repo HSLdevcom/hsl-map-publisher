@@ -163,19 +163,32 @@ const nearbyItemsMapper = mapProps(props => {
 
   const currentStop = projectedStops.find(({ stopIds }) => stopIds.includes(props.stopId));
   const nearbyStops = projectedStops.filter(({ stopIds }) => !stopIds.includes(props.stopId));
-
   // Calculate distances to sale points and get the nearest one
-  const nearestSalePoint = projectedSalePoints
-    .map(sp => {
-      // Euclidean distance
-      const distance = haversine(
-        { latitude: sp.lat, longitude: sp.lon },
-        { latitude: projectedCurrentLocation.lat, longitude: projectedCurrentLocation.lon },
-        { unit: 'meter' },
-      );
-      return { ...sp, distance };
-    })
-    .reduce((prev, curr) => (prev && curr.distance > prev.distance ? prev : curr), null);
+  const nearestSalePoint = props.salesPoint
+    ? projectedSalePoints
+        .map(sp => {
+          // Euclidean distance
+          const distance = haversine(
+            { latitude: sp.lat, longitude: sp.lon },
+            { latitude: projectedCurrentLocation.lat, longitude: projectedCurrentLocation.lon },
+            { unit: 'meter' },
+          );
+          return { ...sp, distance };
+        })
+        .reduce((prev, curr) => (prev && curr.distance > prev.distance ? prev : curr), null)
+    : null;
+
+  const projectedSalesPoints = [];
+  props.salePoints.forEach(salePoint => {
+    if (
+      salePoint.lon > minLon &&
+      salePoint.lon < maxLon &&
+      salePoint.lat < minLat &&
+      salePoint.lat > maxLat
+    ) {
+      projectedSalesPoints.push(salePoint);
+    }
+  });
 
   const mapOptions = {
     center: [viewport.longitude, viewport.latitude],
@@ -214,6 +227,7 @@ const nearbyItemsMapper = mapProps(props => {
     maxLat,
     projectedSymbols,
     nearestSalePoint,
+    projectedSalesPoints,
   };
 });
 
@@ -283,9 +297,27 @@ const getSalePoints = async () => {
   return result;
 };
 
+const fetchOSMObjects = async props => {
+  const osmData = await fetch(
+    `https://nominatim.openstreetmap.org/search.php?q=metro&
+    viewbox=${props.maxInterestLon}%2C${props.maxInterestLat}%2C${props.minInterestLon}%2C${props.minInterestLat}
+    &bounded=1&format=json&namedetails=1`,
+  );
+  const results = await osmData.json();
+  return results;
+};
+
+const osmPointsMapper = mapProps(props => {
+  const subwayEntrances = fetchOSMObjects(props);
+  return {
+    ...props,
+    subwayEntrances,
+  };
+});
+
 const salePointsMapper = mapProps(props => {
   // If sales points are not configured, do not fetch them but return empty array
-  const salePoints = props.salesPoint ? getSalePoints() : Promise.resolve([]);
+  const salePoints = props.salesPoint || props.legend ? getSalePoints() : Promise.resolve([]);
   return {
     ...props,
     salePoints,
@@ -298,6 +330,8 @@ const hoc = compose(
   graphql(nearbyItemsQuery),
   salePointsMapper,
   promiseWrapper('salePoints'),
+  osmPointsMapper,
+  promiseWrapper('subwayEntrances'),
   apolloWrapper(nearbyItemsMapper),
 );
 
