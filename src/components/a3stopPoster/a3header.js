@@ -131,7 +131,7 @@ class A3Header extends Component {
         <div className={styles.stopIdContainer}>
           <div className={styles.stopIdTitle}>Pysäkkinumero</div>
           <div className={styles.stopIdTitle}>Hållplatsnummer</div>
-          <div className={styles.stopId}>{this.props.variables.stopId}</div>
+          <div className={styles.stopId}>{this.props.stop.shortId.replace(' ', '')}</div>
         </div>
       </div>
     );

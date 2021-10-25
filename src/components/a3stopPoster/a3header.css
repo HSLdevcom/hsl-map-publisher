@@ -63,6 +63,7 @@
 .stopIdTitle {
   font-size: 18px;
   color: var(--timetable-text-color);
+  font-family: GothamRounded-Medium;
 }
 
 .stopId {
@@ -73,6 +74,7 @@
   text-align: center;
   border: 5px solid var(--timetable-text-color);
   border-radius: 10px;
+  font-family: GothamRounded-Medium;
 }
 
 .simplestRoutes {

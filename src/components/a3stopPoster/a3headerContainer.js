@@ -14,6 +14,7 @@ const routesQuery = gql`
     stop: stopByStopId(stopId: $stopId) {
       nameFi
       nameSe
+      shortId
       siblings {
         nodes {
           routeSegments: routeSegmentsForDate(date: $date) {
@@ -59,10 +60,7 @@ const propsMapper = mapProps(props => ({
   ).sort(routeCompare),
 }));
 
-const hoc = compose(
-  graphql(routesQuery),
-  apolloWrapper(propsMapper),
-);
+const hoc = compose(graphql(routesQuery), apolloWrapper(propsMapper));
 
 export default component => {
   const A3HeaderContainer = hoc(component);
