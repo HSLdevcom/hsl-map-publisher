@@ -17,3 +17,5 @@ jobs:
         with:
           context: .
           tags: hsldevcom/hsl-map-publisher:dev
+          build-args: |
+            BUILD_ENV: dev
