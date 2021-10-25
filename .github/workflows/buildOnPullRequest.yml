@@ -1,4 +1,4 @@
-name: Build and publish Docker Hub dev image
+name: Build
 
 on:
   pull_request:
@@ -17,3 +17,5 @@ jobs:
         with:
           context: .
           tags: hsldevcom/hsl-map-publisher:dev
+          build-args: |
+            BUILD_ENV=dev
