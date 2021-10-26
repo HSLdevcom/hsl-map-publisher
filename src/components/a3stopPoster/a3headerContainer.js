@@ -12,6 +12,9 @@ import routeCompare from 'util/routeCompare';
 const routesQuery = gql`
   query routesQuery($stopId: String!, $date: Date!) {
     stop: stopByStopId(stopId: $stopId) {
+      nameFi
+      nameSe
+      shortId
       siblings {
         nodes {
           routeSegments: routeSegmentsForDate(date: $date) {
@@ -37,7 +40,8 @@ const routesQuery = gql`
 `;
 
 const propsMapper = mapProps(props => ({
-  printAsA3: props.printAsA3,
+  variables: props.data.variables,
+  stop: props.data.stop,
   routes: flatMap(props.data.stop.siblings.nodes, node =>
     node.routeSegments.nodes
       .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
@@ -56,18 +60,15 @@ const propsMapper = mapProps(props => ({
   ).sort(routeCompare),
 }));
 
-const hoc = compose(
-  graphql(routesQuery),
-  apolloWrapper(propsMapper),
-);
+const hoc = compose(graphql(routesQuery), apolloWrapper(propsMapper));
 
 export default component => {
-  const RoutesContainer = hoc(component);
+  const A3HeaderContainer = hoc(component);
 
-  RoutesContainer.propTypes = {
+  A3HeaderContainer.propTypes = {
     stopId: PropTypes.string.isRequired,
     date: PropTypes.string.isRequired,
   };
 
-  return RoutesContainer;
+  return A3HeaderContainer;
 };

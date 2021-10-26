@@ -1,0 +1,53 @@
+/*
+ Poster 810mm x 1210mm / 31.89in x 47.64in / 2296px x 3430px @ 72 ppi
+ Bleed 5mm / 15 px @ 72 ppi
+*/
+
+.root {
+  width: calc(1211px + 30px);
+  height: calc(856px + 30px);
+  padding: 10px;
+  margin: -15px;
+  color: white;
+  background: var(--background);
+  box-sizing: border-box;
+}
+
+.content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-flow: column;
+  overflow: hidden;
+}
+
+.columns {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+}
+
+.column {
+  display: flex;
+  flex-flow: column;
+  align-items: stretch;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+
+.left {
+  composes: column;
+  width: 100%;
+}
+
+.right {
+  composes: column;
+  flex: 1;
+}
+
+.timetables {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+}

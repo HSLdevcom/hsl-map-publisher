@@ -96,7 +96,7 @@ const propsMapper = mapProps(props => {
       })),
   );
 
-  return { tree: routesToTree(routes, props.data.stop, props.height) };
+  return { tree: routesToTree(routes, props.data.stop, props.height), printAsA3: props.printAsA3 };
 });
 
 const hoc = compose(
