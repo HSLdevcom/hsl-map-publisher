@@ -1,9 +1,13 @@
 #!/bin/bash
 set -e
 
+font_dir=~/.local/share/fonts/opentype
+mkdir -p $font_dir
+
 # Check if the fonts already exist. Hey, we might be lucky!
 if [ -n "$(ls -A /fonts 2>/dev/null)" ]; then
   echo "Fonts seem to exist. If they do not, ensure /fonts dir is empty and try again."
+  cp -R /fonts $font_dir
   exit 0
 fi
 
@@ -30,10 +34,7 @@ AZURE_STORAGE_KEY=$(<$key_secret)
 AZURE_STORAGE_ACCOUNT=$(<$account_secret)
 
 container_name=${AZURE_STORAGE_CONTAINER:=fonts}
-destination=~/.local/share/fonts/opentype
 
-mkdir -p ${destination}
-
-az storage blob download-batch --destination $destination --source $container_name --pattern *.otf --no-progress --account-name $AZURE_STORAGE_ACCOUNT --account-key $AZURE_STORAGE_KEY
+az storage blob download-batch --destination $font_dir --source $container_name --pattern *.otf --no-progress --account-name $AZURE_STORAGE_ACCOUNT --account-key $AZURE_STORAGE_KEY
 
 echo "Fonts downloaded."
