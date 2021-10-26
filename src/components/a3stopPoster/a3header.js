@@ -9,7 +9,7 @@ import SimpleRoutes from '../timetable/simpleRoutes';
 
 import styles from './a3header.css';
 
-const MAX_COLUMNS = 6;
+const MAX_COLUMNS = 5;
 
 class A3Header extends Component {
   static propTypes = {
@@ -32,10 +32,6 @@ class A3Header extends Component {
 
   componentDidMount() {
     this.updateLayout();
-  }
-
-  componentWillReceiveProps() {
-    this.setState({ columns: MAX_COLUMNS });
   }
 
   componentDidUpdate() {
@@ -72,7 +68,7 @@ class A3Header extends Component {
   }
 
   render() {
-    const routesPerColumn = Math.ceil(this.props.routes.length / this.state.columns);
+    const routesPerColumn = Math.ceil(this.props.routes.length / MAX_COLUMNS);
     const routeColumns = chunk(
       sortBy(this.props.routes, route => !isTrunkRoute(route.routeId)),
       routesPerColumn,
