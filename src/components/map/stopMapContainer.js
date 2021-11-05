@@ -298,12 +298,17 @@ const getSalePoints = async () => {
 };
 
 const fetchOSMObjects = async props => {
-  const osmData = await fetch(
-    `https://nominatim.openstreetmap.org/search.php?q=metro&
-    viewbox=${props.maxInterestLon}%2C${props.maxInterestLat}%2C${props.minInterestLon}%2C${props.minInterestLat}
-    &bounded=1&format=json&namedetails=1`,
-  );
-  const results = await osmData.json();
+  let results;
+  try {
+    const osmData = await fetch(
+      `https://nominatim.openstreetmap.org/search.php?q=subway_entrance&
+      viewbox=${props.maxInterestLon}%2C${props.maxInterestLat}%2C${props.minInterestLon}%2C${props.minInterestLat}
+      &bounded=1&format=json&namedetails=1`,
+    );
+    results = await osmData.json();
+  } catch (e) {
+    console.log('Subway entrances fetch error:', e);
+  }
   return results;
 };
 

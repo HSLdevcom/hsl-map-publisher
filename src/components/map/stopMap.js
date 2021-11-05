@@ -229,7 +229,7 @@ const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
     }
   }
 
-  legendHeight += 20; // Offset
+  legendHeight += 100; // Offset, scaleBar and attribution
 
   return {
     content: legendContent,
@@ -371,25 +371,21 @@ const StopMap = props => {
             </ItemPositioned>
           )}
 
+          {legend.content.length > 1 && props.legend && (
+            <ItemFixed top={legendStyle.top} left={10}>
+              <div className={styles.legend}>{legend.content}</div>
+            </ItemFixed>
+          )}
+
           <ItemFixed top={mapStyle.height - INFO_MARGIN_BOTTOM} left={INFO_MARGIN_LEFT}>
             <div>
               <Scalebar targetWidth={250} pixelsPerMeter={props.pixelsPerMeter} />
               <Attribution />
             </div>
           </ItemFixed>
-
           <ItemFixed top={miniMapStyle.top} left={miniMapStyle.left}>
             <div style={miniMapStyle} />
           </ItemFixed>
-          {legend.content.length > 1 && props.legend && (
-            <ItemFixed
-              width={150}
-              height={legend.height}
-              top={legendStyle.top}
-              left={legendStyle.left}>
-              <div className={styles.legend}>{legend.content}</div>
-            </ItemFixed>
-          )}
         </ItemContainer>
       </div>
 

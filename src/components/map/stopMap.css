@@ -25,7 +25,6 @@
 
 .legend {
   composes: mapContainer;
-  position: absolute;
   z-index: 20;
   background-color: white;
   border-radius: 15px;
