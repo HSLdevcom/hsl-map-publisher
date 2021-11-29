@@ -163,13 +163,14 @@ const StopMap = props => {
         <MapImage
           options={props.mapOptions}
           components={{
-            text_fisv: { enabled: true },
-            routes: { enabled: true },
-            citybikes: { enabled: props.showCitybikes },
-            print: { enabled: true },
-            ticket_sales: { enabled: true },
             municipal_borders: { enabled: true },
+            routes: { enabled: true },
+            subway_entrance: { enabled: true },
+            ticket_sales: { enabled: true },
+            citybikes: { enabled: props.showCitybikes },
             ticket_zones: { enabled: mapStyle.mapZones },
+            text_fisv: { enabled: true },
+            print: { enabled: true },
           }}
           date={props.date}
         />
