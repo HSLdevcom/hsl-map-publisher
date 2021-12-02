@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 
 import { isTrunkRoute, colorsByMode } from 'util/domain';
 
+import styles from './stopLabel.css';
+
 const strokeWidth = 5;
 
 const StopSymbol = props => {
@@ -28,8 +30,9 @@ const StopSymbol = props => {
     colors.push(colorsByMode.BUS);
   }
 
+  const maxRadius = props.size / 2 - (strokeWidth / 2) * (4 - colors.length);
+
   const outlines = colors.map((color, index) => {
-    const maxRadius = props.size / 2 - (strokeWidth / 2) * (4 - colors.length);
     const radius = maxRadius - index * (strokeWidth + 1);
     return { color, radius };
   });
@@ -48,12 +51,28 @@ const StopSymbol = props => {
           fill="none"
         />
       ))}
+      <text
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fontWeight="bold"
+        className={styles.route}
+        x={props.size / 2}
+        y={props.size / 2 + 1}
+        fill={colors.pop()}
+        fontSize="10.5">
+        {props.platform}
+      </text>
     </svg>
   );
 };
 
+StopSymbol.defaultProps = {
+  platform: null,
+};
+
 StopSymbol.propTypes = {
   size: PropTypes.number.isRequired,
+  platform: PropTypes.string,
   routes: PropTypes.arrayOf(
     PropTypes.shape({
       routeId: PropTypes.string.isRequired,

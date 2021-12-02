@@ -166,18 +166,26 @@ const StopMap = props => {
         <ItemContainer>
           {stops.map((stop, index) => (
             <ItemFixed key={index} top={stop.y - STOP_RADIUS} left={stop.x - STOP_RADIUS}>
-              <StopSymbol routes={stop.routes} size={STOP_RADIUS * 2} />
+              <StopSymbol
+                platform={stop.stops.nodes[0].platform}
+                routes={stop.routes}
+                size={STOP_RADIUS * 2}
+              />
             </ItemFixed>
           ))}
 
           <ItemFixed
             top={props.currentStop.y - STOP_RADIUS}
             left={props.currentStop.x - STOP_RADIUS}>
-            <StopSymbol routes={props.currentStop.routes} size={STOP_RADIUS * 2} />
+            <StopSymbol
+              platform={props.currentStop.stops.nodes[0].platform}
+              routes={props.currentStop.routes}
+              size={STOP_RADIUS * 2}
+            />
           </ItemFixed>
 
           <ItemFixed
-            top={props.currentStop.y - 2 * LOCATION_RADIUS}
+            top={props.currentStop.y - 2.2 * LOCATION_RADIUS}
             left={props.currentStop.x - LOCATION_RADIUS}>
             <Row style={{ height: LOCATION_RADIUS * 2 }}>
               <LocationSymbol size={LOCATION_RADIUS * 2} />

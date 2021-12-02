@@ -50,6 +50,7 @@ const nearbyItemsQuery = gql`
         stops {
           nodes {
             calculatedHeading
+            platform
             routeSegments: routeSegmentsForDate(date: $date) {
               nodes {
                 routeId
@@ -197,6 +198,7 @@ const mapPositionQuery = gql`
       stopId
       lat
       lon
+      platform
     }
   }
 `;
@@ -204,6 +206,7 @@ const mapPositionQuery = gql`
 const mapInterestsMapper = mapProps(props => {
   const longitude = props.data.stop.lon;
   const latitude = props.data.stop.lat;
+  const { platform } = props.data.stop;
 
   const maxDimensionsForInterests = {
     height: props.height * 2,
@@ -226,6 +229,7 @@ const mapInterestsMapper = mapProps(props => {
     ...props,
     longitude,
     latitude,
+    platform,
     minInterestLat,
     minInterestLon,
     maxInterestLat,
