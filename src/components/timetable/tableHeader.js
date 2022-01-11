@@ -6,12 +6,13 @@ import styles from './tableHeader.css';
 
 const TableHeader = props => {
   const header = props.printAsA3 ? (
-    <div className={styles.a3Title}>
+    <span>
+      {' '}
       &nbsp;&nbsp;
       {props.subtitleSw}
       &nbsp;&nbsp;
       {props.subtitleEn}
-    </div>
+    </span>
   ) : (
     <span>
       {' '}
@@ -25,6 +26,7 @@ const TableHeader = props => {
     <div
       className={classNames(styles.root, {
         [styles.largerPaddingTop]: props.printingAsA4,
+        [styles.noPaddingTop]: props.printAsA3,
       })}>
       <div className={styles.title}>
         <span className={styles.strong}>{props.title}</span>

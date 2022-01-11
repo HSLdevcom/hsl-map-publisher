@@ -2,11 +2,10 @@ const uuidv1 = require('uuid/v1');
 const camelCase = require('lodash/camelCase');
 const snakeCase = require('lodash/snakeCase');
 const pMap = require('p-map');
-const pReduce = require('p-reduce');
 const merge = require('lodash/merge');
 const get = require('lodash/get');
-const pick = require('lodash/pick');
 const flatMap = require('lodash/flatMap');
+const fetch = require('node-fetch');
 
 const config = require('../knexfile');
 // eslint-disable-next-line import/order

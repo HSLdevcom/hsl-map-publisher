@@ -9,6 +9,10 @@
   padding-top: 0.25em;
 }
 
+.root.noPaddingTop {
+  margin: 0;
+}
+
 .strong {
   font-family: GothamXNarrow-Medium;
   font-size: 1.115em;

@@ -12,6 +12,7 @@ const { AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_KEY } = require('../constants');
 
 const CLIENT_URL = 'http://localhost:5000';
 const RENDER_TIMEOUT = 10 * 60 * 1000;
+const A3_RENDER_TIMEOUT = 2 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
 const SCALE = 96 / 72;
 
@@ -64,7 +65,7 @@ async function renderComponent(options) {
   console.log(`Opening ${pageUrl} in Puppeteer.`);
 
   await page.goto(pageUrl, {
-    timeout: RENDER_TIMEOUT,
+    timeout: component === 'A3StopPoster' ? A3_RENDER_TIMEOUT : RENDER_TIMEOUT,
   });
 
   const { error = null, width, height } = await page.evaluate(
@@ -96,6 +97,14 @@ async function renderComponent(options) {
       scale: SCALE,
     };
   }
+  if (component === 'A3StopPoster') {
+    printOptions = {
+      printBackground: true,
+      width: 1191,
+      height: 842,
+      margin: 0,
+    };
+  }
 
   const contents = await page.pdf(printOptions);
 
@@ -108,7 +117,7 @@ async function renderComponent(options) {
 }
 
 async function renderComponentRetry(options) {
-  const { onInfo, onError } = options;
+  const { onInfo, onError, component } = options;
 
   for (let i = 0; i < MAX_RENDER_ATTEMPTS; i++) {
     /* eslint-disable no-await-in-loop */
@@ -119,7 +128,11 @@ async function renderComponentRetry(options) {
         await initialize();
       }
       const timeout = new Promise((resolve, reject) =>
-        setTimeout(reject, RENDER_TIMEOUT, new Error('Render timeout')),
+        setTimeout(
+          reject,
+          component === 'A3StopPoster' ? A3_RENDER_TIMEOUT : RENDER_TIMEOUT,
+          new Error('Render timeout'),
+        ),
       );
 
       const posterUploaded = await Promise.race([renderComponent(options), timeout]);
