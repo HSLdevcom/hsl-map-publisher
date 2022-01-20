@@ -32,6 +32,7 @@ const secretsEnv = mapValues(process.env, (value, key) => {
 
 module.exports = {
   PG_CONNECTION_STRING: secretsEnv.PG_CONNECTION_STRING || '',
+  REDIS_CONNECTION_STRING: secretsEnv.REDIS_CONNECTION_STRING || '',
   JORE_GRAPHQL_URL: secretsEnv.JORE_GRAPHQL_URL || '',
   GENERATE_API_URL: secretsEnv.GENERATE_API_URL || '',
   AZURE_UPLOAD_CONTAINER: secretsEnv.AZURE_UPLOAD_CONTAINER || 'publisher-prod',
