@@ -1,4 +1,4 @@
-# HSL Map Publisher
+# HSL Map Publisher (Julistegeneraattori)
 
 This project is the server-side component of the poster publisher (the UI can be found in [HSLdevcom/hsl-map-publisher-ui](https://github.com/HSLdevcom/hsl-map-publisher-ui)) that generates the stop posters that you see on public transport stops around the Helsinki area. It uses PostgreSQL as the database where the poster data and generation status is stored, React for rendering the posters, Puppeteer for generating PDF's of the poster app and Koa as the server to tie everything together.
 
@@ -38,11 +38,11 @@ It will make two layout passes to check if the map can be rendered. The ads (gra
 
 Each component will add itself to the "render queue" when mounted, an operation of which there are multiple examples in the code. Once the component has finished its own data fetching and layout procedures it removes itself from the render queue. Once the render queue is empty, the poster is deemed finished and the server will instruct Puppeteer to create a PDF of the page. The component can also pass an error when removing itself which triggers the whole poster to fail.
 
-### Running the apps
+### Running the app
 
 Server and REST API for printing components to PDF files and managing their metadata in a Postgres database.
 
-Start Postgres:
+#### 1. Start Postgres
 
 ```
 docker run -p 0.0.0.0:5432:5432 --env POSTGRES_PASSWORD=postgres --name publisher-postgres postgres
@@ -56,24 +56,41 @@ PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres
 
 Again, adjust the port if you are running your Publisher Postgres instance on an other port.
 
-In development, start the Publisher server like this, prepending the Postgres connection string:
+#### 2. Redis
 
+Start Redis
+```
+docker run --name redis --rm -p 6379:6379 -d redis
+```
+
+For default configuration, place the following to `.env`:
+```
+REDIS_CONNECTION_STRING=redis://localhost:6379
+```
+
+#### 3. Backend, worker and poster UI
+
+In development, start the Publisher backend server like this, prepending the Postgres connection string:
+(or place the connection string to `.env`)
 ```bash
-PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres npm run server:hot
+PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres yarn run server:hot
 ```
 
 That command will run a Forever instance that watches for changes and restarts the server when they happen.
 
 Alternatively, to run the server with plain Node, leave off `hot`:
-
 ```bash
-PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres npm run server
+PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres yarn run server
 ```
 
-The React app needs to be started separately:
+Then, start generator worker. (You can start multiple workers.)
+```
+PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres yarn worker
+```
 
+Finally, start the React app
 ```bash
-npm start
+yarn start
 ```
 
 Now you can use the UI with the server, or open a poster separately in your browser. The poster app needs `component` and `props` query parameters, and the server will echo the currently rendering URL in its console. But if you just need to open the poster app, you can use this link that will show H0454, Snellmaninkatu:
@@ -83,6 +100,10 @@ Now you can use the UI with the server, or open a poster separately in your brow
 You will have to create a template using the Publisher UI. The poster app will download the template from the Publisher server.
 
 If Azure credentials are not set in the .env file the posters will be stored locally.
+
+#### 4. Start frontend
+
+See [hsl-map-publisher-ui](https://github.com/HSLdevcom/hsl-map-publisher-ui) for UI.
 
 ### Running in Docker
 
