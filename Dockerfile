@@ -42,5 +42,6 @@ CMD \
   fc-cache -f -v && \
   yarn run start:production && \
   yarn run server:production && \
+  yarn run worker:production && \
   sleep 3 && \
   node_modules/.bin/forever -f logs 1
