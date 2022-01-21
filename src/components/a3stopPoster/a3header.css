@@ -5,12 +5,11 @@
   align-items: center;
   background: white;
   border-radius: 25px;
-  padding: 20px;
+  padding: 15px;
   white-space: nowrap;
   overflow: hidden;
   font-size: 28px;
-  margin-bottom: 10px;
-  max-height: 125px;
+  height: 90px;
 }
 
 .routesContainer {
@@ -55,7 +54,7 @@
 
 .stopIdContainer {
   display: flex;
-  flex-flow: column wrap;
+  flex-flow: column;
   align-items: center;
   max-height: 100%;
 }

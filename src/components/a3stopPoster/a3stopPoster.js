@@ -1,27 +1,20 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { hot } from 'react-hot-loader';
-import { get } from 'lodash';
-import { JustifiedColumn, Spacer } from 'components/util';
+import { JustifiedColumn } from 'components/util';
 import renderQueue from 'util/renderQueue';
 import { colorsByMode } from 'util/domain';
-import Measure from 'react-measure';
+import { chunk } from 'lodash';
 
-import CropMarks from 'components/cropMarks';
 import RouteDiagram from 'components/routeDiagram/routeDiagramContainer';
-import Timetable from 'components/timetable/timetableContainer';
+import Timetable from 'components/a3Timetable/a3TimetableContainer';
 
 import Header from './a3header';
 
 import styles from './a3stopPoster.css';
 
-const ROUTE_DIAGRAM_MAX_HEIGHT = 25;
-const ROUTE_DIAGRAM_MIN_HEIGHT = 10;
-
-const trunkStopStyle = {
-  '--background': colorsByMode.TRUNK,
-  '--light-background': '#FFE0D1',
-};
+const ROUTE_DIAGRAM_MAX_HEIGHT = 10;
+const ROUTE_DIAGRAM_MIN_HEIGHT = 5;
 
 const defaultDiagramOptions = {
   diagramStopCount: ROUTE_DIAGRAM_MAX_HEIGHT,
@@ -35,14 +28,10 @@ class A3StopPoster extends Component {
     super(props);
 
     this.onError = this.onError.bind(this);
-
+    this.updateHook = this.updateHook.bind(this);
     this.state = {
-      template: null,
-      hasRoutesOnTop: false,
-      hasDiagram: true,
-      hasStretchedLeftColumn: false,
-      hasColumnTimetable: false,
       diagramOptions: defaultDiagramOptions,
+      pageCount: 1,
     };
   }
 
@@ -50,35 +39,17 @@ class A3StopPoster extends Component {
     renderQueue.add(this);
   }
 
-  async componentDidMount() {
-    if (this.props.template) {
-      let templateReq;
-      let templateBody = null;
-
-      try {
-        // This url will probably always be the same. If you find yourself
-        // changing it, please make an .env setup while you're at it.
-        templateReq = await window.fetch(`http://localhost:4000/templates/${this.props.template}`);
-        templateBody = await templateReq.json();
-      } catch (err) {
-        this.onError(err);
-      }
-
-      this.setState({
-        template: templateBody,
-      });
-    } else {
-      this.setState({
-        template: false,
-      });
-    }
-
+  componentDidMount() {
+    this.updateLayout();
     renderQueue.onEmpty(error => !error && this.updateLayout(), {
       ignore: this,
     });
   }
 
   componentDidUpdate() {
+    if (this.hasOverflow()) {
+      this.updateLayout();
+    }
     renderQueue.onEmpty(error => !error && this.updateLayout(), {
       ignore: this,
     });
@@ -88,84 +59,45 @@ class A3StopPoster extends Component {
     renderQueue.remove(this, { error: new Error(error) });
   }
 
-  hasOverflow() {
-    if (!this.content) {
-      console.log('no content');
-      return false;
-    }
-    // Horizontal overflow is not automatically resolvable.
-    if (this.content.scrollWidth > this.content.clientWidth && this.state.hasRoutesOnTop) {
-      this.onError('Unresolvable horizontal overflow detected.');
-    }
-    return this.content.scrollHeight > this.content.clientHeight;
-  }
+  updateHook = groupedRows => {
+    const chunkedRows = chunk(groupedRows, 3);
+    const pageCount = chunkedRows.length;
+
+    this.setState({ groupedRows, pageCount });
+    this.updateLayout();
+  };
 
   updateLayout() {
     if (!this.props.hasRoutes) {
       this.onError('No valid routes for stop');
       return;
     }
-
-    if (this.hasOverflow() || this.state.diagramOptions.binarySearching) {
-      if (!this.state.hasStretchedLeftColumn) {
-        this.setState({ hasStretchedLeftColumn: true });
-        return;
-      }
-
-      if (this.state.hasDiagram) {
-        // TODO: This is kind of dirty fix. Binarysearch to get acceptable
-        // height for routetree.
-        const { diagramOptions } = this.state;
-        diagramOptions.binarySearching = true;
-        diagramOptions.middleHeightValue =
-          diagramOptions.heightValues[Math.floor(diagramOptions.heightValues.length / 2)];
-        const prevCount = diagramOptions.diagramStopCount;
-        diagramOptions.diagramStopCount =
-          ROUTE_DIAGRAM_MAX_HEIGHT - diagramOptions.middleHeightValue;
-
-        if (this.hasOverflow()) {
-          if (diagramOptions.heightValues.length === 1) diagramOptions.heightValues = [];
-          diagramOptions.heightValues = diagramOptions.heightValues.slice(
-            Math.floor(diagramOptions.heightValues.length / 2),
-            diagramOptions.heightValues.length,
-          );
-        } else {
-          diagramOptions.latestFittingCount = prevCount;
-          diagramOptions.heightValues = diagramOptions.heightValues.slice(
-            0,
-            Math.floor(diagramOptions.heightValues.length / 2),
-          );
-        }
-        if (this.hasOverflow() && diagramOptions.latestFittingCount) {
-          diagramOptions.diagramStopCount = diagramOptions.latestFittingCount;
-          diagramOptions.binarySearching = false;
-        }
-
-        if (diagramOptions.heightValues.length < 1) {
-          diagramOptions.binarySearching = false;
-          if (!diagramOptions.latestFittingCount) {
-            this.setState({ hasDiagram: false });
-          }
-        }
-
-        this.setState({ diagramOptions });
-        return;
-      }
-
-      if (this.state.hasColumnTimetable) {
+    const overflow = this.hasOverflow();
+    if (overflow.vertical || overflow.horizontal || this.state.diagramOptions.binarySearching) {
+      if (overflow.vertical) {
+        const { pageCount } = this.state;
         this.setState({
-          hasColumnTimetable: false,
+          pageCount: pageCount + 1,
         });
         return;
       }
-
-      this.onError('Failed to remove layout overflow');
+      renderQueue.remove(this, { error: new Error('Failed to remove routes overflow') });
       return;
     }
-
     window.setTimeout(() => {
       renderQueue.remove(this);
     }, 1000);
+  }
+
+  hasOverflow() {
+    if (!this.content) {
+      console.log('no content');
+      return false;
+    }
+    return {
+      horizontal: this.content.scrollWidth > this.content.clientWidth,
+      vertical: this.content.scrollHeight > this.content.clientHeight,
+    };
   }
 
   render() {
@@ -183,13 +115,6 @@ class A3StopPoster extends Component {
       return null;
     }
 
-    const { template, hasDiagram, hasStretchedLeftColumn, hasColumnTimetable } = this.state;
-
-    const { isTramStop } = this.props;
-    const src = get(template, 'areas', []).find(t => t.key === 'tram');
-    const tramImage = get(src, 'slots[0].image.svg', '');
-    let useDiagram = hasDiagram || (hasDiagram && isTramStop && !tramImage);
-    if (isTramStop && tramImage) useDiagram = false;
     const printAsA3 = true;
     const StopPosterTimetable = props => (
       <Timetable
@@ -204,69 +129,58 @@ class A3StopPoster extends Component {
         segments={props.segments}
         routeFilter={props.routeFilter}
         printAsA3={printAsA3}
+        updateHook={props.updateHook}
+        groupedRows={props.groupedRows}
+        diagram={props.diagram}
       />
     );
+    const containerStyle = {};
+    if (isTrunkStop) {
+      containerStyle['--background'] = colorsByMode.TRUNK;
+      containerStyle['--light-background'] = '#FFE0D1';
+    }
+    containerStyle.height = `${841 * this.state.pageCount}px`;
+    const diagram = {
+      diagramOptions: this.state.diagramOptions,
+      stopId,
+      date,
+      routeFilter: this.props.routeFilter,
+      printAsA3,
+    };
     return (
-      <CropMarks>
-        <div className={styles.root} style={isTrunkStop ? trunkStopStyle : null}>
-          <JustifiedColumn>
-            <div
-              className={styles.content}
-              ref={ref => {
-                this.content = ref;
-              }}>
-              <Header stopId={stopId} date={date} routeFilter={this.props.routeFilter} />
-              <div className={styles.columns}>
-                <div className={styles.left}>
-                  {hasColumnTimetable && (
-                    <StopPosterTimetable routeFilter={this.props.routeFilter} />
-                  )}
-                  {!hasColumnTimetable && (
-                    <div className={styles.timetables}>
-                      <StopPosterTimetable
-                        segments={['weekdays']}
-                        routeFilter={this.props.routeFilter}
-                      />
-                      <Spacer width={10} />
-                      <StopPosterTimetable
-                        segments={['saturdays']}
-                        hideDetails
-                        routeFilter={this.props.routeFilter}
-                      />
-                      <Spacer width={10} />
-                      <StopPosterTimetable
-                        segments={['sundays']}
-                        hideDetails
-                        routeFilter={this.props.routeFilter}
-                      />
-                    </div>
-                  )}
+      <div
+        className={styles.root}
+        style={containerStyle}
+        ref={ref => {
+          this.content = ref;
+        }}>
+        <JustifiedColumn>
+          <div className={styles.content}>
+            <Header stopId={stopId} date={date} routeFilter={this.props.routeFilter} />
+            <div className={styles.columns}>
+              <div className={styles.timetablesContainer}>
+                <div className={styles.timetables}>
+                  <StopPosterTimetable
+                    segments={['weekdays', 'saturdays', 'sundays']}
+                    hideDetails
+                    routeFilter={this.props.routeFilter}
+                    updateHook={this.updateHook}
+                    groupedRows={this.state.groupedRows}
+                    diagram={diagram}
+                  />
                 </div>
-                <Measure client>
-                  {({
-                    measureRef,
-                    contentRect: {
-                      client: { height: rightColumnHeight },
-                    },
-                  }) => (
-                    <div className={styles.right} ref={measureRef}>
-                      {useDiagram && (
-                        <RouteDiagram
-                          height={this.state.diagramOptions.diagramStopCount}
-                          stopId={stopId}
-                          date={date}
-                          routeFilter={this.props.routeFilter}
-                          printAsA3={printAsA3}
-                        />
-                      )}
-                    </div>
-                  )}
-                </Measure>
+                {/* <RouteDiagram
+                    height={this.state.diagramOptions.diagramStopCount}
+                    stopId={stopId}
+                    date={date}
+                    routeFilter={this.props.routeFilter}
+                    printAsA3={printAsA3}
+                  /> */}
               </div>
             </div>
-          </JustifiedColumn>
-        </div>
-      </CropMarks>
+          </div>
+        </JustifiedColumn>
+      </div>
     );
   }
 }
