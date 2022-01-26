@@ -161,7 +161,7 @@ const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
           <div key={mode} className={styles.legendRow}>
             <div className={classNames(styles.legendLine, styles.subway)} />
             <div className={classNames(styles.legendIcon, styles.subway)} />
-            <div className={styles.legendText}>Metro / Subway</div>
+            <div className={styles.legendText}>Metro</div>
           </div>
         );
       case 'RAIL':
@@ -200,7 +200,9 @@ const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
       legendContent.push(
         <div key={subwayEntrance.type} className={styles.legendRow}>
           <InlineSVG style={svgStyles} src={subwayStationIcon} />
-          <div className={styles.legendText}>Metron sisäänkäynti / Subway entrance</div>
+          <div className={styles.legendText}>
+            Metron sisäänkäynti / Metrons ingång / Metro entrance
+          </div>
         </div>,
       );
     }
@@ -214,7 +216,9 @@ const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
       legendContent.push(
         <div key="Myyntipiste" className={styles.legendRow}>
           <InlineSVG style={svgStyles} src={ticketSalesPointIcon} />
-          <div className={styles.legendText}>Lipunmyynti / Ticket sales</div>
+          <div className={styles.legendText}>
+            Lipunmyyntipiste / Biljettförsäljning / Ticket sales
+          </div>
         </div>,
       );
     }
