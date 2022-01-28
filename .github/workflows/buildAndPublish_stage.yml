@@ -1,9 +1,9 @@
-name: Build and publish Docker Hub dev image
+name: Build and publish Docker Hub stage image
 
 on:
   push:
     branches:
-      - 'development'
+      - 'stage'
 
 jobs:
   build-container:
@@ -37,7 +37,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ format('hsldevcom/hsl-map-publisher:dev-{0}-{1}', steps.timestamp.outputs.timestamp, steps.commit_hash.outputs.hash) }}
+          tags: ${{ format('hsldevcom/hsl-map-publisher:stage-{0}-{1}', steps.timestamp.outputs.timestamp, steps.commit_hash.outputs.hash) }}
           build-args: |
             BUILD_ENV=dev
 
@@ -46,6 +46,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: hsldevcom/hsl-map-publisher:dev
+          tags: hsldevcom/hsl-map-publisher:stage
           build-args: |
-            BUILD_ENV=dev
+            BUILD_ENV=stage
