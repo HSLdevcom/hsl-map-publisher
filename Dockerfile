@@ -33,7 +33,7 @@ RUN yarn && yarn cache clean
 
 COPY . ${WORK}
 
-ARG BUILD_ENV=production
+ARG BUILD_ENV=prod
 COPY .env.${BUILD_ENV} ${WORK}/.env
 
 RUN yarn run build
