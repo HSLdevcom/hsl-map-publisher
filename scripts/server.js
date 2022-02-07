@@ -51,7 +51,9 @@ const queue = new Queue('publisher', { connection: bullRedisConnection });
 
 async function generatePoster(buildId, component, props, index) {
   const { stopId, date, template, selectedRuleTemplates } = props;
-  const data = await getStopInfo({ stopId, date });
+
+  // RuleTemplates are not available for TerminalPoster
+  const data = component !== 'TerminalPoster' ? await getStopInfo({ stopId, date }) : null;
 
   // Checks if any rule template will match the stop, and returns *the first one*.
   // If no match, returns the default template.
