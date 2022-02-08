@@ -13,7 +13,7 @@ import TramDiagram from 'components/tramDiagram/tramDiagram';
 import Timetable from 'components/timetable/timetableContainer';
 import Metadata from 'components/metadata';
 
-import Header from './terminalHeaderContainer';
+import Header from './headerContainer';
 import Footer from './footer';
 
 import Routes from './routes';

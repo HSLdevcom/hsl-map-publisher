@@ -15,15 +15,28 @@ const headerQuery = gql`
       nameSe
       stopZone
     }
+    terminal: terminalByTerminalId(terminalId: $stopId) {
+      nameFi
+      nameSe
+      stops: stopsByTerminalId {
+        nodes {
+          stopZone
+        }
+      }
+    }
   }
 `;
 
-const propsMapper = mapProps(props => props.data.stop);
+const propsMapper = mapProps(props => {
+  const { stop } = props.data;
+  const { terminal } = props.data;
+  const { shortId, nameFi, nameSe } = stop || terminal;
+  const { stopZone } = stop || terminal.stops.nodes[0];
 
-const hoc = compose(
-  graphql(headerQuery),
-  apolloWrapper(propsMapper),
-);
+  return { shortId, nameFi, nameSe, stopZone };
+});
+
+const hoc = compose(graphql(headerQuery), apolloWrapper(propsMapper));
 
 const HeaderContainer = hoc(Header);
 
