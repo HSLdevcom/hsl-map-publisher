@@ -220,18 +220,21 @@ const nearbyItemsMapper = mapProps(props => {
 const mapPositionQuery = gql`
   query mapPositionQuery($stopId: String!) {
     stop: stopByStopId(stopId: $stopId) {
-      stopId
       lat
       lon
-      platform
+    }
+    terminal: terminalByTerminalId(terminalId: $stopId) {
+      lat
+      lon
     }
   }
 `;
 
 const mapInterestsMapper = mapProps(props => {
-  const longitude = props.data.stop.lon;
-  const latitude = props.data.stop.lat;
-  const { platform } = props.data.stop;
+  const { stop, terminal } = props.data;
+  const longitude = stop ? stop.lon : terminal.lon;
+  const latitude = stop ? stop.lat : terminal.lat;
+  const isTerminal = terminal !== null;
 
   const maxDimensionsForInterests = {
     height: props.height * 2,
@@ -254,7 +257,7 @@ const mapInterestsMapper = mapProps(props => {
     ...props,
     longitude,
     latitude,
-    platform,
+    isTerminal,
     minInterestLat,
     minInterestLon,
     maxInterestLat,

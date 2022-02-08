@@ -154,7 +154,7 @@ const StopMap = props => {
     newPosition.viewport,
   );
 
-  const { nearestSalePoint } = props;
+  const { nearestSalePoint, isTerminal } = props;
   const salesPointIcon = nearestSalePoint && getSalesPointIcon(nearestSalePoint.type);
 
   return (
@@ -188,15 +188,17 @@ const StopMap = props => {
             </ItemFixed>
           ))}
 
-          <ItemFixed
-            top={props.currentStop.y - STOP_RADIUS}
-            left={props.currentStop.x - STOP_RADIUS}>
-            <StopSymbol
-              platform={props.currentStop.stops.nodes[0].platform}
-              routes={props.currentStop.routes}
-              size={STOP_RADIUS * 2}
-            />
-          </ItemFixed>
+          {!isTerminal && (
+            <ItemFixed
+              top={props.currentStop.y - STOP_RADIUS}
+              left={props.currentStop.x - STOP_RADIUS}>
+              <StopSymbol
+                platform={props.currentStop.stops.nodes[0].platform}
+                routes={props.currentStop.routes}
+                size={STOP_RADIUS * 2}
+              />
+            </ItemFixed>
+          )}
 
           <ItemFixed
             top={props.currentStop.y - 2.2 * LOCATION_RADIUS}
@@ -317,6 +319,7 @@ const nearestSalePointType = PropTypes.shape({
 StopMap.defaultProps = {
   projectedSymbols: null,
   nearestSalePoint: null,
+  isTerminal: false,
 };
 
 StopMap.propTypes = {
@@ -329,6 +332,7 @@ StopMap.propTypes = {
   showCitybikes: PropTypes.bool.isRequired,
   projectedSymbols: PropTypes.arrayOf(Object),
   nearestSalePoint: nearestSalePointType,
+  isTerminal: PropTypes.bool,
 };
 
 export default StopMap;
