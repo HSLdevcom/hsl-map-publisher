@@ -70,6 +70,7 @@ const Timetable = props => (
             &nbsp;&nbsp;
           </div>
           <div className={styles.subtitle}>{props.stopNameSe}</div>
+          {props.platformInfo && <div className={styles.title}>{props.platform}</div>}
         </div>
       )}
       {props.showValidityPeriod && (
@@ -167,7 +168,9 @@ Timetable.defaultProps = {
   printableAsA4: false,
   standalone: false,
   greyscale: false,
+  platformInfo: false,
   specialSymbols: [],
+  platform: null,
 };
 
 Timetable.propTypes = {
@@ -186,11 +189,13 @@ Timetable.propTypes = {
   stopShortId: PropTypes.string.isRequired,
   stopId: PropTypes.string.isRequired,
   stopZone: PropTypes.string.isRequired,
+  platform: PropTypes.string,
   date: PropTypes.string.isRequired,
   stopNameFi: PropTypes.string.isRequired,
   stopNameSe: PropTypes.string.isRequired,
   standalone: PropTypes.bool,
   greyscale: PropTypes.bool,
+  platformInfo: PropTypes.bool,
   specialSymbols: PropTypes.array,
 };
 

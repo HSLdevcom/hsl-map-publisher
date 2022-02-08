@@ -37,7 +37,7 @@ const defaultDiagramOptions = {
   binarySearching: false,
 };
 
-class StopPoster extends Component {
+class TerminalPoster extends Component {
   constructor(props) {
     console.log(props);
     super(props);
@@ -306,8 +306,8 @@ class StopPoster extends Component {
 
   render() {
     const {
+      terminalId,
       shortId,
-      stopId,
       isTrunkStop,
       hasRoutes: hasRoutesProp,
       date,
@@ -319,6 +319,8 @@ class StopPoster extends Component {
       salesPoint,
       minimapZoneSymbols,
       minimapZones,
+      stops,
+      routeFilter,
     } = this.props;
 
     if (!hasRoutesProp) {
@@ -339,31 +341,38 @@ class StopPoster extends Component {
     const { isTramStop } = this.props;
     const src = get(template, 'areas', []).find(t => t.key === 'tram');
     const tramImage = get(src, 'slots[0].image.svg', '');
-    let useDiagram = hasDiagram || (hasDiagram && isTramStop && !tramImage);
+    let useDiagram = false;
+    // let useDiagram = hasDiagram || (hasDiagram && isTramStop && !tramImage);
     if (isTramStop && tramImage) useDiagram = false;
 
-    const StopPosterTimetable = props => (
-      <div className={styles.timetable}>
-        <Timetable
-          stopId={stopId}
-          date={date}
-          isSummerTimetable={isSummerTimetable}
-          dateBegin={dateBegin}
-          dateEnd={dateEnd}
-          showValidityPeriod={!props.hideDetails}
-          showNotes={!props.hideDetails}
-          showComponentName={!props.hideDetails}
-          segments={props.segments}
-          routeFilter={props.routeFilter}
-        />
-      </div>
+    const TerminalPosterTimetable = props => (
+      <React.Fragment>
+        {stops.map(id => (
+          <div className={styles.timetable} key={id}>
+            <Timetable
+              stopId={id}
+              date={date}
+              isSummerTimetable={isSummerTimetable}
+              dateBegin={dateBegin}
+              dateEnd={dateEnd}
+              showValidityPeriod={!props.hideDetails}
+              showNotes={!props.hideDetails}
+              showComponentName={false}
+              segments={props.segments}
+              routeFilter={props.routeFilter}
+              platformInfo
+              showStopInformation
+            />
+          </div>
+        ))}
+      </React.Fragment>
     );
 
     return (
       <CropMarks>
         <div className={styles.root} style={isTrunkStop ? trunkStopStyle : null}>
           <JustifiedColumn>
-            <Header stopId={stopId} />
+            <Header stopId={terminalId} />
             <div
               className={styles.content}
               ref={ref => {
@@ -371,20 +380,20 @@ class StopPoster extends Component {
               }}>
               <Spacer width="100%" height={50} />
               {hasRoutes && hasRoutesOnTop && (
-                <Routes stopId={stopId} date={date} routeFilter={this.props.routeFilter} />
+                <Routes stopId={terminalId} date={date} routeFilter={this.props.routeFilter} />
               )}
               {hasRoutes && hasRoutesOnTop && <Spacer height={10} />}
               <div className={styles.columns}>
                 <div className={hasStretchedLeftColumn ? styles.leftStretched : styles.left}>
                   {hasRoutes && !hasRoutesOnTop && (
-                    <Routes stopId={stopId} date={date} routeFilter={this.props.routeFilter} />
+                    <Routes stopId={terminalId} date={date} routeFilter={this.props.routeFilter} />
                   )}
                   {hasRoutes && !hasRoutesOnTop && <Spacer height={10} />}
                   {hasColumnTimetable && (
-                    <StopPosterTimetable routeFilter={this.props.routeFilter} />
+                    <TerminalPosterTimetable routeFilter={this.props.routeFilter} />
                   )}
                   {!hasColumnTimetable && (
-                    <StopPosterTimetable
+                    <TerminalPosterTimetable
                       segments={['weekdays']}
                       routeFilter={this.props.routeFilter}
                     />
@@ -409,13 +418,13 @@ class StopPoster extends Component {
                     <div className={styles.right} ref={measureRef}>
                       {!hasColumnTimetable && (
                         <div className={styles.timetables}>
-                          <StopPosterTimetable
+                          <TerminalPosterTimetable
                             segments={['saturdays']}
                             hideDetails
                             routeFilter={this.props.routeFilter}
                           />
                           <Spacer width={10} />
-                          <StopPosterTimetable
+                          <TerminalPosterTimetable
                             segments={['sundays']}
                             hideDetails
                             routeFilter={this.props.routeFilter}
@@ -428,7 +437,7 @@ class StopPoster extends Component {
                         <CustomMap
                           key={`poster_map_${hasRoutes}${hasRoutesOnTop}${useDiagram}${isTramStop}${hasStretchedLeftColumn}${hasColumnTimetable}`}
                           setMapHeight={this.setMapHeight}
-                          stopId={stopId}
+                          stopId={terminalId}
                           date={date}
                           isSummerTimetable={isSummerTimetable}
                           template={
@@ -448,7 +457,7 @@ class StopPoster extends Component {
                       {useDiagram && (
                         <RouteDiagram
                           height={this.state.diagramOptions.diagramStopCount}
-                          stopId={stopId}
+                          stopId={terminalId}
                           date={date}
                           routeFilter={this.props.routeFilter}
                         />
@@ -474,8 +483,8 @@ class StopPoster extends Component {
   }
 }
 
-StopPoster.propTypes = {
-  stopId: PropTypes.string.isRequired,
+TerminalPoster.propTypes = {
+  terminalId: PropTypes.string.isRequired,
   date: PropTypes.string.isRequired,
   isSummerTimetable: PropTypes.bool,
   dateBegin: PropTypes.string,
@@ -491,9 +500,10 @@ StopPoster.propTypes = {
   minimapZoneSymbols: PropTypes.bool,
   minimapZones: PropTypes.bool,
   routeFilter: PropTypes.string,
+  stops: PropTypes.array.isRequired,
 };
 
-StopPoster.defaultProps = {
+TerminalPoster.defaultProps = {
   isSummerTimetable: false,
   dateBegin: null,
   dateEnd: null,
@@ -505,4 +515,4 @@ StopPoster.defaultProps = {
   routeFilter: '',
 };
 
-export default hot(module)(StopPoster);
+export default hot(module)(TerminalPoster);
