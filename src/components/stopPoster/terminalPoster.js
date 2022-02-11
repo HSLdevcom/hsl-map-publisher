@@ -48,13 +48,15 @@ class TerminalPoster extends Component {
     this.state = {
       mapHeight: -1,
       template: null,
-      hasRoutesOnTop: false,
+      hasRoutesOnTop: true,
       hasDiagram: true,
       hasRoutes: true,
       hasStretchedLeftColumn: false,
       shouldRenderMap: false,
       triedRenderingMap: false,
-      hasColumnTimetable: true,
+      hasColumnTimetable: false,
+      hasTimetable: true,
+      hasLeftColumn: true,
       removedAds: null,
       adsPhase: false,
       diagramOptions: defaultDiagramOptions,
@@ -180,65 +182,15 @@ class TerminalPoster extends Component {
     }
 
     if (this.hasOverflow() || this.state.diagramOptions.binarySearching) {
-      if (!this.state.hasRoutesOnTop) {
-        this.setState({ hasRoutesOnTop: true });
-        return;
-      }
-
       if (!this.state.hasStretchedLeftColumn) {
         this.setState({ hasStretchedLeftColumn: true });
         return;
       }
 
-      if (this.state.hasDiagram) {
-        // TODO: This is kind of dirty fix. Binarysearch to get acceptable
-        // height for routetree.
-        const { diagramOptions } = this.state;
-        diagramOptions.binarySearching = true;
-        diagramOptions.middleHeightValue =
-          diagramOptions.heightValues[Math.floor(diagramOptions.heightValues.length / 2)];
-        const prevCount = diagramOptions.diagramStopCount;
-        diagramOptions.diagramStopCount =
-          ROUTE_DIAGRAM_MAX_HEIGHT - diagramOptions.middleHeightValue;
-
-        if (this.hasOverflow()) {
-          if (diagramOptions.heightValues.length === 1) diagramOptions.heightValues = [];
-          diagramOptions.heightValues = diagramOptions.heightValues.slice(
-            Math.floor(diagramOptions.heightValues.length / 2),
-            diagramOptions.heightValues.length,
-          );
-        } else {
-          diagramOptions.latestFittingCount = prevCount;
-          diagramOptions.heightValues = diagramOptions.heightValues.slice(
-            0,
-            Math.floor(diagramOptions.heightValues.length / 2),
-          );
-        }
-        if (this.hasOverflow() && diagramOptions.latestFittingCount) {
-          diagramOptions.diagramStopCount = diagramOptions.latestFittingCount;
-          diagramOptions.binarySearching = false;
-        }
-
-        if (diagramOptions.heightValues.length < 1) {
-          diagramOptions.binarySearching = false;
-          if (!diagramOptions.latestFittingCount) {
-            this.setState({ hasDiagram: false });
-          }
-        }
-
-        this.setState({ diagramOptions });
-        return;
-      }
-
-      if (this.state.hasColumnTimetable) {
+      if (this.state.hasColumnTimetable && this.state.hasTimetable) {
         this.setState({
           hasColumnTimetable: false,
         });
-        return;
-      }
-
-      if (this.state.hasRoutes) {
-        this.setState({ hasRoutes: false });
         return;
       }
 
@@ -258,18 +210,20 @@ class TerminalPoster extends Component {
         return;
       }
 
-      if (this.state.shouldRenderMap) {
-        //  If map don't fit try fill available space with diagram.
+      if (this.state.hasTimetable) {
         this.setState({
-          shouldRenderMap: false,
-          triedRenderingMap: true,
-          hasDiagram: true,
-          diagramOptions: defaultDiagramOptions,
+          hasTimetable: false,
+          hasLeftColumn: false,
         });
         return;
       }
 
-      this.onError('Failed to remove layout overflow');
+      // This is dirty fix to wait a bit until to raise error.
+      // Otherwise, the error will be raised before the map has been resized.
+      window.setTimeout(() => {
+        if (this.hasOverflow()) this.onError('Failed to remove layout overflow');
+      }, 10000);
+
       return;
     }
 
@@ -336,13 +290,15 @@ class TerminalPoster extends Component {
       hasRoutes,
       shouldRenderMap,
       hasColumnTimetable,
+      hasTimetable,
+      hasLeftColumn,
     } = this.state;
 
     const { isTramStop } = this.props;
     const src = get(template, 'areas', []).find(t => t.key === 'tram');
     const tramImage = get(src, 'slots[0].image.svg', '');
     let useDiagram = false;
-    // let useDiagram = hasDiagram || (hasDiagram && isTramStop && !tramImage);
+
     if (isTramStop && tramImage) useDiagram = false;
 
     const TerminalPosterTimetable = props => (
@@ -384,58 +340,46 @@ class TerminalPoster extends Component {
               )}
               {hasRoutes && hasRoutesOnTop && <Spacer height={10} />}
               <div className={styles.columns}>
-                <div className={hasStretchedLeftColumn ? styles.leftStretched : styles.left}>
-                  {hasRoutes && !hasRoutesOnTop && (
-                    <Routes stopId={terminalId} date={date} routeFilter={this.props.routeFilter} />
-                  )}
-                  {hasRoutes && !hasRoutesOnTop && <Spacer height={10} />}
-                  {hasColumnTimetable && (
-                    <TerminalPosterTimetable routeFilter={this.props.routeFilter} />
-                  )}
-                  {!hasColumnTimetable && (
-                    <TerminalPosterTimetable
-                      segments={['weekdays']}
-                      routeFilter={this.props.routeFilter}
+                {hasLeftColumn && (
+                  <div className={hasStretchedLeftColumn ? styles.leftStretched : styles.left}>
+                    {hasRoutes && !hasRoutesOnTop && (
+                      <Routes
+                        stopId={terminalId}
+                        date={date}
+                        routeFilter={this.props.routeFilter}
+                      />
+                    )}
+                    {hasRoutes && !hasRoutesOnTop && <Spacer height={10} />}
+                    {hasTimetable && hasColumnTimetable && (
+                      <TerminalPosterTimetable routeFilter={this.props.routeFilter} />
+                    )}
+                    {hasTimetable && !hasColumnTimetable && (
+                      <TerminalPosterTimetable
+                        segments={['weekdays', 'saturdays', 'sundays']}
+                        routeFilter={this.props.routeFilter}
+                      />
+                    )}
+                    {/* The key will make sure the ad container updates its size if the layout changes */}
+                    <AdContainer
+                      key={`poster_ads_${hasRoutes}${hasRoutesOnTop}${hasStretchedLeftColumn}${useDiagram}`}
+                      shortId={shortId}
+                      template={
+                        template ? get(template, 'areas', []).find(t => t.key === 'ads') : {}
+                      }
                     />
-                  )}
-                  {/* The key will make sure the ad container updates its size if the layout changes */}
-                  <AdContainer
-                    key={`poster_ads_${hasRoutes}${hasRoutesOnTop}${hasStretchedLeftColumn}${useDiagram}`}
-                    shortId={shortId}
-                    template={template ? get(template, 'areas', []).find(t => t.key === 'ads') : {}}
-                  />
-                </div>
+                  </div>
+                )}
 
                 <Spacer width={10} />
 
                 <Measure client>
-                  {({
-                    measureRef,
-                    contentRect: {
-                      client: { height: rightColumnHeight },
-                    },
-                  }) => (
+                  {({ measureRef, contentRect }) => (
                     <div className={styles.right} ref={measureRef}>
-                      {!hasColumnTimetable && (
-                        <div className={styles.timetables}>
-                          <TerminalPosterTimetable
-                            segments={['saturdays']}
-                            hideDetails
-                            routeFilter={this.props.routeFilter}
-                          />
-                          <Spacer width={10} />
-                          <TerminalPosterTimetable
-                            segments={['sundays']}
-                            hideDetails
-                            routeFilter={this.props.routeFilter}
-                          />
-                        </div>
-                      )}
                       {!useDiagram && <Spacer height={10} />}
                       {/* The key will make sure the map updates its size if the layout changes */}
                       {shouldRenderMap && (
                         <CustomMap
-                          key={`poster_map_${hasRoutes}${hasRoutesOnTop}${useDiagram}${isTramStop}${hasStretchedLeftColumn}${hasColumnTimetable}`}
+                          key={`poster_map_${hasRoutes}${hasRoutesOnTop}${useDiagram}${isTramStop}${hasStretchedLeftColumn}${hasColumnTimetable}${hasTimetable}${hasLeftColumn}${contentRect.client.height}`}
                           setMapHeight={this.setMapHeight}
                           stopId={terminalId}
                           date={date}

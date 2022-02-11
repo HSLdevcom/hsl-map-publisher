@@ -301,8 +301,8 @@ const StopType = PropTypes.shape({
     PropTypes.shape({
       routeId: PropTypes.string.isRequired,
     }).isRequired,
-  ).isRequired,
-  stopIds: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+  ),
+  stopIds: PropTypes.arrayOf(PropTypes.string.isRequired),
   calculatedHeading: PropTypes.number,
 });
 
