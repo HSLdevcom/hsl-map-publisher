@@ -49,7 +49,6 @@ class TerminalPoster extends Component {
       mapHeight: -1,
       template: null,
       hasRoutesOnTop: true,
-      hasDiagram: true,
       hasRoutes: true,
       hasStretchedLeftColumn: false,
       shouldRenderMap: false,
@@ -274,7 +273,6 @@ class TerminalPoster extends Component {
       minimapZoneSymbols,
       minimapZones,
       stops,
-      routeFilter,
     } = this.props;
 
     if (!hasRoutesProp) {
@@ -283,9 +281,7 @@ class TerminalPoster extends Component {
 
     const {
       template,
-      mapHeight,
       hasRoutesOnTop,
-      hasDiagram,
       hasStretchedLeftColumn,
       hasRoutes,
       shouldRenderMap,

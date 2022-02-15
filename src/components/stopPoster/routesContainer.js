@@ -54,7 +54,7 @@ const routesQuery = gql`
 
 const propsMapper = mapProps(props => {
   const { stop, multipleStops } = props.data;
-  const stops = multipleStops ? multipleStops.nodes : [stop]; // Use multiple stops if available.
+  const stops = multipleStops ? multipleStops.nodes : [stop]; // Use multiple stops if the query returned them.
   return {
     printAsA3: props.printAsA3,
     routes: flatMap(

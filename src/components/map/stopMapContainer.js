@@ -232,6 +232,7 @@ const mapPositionQuery = gql`
 
 const mapInterestsMapper = mapProps(props => {
   const { stop, terminal } = props.data;
+  // Use either stop or terminal information, depending on which query has succeeded.
   const longitude = stop ? stop.lon : terminal.lon;
   const latitude = stop ? stop.lat : terminal.lat;
   const isTerminal = terminal !== null;

@@ -28,8 +28,8 @@ const headerQuery = gql`
 `;
 
 const propsMapper = mapProps(props => {
-  const { stop } = props.data;
-  const { terminal } = props.data;
+  const { stop, terminal } = props.data;
+  // Get the details from stop or terminal depending on how the query returned data
   const { shortId, nameFi, nameSe } = stop || terminal;
   const { stopZone } = stop || terminal.stops.nodes[0];
 
