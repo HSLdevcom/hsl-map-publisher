@@ -6,6 +6,8 @@ import classNames from 'classnames';
 import TableHeader from './tableHeader';
 import TableRows from './tableRows';
 import SimpleRoutes from './simpleRoutes';
+import PlatformSymbol from './platformSymbol';
+
 import styles from './timetable.css';
 
 const formatDate = date => {
@@ -64,13 +66,17 @@ const Timetable = props => (
     })}>
     <div className={styles.header}>
       {props.showStopInformation && (
-        <div className={styles.headerTitle}>
-          <div className={styles.title}>
-            {props.stopNameFi}
-            &nbsp;&nbsp;
+        <div style={{ display: 'flex' }}>
+          <div className={styles.headerTitle}>
+            <div className={styles.title}>
+              {props.stopNameFi}
+              &nbsp;&nbsp;
+            </div>
+            <div className={styles.subtitle}>{props.stopNameSe}</div>
           </div>
-          <div className={styles.subtitle}>{props.stopNameSe}</div>
-          {props.platformInfo && <div className={styles.title}>{props.platform}</div>}
+          <div>
+            {props.platformInfo && props.platform && <PlatformSymbol platform={props.platform} />}
+          </div>
         </div>
       )}
       {props.showValidityPeriod && (
