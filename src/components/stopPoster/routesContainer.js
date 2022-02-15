@@ -10,7 +10,7 @@ import apolloWrapper from 'util/apolloWrapper';
 import routeCompare from 'util/routeCompare';
 
 const routesQuery = gql`
-  query routesQuery($stopId: String!, $date: Date!) {
+  query routesQuery($stopId: String!, $selectedStops: [String], $date: Date!) {
     stop: stopByStopId(stopId: $stopId) {
       routeSegments: routeSegmentsForDate(date: $date) {
         nodes {
@@ -29,22 +29,20 @@ const routesQuery = gql`
         }
       }
     }
-    terminal: terminalByTerminalId(terminalId: $stopId) {
-      stops: stopsByTerminalId {
-        nodes {
-          routeSegments: routeSegmentsForDate(date: $date) {
-            nodes {
-              routeId
-              viaFi
-              viaSe
-              hasRegularDayDepartures(date: $date)
-              pickupDropoffType
-              route {
-                nodes {
-                  destinationFi
-                  destinationSe
-                  mode
-                }
+    multipleStops: getStopsByIds(stopIds: $selectedStops) {
+      nodes {
+        routeSegments: routeSegmentsForDate(date: $date) {
+          nodes {
+            routeId
+            viaFi
+            viaSe
+            hasRegularDayDepartures(date: $date)
+            pickupDropoffType
+            route {
+              nodes {
+                destinationFi
+                destinationSe
+                mode
               }
             }
           }
@@ -55,8 +53,8 @@ const routesQuery = gql`
 `;
 
 const propsMapper = mapProps(props => {
-  const { stop, terminal } = props.data;
-  const stops = stop ? [stop] : terminal.stops.nodes;
+  const { stop, multipleStops } = props.data;
+  const stops = multipleStops ? multipleStops.nodes : [stop]; // Use multiple stops if available.
   return {
     printAsA3: props.printAsA3,
     routes: flatMap(
@@ -89,6 +87,7 @@ export default component => {
   RoutesContainer.propTypes = {
     stopId: PropTypes.string.isRequired,
     date: PropTypes.string.isRequired,
+    selectedStops: PropTypes.array,
   };
 
   return RoutesContainer;

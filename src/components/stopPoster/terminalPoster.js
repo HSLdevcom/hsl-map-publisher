@@ -336,7 +336,12 @@ class TerminalPoster extends Component {
               }}>
               <Spacer width="100%" height={50} />
               {hasRoutes && hasRoutesOnTop && (
-                <Routes stopId={terminalId} date={date} routeFilter={this.props.routeFilter} />
+                <Routes
+                  stopId={terminalId}
+                  selectedStops={stops}
+                  date={date}
+                  routeFilter={this.props.routeFilter}
+                />
               )}
               {hasRoutes && hasRoutesOnTop && <Spacer height={10} />}
               <div className={styles.columns}>
@@ -345,6 +350,7 @@ class TerminalPoster extends Component {
                     {hasRoutes && !hasRoutesOnTop && (
                       <Routes
                         stopId={terminalId}
+                        selectedStops={stops}
                         date={date}
                         routeFilter={this.props.routeFilter}
                       />
