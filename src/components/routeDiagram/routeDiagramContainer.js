@@ -99,6 +99,7 @@ const propsMapper = mapProps(props => {
   return {
     tree: routesToTree(routes, props.data.stop, props.height, treeMaxWidth),
     printAsA3: props.printAsA3,
+    useWide: props.useWide,
   };
 });
 

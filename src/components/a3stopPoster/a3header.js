@@ -4,7 +4,7 @@ import { chunk, cloneDeep, sortBy } from 'lodash';
 import { Row, Column, InlineSVG } from 'components/util';
 import a3headerContainer from './a3headerContainer';
 import renderQueue from 'util/renderQueue';
-import { isTrunkRoute, getColor, getIcon, routeGeneralizer } from 'util/domain';
+import { isTrunkRoute, getColor } from 'util/domain';
 import SimpleRoutes from '../timetable/simpleRoutes';
 
 import styles from './a3header.css';
@@ -43,14 +43,15 @@ class A3Header extends Component {
   }
 
   hasOverflow() {
-    return (
-      this.root.scrollWidth > this.root.clientWidth ||
-      this.root.scrollHeight > this.root.clientHeight
-    );
+    return {
+      horizontal: this.root.scrollWidth > this.root.clientWidth,
+      vertical: this.root.scrollHeight > this.root.clientHeight,
+    };
   }
 
   updateLayout() {
-    if (this.hasOverflow()) {
+    const overflow = this.hasOverflow();
+    if (overflow.vertical || overflow.horizontal) {
       if (!this.state.simpleRoutes) {
         renderQueue.add(this);
         this.setState({ simpleRoutes: true });
@@ -74,6 +75,8 @@ class A3Header extends Component {
       routesPerColumn,
     );
     const routeIds = this.props.routes.map(route => route.routeId);
+
+    const zone = this.props.stop.stopZone;
 
     const routeIdsStr = routeIds.join(', ');
     return (
@@ -124,10 +127,16 @@ class A3Header extends Component {
         {this.state.simpleRoutes && this.state.hideDestinations && (
           <div className={styles.simplestRoutes}>{routeIdsStr}</div>
         )}
-        <div className={styles.stopIdContainer}>
-          <div className={styles.stopIdTitle}>Pysäkkinumero</div>
-          <div className={styles.stopIdTitle}>Hållplatsnummer</div>
-          <div className={styles.stopId}>{this.props.stop.shortId.replace(' ', '')}</div>
+        <div className={styles.infoContainer}>
+          <div className={styles.stopIdContainer}>
+            <div className={styles.stopIdTitle}>Pysäkkinumero</div>
+            <div className={styles.stopIdTitle}>Hållplatsnummer</div>
+            <div className={styles.stopId}>{this.props.stop.shortId.replace(' ', '')}</div>
+          </div>
+          <div className={styles.zone}>
+            <div className={styles.zoneHeading}>Vyöhyketieto</div>
+            <div className={styles.zoneLetter}>{zone}</div>
+          </div>
         </div>
       </div>
     );

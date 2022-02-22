@@ -15,7 +15,7 @@
 }
 
 .tableContentContainer > *:first-child {
-  height: 710px;
+  height: 720px;
 }
 
 .tableContentContainer > *:not(:first-child) {

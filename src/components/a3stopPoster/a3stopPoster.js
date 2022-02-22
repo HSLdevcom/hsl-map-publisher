@@ -6,11 +6,8 @@ import renderQueue from 'util/renderQueue';
 import { colorsByMode } from 'util/domain';
 import { chunk } from 'lodash';
 
-import RouteDiagram from 'components/routeDiagram/routeDiagramContainer';
 import Timetable from 'components/a3Timetable/a3TimetableContainer';
-
 import Header from './a3header';
-
 import styles from './a3stopPoster.css';
 
 const ROUTE_DIAGRAM_MAX_HEIGHT = 10;
