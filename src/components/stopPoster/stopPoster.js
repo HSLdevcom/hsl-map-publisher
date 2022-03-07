@@ -370,13 +370,13 @@ class StopPoster extends Component {
               }}>
               <Spacer width="100%" height={50} />
               {hasRoutes && hasRoutesOnTop && (
-                <Routes stopId={stopId} date={date} routeFilter={this.props.routeFilter} />
+                <Routes stopIds={[stopId]} date={date} routeFilter={this.props.routeFilter} />
               )}
               {hasRoutes && hasRoutesOnTop && <Spacer height={10} />}
               <div className={styles.columns}>
                 <div className={hasStretchedLeftColumn ? styles.leftStretched : styles.left}>
                   {hasRoutes && !hasRoutesOnTop && (
-                    <Routes stopId={stopId} date={date} routeFilter={this.props.routeFilter} />
+                    <Routes stopIds={[stopId]} date={date} routeFilter={this.props.routeFilter} />
                   )}
                   {hasRoutes && !hasRoutesOnTop && <Spacer height={10} />}
                   {hasColumnTimetable && (
