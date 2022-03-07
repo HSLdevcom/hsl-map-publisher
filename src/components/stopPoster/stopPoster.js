@@ -447,7 +447,7 @@ class StopPoster extends Component {
                       {useDiagram && (
                         <RouteDiagram
                           height={this.state.diagramOptions.diagramStopCount}
-                          stopId={stopId}
+                          stopIds={[stopId]}
                           date={date}
                           routeFilter={this.props.routeFilter}
                         />

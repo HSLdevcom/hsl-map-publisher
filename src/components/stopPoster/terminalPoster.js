@@ -293,7 +293,7 @@ class TerminalPoster extends Component {
     const { isTramStop } = this.props;
     const src = get(template, 'areas', []).find(t => t.key === 'tram');
     const tramImage = get(src, 'slots[0].image.svg', '');
-    let useDiagram = false;
+    let useDiagram = true;
 
     if (isTramStop && tramImage) useDiagram = false;
 
@@ -403,7 +403,7 @@ class TerminalPoster extends Component {
                       {useDiagram && (
                         <RouteDiagram
                           height={this.state.diagramOptions.diagramStopCount}
-                          stopId={terminalId}
+                          stopIds={stops}
                           date={date}
                           routeFilter={this.props.routeFilter}
                         />

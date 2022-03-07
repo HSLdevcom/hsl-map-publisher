@@ -12,44 +12,46 @@ import { routesToTree } from 'util/routes';
 import RouteDiagram from './routeDiagram';
 
 const routeDiagramQuery = gql`
-  query routeDiagramQuery($stopId: String!, $date: Date!) {
-    stop: stopByStopId(stopId: $stopId) {
-      shortId
-      stopZone
-      siblings {
-        nodes {
-          routeSegments: routeSegmentsForDate(date: $date) {
-            nodes {
-              routeId
-              hasRegularDayDepartures(date: $date)
-              pickupDropoffType
-              route {
-                nodes {
-                  destinationFi
-                  destinationSe
+  query routeDiagramQuery($stopIds: [String]!, $date: Date!) {
+    stops: getStopsByIds(stopIds: $stopIds) {
+      nodes {
+        shortId
+        stopZone
+        siblings {
+          nodes {
+            routeSegments: routeSegmentsForDate(date: $date) {
+              nodes {
+                routeId
+                hasRegularDayDepartures(date: $date)
+                pickupDropoffType
+                route {
+                  nodes {
+                    destinationFi
+                    destinationSe
+                  }
                 }
-              }
-              nextStops {
-                nodes {
-                  stopIndex
-                  stopByStopId {
-                    nameFi
-                    nameSe
-                    shortId
-                    stopZone
-                    terminalId
-                    stopId
-                    routeSegments: routeSegmentsForDate(date: $date) {
-                      nodes {
-                        routeId
-                        hasRegularDayDepartures(date: $date)
-                      }
-                    }
-                    terminalByTerminalId {
-                      siblings {
+                nextStops {
+                  nodes {
+                    stopIndex
+                    stopByStopId {
+                      nameFi
+                      nameSe
+                      shortId
+                      stopZone
+                      terminalId
+                      stopId
+                      routeSegments: routeSegmentsForDate(date: $date) {
                         nodes {
-                          modes(date: $date) {
-                            nodes
+                          routeId
+                          hasRegularDayDepartures(date: $date)
+                        }
+                      }
+                      terminalByTerminalId {
+                        siblings {
+                          nodes {
+                            modes(date: $date) {
+                              nodes
+                            }
                           }
                         }
                       }
@@ -79,25 +81,30 @@ const nodeToStop = ({ stopByStopId }) => {
 };
 
 const propsMapper = mapProps(props => {
-  const routes = flatMap(props.data.stop.siblings.nodes, stop =>
-    stop.routeSegments.nodes
-      // Select regular routes that allow boarding from current stop
-      .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
-      .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
-      .filter(routeSegment => !isDropOffOnly(routeSegment))
-      .filter(routeSegment =>
-        filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter }),
-      )
-      .map(routeSegment => ({
-        ...routeSegment.route.nodes[0],
-        routeId: trimRouteId(routeSegment.routeId),
-        // List all stops (including drop-off only) for each route
-        stops: sortBy(routeSegment.nextStops.nodes, node => node.stopIndex).map(nodeToStop),
-      })),
+  const routes = flatMap(props.data.stops.nodes, s =>
+    flatMap(s.siblings.nodes, stop =>
+      stop.routeSegments.nodes
+        // Select regular routes that allow boarding from current stop
+        .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
+        .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
+        .filter(routeSegment => !isDropOffOnly(routeSegment))
+        .filter(routeSegment =>
+          filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter }),
+        )
+        .map(routeSegment => ({
+          ...routeSegment.route.nodes[0],
+          routeId: trimRouteId(routeSegment.routeId),
+          // List all stops (including drop-off only) for each route
+          stops: sortBy(routeSegment.nextStops.nodes, node => node.stopIndex).map(nodeToStop),
+        })),
+    ),
   );
   const treeMaxWidth = props.printAsA3 ? 5 : 6;
+
+  const stopDetails = props.data.stops.nodes[0]; // We can use the first one, because the zone should be the same for all in the group.
+
   return {
-    tree: routesToTree(routes, props.data.stop, props.height, treeMaxWidth),
+    tree: routesToTree(routes, stopDetails, props.height, treeMaxWidth),
     printAsA3: props.printAsA3,
   };
 });
@@ -107,7 +114,7 @@ const hoc = compose(graphql(routeDiagramQuery), apolloWrapper(propsMapper));
 const RouteDiagramContainer = hoc(RouteDiagram);
 
 RouteDiagramContainer.propTypes = {
-  stopId: PropTypes.string.isRequired,
+  stopIds: PropTypes.array.isRequired,
   date: PropTypes.string.isRequired,
 };
 

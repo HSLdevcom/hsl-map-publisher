@@ -97,7 +97,7 @@ const TableRows = props => {
           return (
             <RouteDiagram
               height={props.diagram.diagramOptions.diagramStopCount}
-              stopId={props.diagram.stopId}
+              stopIds={[props.diagram.stopId]}
               date={props.diagram.date}
               routeFilter={props.diagram.routeFilter}
               printAsA3={props.diagram.printAsA3}
