@@ -39,6 +39,7 @@ const propsMapper = mapProps(props => {
   const stops = props.data.stops.nodes;
   return {
     printAsA3: props.printAsA3,
+    platformInfo: props.platformInfo,
     routes: flatMap(
       stops.map(s =>
         s.routeSegments.nodes

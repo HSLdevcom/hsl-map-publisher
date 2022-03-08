@@ -38,3 +38,21 @@
   justify-content: space-between;
   height: 100%;
 }
+
+/* PlatformSymbol styles */
+.PScontainer {
+  display: block;
+}
+
+.PScircle {
+  fill: none;
+  stroke: var(--hsl-blue);
+  stroke-width: 3;
+}
+
+.PStext {
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-weight: bold;
+  fill: var(--hsl-blue);
+}

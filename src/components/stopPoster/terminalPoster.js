@@ -332,14 +332,24 @@ class TerminalPoster extends Component {
               }}>
               <Spacer width="100%" height={50} />
               {hasRoutes && hasRoutesOnTop && (
-                <Routes stopIds={stops} date={date} routeFilter={this.props.routeFilter} />
+                <Routes
+                  stopIds={stops}
+                  date={date}
+                  routeFilter={this.props.routeFilter}
+                  platformInfo
+                />
               )}
               {hasRoutes && hasRoutesOnTop && <Spacer height={10} />}
               <div className={styles.columns}>
                 {hasLeftColumn && (
                   <div className={hasStretchedLeftColumn ? styles.leftStretched : styles.left}>
                     {hasRoutes && !hasRoutesOnTop && (
-                      <Routes stopIds={stops} date={date} routeFilter={this.props.routeFilter} />
+                      <Routes
+                        stopIds={stops}
+                        date={date}
+                        routeFilter={this.props.routeFilter}
+                        platformInfo
+                      />
                     )}
                     {hasRoutes && !hasRoutesOnTop && <Spacer height={10} />}
                     {hasTimetable && hasColumnTimetable && (

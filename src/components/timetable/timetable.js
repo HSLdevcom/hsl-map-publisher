@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Spacer } from 'components/util';
+import { Spacer, PlatformSymbol } from 'components/util';
 import classNames from 'classnames';
 
 import TableHeader from './tableHeader';
 import TableRows from './tableRows';
 import SimpleRoutes from './simpleRoutes';
-import PlatformSymbol from './platformSymbol';
 
 import styles from './timetable.css';
 

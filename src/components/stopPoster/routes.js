@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import chunk from 'lodash/chunk';
 import sortBy from 'lodash/sortBy';
-import { Row, Column, InlineSVG } from 'components/util';
+import { Row, Column, InlineSVG, PlatformSymbol } from 'components/util';
 import routesContainer from './routesContainer';
 import renderQueue from 'util/renderQueue';
 import { isTrunkRoute, getColor, getIcon } from 'util/domain';
@@ -20,6 +20,11 @@ class Routes extends Component {
         destinationSe: PropTypes.string,
       }),
     ).isRequired,
+    platformInfo: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    platformInfo: false,
   };
 
   constructor(props) {
@@ -103,6 +108,22 @@ class Routes extends Component {
                 </div>
               ))}
             </Column>
+            {this.props.platformInfo && (
+              <Column>
+                {routes.map(
+                  (route, index) =>
+                    route.platform && (
+                      <div className={styles.group}>
+                        <PlatformSymbol
+                          platform={route.platform}
+                          size={50}
+                          color={getColor(route)}
+                        />
+                      </div>
+                    ),
+                )}
+              </Column>
+            )}
           </Row>
         ))}
       </div>
