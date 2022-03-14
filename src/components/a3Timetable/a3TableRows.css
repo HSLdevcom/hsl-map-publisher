@@ -50,6 +50,14 @@
   border-bottom-left-radius: 15px;
 }
 
+.summer > *:nth-child(odd) {
+  background-color: var(--light-background);
+}
+
+.summer > *:nth-child(even) {
+  background-color: var(--timetable-accent-color);
+}
+
 .item {
   display: flex;
   min-width: 3.75em;

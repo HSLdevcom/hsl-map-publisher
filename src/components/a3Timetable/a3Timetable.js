@@ -373,7 +373,12 @@ class Timetable extends Component {
               return (
                 <div className={styles.tableRowsContainer}>
                   {chunkedRow.map(rows => (
-                    <TableRows diagram={this.props.diagram} departures={rows} useWide={useWide} />
+                    <TableRows
+                      diagram={this.props.diagram}
+                      departures={rows}
+                      useWide={useWide}
+                      isSummerTimetable={this.props.isSummerTimetable}
+                    />
                   ))}
                 </div>
               );
