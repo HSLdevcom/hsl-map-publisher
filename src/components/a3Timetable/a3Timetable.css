@@ -45,14 +45,14 @@
 }
 
 .root.summer {
-  background: white;
-  --timetable-accent-color: var(--light-background);
+  /* background: white;
+  --timetable-accent-color: var(--light-background); */
 }
 
 .root.greyscale {
-  background: white;
+  /* background: white;
   color: black;
-  --timetable-accent-color: #eaeaea;
+  --timetable-accent-color: #eaeaea; */
 }
 
 .root.printable {
