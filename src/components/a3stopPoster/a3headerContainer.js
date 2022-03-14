@@ -15,6 +15,7 @@ const routesQuery = gql`
       nameFi
       nameSe
       shortId
+      stopZone
       siblings {
         nodes {
           routeSegments: routeSegmentsForDate(date: $date) {

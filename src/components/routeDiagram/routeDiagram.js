@@ -9,7 +9,12 @@ import Path from './path';
 import styles from './routeDiagram.css';
 
 const RouteDiagram = props => (
-  <div className={!props.printAsA3 ? styles.root : classNames(styles.root, styles.a3)}>
+  <div
+    className={
+      !props.printAsA3
+        ? styles.root
+        : classNames(styles.root, styles.a3, props.useWide ? styles.useWide : '')
+    }>
     <div className={styles.componentName}>
       <div className={!props.printAsA3 ? styles.title : styles.titleA3}>Linjojen reitit</div>
       <div className={!props.printAsA3 ? styles.subtitle : styles.subtitleA3}>
@@ -30,11 +35,13 @@ const RouteDiagram = props => (
 
 RouteDiagram.defaultProps = {
   printAsA3: false,
+  useWide: false,
 };
 
 RouteDiagram.propTypes = {
   tree: PropTypes.shape(Path.propTypes).isRequired,
   printAsA3: PropTypes.bool,
+  useWide: PropTypes.bool,
 };
 
 export default RouteDiagram;
