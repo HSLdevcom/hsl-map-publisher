@@ -113,7 +113,14 @@ const TableRows = props => {
           }
         });
         if (!!arr.length && !!content.length) {
-          return <div className={styles.a3root}>{content}</div>;
+          return (
+            <div
+              className={classnames(styles.a3root, {
+                [styles.summer]: props.isSummerTimetable,
+              })}>
+              {content}
+            </div>
+          );
         }
         return null;
       })}
@@ -124,6 +131,7 @@ const TableRows = props => {
 TableRows.defaultProps = {
   diagram: null,
   useWide: false,
+  isSummerTimetable: false,
 };
 
 TableRows.propTypes = {
@@ -135,6 +143,7 @@ TableRows.propTypes = {
   ).isRequired,
   diagram: PropTypes.object,
   useWide: PropTypes.bool,
+  isSummerTimetable: PropTypes.bool,
 };
 
 export default TableRows;
