@@ -99,7 +99,7 @@ const propsMapper = mapProps(props => {
         })),
     ),
   );
-  const treeMaxWidth = props.printAsA3 ? 5 : 6;
+  const treeMaxWidth = props.maxColumns ? props.maxColumns : props.printAsA3 ? 5 : 6; // Defaults 6 for normal posters and 5 for a3 posters.
 
   const stopDetails = props.data.stops.nodes[0]; // We can use the first one, because the zone should be the same for all in the group.
 

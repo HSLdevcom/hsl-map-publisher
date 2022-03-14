@@ -21,10 +21,14 @@ class Routes extends Component {
       }),
     ).isRequired,
     platformInfo: PropTypes.bool,
+    betterLayoutAvailable: PropTypes.bool,
+    triggerAnotherLayout: PropTypes.func,
   };
 
   static defaultProps = {
     platformInfo: false,
+    betterLayoutAvailable: false,
+    triggerAnotherLayout: () => {},
   };
 
   constructor(props) {
@@ -59,8 +63,10 @@ class Routes extends Component {
         this.setState(state => ({ columns: state.columns - 1 }));
         return;
       }
-      renderQueue.remove(this, { error: new Error('Failed to remove routes overflow') });
-      return;
+      if (!this.props.betterLayoutAvailable) {
+        renderQueue.remove(this, { error: new Error('Failed to remove routes overflow') });
+      }
+      this.props.triggerAnotherLayout();
     }
     renderQueue.remove(this);
   }
@@ -113,7 +119,7 @@ class Routes extends Component {
                 {routes.map(
                   (route, index) =>
                     route.platform && (
-                      <div className={styles.group}>
+                      <div key={index} className={styles.group}>
                         <PlatformSymbol
                           platform={route.platform}
                           size={50}

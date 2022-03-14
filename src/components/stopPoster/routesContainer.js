@@ -36,10 +36,10 @@ const routesQuery = gql`
 `;
 
 const propsMapper = mapProps(props => {
-  const stops = props.data.stops.nodes;
+  const { data, routeFilter, ...propsToForward } = props;
+  const stops = data.stops.nodes;
   return {
-    printAsA3: props.printAsA3,
-    platformInfo: props.platformInfo,
+    ...propsToForward,
     routes: flatMap(
       stops.map(s =>
         s.routeSegments.nodes
@@ -48,7 +48,7 @@ const propsMapper = mapProps(props => {
           .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
           .filter(routeSegment => !isDropOffOnly(routeSegment))
           .filter(routeSegment =>
-            filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter }),
+            filterRoute({ routeId: routeSegment.routeId, filter: routeFilter }),
           ),
       ),
     )

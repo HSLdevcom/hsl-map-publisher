@@ -48,7 +48,8 @@ class TerminalPoster extends Component {
     this.state = {
       mapHeight: -1,
       template: null,
-      hasRoutesOnTop: true,
+      hasRoutesOnTop: false,
+      hasDiagram: true,
       hasRoutes: true,
       hasStretchedLeftColumn: false,
       shouldRenderMap: false,
@@ -181,15 +182,66 @@ class TerminalPoster extends Component {
     }
 
     if (this.hasOverflow() || this.state.diagramOptions.binarySearching) {
+      if (!this.state.hasRoutesOnTop) {
+        this.setState(prevState => ({
+          hasRoutesOnTop: true,
+          hasLeftColumn: !prevState.hasTimetable ? false : prevState.hasLeftColumn,
+        }));
+        return;
+      }
+
       if (!this.state.hasStretchedLeftColumn) {
         this.setState({ hasStretchedLeftColumn: true });
         return;
       }
 
-      if (this.state.hasColumnTimetable && this.state.hasTimetable) {
+      if (this.state.hasTimetable) {
+        // Remove timetables and start iteration again
         this.setState({
-          hasColumnTimetable: false,
+          hasTimetable: false,
+          hasRoutesOnTop: false,
+          hasStretchedLeftColumn: false,
         });
+        return;
+      }
+
+      if (this.state.hasDiagram) {
+        // TODO: This is kind of dirty fix. Binarysearch to get acceptable
+        // height for routetree.
+        const { diagramOptions } = this.state;
+        diagramOptions.binarySearching = true;
+        diagramOptions.middleHeightValue =
+          diagramOptions.heightValues[Math.floor(diagramOptions.heightValues.length / 2)];
+        const prevCount = diagramOptions.diagramStopCount;
+        diagramOptions.diagramStopCount =
+          ROUTE_DIAGRAM_MAX_HEIGHT - diagramOptions.middleHeightValue;
+
+        if (this.hasOverflow()) {
+          if (diagramOptions.heightValues.length === 1) diagramOptions.heightValues = [];
+          diagramOptions.heightValues = diagramOptions.heightValues.slice(
+            Math.floor(diagramOptions.heightValues.length / 2),
+            diagramOptions.heightValues.length,
+          );
+        } else {
+          diagramOptions.latestFittingCount = prevCount;
+          diagramOptions.heightValues = diagramOptions.heightValues.slice(
+            0,
+            Math.floor(diagramOptions.heightValues.length / 2),
+          );
+        }
+        if (this.hasOverflow() && diagramOptions.latestFittingCount) {
+          diagramOptions.diagramStopCount = diagramOptions.latestFittingCount;
+          diagramOptions.binarySearching = false;
+        }
+
+        if (diagramOptions.heightValues.length < 1) {
+          diagramOptions.binarySearching = false;
+          if (!diagramOptions.latestFittingCount) {
+            this.setState({ hasDiagram: false });
+          }
+        }
+
+        this.setState({ diagramOptions });
         return;
       }
 
@@ -231,7 +283,7 @@ class TerminalPoster extends Component {
       return;
     }
 
-    if (this.state.template && this.state.removedAds.length > 0) {
+    if (this.state.template && this.state.removedAds && this.state.removedAds.length > 0) {
       const { template } = this.state;
       const svg = get(template, 'areas', []).find(t => t.key === 'map').slots[0];
       //  If using svg postpone adsPhase untill we have mapHeight.
@@ -255,6 +307,16 @@ class TerminalPoster extends Component {
     window.setTimeout(() => {
       renderQueue.remove(this);
     }, 1000);
+  }
+
+  triggerAnotherRoutesLayout() {
+    // When we trigger another layout, the left column always exists.
+    // First try wider column and then move routes to top.
+    if (!this.state.hasStretchedLeftColumn) {
+      this.setState({ hasStretchedLeftColumn: true });
+    } else {
+      this.setState({ hasLeftColumn: false, hasRoutesOnTop: true });
+    }
   }
 
   render() {
@@ -333,10 +395,13 @@ class TerminalPoster extends Component {
               <Spacer width="100%" height={50} />
               {hasRoutes && hasRoutesOnTop && (
                 <Routes
+                  key={`poster_routes_${hasRoutesOnTop}${hasTimetable}${hasLeftColumn}${hasStretchedLeftColumn}${useDiagram}`}
                   stopIds={stops}
                   date={date}
                   routeFilter={this.props.routeFilter}
                   platformInfo
+                  betterLayoutAvailable={!hasRoutesOnTop} // Routes on top is the easiest layout option and the last one to try.
+                  triggerAnotherLayout={() => this.triggerAnotherRoutesLayout()}
                 />
               )}
               {hasRoutes && hasRoutesOnTop && <Spacer height={10} />}
@@ -345,10 +410,13 @@ class TerminalPoster extends Component {
                   <div className={hasStretchedLeftColumn ? styles.leftStretched : styles.left}>
                     {hasRoutes && !hasRoutesOnTop && (
                       <Routes
+                        key={`poster_routes_${hasRoutesOnTop}${hasTimetable}${hasLeftColumn}${hasStretchedLeftColumn}${useDiagram}`}
                         stopIds={stops}
                         date={date}
                         routeFilter={this.props.routeFilter}
                         platformInfo
+                        betterLayoutAvailable={!hasRoutesOnTop} // Routes on top is the easiest layout option and the last one to try.
+                        triggerAnotherLayout={() => this.triggerAnotherRoutesLayout()}
                       />
                     )}
                     {hasRoutes && !hasRoutesOnTop && <Spacer height={10} />}
@@ -406,6 +474,7 @@ class TerminalPoster extends Component {
                           stopIds={stops}
                           date={date}
                           routeFilter={this.props.routeFilter}
+                          maxColumns={hasLeftColumn ? 6 : 8}
                         />
                       )}
                       {isTramStop && tramImage && <TramDiagram svg={tramImage} />}
