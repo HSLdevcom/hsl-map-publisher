@@ -6,8 +6,10 @@ import compose from 'recompose/compose';
 import flatMap from 'lodash/flatMap';
 import get from 'lodash/get';
 import { PerspectiveMercatorViewport } from 'viewport-mercator-project';
+import haversine from 'haversine';
 
 import apolloWrapper from 'util/apolloWrapper';
+import promiseWrapper from 'util/promiseWrapper';
 import { isNumberVariant, trimRouteId, isDropOffOnly } from 'util/domain';
 import { calculateStopsViewport } from 'util/stopPoster';
 import routeCompare from 'util/routeCompare';
@@ -25,6 +27,13 @@ const MINI_MAP_ZOOM = 9;
 // Mini map position
 const MINI_MAP_MARGIN_RIGHT = 60;
 const MINI_MAP_MARGIN_BOTTOM = -40;
+
+const SALE_POINT_TYPES = [
+  'Kertalippuautomaatti',
+  'Monilippuautomaatti',
+  'myyntipiste', // yes, there is one in lowercase
+  'Myyntipiste',
+];
 
 const nearbyItemsQuery = gql`
   query nearbyItemsQuery(
@@ -136,6 +145,7 @@ const nearbyItemsMapper = mapProps(props => {
     maxLon,
     maxLat,
     projectedSymbols,
+    projectedSalePoints,
   } = calculateStopsViewport({
     longitude: props.longitude,
     latitude: props.latitude,
@@ -144,6 +154,7 @@ const nearbyItemsMapper = mapProps(props => {
     minZoom: MIN_ZOOM,
     maxZoom: MAX_ZOOM,
     stops,
+    salePoints: props.salePoints,
     currentStopId: props.stopId,
     miniMapStartX: props.width - MINI_MAP_WIDTH - MINI_MAP_MARGIN_RIGHT,
     miniMapStartY: props.height - MINI_MAP_HEIGHT - MINI_MAP_MARGIN_BOTTOM,
@@ -152,6 +163,19 @@ const nearbyItemsMapper = mapProps(props => {
 
   const currentStop = projectedStops.find(({ stopIds }) => stopIds.includes(props.stopId));
   const nearbyStops = projectedStops.filter(({ stopIds }) => !stopIds.includes(props.stopId));
+
+  // Calculate distances to sale points and get the nearest one
+  const nearestSalePoint = projectedSalePoints
+    .map(sp => {
+      // Euclidean distance
+      const distance = haversine(
+        { latitude: sp.lat, longitude: sp.lon },
+        { latitude: projectedCurrentLocation.lat, longitude: projectedCurrentLocation.lon },
+        { unit: 'meter' },
+      );
+      return { ...sp, distance };
+    })
+    .reduce((prev, curr) => (prev && curr.distance > prev.distance ? prev : curr), null);
 
   const mapOptions = {
     center: [viewport.longitude, viewport.latitude],
@@ -189,6 +213,7 @@ const nearbyItemsMapper = mapProps(props => {
     maxLon,
     maxLat,
     projectedSymbols,
+    nearestSalePoint,
   };
 });
 
@@ -237,10 +262,42 @@ const mapInterestsMapper = mapProps(props => {
   };
 });
 
+const getSalePoints = async () => {
+  const response = await fetch(process.env.SALES_POINT_DATA_URL, { method: 'GET' });
+  const data = await response.json();
+  const result = data.features
+    .filter(sp => SALE_POINT_TYPES.includes(sp.properties.Tyyppi))
+    .map(sp => {
+      const { properties } = sp;
+      const { coordinates } = sp.geometry;
+      const [lon, lat] = coordinates;
+      return {
+        id: properties.ID,
+        type: properties.Tyyppi,
+        title: properties.Nimi,
+        address: properties.Osoite,
+        lat,
+        lon,
+      };
+    });
+  return result;
+};
+
+const salePointsMapper = mapProps(props => {
+  // If sales points are not configured, do not fetch them but return empty array
+  const salePoints = props.salesPoint ? getSalePoints() : Promise.resolve([]);
+  return {
+    ...props,
+    salePoints,
+  };
+});
+
 const hoc = compose(
   graphql(mapPositionQuery),
   apolloWrapper(mapInterestsMapper),
   graphql(nearbyItemsQuery),
+  salePointsMapper,
+  promiseWrapper('salePoints'),
   apolloWrapper(nearbyItemsMapper),
 );
 

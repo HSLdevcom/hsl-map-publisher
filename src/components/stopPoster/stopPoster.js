@@ -315,6 +315,7 @@ class StopPoster extends Component {
       dateEnd,
       mapZoneSymbols,
       mapZones,
+      salesPoint,
       minimapZoneSymbols,
       minimapZones,
     } = this.props;
@@ -436,6 +437,7 @@ class StopPoster extends Component {
                           }
                           mapZoneSymbols={mapZoneSymbols}
                           mapZones={mapZones}
+                          salesPoint={salesPoint}
                           minimapZoneSymbols={minimapZoneSymbols}
                           minimapZones={minimapZones}
                         />
@@ -484,6 +486,7 @@ StopPoster.propTypes = {
   template: PropTypes.any.isRequired,
   mapZoneSymbols: PropTypes.bool,
   mapZones: PropTypes.bool,
+  salesPoint: PropTypes.bool,
   minimapZoneSymbols: PropTypes.bool,
   minimapZones: PropTypes.bool,
   routeFilter: PropTypes.string,
@@ -495,6 +498,7 @@ StopPoster.defaultProps = {
   dateEnd: null,
   mapZoneSymbols: false,
   mapZones: false,
+  salesPoint: false,
   minimapZoneSymbols: false,
   minimapZones: false,
   routeFilter: '',
