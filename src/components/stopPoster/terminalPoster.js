@@ -182,16 +182,16 @@ class TerminalPoster extends Component {
     }
 
     if (this.hasOverflow() || this.state.diagramOptions.binarySearching) {
-      if (!this.state.hasRoutesOnTop) {
-        this.setState(prevState => ({
-          hasRoutesOnTop: true,
-          hasLeftColumn: !prevState.hasTimetable ? false : prevState.hasLeftColumn,
-        }));
+      if (!this.state.hasStretchedLeftColumn) {
+        this.setState({ hasStretchedLeftColumn: true });
         return;
       }
 
-      if (!this.state.hasStretchedLeftColumn) {
-        this.setState({ hasStretchedLeftColumn: true });
+      if (!this.state.hasRoutesOnTop) {
+        this.setState({
+          hasRoutesOnTop: true,
+          hasStretchedLeftColumn: false,
+        });
         return;
       }
 
@@ -199,8 +199,8 @@ class TerminalPoster extends Component {
         // Remove timetables and start iteration again
         this.setState({
           hasTimetable: false,
-          hasRoutesOnTop: false,
-          hasStretchedLeftColumn: false,
+          hasRoutesOnTop: true,
+          hasLeftColumn: false,
         });
         return;
       }
@@ -258,14 +258,6 @@ class TerminalPoster extends Component {
           }
         }
         this.setState({ template });
-        return;
-      }
-
-      if (this.state.hasTimetable) {
-        this.setState({
-          hasTimetable: false,
-          hasLeftColumn: false,
-        });
         return;
       }
 
