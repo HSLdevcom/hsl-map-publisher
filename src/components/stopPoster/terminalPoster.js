@@ -119,7 +119,8 @@ class TerminalPoster extends Component {
     if (this.content.scrollWidth > this.content.clientWidth && this.state.hasRoutesOnTop) {
       this.onError('Unresolvable horizontal overflow detected.');
     }
-    return this.content.scrollHeight > this.content.clientHeight;
+    // Allow minor overflow tto make layout predictable
+    return this.content.scrollHeight > this.content.clientHeight + 3;
   }
 
   removeAdsFromTemplate(ads) {
@@ -453,7 +454,7 @@ class TerminalPoster extends Component {
                           }
                           mapZoneSymbols={mapZoneSymbols}
                           mapZones={mapZones}
-                          salesPoint={salesPoint}
+                          showSalesPoint={salesPoint}
                           minimapZoneSymbols={minimapZoneSymbols}
                           minimapZones={minimapZones}
                         />

@@ -437,7 +437,7 @@ class StopPoster extends Component {
                           }
                           mapZoneSymbols={mapZoneSymbols}
                           mapZones={mapZones}
-                          salesPoint={salesPoint}
+                          showSalesPoint={salesPoint}
                           minimapZoneSymbols={minimapZoneSymbols}
                           minimapZones={minimapZones}
                         />

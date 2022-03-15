@@ -266,30 +266,30 @@ const mapInterestsMapper = mapProps(props => {
   };
 });
 
-const getSalePoints = async () => {
-  const response = await fetch(process.env.SALES_POINT_DATA_URL, { method: 'GET' });
-  const data = await response.json();
-  const result = data.features
-    .filter(sp => SALE_POINT_TYPES.includes(sp.properties.Tyyppi))
-    .map(sp => {
-      const { properties } = sp;
-      const { coordinates } = sp.geometry;
-      const [lon, lat] = coordinates;
-      return {
-        id: properties.ID,
-        type: properties.Tyyppi,
-        title: properties.Nimi,
-        address: properties.Osoite,
-        lat,
-        lon,
-      };
-    });
-  return result;
-};
+const getSalePoints = () =>
+  fetch(process.env.SALES_POINT_DATA_URL, { method: 'GET' })
+    .then(response => response.json())
+    .then(data =>
+      data.features
+        .filter(sp => SALE_POINT_TYPES.includes(sp.properties.Tyyppi))
+        .map(sp => {
+          const { properties } = sp;
+          const { coordinates } = sp.geometry;
+          const [lon, lat] = coordinates;
+          return {
+            id: properties.ID,
+            type: properties.Tyyppi,
+            title: properties.Nimi,
+            address: properties.Osoite,
+            lat,
+            lon,
+          };
+        }),
+    );
 
 const salePointsMapper = mapProps(props => {
   // If sales points are not configured, do not fetch them but return empty array
-  const salePoints = props.salesPoint ? getSalePoints() : Promise.resolve([]);
+  const salePoints = props.showSalesPoint ? getSalePoints() : Promise.resolve([]);
   return {
     ...props,
     salePoints,
