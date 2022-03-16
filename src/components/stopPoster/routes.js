@@ -40,10 +40,6 @@ class Routes extends Component {
     this.updateLayout();
   }
 
-  componentWillReceiveProps() {
-    this.setState({ columns: MAX_COLUMNS });
-  }
-
   componentDidUpdate() {
     this.updateLayout();
   }

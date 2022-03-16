@@ -39,7 +39,6 @@ const defaultDiagramOptions = {
 
 class TerminalPoster extends Component {
   constructor(props) {
-    console.log(props);
     super(props);
 
     this.onError = this.onError.bind(this);
@@ -61,9 +60,6 @@ class TerminalPoster extends Component {
       adsPhase: false,
       diagramOptions: defaultDiagramOptions,
     };
-  }
-
-  componentWillMount() {
     renderQueue.add(this);
   }
 
