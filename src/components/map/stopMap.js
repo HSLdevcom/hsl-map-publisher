@@ -200,16 +200,18 @@ const StopMap = props => {
             </ItemFixed>
           )}
 
-          <ItemFixed
-            top={props.currentStop.y - 2.2 * LOCATION_RADIUS}
-            left={props.currentStop.x - LOCATION_RADIUS}>
-            <Row style={{ height: LOCATION_RADIUS * 2 }}>
-              <LocationSymbol size={LOCATION_RADIUS * 2} />
-              <div className={styles.title}>Olet tässä</div>
-              <div className={styles.subtitle}>Du är här</div>
-              <div className={styles.subtitle}>You are here</div>
-            </Row>
-          </ItemFixed>
+          {!isTerminal && (
+            <ItemFixed
+              top={props.currentStop.y - 2.2 * LOCATION_RADIUS}
+              left={props.currentStop.x - LOCATION_RADIUS}>
+              <Row style={{ height: LOCATION_RADIUS * 2 }}>
+                <LocationSymbol size={LOCATION_RADIUS * 2} />
+                <div className={styles.title}>Olet tässä</div>
+                <div className={styles.subtitle}>Du är här</div>
+                <div className={styles.subtitle}>You are here</div>
+              </Row>
+            </ItemFixed>
+          )}
 
           {symbolForEachZone &&
             symbolForEachZone.length > 0 &&
