@@ -68,6 +68,11 @@ const nearbyItemsQuery = gql`
                 viaFi
                 viaSe
                 stopIndex
+                line {
+                  nodes {
+                    trunkRoute
+                  }
+                }
                 route {
                   nodes {
                     destinationFi
@@ -116,7 +121,6 @@ const stopsMapper = stopGroup => ({
         const destinationSe = mergedRouteSegment.destinationSe
           ? mergedRouteSegment.destinationSe
           : get(mergedRouteSegment, 'route.nodes[0].destinationSe');
-
         return {
           routeId: trimRouteId(mergedRouteSegment.routeId),
           destinationFi,
@@ -124,6 +128,8 @@ const stopsMapper = stopGroup => ({
           viaFi: mergedRouteSegment.viaFi,
           viaSe: mergedRouteSegment.viaSe,
           mode: mergedRouteSegment.route.nodes[0].mode,
+          trunkRoute:
+            mergedRouteSegment.line.nodes && mergedRouteSegment.line.nodes[0].trunkRoute === '1',
         };
       }),
   ).sort(routeCompare),

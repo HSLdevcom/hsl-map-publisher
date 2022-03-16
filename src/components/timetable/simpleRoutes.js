@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { chunk, cloneDeep, sortBy } from 'lodash';
-import { routeGeneralizer, isTrunkRoute } from 'util/domain';
+import { routeGeneralizer } from 'util/domain';
 
 import { Column } from '../util';
 
@@ -36,7 +36,7 @@ function SimpleRoutes(props) {
   const routes = mapRoutesByDestination(props.routes);
   const routesPerColumn = Math.ceil(routes.length / 2);
   const routeColumns = chunk(
-    sortBy(routes, route => !isTrunkRoute(route.routeId)),
+    sortBy(routes, route => !route.trunkRoute),
     routesPerColumn,
   );
 
