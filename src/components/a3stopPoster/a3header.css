@@ -1,0 +1,129 @@
+.root {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  border-radius: 15px;
+  padding: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 28px;
+  height: 87px;
+}
+
+.infoContainer {
+  display: flex;
+}
+
+.zone {
+  display: flex;
+  flex-direction: column;
+  height: 0px;
+  color: var(--background);
+  background: white;
+  align-items: center;
+}
+
+.zoneHeading {
+  display: flex;
+  color: black;
+  font-size: 18px;
+  font-family: GothamRounded-Medium;
+}
+.zoneLetter {
+  display: flex;
+  color: black;
+  font-size: 2em;
+  font-family: GothamRounded-Medium;
+}
+
+.routesContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.group {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.destinations {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.id {
+  padding: 0 12px;
+  font-family: GothamXNarrow-Medium;
+  font-size: 1.2em;
+}
+
+.simple .id {
+  font-size: 0.83em;
+  padding: 0 0.25em 0 0;
+  font-family: GothamXNarrow-Medium;
+}
+
+.stopTitleContainer {
+  padding-right: 20px;
+}
+
+.stopTitle {
+  font-size: 1em;
+  color: var(--timetable-text-color);
+  font-family: GothamRounded-Book;
+}
+
+.stopIdContainer {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  max-height: 100%;
+  padding-right: 5px;
+}
+
+.stopIdTitle {
+  font-size: 18px;
+  color: var(--timetable-text-color);
+  font-family: GothamRounded-Medium;
+}
+
+.stopId {
+  color: var(--timetable-text-color);
+  margin-top: 5px;
+  padding: 0 20px;
+  font-size: 0.75em;
+  text-align: center;
+  border: 5px solid var(--timetable-text-color);
+  border-radius: 10px;
+  font-family: GothamRounded-Medium;
+}
+
+.simplestRoutes {
+  font-size: 0.73em;
+  display: flex;
+  flex-wrap: wrap;
+  width: auto;
+  white-space: normal;
+  padding: 10px 50px 10px 50px;
+  color: var(--timetable-text-color);
+}
+
+.title {
+  padding-right: 0.893em;
+  font-family: GothamXNarrow-Medium;
+  font-size: 0.63em;
+}
+
+.simple .title {
+  padding-right: 0.25em;
+}
+
+.subtitle {
+  composes: title;
+  font-family: GothamXNarrow-Book;
+}

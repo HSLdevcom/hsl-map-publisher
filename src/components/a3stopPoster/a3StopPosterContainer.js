@@ -14,7 +14,7 @@ import {
   filterRoute,
 } from 'util/domain';
 
-import StopPoster from './stopPoster';
+import A3StopPoster from './a3stopPoster';
 
 const stopPosterQuery = gql`
   query stopPosterQuery($stopId: String!, $date: Date!) {
@@ -62,9 +62,12 @@ const propsMapper = withProps(props => {
   };
 });
 
-const hoc = compose(graphql(stopPosterQuery), apolloWrapper(propsMapper));
+const hoc = compose(
+  graphql(stopPosterQuery),
+  apolloWrapper(propsMapper),
+);
 
-const StopPosterContainer = hoc(StopPoster);
+const StopPosterContainer = hoc(A3StopPoster);
 
 StopPosterContainer.propTypes = {
   stopId: PropTypes.string.isRequired,

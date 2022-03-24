@@ -1,28 +1,30 @@
+const { Worker, QueueScheduler } = require('bullmq');
+const Redis = require('ioredis');
 const fs = require('fs-extra');
 const path = require('path');
 const puppeteer = require('puppeteer');
 const qs = require('qs');
-const { promisify } = require('util');
-const { spawn } = require('child_process');
 const log = require('./util/log');
-const get = require('lodash/get');
 const { uploadPosterToCloud } = require('./cloudService');
 
-const { AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_KEY } = require('../constants');
+const { addEvent, updatePoster } = require('./store');
+
+const {
+  AZURE_STORAGE_ACCOUNT,
+  AZURE_STORAGE_KEY,
+  REDIS_CONNECTION_STRING,
+} = require('../constants');
 
 const CLIENT_URL = 'http://localhost:5000';
 const RENDER_TIMEOUT = 10 * 60 * 1000;
+const A3_RENDER_TIMEOUT = 2 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
 const SCALE = 96 / 72;
 
 let browser = null;
-let previous = Promise.resolve();
 const cwd = process.cwd();
 
 const pdfOutputDir = path.join(cwd, 'output');
-const concatOutputDir = path.join(pdfOutputDir, 'concatenated');
-
-fs.ensureDirSync(concatOutputDir);
 
 const pdfPath = id => path.join(pdfOutputDir, `${id}.pdf`);
 
@@ -64,7 +66,7 @@ async function renderComponent(options) {
   console.log(`Opening ${pageUrl} in Puppeteer.`);
 
   await page.goto(pageUrl, {
-    timeout: RENDER_TIMEOUT,
+    timeout: component === 'A3StopPoster' ? A3_RENDER_TIMEOUT : RENDER_TIMEOUT,
   });
 
   const { error = null, width, height } = await page.evaluate(
@@ -96,6 +98,14 @@ async function renderComponent(options) {
       scale: SCALE,
     };
   }
+  if (component === 'A3StopPoster') {
+    printOptions = {
+      printBackground: true,
+      width: 1191,
+      height: 842,
+      margin: 0,
+    };
+  }
 
   const contents = await page.pdf(printOptions);
 
@@ -108,7 +118,7 @@ async function renderComponent(options) {
 }
 
 async function renderComponentRetry(options) {
-  const { onInfo, onError } = options;
+  const { onInfo, onError, component } = options;
 
   for (let i = 0; i < MAX_RENDER_ATTEMPTS; i++) {
     /* eslint-disable no-await-in-loop */
@@ -119,7 +129,11 @@ async function renderComponentRetry(options) {
         await initialize();
       }
       const timeout = new Promise((resolve, reject) =>
-        setTimeout(reject, RENDER_TIMEOUT, new Error('Render timeout')),
+        setTimeout(
+          reject,
+          component === 'A3StopPoster' ? A3_RENDER_TIMEOUT : RENDER_TIMEOUT,
+          new Error('Render timeout'),
+        ),
       );
 
       const posterUploaded = await Promise.race([renderComponent(options), timeout]);
@@ -142,86 +156,79 @@ async function renderComponentRetry(options) {
   return { success: false };
 }
 
-/**
- * Adds component to render queue
- * @param {Object} options
- * @param {string} options.id - Unique id
- * @param {string} options.component - React component to render
- * @param {Object} options.props - Props to pass to component
- * @param {function} options.onInfo - Callback (string)
- * @param {function} options.onError - Callback (Error)
- * @returns {Promise} - Always resolves with { success }
- */
-function generate(options) {
-  previous = previous.then(() => renderComponentRetry(options));
-  return previous;
-}
+async function generate(options) {
+  const { id } = options;
 
-/**
- * Concatenates posters to a multi-page PDF
- * @param {string[]} ids - Ids to concatate
- * @returns {Readable} - PDF stream
- * @param ids
- * @param title
- */
-async function concatenate(ids, title) {
-  const concatFolderExists = await fs.pathExists(concatOutputDir);
-  if (!concatFolderExists) {
-    fs.ensureDirSync(concatOutputDir);
-  }
-
-  const filenames = ids.map(id => pdfPath(id));
-  const parsedTitle = title.replace('/', '');
-  const filepath = path.join(concatOutputDir, `${parsedTitle}.pdf`);
-  const fileExists = await fs.pathExists(filepath);
-
-  if (!fileExists) {
-    return new Promise((resolve, reject) => {
-      const pdftk = spawn('pdftk', [...filenames, 'cat', 'output', filepath]);
-
-      pdftk.on('error', err => {
-        reject(err);
-      });
-
-      pdftk.on('close', code => {
-        if (code === 0) {
-          resolve(filepath);
-        } else {
-          reject(new Error(`PDFTK closed with code ${code}`));
-        }
-      });
+  const onInfo = (message = 'No message.') => {
+    console.log(`${id}: ${message}`); // eslint-disable-line no-console
+    addEvent({
+      posterId: id,
+      type: 'INFO',
+      message,
     });
-  }
+  };
+  const onError = error => {
+    console.error(`${id}: ${error.message} ${error.stack}`); // eslint-disable-line no-console
+    addEvent({
+      posterId: id,
+      type: 'ERROR',
+      message: error.message,
+    });
+  };
 
-  return filepath;
-}
-
-async function removeFiles(ids) {
-  if (!AZURE_STORAGE_ACCOUNT || !AZURE_STORAGE_KEY) {
-    console.log('Azure credentials not set. Not removing files.');
-    return;
-  }
-  const filenames = ids.map(id => pdfPath(id));
-  const removePromises = [];
-
-  filenames.forEach(filename => {
-    const createPromise = async () => {
-      try {
-        await fs.remove(filename);
-      } catch (err) {
-        console.log(`Pdf ${filename} removal unsuccessful.`);
-        console.error(err);
-      }
-    };
-
-    removePromises.push(createPromise());
+  const { success, uploaded } = await renderComponentRetry({
+    ...options,
+    onInfo,
+    onError,
   });
 
-  await Promise.all(removePromises);
+  updatePoster({
+    id,
+    status: success && uploaded ? 'READY' : 'FAILED',
+  });
 }
 
-module.exports = {
-  generate,
-  concatenate,
-  removeFiles,
-};
+const bullRedisConnection = new Redis(REDIS_CONNECTION_STRING, {
+  maxRetriesPerRequest: null,
+  enableReadyCheck: false,
+});
+
+// Queue scheduler to restart stopped jobs.
+const queueScheduler = new QueueScheduler('publisher', {
+  connection: bullRedisConnection,
+});
+
+// Worker implementation
+const worker = new Worker(
+  'publisher',
+  async job => {
+    const { options } = job.data;
+    await generate(options);
+  },
+  {
+    connection: bullRedisConnection,
+  },
+);
+
+console.log('Worker ready for jobs!');
+
+worker.on('active', job => {
+  console.log(`Started to process ${job.id}`);
+});
+
+worker.on('completed', job => {
+  console.log(`${job.id} has completed!`);
+});
+
+worker.on('failed', (job, err) => {
+  console.log(`${job.id} has failed with ${err.message}`);
+});
+
+worker.on('drained', () => console.log('Job queue empty! Waiting for new jobs...'));
+
+process.on('SIGINT', () => {
+  console.log('Shutting down worker...');
+  worker.close(true);
+  queueScheduler.close();
+  process.exit(0);
+});

@@ -1,0 +1,81 @@
+.a3container {
+  width: 389.5px;
+  padding-left: 10px;
+  height: fit-content;
+}
+
+.wide {
+  width: 589.5px;
+}
+
+.diagram {
+  /* width: fit-content; */
+  min-width: 389.5px;
+  max-width: 1100px;
+}
+
+.a3container > *:not(:first-child) {
+  margin-top: 10px;
+}
+
+.a3root {
+  margin: 0px;
+  color: black;
+  min-width: 389.5px;
+  background: white;
+  border-radius: 15px;
+  width: inherit;
+}
+
+.a3tableHeaderContainer {
+  margin-bottom: 10px;
+  border-radius: 15px;
+}
+
+.a3root > *:nth-child(odd) {
+  background-color: var(--timetable-accent-color);
+}
+
+.a3root > *:nth-child(even) {
+  background-color: var(--light-background);
+}
+
+.a3root > *:first-child {
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
+.a3root > *:last-child {
+  border-bottom-right-radius: 15px;
+  border-bottom-left-radius: 15px;
+}
+
+.summer > *:nth-child(odd) {
+  background-color: var(--light-background);
+}
+
+.summer > *:nth-child(even) {
+  background-color: var(--timetable-accent-color);
+}
+
+.item {
+  display: flex;
+  min-width: 3.75em;
+  padding: 0.25em 0;
+  font-family: GothamXNarrow-Book;
+  font-size: 0.75em;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  margin-right: 0.25em;
+}
+
+.minutes {
+  min-width: 0.75em;
+  font-family: GothamXNarrow-Medium;
+}
+
+.hours {
+  composes: item;
+  padding-left: 0.938em;
+  font-family: GothamXNarrow-Medium;
+}

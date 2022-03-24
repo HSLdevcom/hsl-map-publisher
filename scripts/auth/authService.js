@@ -1,4 +1,4 @@
-const nodeFetch = require('node-fetch');
+const fetch = require('node-fetch');
 
 const { CLIENT_ID, REDIRECT_URI, LOGIN_PROVIDER_URI, API_CLIENT_ID } = process.env;
 
@@ -8,7 +8,7 @@ const authHash = Buffer.from(`${API_CLIENT_ID}:${API_CLIENT_SECRET}`).toString('
 
 const requestAccessToken = async code => {
   const url = `${LOGIN_PROVIDER_URI}/openid/token?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&grant_type=authorization_code&code=${code}&redirect_uri=${REDIRECT_URI}`;
-  const response = await nodeFetch(url, {
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -20,7 +20,7 @@ const requestAccessToken = async code => {
 
 const requestUserInfo = async accessToken => {
   const url = `${LOGIN_PROVIDER_URI}/openid/userinfo`;
-  const response = await nodeFetch(url, {
+  const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -37,7 +37,7 @@ const requestUserInfo = async accessToken => {
 
 const logoutFromIdentityProvider = async accessToken => {
   const url = `${LOGIN_PROVIDER_URI}/openid/logout`;
-  return nodeFetch(url, {
+  return fetch(url, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -46,7 +46,7 @@ const logoutFromIdentityProvider = async accessToken => {
 
 const requestGroups = async () => {
   const url = `${LOGIN_PROVIDER_URI}/api/rest/v1/group`;
-  const groupsResponse = await nodeFetch(url, {
+  const groupsResponse = await fetch(url, {
     method: 'GET',
     headers: {
       Authorization: `Basic ${authHash}`,
@@ -65,7 +65,7 @@ const setGroup = async (userId, groupNames) => {
       groupIds.push(group.id);
     }
   });
-  const response = await nodeFetch(url, {
+  const response = await fetch(url, {
     method: 'PUT',
     headers: {
       Accept: 'application/json',

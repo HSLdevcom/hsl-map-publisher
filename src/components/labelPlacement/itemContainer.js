@@ -29,6 +29,7 @@ class ItemContainer extends Component {
 
   componentWillUnmount() {
     this.worker.terminate();
+    renderQueue.remove(this);
   }
 
   updateChildren() {

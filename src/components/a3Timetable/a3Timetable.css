@@ -1,18 +1,43 @@
 .root {
   position: relative;
   width: 100%;
-  padding: var(--border-radius);
-  padding-top: calc(var(--border-radius) - 15px);
-  border-radius: var(--border-radius);
+  border-radius: 30px;
   color: var(--hsl-blue);
-  background: var(--light-background);
   --timetable-accent-color: white;
   font-size: 16px;
 }
 
-.root.a3 {
-  border-radius: 30px;
-  padding: 15px 0px 30px 0px;
+.tableContentContainer {
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+}
+
+.tableContentContainer > *:first-child {
+  height: 720px;
+}
+
+.tableContentContainer > *:not(:first-child) {
+  height: 841px;
+}
+
+.a3routeDiagram {
+  padding-left: 5px;
+  height: fit-content;
+  width: fit-content;
+}
+
+.tableRowsContainer {
+  display: flex;
+  /* flex-direction: row; */
+  padding-top: 10px;
+  padding-bottom: 10px;
+  max-width: 1171px;
+}
+
+.tableRowsContainer > *:first-child {
+  padding-left: 0px;
 }
 
 .root.standalone {
@@ -20,14 +45,14 @@
 }
 
 .root.summer {
-  background: white;
-  --timetable-accent-color: var(--light-background);
+  /* background: white;
+  --timetable-accent-color: var(--light-background); */
 }
 
 .root.greyscale {
-  background: white;
+  /* background: white;
   color: black;
-  --timetable-accent-color: #eaeaea;
+  --timetable-accent-color: #eaeaea; */
 }
 
 .root.printable {

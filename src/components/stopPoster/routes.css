@@ -32,6 +32,22 @@
   padding-right: 0;
 }
 
+.root.simple.a3 {
+  width: auto;
+  align-items: center;
+  max-width: 750px;
+  padding: 0px;
+}
+
+.column.a3 {
+  width: auto;
+  padding-right: 10px;
+}
+
+.column.a3:nth-child(even) {
+  padding-right: 0px;
+}
+
 .group {
   display: flex;
   flex-direction: column;

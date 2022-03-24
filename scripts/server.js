@@ -6,16 +6,21 @@ const Router = require('koa-router');
 const cors = require('@koa/cors');
 const jsonBody = require('koa-json-body');
 const fs = require('fs-extra');
+const { Queue } = require('bullmq');
+const Redis = require('ioredis');
 
-const generator = require('./generator');
+const fileHandler = require('./fileHandler');
 const authEndpoints = require('./auth/authEndpoints');
 const { matchStopDataToRules } = require('./util/rules');
 
-const { DOMAINS_ALLOWED_TO_GENERATE, PUBLISHER_TEST_GROUP } = require('../constants');
+const {
+  DOMAINS_ALLOWED_TO_GENERATE,
+  PUBLISHER_TEST_GROUP,
+  REDIS_CONNECTION_STRING,
+} = require('../constants');
 
 const {
   migrate,
-  addEvent,
   getBuilds,
   getBuild,
   addBuild,
@@ -23,7 +28,6 @@ const {
   removeBuild,
   getPoster,
   addPoster,
-  updatePoster,
   removePoster,
   getTemplates,
   addTemplate,
@@ -38,6 +42,12 @@ const {
 const { downloadPostersFromCloud } = require('./cloudService');
 
 const PORT = 4000;
+
+const bullRedisConnection = new Redis(REDIS_CONNECTION_STRING, {
+  maxRetriesPerRequest: null,
+  enableReadyCheck: false,
+});
+const queue = new Queue('publisher', { connection: bullRedisConnection });
 
 async function generatePoster(buildId, component, props, index) {
   const { stopId, date, template, selectedRuleTemplates } = props;
@@ -68,40 +78,14 @@ async function generatePoster(buildId, component, props, index) {
     order: index,
   });
 
-  const onInfo = (message = 'No message.') => {
-    console.log(`${id}: ${message}`); // eslint-disable-line no-console
-    addEvent({
-      posterId: id,
-      type: 'INFO',
-      message,
-    });
-  };
-  const onError = error => {
-    console.error(`${id}: ${error.message} ${error.stack}`); // eslint-disable-line no-console
-    addEvent({
-      posterId: id,
-      type: 'ERROR',
-      message: error.message,
-    });
-  };
-
   const options = {
     id,
     component,
     props: renderProps,
     template: chosenTemplate,
-    onInfo,
-    onError,
   };
-  generator
-    .generate(options)
-    .then(({ success, uploaded }) => {
-      updatePoster({
-        id,
-        status: success && uploaded ? 'READY' : 'FAILED',
-      });
-    })
-    .catch(error => console.error(error)); // eslint-disable-line no-console
+
+  queue.add('generate', { options }, { jobId: id });
 
   return { id };
 }
@@ -261,8 +245,8 @@ async function main() {
       ctx.throw(404, 'Poster ids not found.');
     }
     try {
-      filename = await generator.concatenate(downloadedPosterIds, `${component}-${id}`);
-      await generator.removeFiles(downloadedPosterIds);
+      filename = await fileHandler.concatenate(downloadedPosterIds, `${component}-${id}`);
+      await fileHandler.removeFiles(downloadedPosterIds);
     } catch (err) {
       ctx.throw(500, err.message || 'PDF concatenation failed.');
     }
@@ -308,11 +292,11 @@ async function main() {
         'asc',
       );
 
-      filename = await generator.concatenate(
+      filename = await fileHandler.concatenate(
         orderedPosters.map(poster => poster.id),
         parsedTitle,
       );
-      await generator.removeFiles(downloadedPosterIds);
+      await fileHandler.removeFiles(downloadedPosterIds);
     } catch (err) {
       ctx.throw(500, err.message || 'PDF concatenation failed.');
     }

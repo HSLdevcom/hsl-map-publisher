@@ -40,10 +40,16 @@ function SimpleRoutes(props) {
     routesPerColumn,
   );
 
+  let containerStyle = [styles.root, styles.simple].join(' ');
+  let columnStyle = styles.column;
+  if (props.printAsA3) {
+    containerStyle = [containerStyle, styles.a3].join(' ');
+    columnStyle = [styles.column, styles.a3].join(' ');
+  }
   return (
-    <div className={[styles.root, styles.simple].join(' ')}>
+    <div className={containerStyle}>
       {routeColumns.map((routeColumn, i) => (
-        <Column className={styles.column} key={i}>
+        <Column className={columnStyle} key={i}>
           {routeColumn.map(route => (
             <div className={styles.groupA4} key={`route_row_${route.routeId}`}>
               <div className={styles.routeIdsContainer}>
@@ -77,6 +83,10 @@ function SimpleRoutes(props) {
   );
 }
 
+SimpleRoutes.defaultProps = {
+  printAsA3: false,
+};
+
 SimpleRoutes.propTypes = {
   routes: PropTypes.arrayOf(
     PropTypes.shape({
@@ -85,6 +95,7 @@ SimpleRoutes.propTypes = {
       destinationSe: PropTypes.string,
     }),
   ).isRequired,
+  printAsA3: PropTypes.bool,
 };
 
 export default routesContainer(SimpleRoutes);

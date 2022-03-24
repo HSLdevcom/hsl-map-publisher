@@ -95,14 +95,15 @@ const propsMapper = mapProps(props => {
         stops: sortBy(routeSegment.nextStops.nodes, node => node.stopIndex).map(nodeToStop),
       })),
   );
-
-  return { tree: routesToTree(routes, props.data.stop, props.height) };
+  const treeMaxWidth = props.printAsA3 ? 5 : 6;
+  return {
+    tree: routesToTree(routes, props.data.stop, props.height, treeMaxWidth),
+    printAsA3: props.printAsA3,
+    useWide: props.useWide,
+  };
 });
 
-const hoc = compose(
-  graphql(routeDiagramQuery),
-  apolloWrapper(propsMapper),
-);
+const hoc = compose(graphql(routeDiagramQuery), apolloWrapper(propsMapper));
 
 const RouteDiagramContainer = hoc(RouteDiagram);
 

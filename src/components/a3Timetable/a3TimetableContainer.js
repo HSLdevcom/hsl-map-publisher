@@ -12,7 +12,7 @@ import pick from 'lodash/pick';
 import apolloWrapper from 'util/apolloWrapper';
 import { isDropOffOnly, trimRouteId, filterRoute } from 'util/domain';
 
-import Timetable from './timetable';
+import A3Timetable from './a3Timetable';
 
 function filterDepartures(departures, routeSegments, routeFilter) {
   return departures
@@ -237,7 +237,6 @@ const propsMapper = mapProps(props => {
     flatMap(props.data.stop.siblings.nodes, stop =>
       stop.departures.nodes.map(departure => departure.dateEnd),
     ).sort((a, b) => a.localeCompare(b))[0];
-
   return {
     weekdays,
     saturdays,
@@ -256,16 +255,18 @@ const propsMapper = mapProps(props => {
     stopShortId: props.data.stop.shortId,
     stopId: props.data.stop.stopId,
     stopZone: props.data.stop.stopZone,
-    printableAsA4: props.printTimetablesAsA4,
     greyscale: props.printTimetablesAsGreyscale,
     standalone: props.standalone,
+    updateHook: props.updateHook,
+    groupedRows: props.groupedRows,
+    diagram: props.diagram,
     specialSymbols,
   };
 });
 
 const hoc = compose(graphql(timetableQuery), apolloWrapper(propsMapper));
 
-const TimetableContainer = hoc(Timetable);
+const TimetableContainer = hoc(A3Timetable);
 
 TimetableContainer.defaultProps = {
   dateBegin: null,

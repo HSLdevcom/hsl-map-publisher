@@ -3,6 +3,7 @@
   font-family: GothamRounded-Book;
   color: var(--timetable-text-color);
   page-break-after: avoid;
+  margin: 0;
 }
 
 .root.largerPaddingTop {
@@ -30,12 +31,22 @@
   font-size: 0.75em;
   line-height: 1.2;
   letter-spacing: -0.025em;
+  align-items: center;
 }
 
-.subtitle > *:first-child {
-  min-width: 4.2em;
+.subtitleContent {
+  padding-left: 5px;
+}
+
+.subtitleContentExtraPadding {
+  padding-left: 10px;
 }
 
 .a3Title {
   font-size: 0.8em;
+}
+
+.timeLogo {
+  height: 30px;
+  width: 30px;
 }

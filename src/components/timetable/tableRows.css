@@ -11,6 +11,16 @@
   background-color: var(--timetable-accent-color);
 }
 
+.a3root {
+  margin: 0px;
+  padding: 0px;
+  color: black;
+}
+
+.a3root > *:nth-child(odd) {
+  background-color: var(--timetable-accent-color);
+}
+
 .item {
   display: flex;
   min-width: 3.75em;
