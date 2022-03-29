@@ -1,11 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
+import find from 'lodash/find';
 import ItemContainer from 'components/labelPlacement/itemContainer';
 import ItemFixed from 'components/labelPlacement/itemFixed';
 import ItemPositioned from 'components/labelPlacement/itemPositioned';
+import { isTrunkRoute } from 'util/domain';
 import { Row, InlineSVG } from 'components/util';
 
 import locationIcon from 'icons/marker.svg';
+import subwayStationIcon from 'icons/icon-subway-station.svg';
 import ticketMachineIcon from 'icons/icon-ticket-machine.svg';
 import ticketSalesPointIcon from 'icons/icon-tickets-sales-point.svg';
 
@@ -120,6 +124,123 @@ const calculateSymbolDistancesFromStops = (stops, symbols) => {
   return symbolsWithStopDistances;
 };
 
+const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
+  const modes = [];
+  stops.forEach(stop => {
+    stop.routes.forEach(route => {
+      const { mode } = route;
+      if (mode && !modes.includes(mode)) {
+        modes.push(mode);
+      }
+      if (isTrunkRoute(route.routeId) && !modes.includes('TRUNK')) {
+        modes.push('TRUNK');
+      }
+    });
+  });
+
+  const legendContent = modes.map(mode => {
+    switch (mode) {
+      case 'BUS':
+        return (
+          <div key={mode} className={styles.legendRow}>
+            <div className={classNames(styles.legendLine, styles.bus)} />
+            <div className={classNames(styles.legendIcon, styles.bus)} />
+            <div className={styles.legendText}>Bussi / Buss / Bus</div>
+          </div>
+        );
+      case 'TRAM':
+        return (
+          <div key={mode} className={styles.legendRow}>
+            <div className={classNames(styles.legendLine, styles.tram)} />
+            <div className={classNames(styles.legendIcon, styles.tram)} />
+            <div className={styles.legendText}>Raitiovaunu / Spårvagn / Tram</div>
+          </div>
+        );
+      case 'SUBWAY':
+        return (
+          <div key={mode} className={styles.legendRow}>
+            <div className={classNames(styles.legendLine, styles.subway)} />
+            <div className={classNames(styles.legendIcon, styles.subway)} />
+            <div className={styles.legendText}>Metro</div>
+          </div>
+        );
+      case 'RAIL':
+        return (
+          <div key={mode} className={styles.legendRow}>
+            <div className={classNames(styles.legendLine, styles.rail)} />
+            <div className={classNames(styles.legendIcon, styles.rail)} />
+            <div className={styles.legendText}>Juna / Rail</div>
+          </div>
+        );
+      case 'TRUNK':
+        return (
+          <div key={mode} className={styles.legendRow}>
+            <div className={classNames(styles.legendLine, styles.trunk)} />
+            <div className={classNames(styles.legendIcon, styles.trunk)} />
+            <div className={styles.legendText}>Runkolinja / Trunk route</div>
+          </div>
+        );
+      default:
+        return '';
+    }
+  });
+
+  let legendHeight = legendContent.length * 25;
+
+  const svgStyles = {
+    display: 'block',
+    width: '20px',
+    height: '20px',
+  };
+
+  if (subwayEntrances) {
+    const subwayEntrance = find(subwayEntrances, ['type', 'subway_entrance']);
+    if (subwayEntrance) {
+      legendHeight += 30;
+      legendContent.push(
+        <div key={subwayEntrance.type} className={styles.legendRow}>
+          <InlineSVG style={svgStyles} src={subwayStationIcon} />
+          <div className={styles.legendText}>
+            Metron sisäänkäynti / Metrons ingång / Metro entrance
+          </div>
+        </div>,
+      );
+    }
+  }
+
+  if (projectedSalesPoints) {
+    const ticketSalesPoint = find(projectedSalesPoints, ['type', 'Myyntipiste']);
+    const ticketSalesMachine = find(projectedSalesPoints, ['type', 'Monilippuautomaatti']);
+    if (ticketSalesPoint) {
+      legendHeight += 30;
+      legendContent.push(
+        <div key="Myyntipiste" className={styles.legendRow}>
+          <InlineSVG style={svgStyles} src={ticketSalesPointIcon} />
+          <div className={styles.legendText}>
+            Lipunmyyntipiste / Biljettförsäljning / Ticket sales
+          </div>
+        </div>,
+      );
+    }
+    if (ticketSalesMachine) {
+      legendHeight += 30;
+      legendContent.push(
+        <div key="Monilippuautomaatti" className={styles.legendRow}>
+          <InlineSVG style={svgStyles} src={ticketMachineIcon} />
+          <div className={styles.legendText}>Lippuautomaatti / Ticket sales machine</div>
+        </div>,
+      );
+    }
+  }
+
+  legendHeight += 100; // Offset, scaleBar and attribution
+
+  return {
+    content: legendContent,
+    height: legendHeight,
+  };
+};
+
 const StopMap = props => {
   const mapStyle = {
     width: props.mapOptions.width,
@@ -156,6 +277,13 @@ const StopMap = props => {
 
   const { nearestSalePoint } = props;
   const salesPointIcon = nearestSalePoint && getSalesPointIcon(nearestSalePoint.type);
+
+  const legend = getLegend(stops, props.projectedSalesPoints, props.subwayEntrances);
+
+  const legendStyle = {
+    left: mapStyle.width - props.miniMapOptions.marginRight - props.miniMapOptions.width - 300,
+    top: mapStyle.height - legend.height,
+  };
 
   return (
     <div className={styles.root} style={mapStyle}>
@@ -248,13 +376,18 @@ const StopMap = props => {
             </ItemPositioned>
           )}
 
+          {legend.content.length > 1 && props.legend && (
+            <ItemFixed top={legendStyle.top} left={10}>
+              <div className={styles.legend}>{legend.content}</div>
+            </ItemFixed>
+          )}
+
           <ItemFixed top={mapStyle.height - INFO_MARGIN_BOTTOM} left={INFO_MARGIN_LEFT}>
             <div>
               <Scalebar targetWidth={250} pixelsPerMeter={props.pixelsPerMeter} />
               <Attribution />
             </div>
           </ItemFixed>
-
           <ItemFixed top={miniMapStyle.top} left={miniMapStyle.left}>
             <div style={miniMapStyle} />
           </ItemFixed>
@@ -317,6 +450,9 @@ const nearestSalePointType = PropTypes.shape({
 StopMap.defaultProps = {
   projectedSymbols: null,
   nearestSalePoint: null,
+  projectedSalesPoints: null,
+  subwayEntrances: null,
+  legend: false,
 };
 
 StopMap.propTypes = {
@@ -329,6 +465,9 @@ StopMap.propTypes = {
   showCitybikes: PropTypes.bool.isRequired,
   projectedSymbols: PropTypes.arrayOf(Object),
   nearestSalePoint: nearestSalePointType,
+  projectedSalesPoints: PropTypes.arrayOf(Object),
+  subwayEntrances: PropTypes.arrayOf(Object),
+  legend: PropTypes.bool,
 };
 
 export default StopMap;
