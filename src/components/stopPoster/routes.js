@@ -112,18 +112,13 @@ class Routes extends Component {
             </Column>
             {this.props.platformInfo && (
               <Column>
-                {routes.map(
-                  (route, index) =>
-                    route.platform && (
-                      <div key={index} className={styles.group}>
-                        <PlatformSymbol
-                          platform={route.platform}
-                          size={50}
-                          color={getColor(route)}
-                        />
-                      </div>
-                    ),
-                )}
+                {routes.map((route, index) => (
+                  <div key={index} className={styles.group}>
+                    {route.platform && (
+                      <PlatformSymbol platform={route.platform} size={50} color={getColor(route)} />
+                    )}
+                  </div>
+                ))}
               </Column>
             )}
           </Row>
