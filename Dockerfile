@@ -1,4 +1,4 @@
-FROM node:12-buster-slim
+FROM node:16-buster-slim
 
 # This installs the necessary libs to make the bundled version of Chromium that Pupppeteer installs work
 RUN apt-get update \
