@@ -114,8 +114,12 @@ docker run --name redis --rm -p 6379:6379 -d redis
 ```
 Remember to check the naming of the containers! If they are different, use your naming in `.env.local` and in next commands. Add also possible credentials to connection strings, if you have set up them.
 
-Create `fonts/` -directory inside project folder. Place `Gotham Rounded` and `Gotham XNarrow` OpenType fonts there from Azure. Due to licensing, we cannot include the fonts in the repository.
-If you cannot access fonts, remember to use `NO_FONTS=true` variable later on.
+For fonts you have three options:
+- Create `fonts/` -directory inside project folder. Place `Gotham Rounded` and `Gotham XNarrow` OpenType fonts there from Azure.
+- Place `AZURE_STORAGE_ACCOUNT` and `AZURE_STORAGE_KEY` either via `.env.local` or Docker secrets. Fonts will be downloaded from Azure on startup.
+- If no fonts or credentials are provided, the app use just the default fonts found inside Debian image.
+
+Due to licensing, we cannot include the fonts in the public repository.
 
 
 Build the Docker image with the following command:
@@ -124,14 +128,8 @@ Build the Docker image with the following command:
 docker build --build-arg BUILD_ENV=local -t hsl-map-publisher .
 ```
 
-And run the Docker container with this command:
+And run the Docker container with this command (you can leave font-directory mounting away if you don't have them locally):
 
 ```bash
 docker run -d -p 4000:4000 --name publisher -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres --link redis hsl-map-publisher
-```
-
-If you don't have local fonts or Azure credentials, run with variable:
-
-```bash
-docker run -d -p 4000:4000 --name publisher -v $(pwd)/output:/output -v $(pwd)/fonts/:/fonts --link publisher-postgres --link redis -e "NO_FONTS=true" hsl-map-publisher
 ```
