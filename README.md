@@ -112,7 +112,7 @@ As before, make sure you are running a database and broker for the publisher:
 docker run -p 0.0.0.0:5432:5432 --env POSTGRES_PASSWORD=postgres --name publisher-postgres postgres
 docker run --name redis --rm -p 6379:6379 -d redis
 ```
-Remember to check the naming of the containers! If they are different, use your naming in `.env.local` and in next commands. Add also possible credentials to connection strings, if you have set up them.
+Remember to check the naming of the containers! If they are different, use your naming in `.env.local` and in next commands. Add also possible credentials to connection strings, if you have set up them, add fill up the variables left empty (`CLIENT_SECRET`, `API_CLIENT_SECRET` and domain restrictions).
 
 For fonts you have three options:
 - Create `fonts/` -directory inside project folder. Place `Gotham Rounded` and `Gotham XNarrow` OpenType fonts there from Azure.
