@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+if [[ $NO_FONTS = "true" ]]; then
+  echo "NO_FONTS variable is set to true, using only default fonts."
+  exit 0
+fi
+
 font_dir=~/.local/share/fonts/opentype
 mkdir -p $font_dir
 
