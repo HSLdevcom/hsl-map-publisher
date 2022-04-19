@@ -9,7 +9,8 @@ import TableRows from './a3TableRows';
 import SimpleRoutes from '../timetable/simpleRoutes';
 import styles from './a3Timetable.css';
 
-const COLUMS_PER_ROW = 3;
+const COLUMNS_PER_PAGE = 3;
+const MAX_DIAGRAM_RETRIES = 3;
 const PAGE_HEIGHT = 842;
 
 class Timetable extends Component {
@@ -23,6 +24,7 @@ class Timetable extends Component {
         removedRows: [],
         groupedRows: [],
       },
+      diagramRetries: this.props.groupedRows ? MAX_DIAGRAM_RETRIES : 0,
     };
   }
 
@@ -207,6 +209,35 @@ class Timetable extends Component {
     const overflow = this.hasOverflow();
     const { weekdays } = this.state;
 
+    // If diagram retries reach maximum remove diagram and empty columns
+    if (this.state.diagramRetries > MAX_DIAGRAM_RETRIES) {
+      const { groupedRows } = this.state.weekdays;
+
+      while (last(groupedRows).length === 0) {
+        groupedRows.pop();
+        weekdays.groupedRows = groupedRows;
+      }
+
+      while (true) {
+        const lastGroupedRows = last(groupedRows);
+        const lastRow = last(lastGroupedRows);
+        if (lastRow && lastRow.diagram) {
+          lastGroupedRows.pop();
+          groupedRows[groupedRows.length - 1] = lastGroupedRows;
+          weekdays.groupedRows = groupedRows;
+        } else {
+          break;
+        }
+      }
+      this.setState({
+        useDiagram: true,
+        weekdays,
+      });
+      renderQueue.remove(this);
+      this.props.updateHook(weekdays.groupedRows);
+      return;
+    }
+
     if (
       !overflow.vertical &&
       !overflow.horizontal &&
@@ -228,13 +259,17 @@ class Timetable extends Component {
         if (removedRows) {
           removedRows.push(removedRow);
         }
+        let { diagramRetries } = this.state;
+        if (removedRow.diagram) {
+          diagramRetries += 1;
+        }
         this.setState({
           weekdays: {
             removedRows,
             groupedRows,
           },
+          diagramRetries,
         });
-        // }
         return;
       }
       if ((!overflow.vertical || !overflow.horizontal) && removedRows.length > 0) {
@@ -249,11 +284,13 @@ class Timetable extends Component {
         return;
       }
     }
+
     if (
       !overflow.vertical &&
       weekdays.removedRows.length === 0 &&
       weekdays.groupedRows.length > 0 &&
-      !this.state.useDiagram
+      !this.state.useDiagram &&
+      this.state.diagramRetries < MAX_DIAGRAM_RETRIES
     ) {
       const { groupedRows } = this.state.weekdays;
       const lastGroupedRows = groupedRows[groupedRows.length - 1];
@@ -279,9 +316,9 @@ class Timetable extends Component {
       return null;
     }
     const weekdaysRows = this.rowsByHour(this.state.weekdays);
-    const chunkedRows = chunk(this.state.weekdays.groupedRows, COLUMS_PER_ROW);
+    const chunkedRows = chunk(this.state.weekdays.groupedRows, COLUMNS_PER_PAGE);
     // Header is excluded from first page.
-    const contentContainerStyle = { height: PAGE_HEIGHT - 130 };
+    const contentContainerStyle = { height: PAGE_HEIGHT - 115 };
     // ChunkedRow is 3 columns and 3 colums is the maximum for one page. If more
     // than 3 colums we need to increase height so rest of the timetable rows can fit.
     // After first page the height is increased by one A3 page height.
@@ -322,15 +359,26 @@ class Timetable extends Component {
               this.content = ref;
             }}>
             {chunkedRows.map((chunkedRow, index) => {
+              // Use wider timetable columns:
+              // - if one or two columns with 5 rows overflowing
+              // - if three columns and last one is empty
+              // - if less than three columns and diagram is next to be added
               const useWide =
-                (chunkedRow.length === COLUMS_PER_ROW && last(chunkedRow).length === 0) ||
-                (chunkedRow.length < COLUMS_PER_ROW &&
+                (chunkedRow.length <= 2 && this.state.weekdays.removedRows.length < 5) ||
+                (chunkedRow.length === COLUMNS_PER_PAGE && last(chunkedRow).length === 0) ||
+                (chunkedRow.length < COLUMNS_PER_PAGE &&
                   last(last(chunkedRow)) &&
                   last(last(chunkedRow)).diagram);
+
               return (
                 <div className={styles.tableRowsContainer}>
                   {chunkedRow.map(rows => (
-                    <TableRows diagram={this.props.diagram} departures={rows} useWide={useWide} />
+                    <TableRows
+                      diagram={this.props.diagram}
+                      departures={rows}
+                      useWide={useWide}
+                      isSummerTimetable={this.props.isSummerTimetable}
+                    />
                   ))}
                 </div>
               );

@@ -20,6 +20,11 @@
   padding: 20px 20px 20px 20px;
   border-radius: 30px;
   width: fit-content;
+  min-width: 350px;
+}
+
+.useWide {
+  min-width: 548px;
 }
 
 .componentName {

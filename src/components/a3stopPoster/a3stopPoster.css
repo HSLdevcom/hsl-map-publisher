@@ -7,7 +7,7 @@
 .root {
   width: 1191px;
   height: 842px;
-  padding: 10px;
+  padding: 1px;
   color: white;
   background: var(--background);
   box-sizing: border-box;

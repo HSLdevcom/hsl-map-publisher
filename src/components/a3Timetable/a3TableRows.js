@@ -6,7 +6,7 @@ import keys from 'lodash/keys';
 import pickBy from 'lodash/pickBy';
 import { trimRouteId } from 'util/domain';
 import classnames from 'classnames';
-import TableHeader from '../timetable/tableHeader';
+import TableHeader from './a3TableHeader';
 import RouteDiagram from 'components/routeDiagram/routeDiagramContainer';
 
 import styles from './a3TableRows.css';
@@ -72,6 +72,7 @@ const TableRows = props => {
             title={departuresHour.segment}
             subtitleSw="Lördag"
             subtitleEn="Saturday"
+            extended={props.useWide}
             printAsA3
           />
         </div>
@@ -101,6 +102,7 @@ const TableRows = props => {
               date={props.diagram.date}
               routeFilter={props.diagram.routeFilter}
               printAsA3={props.diagram.printAsA3}
+              useWide={props.useWide}
             />
           );
         }
@@ -111,7 +113,14 @@ const TableRows = props => {
           }
         });
         if (!!arr.length && !!content.length) {
-          return <div className={styles.a3root}>{content}</div>;
+          return (
+            <div
+              className={classnames(styles.a3root, {
+                [styles.summer]: props.isSummerTimetable,
+              })}>
+              {content}
+            </div>
+          );
         }
         return null;
       })}
@@ -122,6 +131,7 @@ const TableRows = props => {
 TableRows.defaultProps = {
   diagram: null,
   useWide: false,
+  isSummerTimetable: false,
 };
 
 TableRows.propTypes = {
@@ -133,6 +143,7 @@ TableRows.propTypes = {
   ).isRequired,
   diagram: PropTypes.object,
   useWide: PropTypes.bool,
+  isSummerTimetable: PropTypes.bool,
 };
 
 export default TableRows;
