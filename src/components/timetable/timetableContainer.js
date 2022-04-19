@@ -263,6 +263,7 @@ const propsMapper = mapProps(props => {
     standalone: props.standalone,
     specialSymbols,
     platformInfo: props.platformInfo,
+    hasDepartures: departures.length > 0,
   };
 });
 

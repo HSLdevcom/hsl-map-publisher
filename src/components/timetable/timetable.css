@@ -8,6 +8,7 @@
   background: var(--light-background);
   --timetable-accent-color: white;
   font-size: 16px;
+  margin-bottom: 10px;
 }
 
 .root.a3 {
