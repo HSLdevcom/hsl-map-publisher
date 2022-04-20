@@ -44,6 +44,11 @@ const routeDiagramQuery = gql`
                         nodes {
                           routeId
                           hasRegularDayDepartures(date: $date)
+                          route {
+                            nodes {
+                              mode
+                            }
+                          }
                         }
                       }
                       terminalByTerminalId {
