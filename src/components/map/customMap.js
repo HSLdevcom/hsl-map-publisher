@@ -46,6 +46,10 @@ class CustomMap extends Component {
     renderQueue.remove(this);
   }
 
+  componentWillUnmount() {
+    renderQueue.remove(this);
+  }
+
   onResize = ({ client: { width, height } }) => {
     const { mapWidth, mapHeight } = this.state;
     const { setMapHeight, template } = this.props;
