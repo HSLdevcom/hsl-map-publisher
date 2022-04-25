@@ -238,6 +238,10 @@ class TerminalPoster extends Component {
           }
         }
 
+        if (this.state.mapHeight <= 0) {
+          this.setState({ hasDiagram: false });
+          return;
+        }
         this.setState({ diagramOptions });
         return;
       }
@@ -344,7 +348,7 @@ class TerminalPoster extends Component {
     const { isTramStop } = this.props;
     const src = get(template, 'areas', []).find(t => t.key === 'tram');
     const tramImage = get(src, 'slots[0].image.svg', '');
-    let useDiagram = true;
+    let useDiagram = this.state.hasDiagram;
 
     if (isTramStop && tramImage) useDiagram = false;
 
