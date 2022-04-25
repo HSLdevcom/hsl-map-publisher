@@ -53,6 +53,6 @@
 .PStext {
   text-anchor: middle;
   dominant-baseline: middle;
-  font-weight: bold;
+  font-family: GothamRounded-Medium;
   fill: var(--hsl-blue);
 }
