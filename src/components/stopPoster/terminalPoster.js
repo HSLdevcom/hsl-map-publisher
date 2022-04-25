@@ -51,7 +51,7 @@ class TerminalPoster extends Component {
       hasDiagram: true,
       hasRoutes: true,
       hasStretchedLeftColumn: false,
-      shouldRenderMap: false,
+      shouldRenderMap: true,
       triedRenderingMap: false,
       hasColumnTimetable: false,
       hasTimetable: true,

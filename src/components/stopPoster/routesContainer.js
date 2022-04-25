@@ -4,6 +4,8 @@ import gql from 'graphql-tag';
 import compose from 'recompose/compose';
 import mapProps from 'recompose/mapProps';
 import flatMap from 'lodash/flatMap';
+import groupBy from 'lodash/groupBy';
+import compact from 'lodash/compact';
 
 import { isNumberVariant, trimRouteId, isDropOffOnly, filterRoute } from 'util/domain';
 import apolloWrapper from 'util/apolloWrapper';
@@ -37,30 +39,41 @@ const routesQuery = gql`
 
 const propsMapper = mapProps(props => {
   const { data, routeFilter, ...propsToForward } = props;
-  const stops = data.stops.nodes;
+  const stops = flatMap(
+    data.stops.nodes.map(s =>
+      s.routeSegments.nodes
+        .map(routeSegment => ({ ...routeSegment, platform: s.platform }))
+        .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
+        .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
+        .filter(routeSegment => !isDropOffOnly(routeSegment))
+        .filter(routeSegment =>
+          filterRoute({ routeId: routeSegment.routeId, filter: routeFilter }),
+        ),
+    ),
+  );
+  const routes = stops.map(routeSegment => ({
+    ...routeSegment.route.nodes[0],
+    viaFi: routeSegment.viaFi,
+    viaSe: routeSegment.viaSe,
+    routeId: trimRouteId(routeSegment.routeId),
+    fullRouteId: routeSegment.routeId,
+    platform: routeSegment.platform,
+  }));
+
+  // Group similar routes and place the platforminfo in the list
+  const routesGrouped = Object.values(groupBy(routes, r => r.routeId + r.destinationFi))
+    .map(r =>
+      r.reduce((prev, curr) => ({ ...prev, platforms: prev.platforms.concat(curr.platform) }), {
+        ...r[0],
+        platforms: [],
+      }),
+    )
+    .map(r => ({ ...r, platforms: compact(r.platforms).sort() }))
+    .sort(routeCompare);
+
   return {
     ...propsToForward,
-    routes: flatMap(
-      stops.map(s =>
-        s.routeSegments.nodes
-          .map(routeSegment => ({ ...routeSegment, platform: s.platform }))
-          .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
-          .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
-          .filter(routeSegment => !isDropOffOnly(routeSegment))
-          .filter(routeSegment =>
-            filterRoute({ routeId: routeSegment.routeId, filter: routeFilter }),
-          ),
-      ),
-    )
-      .map(routeSegment => ({
-        ...routeSegment.route.nodes[0],
-        viaFi: routeSegment.viaFi,
-        viaSe: routeSegment.viaSe,
-        routeId: trimRouteId(routeSegment.routeId),
-        fullRouteId: routeSegment.routeId,
-        platform: routeSegment.platform,
-      }))
-      .sort(routeCompare),
+    routes: routesGrouped,
   };
 });
 
