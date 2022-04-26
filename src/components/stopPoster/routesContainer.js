@@ -21,6 +21,11 @@ const routesQuery = gql`
               viaSe
               hasRegularDayDepartures(date: $date)
               pickupDropoffType
+              line {
+                nodes {
+                  trunkRoute
+                }
+              }
               route {
                 nodes {
                   destinationFi
@@ -35,7 +40,6 @@ const routesQuery = gql`
     }
   }
 `;
-
 const propsMapper = mapProps(props => ({
   printAsA3: props.printAsA3,
   routes: flatMap(props.data.stop.siblings.nodes, node =>
@@ -50,16 +54,14 @@ const propsMapper = mapProps(props => ({
         ...routeSegment.route.nodes[0],
         viaFi: routeSegment.viaFi,
         viaSe: routeSegment.viaSe,
+        trunkRoute: routeSegment.line.nodes && routeSegment.line.nodes[0].trunkRoute === '1',
         routeId: trimRouteId(routeSegment.routeId),
         fullRouteId: routeSegment.routeId,
       })),
   ).sort(routeCompare),
 }));
 
-const hoc = compose(
-  graphql(routesQuery),
-  apolloWrapper(propsMapper),
-);
+const hoc = compose(graphql(routesQuery), apolloWrapper(propsMapper));
 
 export default component => {
   const RoutesContainer = hoc(component);

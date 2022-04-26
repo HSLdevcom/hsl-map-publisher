@@ -8,7 +8,6 @@ import trunkIcon from 'icons/icon_trunk.svg';
 import zoneByShortId from 'data/zoneByShortId';
 
 // TODO: Get routes from api?
-const TRUNK_ROUTES = ['20', '30', '40', '200', '500', '510', '550', '560', '570'];
 const RAIL_ROUTE_ID_REGEXP = /^300[12]/;
 const SUBWAY_ROUTE_ID_REGEXP = /^31/;
 const U_LINE_REGEX = /^7/;
@@ -38,15 +37,6 @@ function isRailRoute(routeId) {
  */
 function isSubwayRoute(routeId) {
   return SUBWAY_ROUTE_ID_REGEXP.test(routeId);
-}
-
-/**
- * Returns whether a route id is belongs to a trunk route
- * @param {String} routeId - Route id
- * @returns {String}
- */
-function isTrunkRoute(routeId) {
-  return TRUNK_ROUTES.includes(routeId);
 }
 
 function isULine(routeId) {
@@ -125,14 +115,14 @@ const iconsByMode = {
 };
 
 function getColor(route) {
-  if (isTrunkRoute(route.routeId)) {
+  if (route.trunkRoute) {
     return colorsByMode.TRUNK;
   }
   return colorsByMode[route.mode];
 }
 
 function getIcon(route) {
-  if (isTrunkRoute(route.routeId)) {
+  if (route.trunkRoute) {
     return iconsByMode.TRUNK;
   }
   return iconsByMode[route.mode];
@@ -307,7 +297,6 @@ export {
   isNumberVariant,
   isRailRoute,
   isSubwayRoute,
-  isTrunkRoute,
   isULine,
   trimRouteId,
   isDropOffOnly,
