@@ -5,7 +5,6 @@ import find from 'lodash/find';
 import ItemContainer from 'components/labelPlacement/itemContainer';
 import ItemFixed from 'components/labelPlacement/itemFixed';
 import ItemPositioned from 'components/labelPlacement/itemPositioned';
-import { isTrunkRoute } from 'util/domain';
 import { Row, InlineSVG } from 'components/util';
 
 import locationIcon from 'icons/marker.svg';
@@ -132,7 +131,7 @@ const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
       if (mode && !modes.includes(mode)) {
         modes.push(mode);
       }
-      if (isTrunkRoute(route.routeId) && !modes.includes('TRUNK')) {
+      if (route.trunkRoute && !modes.includes('TRUNK')) {
         modes.push('TRUNK');
       }
     });
