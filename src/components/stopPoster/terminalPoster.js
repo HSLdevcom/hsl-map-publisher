@@ -436,7 +436,7 @@ class TerminalPoster extends Component {
                   </div>
                 )}
 
-                <Spacer width={10} />
+                {hasLeftColumn && <Spacer width={10} />}
 
                 <Measure client>
                   {({ measureRef, contentRect }) => (
