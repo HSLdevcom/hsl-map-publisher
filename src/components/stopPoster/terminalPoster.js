@@ -178,7 +178,10 @@ class TerminalPoster extends Component {
       return;
     }
 
-    if (this.hasOverflow() || this.state.diagramOptions.binarySearching) {
+    if (
+      this.hasOverflow() ||
+      (this.state.hasDiagram && this.state.diagramOptions.binarySearching)
+    ) {
       if (!this.state.hasStretchedLeftColumn) {
         this.setState({ hasStretchedLeftColumn: true });
         return;
