@@ -11,27 +11,31 @@ if [ -n "$(ls -A /fonts 2>/dev/null)" ]; then
   exit 0
 fi
 
-# Path to the Azure credentials supplied by Docker secrets
-key_secret=/run/secrets/AZURE_STORAGE_KEY
-account_secret=/run/secrets/AZURE_STORAGE_ACCOUNT
-
-# Check if the credentials exist.
-
-cat ${key_secret}
-
-if [ ! -f "$key_secret" ]; then
-  echo "Azure key not set. Fonts not downloaded."
-  exit 0
+# Read env for the script
+if [ -f .env ]; then
+  source .env
 fi
 
-if [ ! -f "$account_secret" ]; then
-  echo "Azure account not set. Fonts not downloaded."
-  exit 0
-fi
+# Find Azure credentials from secrets if not found from env
+if [ -z "$AZURE_STORAGE_KEY" ] || [ -z "$AZURE_STORAGE_ACCOUNT" ]; then
+  # Path to the Azure credentials supplied by Docker secrets
+  key_secret=/run/secrets/AZURE_STORAGE_KEY
+  account_secret=/run/secrets/AZURE_STORAGE_ACCOUNT
 
-# Read the credentials so AZ CLI may use them.
-AZURE_STORAGE_KEY=$(<$key_secret)
-AZURE_STORAGE_ACCOUNT=$(<$account_secret)
+  # Check if the secrets exits, otherwise use just default fonts
+  if [ ! -f "$key_secret" ]; then
+    echo "Azure key not set. Fonts not downloaded."
+    exit 0
+  fi
+  if [ ! -f "$account_secret" ]; then
+    echo "Azure account not set. Fonts not downloaded."
+    exit 0
+  fi
+
+  # Read the credentials to envs
+  AZURE_STORAGE_KEY=$(<$key_secret)
+  AZURE_STORAGE_ACCOUNT=$(<$account_secret)
+fi
 
 container_name=${AZURE_STORAGE_CONTAINER:=fonts}
 

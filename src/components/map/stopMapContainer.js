@@ -170,7 +170,7 @@ const nearbyItemsMapper = mapProps(props => {
   const currentStop = projectedStops.find(({ stopIds }) => stopIds.includes(props.stopId));
   const nearbyStops = projectedStops.filter(({ stopIds }) => !stopIds.includes(props.stopId));
   // Calculate distances to sale points and get the nearest one
-  const nearestSalePoint = props.salesPoint
+  const nearestSalePoint = props.showSalesPoint
     ? projectedSalePoints
         .map(sp => {
           // Euclidean distance
@@ -240,18 +240,22 @@ const nearbyItemsMapper = mapProps(props => {
 const mapPositionQuery = gql`
   query mapPositionQuery($stopId: String!) {
     stop: stopByStopId(stopId: $stopId) {
-      stopId
       lat
       lon
-      platform
+    }
+    terminal: terminalByTerminalId(terminalId: $stopId) {
+      lat
+      lon
     }
   }
 `;
 
 const mapInterestsMapper = mapProps(props => {
-  const longitude = props.data.stop.lon;
-  const latitude = props.data.stop.lat;
-  const { platform } = props.data.stop;
+  const { stop, terminal } = props.data;
+  // Use either stop or terminal information, depending on which query has succeeded.
+  const longitude = stop ? stop.lon : terminal.lon;
+  const latitude = stop ? stop.lat : terminal.lat;
+  const isTerminal = terminal !== null;
 
   const maxDimensionsForInterests = {
     height: props.height * 2,
@@ -274,7 +278,7 @@ const mapInterestsMapper = mapProps(props => {
     ...props,
     longitude,
     latitude,
-    platform,
+    isTerminal,
     minInterestLat,
     minInterestLon,
     maxInterestLat,
@@ -282,26 +286,26 @@ const mapInterestsMapper = mapProps(props => {
   };
 });
 
-const getSalePoints = async () => {
-  const response = await fetch(process.env.SALES_POINT_DATA_URL, { method: 'GET' });
-  const data = await response.json();
-  const result = data.features
-    .filter(sp => SALE_POINT_TYPES.includes(sp.properties.Tyyppi))
-    .map(sp => {
-      const { properties } = sp;
-      const { coordinates } = sp.geometry;
-      const [lon, lat] = coordinates;
-      return {
-        id: properties.ID,
-        type: properties.Tyyppi,
-        title: properties.Nimi,
-        address: properties.Osoite,
-        lat,
-        lon,
-      };
-    });
-  return result;
-};
+const getSalePoints = () =>
+  fetch(process.env.SALES_POINT_DATA_URL, { method: 'GET' })
+    .then(response => response.json())
+    .then(data =>
+      data.features
+        .filter(sp => SALE_POINT_TYPES.includes(sp.properties.Tyyppi))
+        .map(sp => {
+          const { properties } = sp;
+          const { coordinates } = sp.geometry;
+          const [lon, lat] = coordinates;
+          return {
+            id: properties.ID,
+            type: properties.Tyyppi,
+            title: properties.Nimi,
+            address: properties.Osoite,
+            lat,
+            lon,
+          };
+        }),
+    );
 
 const fetchOSMObjects = async props => {
   let results;
@@ -328,7 +332,7 @@ const osmPointsMapper = mapProps(props => {
 
 const salePointsMapper = mapProps(props => {
   // If sales points are not configured, do not fetch them but return empty array
-  const salePoints = props.salesPoint || props.legend ? getSalePoints() : Promise.resolve([]);
+  const salePoints = props.showSalesPoint || props.legend ? getSalePoints() : Promise.resolve([]);
   return {
     ...props,
     salePoints,

@@ -85,6 +85,7 @@ const timetableQuery = gql`
       shortId
       stopId
       stopZone
+      platform
       siblings {
         nodes {
           routeSegments: routeSegmentsForDate(date: $date) {
@@ -250,16 +251,19 @@ const propsMapper = mapProps(props => {
     showValidityPeriod: props.showValidityPeriod,
     showNotes: props.showNotes,
     showComponentName: !props.printTimetablesAsA4 && props.showComponentName,
-    showStopInformation: props.printTimetablesAsA4,
+    showStopInformation: props.printTimetablesAsA4 || props.showStopInformation,
     stopNameFi: props.data.stop.nameFi,
     stopNameSe: props.data.stop.nameSe,
     stopShortId: props.data.stop.shortId,
     stopId: props.data.stop.stopId,
     stopZone: props.data.stop.stopZone,
+    platform: props.data.stop.platform,
     printableAsA4: props.printTimetablesAsA4,
     greyscale: props.printTimetablesAsGreyscale,
     standalone: props.standalone,
     specialSymbols,
+    platformInfo: props.platformInfo,
+    hasDepartures: departures.length > 0,
   };
 });
 
@@ -278,6 +282,7 @@ TimetableContainer.defaultProps = {
   printTimetablesAsA4: false,
   printTimetablesAsGreyscale: false,
   specialSymbols: [],
+  showStopInformation: false,
 };
 
 TimetableContainer.propTypes = {
@@ -294,6 +299,7 @@ TimetableContainer.propTypes = {
   printTimetablesAsA4: PropTypes.bool,
   printTimetablesAsGreyscale: PropTypes.bool,
   specialSymbols: PropTypes.array,
+  showStopInformation: PropTypes.bool,
 };
 
 export default TimetableContainer;

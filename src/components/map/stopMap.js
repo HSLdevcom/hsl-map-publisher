@@ -274,7 +274,7 @@ const StopMap = props => {
     newPosition.viewport,
   );
 
-  const { nearestSalePoint } = props;
+  const { nearestSalePoint, isTerminal } = props;
   const salesPointIcon = nearestSalePoint && getSalesPointIcon(nearestSalePoint.type);
 
   const legend = getLegend(stops, props.projectedSalesPoints, props.subwayEntrances);
@@ -315,26 +315,30 @@ const StopMap = props => {
             </ItemFixed>
           ))}
 
-          <ItemFixed
-            top={props.currentStop.y - STOP_RADIUS}
-            left={props.currentStop.x - STOP_RADIUS}>
-            <StopSymbol
-              platform={props.currentStop.stops.nodes[0].platform}
-              routes={props.currentStop.routes}
-              size={STOP_RADIUS * 2}
-            />
-          </ItemFixed>
+          {!isTerminal && (
+            <ItemFixed
+              top={props.currentStop.y - STOP_RADIUS}
+              left={props.currentStop.x - STOP_RADIUS}>
+              <StopSymbol
+                platform={props.currentStop.stops.nodes[0].platform}
+                routes={props.currentStop.routes}
+                size={STOP_RADIUS * 2}
+              />
+            </ItemFixed>
+          )}
 
-          <ItemFixed
-            top={props.currentStop.y - 2.2 * LOCATION_RADIUS}
-            left={props.currentStop.x - LOCATION_RADIUS}>
-            <Row style={{ height: LOCATION_RADIUS * 2 }}>
-              <LocationSymbol size={LOCATION_RADIUS * 2} />
-              <div className={styles.title}>Olet tässä</div>
-              <div className={styles.subtitle}>Du är här</div>
-              <div className={styles.subtitle}>You are here</div>
-            </Row>
-          </ItemFixed>
+          {!isTerminal && (
+            <ItemFixed
+              top={props.currentStop.y - 2.2 * LOCATION_RADIUS}
+              left={props.currentStop.x - LOCATION_RADIUS}>
+              <Row style={{ height: LOCATION_RADIUS * 2 }}>
+                <LocationSymbol size={LOCATION_RADIUS * 2} />
+                <div className={styles.title}>Olet tässä</div>
+                <div className={styles.subtitle}>Du är här</div>
+                <div className={styles.subtitle}>You are here</div>
+              </Row>
+            </ItemFixed>
+          )}
 
           {symbolForEachZone &&
             symbolForEachZone.length > 0 &&
@@ -431,8 +435,8 @@ const StopType = PropTypes.shape({
     PropTypes.shape({
       routeId: PropTypes.string.isRequired,
     }).isRequired,
-  ).isRequired,
-  stopIds: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+  ),
+  stopIds: PropTypes.arrayOf(PropTypes.string.isRequired),
   calculatedHeading: PropTypes.number,
 });
 
@@ -440,7 +444,7 @@ const nearestSalePointType = PropTypes.shape({
   id: PropTypes.number.isRequired,
   type: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  address: PropTypes.string.isRequired,
+  address: PropTypes.string,
   lat: PropTypes.number.isRequired,
   lon: PropTypes.number.isRequired,
   distance: PropTypes.number.isRequired,
@@ -449,6 +453,7 @@ const nearestSalePointType = PropTypes.shape({
 StopMap.defaultProps = {
   projectedSymbols: null,
   nearestSalePoint: null,
+  isTerminal: false,
   projectedSalesPoints: null,
   subwayEntrances: null,
   legend: false,
@@ -464,6 +469,7 @@ StopMap.propTypes = {
   showCitybikes: PropTypes.bool.isRequired,
   projectedSymbols: PropTypes.arrayOf(Object),
   nearestSalePoint: nearestSalePointType,
+  isTerminal: PropTypes.bool,
   projectedSalesPoints: PropTypes.arrayOf(Object),
   subwayEntrances: PropTypes.arrayOf(Object),
   legend: PropTypes.bool,

@@ -20,7 +20,7 @@ class CustomMap extends Component {
     setMapHeight: PropTypes.func.isRequired,
     mapZoneSymbols: PropTypes.bool,
     mapZones: PropTypes.bool,
-    salesPoint: PropTypes.bool,
+    showSalesPoint: PropTypes.bool,
     minimapZoneSymbols: PropTypes.bool,
     minimapZones: PropTypes.bool,
     legend: PropTypes.bool,
@@ -29,7 +29,7 @@ class CustomMap extends Component {
   static defaultProps = {
     mapZoneSymbols: false,
     mapZones: false,
-    salesPoint: false,
+    showSalesPoint: false,
     minimapZoneSymbols: false,
     minimapZones: false,
     legend: false,
@@ -44,6 +44,14 @@ class CustomMap extends Component {
     renderQueue.add(this);
   }
 
+  componentDidUpdate() {
+    renderQueue.remove(this);
+  }
+
+  componentWillUnmount() {
+    renderQueue.remove(this);
+  }
+
   onResize = ({ client: { width, height } }) => {
     const { mapWidth, mapHeight } = this.state;
     const { setMapHeight, template } = this.props;
@@ -55,15 +63,19 @@ class CustomMap extends Component {
       return;
     }
 
-    setMapHeight(height);
+    if (height !== mapHeight) {
+      setMapHeight(height);
+    }
 
-    this.setState(
-      {
-        mapWidth: width,
-        mapHeight: height,
-      },
-      () => renderQueue.remove(this),
-    );
+    if (height !== mapHeight || width !== mapWidth) {
+      this.setState(
+        {
+          mapWidth: width,
+          mapHeight: height,
+        },
+        () => renderQueue.remove(this),
+      );
+    }
   };
 
   render() {
@@ -74,7 +86,7 @@ class CustomMap extends Component {
       isSummerTimetable,
       mapZoneSymbols,
       mapZones,
-      salesPoint,
+      showSalesPoint,
       minimapZoneSymbols,
       minimapZones,
       legend,
@@ -141,7 +153,7 @@ class CustomMap extends Component {
                 showCitybikes={isSummerTimetable}
                 mapZoneSymbols={mapZoneSymbols}
                 mapZones={mapZones}
-                salesPoint={salesPoint}
+                showSalesPoint={showSalesPoint}
                 minimapZoneSymbols={minimapZoneSymbols}
                 minimapZones={minimapZones}
                 legend={legend}

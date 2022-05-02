@@ -48,9 +48,9 @@ Server and REST API for printing components to PDF files and managing their meta
 docker run -p 0.0.0.0:5432:5432 --env POSTGRES_PASSWORD=postgres --name publisher-postgres postgres
 ```
 
-Adjust the port if you have many Postgres instances running on your machine. The server needs the `PG_CONNECTION_STRING` environment variable set, which it uses to connect to your Postgres instance. If you use the default Postgres port, it looks like this:
+Adjust the port if you have many Postgres instances running on your machine. The server needs the `PG_CONNECTION_STRING` environment variable set, which it uses to connect to your Postgres instance. If you use the default Postgres port, place this to `.env`:
 
-```bash
+```
 PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres
 ```
 
@@ -70,22 +70,21 @@ REDIS_CONNECTION_STRING=redis://localhost:6379
 
 #### 3. Backend, worker and poster UI
 
-In development, start the Publisher backend server like this, prepending the Postgres connection string:
-(or place the connection string to `.env`)
+In development, start the Publisher backend server like this, (make sure you have connection strings in `.env`)
 ```bash
-PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres yarn run server:hot
+yarn run server:hot
 ```
 
 That command will run a Forever instance that watches for changes and restarts the server when they happen.
 
 Alternatively, to run the server with plain Node, leave off `hot`:
 ```bash
-PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres yarn run server
+yarn run server
 ```
 
 Then, start generator worker. (You can start multiple workers.)
 ```
-PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres yarn worker
+yarn worker
 ```
 
 Finally, start the React app
@@ -105,24 +104,32 @@ If Azure credentials are not set in the .env file the posters will be stored loc
 
 See [hsl-map-publisher-ui](https://github.com/HSLdevcom/hsl-map-publisher-ui) for UI.
 
-### Running in Docker
+### Running in local Docker
 
-As before, make sure you are running a database for the publisher:
+As before, make sure you are running a database and broker for the publisher:
 
 ```bash
 docker run -p 0.0.0.0:5432:5432 --env POSTGRES_PASSWORD=postgres --name publisher-postgres postgres
+docker run --name redis --rm -p 6379:6379 -d redis
 ```
+Remember to check the naming of the containers! If they are different, use your naming in `.env.local` and in next commands. Add also possible credentials to connection strings, if you have set up them, add fill up the variables left empty (`CLIENT_SECRET`, `API_CLIENT_SECRET` and domain restrictions).
+
+For fonts you have three options:
+- Create `fonts/` -directory inside project folder. Place `Gotham Rounded` and `Gotham XNarrow` OpenType fonts there from Azure.
+- Place `AZURE_STORAGE_ACCOUNT` and `AZURE_STORAGE_KEY` either via `.env.local` or Docker secrets. Fonts will be downloaded from Azure on startup.
+- If no fonts or credentials are provided, the app use just the default fonts found inside Debian image.
+
+Due to licensing, we cannot include the fonts in the public repository.
+
 
 Build the Docker image with the following command:
 
 ```bash
-docker build -t hsldevcom/hsl-map-publisher .
+docker build --build-arg BUILD_ENV=local -t hsl-map-publisher .
 ```
 
-And run the Docker container with this command:
+And run the Docker container with this command (you can leave font-directory mounting away if you don't have them locally):
 
 ```bash
-docker run -d -p 4000:4000 --name publisher -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres -e "PG_CONNECTION_STRING=postgres://postgres:postgres@publisher-postgres:5432/postgres" --shm-size=1G hsl-map-publisher
+docker run -d -p 4000:4000 --name publisher -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres --link redis hsl-map-publisher
 ```
-
-`fonts` is a directory containing `Gotham Rounded` and `Gotham XNarrow` OpenType fonts. Due to licensing, we cannot include the fonts in the repository.

@@ -21,14 +21,16 @@ class Stop extends Component {
 
   getTerminalAreaRoutes = props => {
     const routes = [];
-    props.routeSegments.nodes.forEach(segment => {
-      const routeId = trimRouteId(segment.routeId);
-      if (!props.destinationRouteIds.includes(routeId) && segment.hasRegularDayDepartures) {
-        if (!routes.includes(routeId)) {
-          routes.push(routeId);
+    props.routeSegments.nodes
+      .filter(segment => ['BUS', 'TRAM'].includes(segment.route.nodes[0].mode)) // Assume only one mode for a route
+      .forEach(segment => {
+        const routeId = trimRouteId(segment.routeId);
+        if (!props.destinationRouteIds.includes(routeId) && segment.hasRegularDayDepartures) {
+          if (!routes.includes(routeId)) {
+            routes.push(routeId);
+          }
         }
-      }
-    });
+      });
     return routeGeneralizer(routes);
   };
 

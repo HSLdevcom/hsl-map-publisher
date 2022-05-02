@@ -15,7 +15,7 @@ const SalePointLabel = props => {
         </div>
         <div>
           <div className={styles.title}>{props.title}</div>
-          <div className={styles.subtitle}>{props.address}</div>
+          {props.address && <div className={styles.subtitle}>{props.address}</div>}
         </div>
       </div>
       <div className={styles.content}>
@@ -38,9 +38,13 @@ const SalePointLabel = props => {
 SalePointLabel.propTypes = {
   type: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  address: PropTypes.string.isRequired,
+  address: PropTypes.string,
   distance: PropTypes.number.isRequired,
   icon: PropTypes.element.isRequired,
+};
+
+SalePointLabel.defaultProps = {
+  address: undefined,
 };
 
 export default SalePointLabel;

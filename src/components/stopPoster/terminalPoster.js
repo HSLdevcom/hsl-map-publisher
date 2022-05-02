@@ -37,7 +37,7 @@ const defaultDiagramOptions = {
   binarySearching: false,
 };
 
-class StopPoster extends Component {
+class TerminalPoster extends Component {
   constructor(props) {
     super(props);
 
@@ -51,16 +51,15 @@ class StopPoster extends Component {
       hasDiagram: true,
       hasRoutes: true,
       hasStretchedLeftColumn: false,
-      shouldRenderMap: false,
+      shouldRenderMap: true,
       triedRenderingMap: false,
-      hasColumnTimetable: true,
+      hasColumnTimetable: false,
+      hasTimetable: true,
+      hasLeftColumn: true,
       removedAds: null,
       adsPhase: false,
       diagramOptions: defaultDiagramOptions,
     };
-  }
-
-  componentWillMount() {
     renderQueue.add(this);
   }
 
@@ -116,7 +115,8 @@ class StopPoster extends Component {
     if (this.content.scrollWidth > this.content.clientWidth && this.state.hasRoutesOnTop) {
       this.onError('Unresolvable horizontal overflow detected.');
     }
-    return this.content.scrollHeight > this.content.clientHeight;
+    // Allow minor overflow tto make layout predictable
+    return this.content.scrollHeight > this.content.clientHeight + 3;
   }
 
   removeAdsFromTemplate(ads) {
@@ -178,14 +178,30 @@ class StopPoster extends Component {
       return;
     }
 
-    if (this.hasOverflow() || this.state.diagramOptions.binarySearching) {
-      if (!this.state.hasRoutesOnTop) {
-        this.setState({ hasRoutesOnTop: true });
+    if (
+      this.hasOverflow() ||
+      (this.state.hasDiagram && this.state.diagramOptions.binarySearching)
+    ) {
+      if (!this.state.hasStretchedLeftColumn) {
+        this.setState({ hasStretchedLeftColumn: true });
         return;
       }
 
-      if (!this.state.hasStretchedLeftColumn) {
-        this.setState({ hasStretchedLeftColumn: true });
+      if (!this.state.hasRoutesOnTop) {
+        this.setState({
+          hasRoutesOnTop: true,
+          hasStretchedLeftColumn: false,
+        });
+        return;
+      }
+
+      if (this.state.hasTimetable) {
+        // Remove timetables and start iteration again
+        this.setState({
+          hasTimetable: false,
+          hasRoutesOnTop: true,
+          hasLeftColumn: false,
+        });
         return;
       }
 
@@ -225,19 +241,11 @@ class StopPoster extends Component {
           }
         }
 
+        if (this.state.mapHeight <= 0) {
+          this.setState({ hasDiagram: false });
+          return;
+        }
         this.setState({ diagramOptions });
-        return;
-      }
-
-      if (this.state.hasColumnTimetable) {
-        this.setState({
-          hasColumnTimetable: false,
-        });
-        return;
-      }
-
-      if (this.state.hasRoutes) {
-        this.setState({ hasRoutes: false });
         return;
       }
 
@@ -257,18 +265,12 @@ class StopPoster extends Component {
         return;
       }
 
-      if (this.state.shouldRenderMap) {
-        //  If map don't fit try fill available space with diagram.
-        this.setState({
-          shouldRenderMap: false,
-          triedRenderingMap: true,
-          hasDiagram: true,
-          diagramOptions: defaultDiagramOptions,
-        });
-        return;
-      }
+      // This is dirty fix to wait a bit until to raise error.
+      // Otherwise, the error will be raised before the map has been resized.
+      window.setTimeout(() => {
+        if (this.hasOverflow()) this.onError('Failed to remove layout overflow');
+      }, 10000);
 
-      this.onError('Failed to remove layout overflow');
       return;
     }
 
@@ -277,7 +279,7 @@ class StopPoster extends Component {
       return;
     }
 
-    if (this.state.template && this.state.removedAds.length > 0) {
+    if (this.state.template && this.state.removedAds && this.state.removedAds.length > 0) {
       const { template } = this.state;
       const svg = get(template, 'areas', []).find(t => t.key === 'map').slots[0];
       //  If using svg postpone adsPhase untill we have mapHeight.
@@ -303,10 +305,20 @@ class StopPoster extends Component {
     }, 1000);
   }
 
+  triggerAnotherRoutesLayout() {
+    // When we trigger another layout, the left column always exists.
+    // First try wider column and then move routes to top.
+    if (!this.state.hasStretchedLeftColumn) {
+      this.setState({ hasStretchedLeftColumn: true });
+    } else {
+      this.setState({ hasLeftColumn: false, hasRoutesOnTop: true });
+    }
+  }
+
   render() {
     const {
+      terminalId,
       shortId,
-      stopId,
       isTrunkStop,
       hasRoutes: hasRoutesProp,
       date,
@@ -319,50 +331,59 @@ class StopPoster extends Component {
       minimapZoneSymbols,
       minimapZones,
       legend,
+      stops,
     } = this.props;
+
     if (!hasRoutesProp) {
       return null;
     }
 
     const {
       template,
-      mapHeight,
       hasRoutesOnTop,
-      hasDiagram,
       hasStretchedLeftColumn,
       hasRoutes,
       shouldRenderMap,
       hasColumnTimetable,
+      hasTimetable,
+      hasLeftColumn,
     } = this.state;
 
     const { isTramStop } = this.props;
     const src = get(template, 'areas', []).find(t => t.key === 'tram');
     const tramImage = get(src, 'slots[0].image.svg', '');
-    let useDiagram = hasDiagram || (hasDiagram && isTramStop && !tramImage);
+    let useDiagram = this.state.hasDiagram;
+
     if (isTramStop && tramImage) useDiagram = false;
 
-    const StopPosterTimetable = props => (
-      <div className={styles.timetable}>
-        <Timetable
-          stopId={stopId}
-          date={date}
-          isSummerTimetable={isSummerTimetable}
-          dateBegin={dateBegin}
-          dateEnd={dateEnd}
-          showValidityPeriod={!props.hideDetails}
-          showNotes={!props.hideDetails}
-          showComponentName={!props.hideDetails}
-          segments={props.segments}
-          routeFilter={props.routeFilter}
-        />
-      </div>
+    const TerminalPosterTimetable = props => (
+      <React.Fragment>
+        {stops.map(id => (
+          <div className={styles.timetable} key={id}>
+            <Timetable
+              stopId={id}
+              date={date}
+              isSummerTimetable={isSummerTimetable}
+              dateBegin={dateBegin}
+              dateEnd={dateEnd}
+              showValidityPeriod={!props.hideDetails}
+              showNotes={!props.hideDetails}
+              showComponentName={false}
+              segments={props.segments}
+              routeFilter={props.routeFilter}
+              platformInfo
+              showStopInformation
+            />
+          </div>
+        ))}
+      </React.Fragment>
     );
 
     return (
       <CropMarks>
         <div className={styles.root} style={isTrunkStop ? trunkStopStyle : null}>
           <JustifiedColumn>
-            <Header stopId={stopId} />
+            <Header stopId={terminalId} />
             <div
               className={styles.content}
               ref={ref => {
@@ -370,64 +391,64 @@ class StopPoster extends Component {
               }}>
               <Spacer width="100%" height={50} />
               {hasRoutes && hasRoutesOnTop && (
-                <Routes stopIds={[stopId]} date={date} routeFilter={this.props.routeFilter} />
+                <Routes
+                  key={`poster_routes_${hasRoutesOnTop}${hasTimetable}${hasLeftColumn}${hasStretchedLeftColumn}${useDiagram}`}
+                  stopIds={stops}
+                  date={date}
+                  routeFilter={this.props.routeFilter}
+                  platformInfo
+                  betterLayoutAvailable={!hasRoutesOnTop} // Routes on top is the easiest layout option and the last one to try.
+                  triggerAnotherLayout={() => this.triggerAnotherRoutesLayout()}
+                />
               )}
               {hasRoutes && hasRoutesOnTop && <Spacer height={10} />}
               <div className={styles.columns}>
-                <div className={hasStretchedLeftColumn ? styles.leftStretched : styles.left}>
-                  {hasRoutes && !hasRoutesOnTop && (
-                    <Routes stopIds={[stopId]} date={date} routeFilter={this.props.routeFilter} />
-                  )}
-                  {hasRoutes && !hasRoutesOnTop && <Spacer height={10} />}
-                  {hasColumnTimetable && (
-                    <StopPosterTimetable routeFilter={this.props.routeFilter} />
-                  )}
-                  {!hasColumnTimetable && (
-                    <StopPosterTimetable
-                      segments={['weekdays']}
-                      routeFilter={this.props.routeFilter}
+                {hasLeftColumn && (
+                  <div className={hasStretchedLeftColumn ? styles.leftStretched : styles.left}>
+                    {hasRoutes && !hasRoutesOnTop && (
+                      <Routes
+                        key={`poster_routes_${hasRoutesOnTop}${hasTimetable}${hasLeftColumn}${hasStretchedLeftColumn}${useDiagram}`}
+                        stopIds={stops}
+                        date={date}
+                        routeFilter={this.props.routeFilter}
+                        platformInfo
+                        betterLayoutAvailable={!hasRoutesOnTop} // Routes on top is the easiest layout option and the last one to try.
+                        triggerAnotherLayout={() => this.triggerAnotherRoutesLayout()}
+                      />
+                    )}
+                    {hasRoutes && !hasRoutesOnTop && <Spacer height={10} />}
+                    {hasTimetable && hasColumnTimetable && (
+                      <TerminalPosterTimetable routeFilter={this.props.routeFilter} />
+                    )}
+                    {hasTimetable && !hasColumnTimetable && (
+                      <TerminalPosterTimetable
+                        segments={['weekdays', 'saturdays', 'sundays']}
+                        routeFilter={this.props.routeFilter}
+                      />
+                    )}
+                    {/* The key will make sure the ad container updates its size if the layout changes */}
+                    <AdContainer
+                      key={`poster_ads_${hasRoutes}${hasRoutesOnTop}${hasStretchedLeftColumn}${useDiagram}`}
+                      shortId={shortId}
+                      template={
+                        template ? get(template, 'areas', []).find(t => t.key === 'ads') : {}
+                      }
                     />
-                  )}
-                  {/* The key will make sure the ad container updates its size if the layout changes */}
-                  <AdContainer
-                    key={`poster_ads_${hasRoutes}${hasRoutesOnTop}${hasStretchedLeftColumn}${useDiagram}`}
-                    shortId={shortId}
-                    template={template ? get(template, 'areas', []).find(t => t.key === 'ads') : {}}
-                  />
-                </div>
+                  </div>
+                )}
 
-                <Spacer width={10} />
+                {hasLeftColumn && <Spacer width={10} />}
 
                 <Measure client>
-                  {({
-                    measureRef,
-                    contentRect: {
-                      client: { height: rightColumnHeight },
-                    },
-                  }) => (
+                  {({ measureRef, contentRect }) => (
                     <div className={styles.right} ref={measureRef}>
-                      {!hasColumnTimetable && (
-                        <div className={styles.timetables}>
-                          <StopPosterTimetable
-                            segments={['saturdays']}
-                            hideDetails
-                            routeFilter={this.props.routeFilter}
-                          />
-                          <Spacer width={10} />
-                          <StopPosterTimetable
-                            segments={['sundays']}
-                            hideDetails
-                            routeFilter={this.props.routeFilter}
-                          />
-                        </div>
-                      )}
                       {!useDiagram && <Spacer height={10} />}
                       {/* The key will make sure the map updates its size if the layout changes */}
                       {shouldRenderMap && (
                         <CustomMap
-                          key={`poster_map_${hasRoutes}${hasRoutesOnTop}${useDiagram}${isTramStop}${hasStretchedLeftColumn}${hasColumnTimetable}`}
+                          key={`poster_map_${hasRoutes}${hasRoutesOnTop}${useDiagram}${isTramStop}${hasStretchedLeftColumn}${hasColumnTimetable}${hasTimetable}${hasLeftColumn}${contentRect.client.height}`}
                           setMapHeight={this.setMapHeight}
-                          stopId={stopId}
+                          stopId={terminalId}
                           date={date}
                           isSummerTimetable={isSummerTimetable}
                           template={
@@ -448,9 +469,10 @@ class StopPoster extends Component {
                       {useDiagram && (
                         <RouteDiagram
                           height={this.state.diagramOptions.diagramStopCount}
-                          stopIds={[stopId]}
+                          stopIds={stops}
                           date={date}
                           routeFilter={this.props.routeFilter}
+                          maxColumns={hasLeftColumn ? 6 : 8}
                         />
                       )}
                       {isTramStop && tramImage && <TramDiagram svg={tramImage} />}
@@ -474,8 +496,8 @@ class StopPoster extends Component {
   }
 }
 
-StopPoster.propTypes = {
-  stopId: PropTypes.string.isRequired,
+TerminalPoster.propTypes = {
+  terminalId: PropTypes.string.isRequired,
   date: PropTypes.string.isRequired,
   isSummerTimetable: PropTypes.bool,
   dateBegin: PropTypes.string,
@@ -492,9 +514,10 @@ StopPoster.propTypes = {
   minimapZones: PropTypes.bool,
   routeFilter: PropTypes.string,
   legend: PropTypes.bool,
+  stops: PropTypes.array.isRequired,
 };
 
-StopPoster.defaultProps = {
+TerminalPoster.defaultProps = {
   isSummerTimetable: false,
   dateBegin: null,
   dateEnd: null,
@@ -507,4 +530,4 @@ StopPoster.defaultProps = {
   legend: false,
 };
 
-export default hot(module)(StopPoster);
+export default hot(module)(TerminalPoster);

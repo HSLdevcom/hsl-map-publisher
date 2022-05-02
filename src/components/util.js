@@ -126,6 +126,37 @@ InlineSVG.propTypes = {
   src: PropTypes.string.isRequired,
 };
 
+const PlatformSymbol = ({ platform, size, color }) => (
+  <svg className={styles.PScontainer} width={size} height={size}>
+    <circle
+      className={styles.PScircle}
+      style={{ stroke: color }}
+      cx={size / 2}
+      cy={size / 2}
+      r={size / 2 - 2}
+    />
+    <text
+      className={styles.PStext}
+      style={{ fill: color }}
+      x={size / 2}
+      y={size / 2}
+      fontSize={size / 2}>
+      {platform}
+    </text>
+  </svg>
+);
+
+PlatformSymbol.propTypes = {
+  platform: PropTypes.string.isRequired,
+  size: PropTypes.number,
+  color: PropTypes.string,
+};
+
+PlatformSymbol.defaultProps = {
+  size: 40,
+  color: undefined, // The default is the bus color (comes from css)
+};
+
 export {
   Row,
   JustifiedRow,
@@ -136,4 +167,5 @@ export {
   Spacer,
   FlexSpacer,
   InlineSVG,
+  PlatformSymbol,
 };
