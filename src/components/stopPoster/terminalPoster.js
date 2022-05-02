@@ -330,6 +330,7 @@ class TerminalPoster extends Component {
       salesPoint,
       minimapZoneSymbols,
       minimapZones,
+      legend,
       stops,
     } = this.props;
 
@@ -460,6 +461,7 @@ class TerminalPoster extends Component {
                           showSalesPoint={salesPoint}
                           minimapZoneSymbols={minimapZoneSymbols}
                           minimapZones={minimapZones}
+                          legend={legend}
                         />
                       )}
 
@@ -511,6 +513,7 @@ TerminalPoster.propTypes = {
   minimapZoneSymbols: PropTypes.bool,
   minimapZones: PropTypes.bool,
   routeFilter: PropTypes.string,
+  legend: PropTypes.bool,
   stops: PropTypes.array.isRequired,
 };
 
@@ -524,6 +527,7 @@ TerminalPoster.defaultProps = {
   minimapZoneSymbols: false,
   minimapZones: false,
   routeFilter: '',
+  legend: false,
 };
 
 export default hot(module)(TerminalPoster);

@@ -111,9 +111,9 @@ const TableRows = props => {
 
   return (
     <div className={styles.root}>
-      {rowsByHour.map((departuresHour, index) => (
+      {rowsByHour.map(departuresHour => (
         <TableRow
-          key={`${index}_${departuresHour.hour}`}
+          key={`${departuresHour.hour}${departuresHour.departures}`}
           hours={departuresHour.hour}
           departures={departuresHour.departures}
         />

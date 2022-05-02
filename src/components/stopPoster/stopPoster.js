@@ -318,8 +318,8 @@ class StopPoster extends Component {
       salesPoint,
       minimapZoneSymbols,
       minimapZones,
+      legend,
     } = this.props;
-
     if (!hasRoutesProp) {
       return null;
     }
@@ -440,6 +440,7 @@ class StopPoster extends Component {
                           showSalesPoint={salesPoint}
                           minimapZoneSymbols={minimapZoneSymbols}
                           minimapZones={minimapZones}
+                          legend={legend}
                         />
                       )}
 
@@ -490,6 +491,7 @@ StopPoster.propTypes = {
   minimapZoneSymbols: PropTypes.bool,
   minimapZones: PropTypes.bool,
   routeFilter: PropTypes.string,
+  legend: PropTypes.bool,
 };
 
 StopPoster.defaultProps = {
@@ -502,6 +504,7 @@ StopPoster.defaultProps = {
   minimapZoneSymbols: false,
   minimapZones: false,
   routeFilter: '',
+  legend: false,
 };
 
 export default hot(module)(StopPoster);

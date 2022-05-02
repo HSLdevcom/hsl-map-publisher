@@ -4,7 +4,7 @@ import { chunk, cloneDeep, sortBy } from 'lodash';
 import { Row, Column, InlineSVG } from 'components/util';
 import a3headerContainer from './a3headerContainer';
 import renderQueue from 'util/renderQueue';
-import { isTrunkRoute, getColor } from 'util/domain';
+import { getColor } from 'util/domain';
 import SimpleRoutes from '../timetable/simpleRoutes';
 
 import styles from './a3header.css';
@@ -71,7 +71,7 @@ class A3Header extends Component {
   render() {
     const routesPerColumn = Math.ceil(this.props.routes.length / MAX_COLUMNS);
     const routeColumns = chunk(
-      sortBy(this.props.routes, route => !isTrunkRoute(route.routeId)),
+      sortBy(this.props.routes, route => !route.trunkRoute),
       routesPerColumn,
     );
     const routeIds = this.props.routes.map(route => route.routeId);

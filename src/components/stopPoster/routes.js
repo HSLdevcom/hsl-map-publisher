@@ -5,7 +5,7 @@ import sortBy from 'lodash/sortBy';
 import { Row, Column, InlineSVG, PlatformSymbol } from 'components/util';
 import routesContainer from './routesContainer';
 import renderQueue from 'util/renderQueue';
-import { isTrunkRoute, getColor, getIcon } from 'util/domain';
+import { getColor, getIcon } from 'util/domain';
 
 import styles from './routes.css';
 
@@ -70,10 +70,9 @@ class Routes extends Component {
   render() {
     const routesPerColumn = Math.ceil(this.props.routes.length / this.state.columns);
     const routeColumns = chunk(
-      sortBy(this.props.routes, route => !isTrunkRoute(route.routeId)),
+      sortBy(this.props.routes, route => !route.trunkRoute),
       routesPerColumn,
     );
-
     return (
       <div
         className={styles.root}

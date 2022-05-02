@@ -23,6 +23,83 @@
   border: 10px solid var(--background);
 }
 
+.legend {
+  composes: mapContainer;
+  z-index: 20;
+  background-color: white;
+  border-radius: 15px;
+  border: 5px solid var(--background);
+  min-width: 200px;
+  min-height: 30px;
+}
+
+.legendRow {
+  padding: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.legendText {
+  color: black;
+  margin-left: 10px;
+  font-family: GothamRounded-Book;
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+
+.legendLine {
+  width: 40px;
+}
+
+.legendLine.bus {
+  border: 2px solid rgb(0, 122, 201);
+}
+
+.legendLine.tram {
+  border: 2px solid rgb(0, 152, 95);
+}
+
+.legendLine.subway {
+  border: 2px dashed rgb(255, 99, 25);
+}
+
+.legendLine.rail {
+  border: 2px dashed rgb(141, 81, 153);
+}
+
+.legendLine.trunk {
+  border: 2px solid rgb(255, 99, 25);
+}
+
+.legendIcon {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: white;
+  position: absolute;
+  left: 20px;
+}
+
+.legendIcon.bus {
+  border: 2px solid rgb(0, 122, 201);
+}
+
+.legendIcon.tram {
+  border: 2px solid rgb(0, 152, 95);
+}
+
+.legendIcon.subway {
+  border: 2px solid rgb(255, 99, 25);
+}
+
+.legendIcon.rail {
+  border: 2px solid rgb(141, 81, 153);
+}
+
+.legendIcon.trunk {
+  border: 2px solid rgb(255, 99, 25);
+}
+
 .overlays {
   position: absolute;
   top: 0;

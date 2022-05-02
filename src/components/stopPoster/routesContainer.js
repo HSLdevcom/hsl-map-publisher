@@ -23,6 +23,11 @@ const routesQuery = gql`
             viaSe
             hasRegularDayDepartures(date: $date)
             pickupDropoffType
+            line {
+              nodes {
+                trunkRoute
+              }
+            }
             route {
               nodes {
                 destinationFi
@@ -55,6 +60,7 @@ const propsMapper = mapProps(props => {
     ...routeSegment.route.nodes[0],
     viaFi: routeSegment.viaFi,
     viaSe: routeSegment.viaSe,
+    trunkRoute: routeSegment.line.nodes && routeSegment.line.nodes[0].trunkRoute === '1',
     routeId: trimRouteId(routeSegment.routeId),
     fullRouteId: routeSegment.routeId,
     platform: routeSegment.platform,
