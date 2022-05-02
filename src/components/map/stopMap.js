@@ -444,7 +444,7 @@ const nearestSalePointType = PropTypes.shape({
   id: PropTypes.number.isRequired,
   type: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  address: PropTypes.string.isRequired,
+  address: PropTypes.string,
   lat: PropTypes.number.isRequired,
   lon: PropTypes.number.isRequired,
   distance: PropTypes.number.isRequired,

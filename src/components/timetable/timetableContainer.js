@@ -282,6 +282,7 @@ TimetableContainer.defaultProps = {
   printTimetablesAsA4: false,
   printTimetablesAsGreyscale: false,
   specialSymbols: [],
+  showStopInformation: false,
 };
 
 TimetableContainer.propTypes = {
@@ -298,6 +299,7 @@ TimetableContainer.propTypes = {
   printTimetablesAsA4: PropTypes.bool,
   printTimetablesAsGreyscale: PropTypes.bool,
   specialSymbols: PropTypes.array,
+  showStopInformation: PropTypes.bool,
 };
 
 export default TimetableContainer;
