@@ -58,9 +58,6 @@ class StopPoster extends Component {
       adsPhase: false,
       diagramOptions: defaultDiagramOptions,
     };
-  }
-
-  componentWillMount() {
     renderQueue.add(this);
   }
 
@@ -193,6 +190,11 @@ class StopPoster extends Component {
         // TODO: This is kind of dirty fix. Binarysearch to get acceptable
         // height for routetree.
         const { diagramOptions } = this.state;
+
+        if (diagramOptions.heightValues.length === 0) {
+          this.setState({ hasDiagram: false });
+          return;
+        }
         diagramOptions.binarySearching = true;
         diagramOptions.middleHeightValue =
           diagramOptions.heightValues[Math.floor(diagramOptions.heightValues.length / 2)];
