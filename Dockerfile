@@ -1,4 +1,4 @@
-FROM node:12-buster-slim
+FROM node:16-buster-slim
 
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -yq wget curl gnupg pdftk fontconfig fonts-liberation --no-install-recommends \
