@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
-const { spawn } = require('child_process');
+const PDFMerger = require('pdf-merger-js');
 
 const { AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_KEY } = require('../constants');
 
@@ -32,21 +32,11 @@ async function concatenate(ids, title) {
   const fileExists = await fs.pathExists(filepath);
 
   if (!fileExists) {
-    return new Promise((resolve, reject) => {
-      const pdftk = spawn('pdftk', [...filenames, 'cat', 'output', filepath]);
-
-      pdftk.on('error', err => {
-        reject(err);
-      });
-
-      pdftk.on('close', code => {
-        if (code === 0) {
-          resolve(filepath);
-        } else {
-          reject(new Error(`PDFTK closed with code ${code}`));
-        }
-      });
+    const merger = new PDFMerger();
+    filenames.forEach(file => {
+      merger.add(file);
     });
+    await merger.save(filepath);
   }
 
   return filepath;
