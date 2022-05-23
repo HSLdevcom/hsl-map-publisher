@@ -28,6 +28,7 @@ const {
   removeBuild,
   getPoster,
   addPoster,
+  updatePoster,
   removePoster,
   getTemplates,
   addTemplate,
@@ -48,6 +49,8 @@ const bullRedisConnection = new Redis(REDIS_CONNECTION_STRING, {
   enableReadyCheck: false,
 });
 const queue = new Queue('publisher', { connection: bullRedisConnection });
+
+const cancelSignalRedis = new Redis(REDIS_CONNECTION_STRING);
 
 async function generatePoster(buildId, component, props, index) {
   const { stopId, date, template, selectedRuleTemplates } = props;
@@ -234,6 +237,18 @@ async function main() {
   router.delete('/posters/:id', async ctx => {
     const { id } = ctx.params;
     const poster = await removePoster({ id });
+    ctx.body = poster;
+  });
+
+  router.post('/cancelPoster', async ctx => {
+    const { item } = ctx.request.body;
+    const jobId = item.id;
+    const poster = await updatePoster({ id: jobId, status: 'FAILED' });
+    const success = await queue.remove(jobId);
+    if (!success) {
+      cancelSignalRedis.publish('cancel', jobId);
+    }
+
     ctx.body = poster;
   });
 
