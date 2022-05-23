@@ -404,11 +404,12 @@ const StopMap = props => {
             center: newPosition.mapCenter,
           }}
           components={{
-            text: { enabled: false },
+            text: { enabled: true },
+            text_fisv: { enabled: true },
             print: { enabled: true },
             routes: { enabled: true, hideBusRoutes: true },
             municipal_borders: { enabled: true },
-            ticket_zone_labels_fixed: { enabled: miniMapStyle.minimapZoneSymbols },
+            ticket_zone_labels: { enabled: miniMapStyle.minimapZoneSymbols },
             ticket_zones: { enabled: miniMapStyle.minimapZones },
           }}
           extraLayers={[placeLabelCity]}

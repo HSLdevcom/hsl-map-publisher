@@ -4745,9 +4745,9 @@ hosted-git-info@^2.1.4:
   resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.8.8.tgz#7539bd4bc1e0e0a895815a2e0262420b12858488"
   integrity sha512-f/wzC2QaWBs7t9IYqB4T3sR1xviIViXJRJTWBlx2Gf3g0Xi5vI7Yy4koXQ1c9OYDGHN9sBy1DQ2AB8fqZBWhUg==
 
-hsl-map-style@hsldevcom/hsl-map-style#development:
+hsl-map-style@hsldevcom/hsl-map-style#master:
   version "1.0.0"
-  resolved "https://codeload.github.com/hsldevcom/hsl-map-style/tar.gz/98fcc0e458d9173366acdb7c35cdcd71ae3a2fa7"
+  resolved "https://codeload.github.com/hsldevcom/hsl-map-style/tar.gz/e90c512df6ad788a70caab39e32d121e4caaebca"
   dependencies:
     lodash "^4.17.4"
 
