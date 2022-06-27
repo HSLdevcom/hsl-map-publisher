@@ -1,4 +1,6 @@
 import React from 'react';
+import classNames from 'classnames';
+import { getColor } from 'util/domain';
 import PropTypes from 'prop-types';
 import groupBy from 'lodash/groupBy';
 import { Row, WrappingRow, Column } from 'components/util';
@@ -19,7 +21,11 @@ const Destinations = props => {
         <WrappingRow key={groupIndex} style={{ marginBottom: 5 }}>
           {destinations.map((destination, index) => (
             <Row key={index}>
-              <div className={styles.routeId}>{destination.routeId}</div>
+              <div
+                className={classNames(styles.routeId)}
+                style={{ color: getColor(destinations[0]) }}>
+                {destination.routeId}
+              </div>
             </Row>
           ))}
           <Column style={{ flexBasis: '100%' }}>
