@@ -1,5 +1,11 @@
 import { PerspectiveMercatorViewport } from 'viewport-mercator-project';
 import FixedZoneSymbols from '../components/map/hsl-zones-publisher-v6.json';
+import TicketZones from '../components/map/ticket-zones.json';
+import * as turf from '@turf/turf';
+import filter from 'lodash/filter';
+// import polygonize from '@turf/polygonize';
+// import lineString from '@turf/lineString';
+// import lineToPolygon from '@turf/lineToPolygon';
 
 const STOPS_PER_PIXEL = 0.000006;
 const MAJOR_TRANSPORT_WEIGHT = 5;
@@ -22,6 +28,23 @@ function toRadians(angle) {
 
 function getDistanceBetweenPoints(x, y, centerX, centerY) {
   return Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+}
+
+function toDegrees(cx, cy, ex, ey) {
+  const dy = ey - cy;
+  const dx = ex - cx;
+  let theta = Math.atan2(dy, dx); // range (-PI, PI]
+  theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
+  // if (theta < 0) theta = 360 + theta; // range [0, 360)
+  return theta;
+}
+
+function withinBounds(lat, lon, maxLat, minLat, maxLon, minLon) {
+  return lat > maxLat && lat < minLat && lon > minLon && lon < maxLon;
+}
+
+function polygonContainsPoint(poly, point) {
+  return turf.booleanContains(poly, point);
 }
 
 function calculateStopsViewport(options) {
@@ -176,18 +199,108 @@ function calculateStopsViewport(options) {
     lat: latitude,
   };
 
-  const projectedSymbols = [];
-  if (useProjectedSymbols) {
-    FixedZoneSymbols.features.forEach(feature => {
-      feature.geometry.coordinates.forEach(coordinates => {
-        const [sLon, sLat] = coordinates;
-        if (sLat > maxLat && sLat < minLat && sLon > minLon && sLon < maxLon) {
-          const [sy, sx] = bestViewPort.project([sLon, sLat]);
-          projectedSymbols.push({ zone: feature.properties.Zone, sx, sy });
+  const leftTop = [minLon, minLat];
+  const rightTop = [maxLon, minLat];
+  const rightBottom = [maxLon, maxLat];
+  const leftBottom = [minLon, maxLat];
+  const bboxLine = turf.lineString([leftTop, rightTop, rightBottom, leftBottom, leftTop]);
+  const bboxPolygon = turf.lineToPolygon(bboxLine);
+
+  const clippedPolygons = [];
+  TicketZones.features.forEach(feature => {
+    const clippedPolygon = turf.intersect(feature, bboxPolygon);
+    if (clippedPolygon) {
+      clippedPolygon.properties = { zone: feature.properties.Zone };
+      clippedPolygons.push(clippedPolygon);
+    }
+  });
+  const zonesInBbox = clippedPolygons.map(feature => feature.properties.zone);
+
+  const ticketZoneLines = TicketZones.features.map(zone => turf.polygonToLine(zone));
+  const intersections = [];
+  ticketZoneLines.forEach(line => {
+    const intersection = turf.lineIntersect(line, bboxLine);
+    if (intersection.features.length > 0) {
+      intersections.push(intersection);
+    }
+  });
+  const zoneBorderLinesInBbox = [];
+  ticketZoneLines.forEach(line => {
+    intersections.forEach(intersection => {
+      const start = intersection.features[0];
+      const stop = intersection.features[1];
+      const sliced = turf.lineSlice(start, stop, line);
+      const inBboxZones = zonesInBbox.includes(sliced.properties.Zone);
+      let isEqual = false;
+      zoneBorderLinesInBbox.forEach(zoneBorderLineInBbox => {
+        if (inBboxZones && turf.booleanEqual(zoneBorderLineInBbox, sliced)) {
+          isEqual = true;
         }
       });
+      if (inBboxZones && !isEqual) {
+        zoneBorderLinesInBbox.push(sliced);
+      }
     });
-  }
+  });
+
+  const projectedSymbols = [];
+
+  zoneBorderLinesInBbox.forEach(zoneBorderLineInBbox => {
+    zoneBorderLineInBbox.geometry.coordinates.forEach((coordinates, index) => {
+      const nextCoordinates = zoneBorderLineInBbox.geometry.coordinates[index + 1];
+      let midCoordinates = null;
+      if (nextCoordinates) {
+        const midPoint = turf.midpoint(turf.point(coordinates), turf.point(nextCoordinates));
+        midCoordinates = midPoint.geometry.coordinates;
+      }
+      if (
+        midCoordinates &&
+        withinBounds(midCoordinates[1], midCoordinates[0], maxLat, minLat, maxLon, minLon) &&
+        withinBounds(coordinates[1], coordinates[0], maxLat, minLat, maxLon, minLon) &&
+        withinBounds(nextCoordinates[1], nextCoordinates[0], maxLat, minLat, maxLon, minLon)
+      ) {
+        const [cx, cy] = bestViewPort.project(coordinates);
+        const [ex, ey] = bestViewPort.project(nextCoordinates);
+        const [mx, my] = bestViewPort.project(midCoordinates);
+
+        const CIRCLE_RADIUS = 150;
+        const TEXT_ALIGNMENT_OFFSET = 60;
+
+        const angle = toDegrees(cx, cy, ex, ey) + 90;
+        const radians = toRadians(angle);
+        const sy = mx + CIRCLE_RADIUS * Math.cos(radians);
+        const sx = my + CIRCLE_RADIUS * Math.sin(radians);
+        const [syLon, syLat] = bestViewPort.unproject([sy, sx]);
+
+        const angle2 = toDegrees(cx, cy, ex, ey) + 270;
+        const radians2 = toRadians(angle2);
+        const sy2 = mx + CIRCLE_RADIUS * Math.cos(radians2);
+        const sx2 = my + CIRCLE_RADIUS * Math.sin(radians2);
+        const [sy2Lon, sy2Lat] = bestViewPort.unproject([sy2, sx2]);
+
+        TicketZones.features.forEach(ticketZone => {
+          if (sx > 0 && polygonContainsPoint(ticketZone, turf.point([syLon, syLat]))) {
+            const textAlignLeft = sy < mx;
+            projectedSymbols.push({
+              zone: ticketZone.properties.Zone,
+              sx,
+              sy: textAlignLeft ? sy - TEXT_ALIGNMENT_OFFSET : sy,
+              textAlignLeft,
+            });
+          }
+          if (sx2 > 0 && polygonContainsPoint(ticketZone, turf.point([sy2Lon, sy2Lat]))) {
+            const textAlignLeft = sy2 < mx;
+            projectedSymbols.push({
+              zone: ticketZone.properties.Zone,
+              sx: sx2,
+              sy: textAlignLeft ? sy2 - TEXT_ALIGNMENT_OFFSET : sy2,
+              textAlignLeft,
+            });
+          }
+        });
+      }
+    });
+  });
 
   return {
     projectedStops,

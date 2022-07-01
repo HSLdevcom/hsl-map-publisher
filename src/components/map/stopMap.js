@@ -262,11 +262,14 @@ const StopMap = props => {
   );
 
   // Filter out zone symbols that are behind the mini map
+  // Added extra buffed width because zone symbols might be cut half by minimap
   const projectedSymbols = props.projectedSymbols.filter(
-    symbol => symbol.sy < miniMapStyle.left || symbol.sx < miniMapStyle.top,
+    symbol => symbol.sy < miniMapStyle.left - 100 || symbol.sx < miniMapStyle.top,
   );
+
   const symbolsWithStopDistances = calculateSymbolDistancesFromStops(stops, projectedSymbols);
-  const symbolForEachZone = getSymbolForEachZone(symbolsWithStopDistances);
+  // const symbolForEachZone = getSymbolForEachZone(symbolsWithStopDistances);
+  const symbolForEachZone = symbolsWithStopDistances;
 
   const miniMapCoordinateHelper = new MapCoordinateHelper(props.miniMapOptions);
   const newPosition = miniMapCoordinateHelper.getMapCenter();
@@ -295,7 +298,7 @@ const StopMap = props => {
             subway_entrance: { enabled: true },
             ticket_sales: { enabled: true },
             citybikes: { enabled: props.showCitybikes },
-            ticket_zones: { enabled: mapStyle.mapZones },
+            ticket_zones: { enabled: true },
             text_fisv: { enabled: true },
             print: { enabled: true },
           }}
@@ -344,7 +347,11 @@ const StopMap = props => {
             symbolForEachZone.length > 0 &&
             symbolForEachZone.map((symbol, index) => (
               <ItemFixed key={index} left={symbol.sy} top={symbol.sx}>
-                <ZoneSymbol zone={symbol.zone} size={LOCATION_RADIUS * 2} />
+                <ZoneSymbol
+                  zone={symbol.zone}
+                  size={LOCATION_RADIUS}
+                  textAlignLeft={symbol.textAlignLeft}
+                />
               </ItemFixed>
             ))}
 
@@ -410,7 +417,7 @@ const StopMap = props => {
             routes: { enabled: true, hideBusRoutes: true },
             municipal_borders: { enabled: true },
             ticket_zone_labels: { enabled: miniMapStyle.minimapZoneSymbols },
-            ticket_zones: { enabled: miniMapStyle.minimapZones },
+            ticket_zones: { enabled: true },
           }}
           extraLayers={[placeLabelCity]}
         />
