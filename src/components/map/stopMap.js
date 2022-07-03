@@ -268,8 +268,7 @@ const StopMap = props => {
   );
 
   const symbolsWithStopDistances = calculateSymbolDistancesFromStops(stops, projectedSymbols);
-  // const symbolForEachZone = getSymbolForEachZone(symbolsWithStopDistances);
-  const symbolForEachZone = symbolsWithStopDistances;
+  const symbolForEachZone = getSymbolForEachZone(symbolsWithStopDistances);
 
   const miniMapCoordinateHelper = new MapCoordinateHelper(props.miniMapOptions);
   const newPosition = miniMapCoordinateHelper.getMapCenter();
