@@ -33,6 +33,7 @@ const SALES_POINT_RADIUS = 9;
 const STOP_RADIUS = 20;
 const LOCATION_RADIUS = 30;
 const LOCATION_RADIUS_MINI = 10;
+const ZONE_SYMBOL_MAP_PADDING = 50;
 
 // Overlays
 const INFO_MARGIN_BOTTOM = 78;
@@ -267,7 +268,15 @@ const StopMap = props => {
     symbol => symbol.sy < miniMapStyle.left - 100 || symbol.sx < miniMapStyle.top,
   );
 
-  const symbolsWithStopDistances = calculateSymbolDistancesFromStops(stops, projectedSymbols);
+  // Avoid map edges so zone symbol and text is fully visible
+  const projectedSymbolsInBbox = projectedSymbols.filter(
+    symbol =>
+      symbol.sy > ZONE_SYMBOL_MAP_PADDING &&
+      symbol.sx > ZONE_SYMBOL_MAP_PADDING &&
+      symbol.sy < mapStyle.width - ZONE_SYMBOL_MAP_PADDING &&
+      symbol.sx < mapStyle.height - ZONE_SYMBOL_MAP_PADDING,
+  );
+  const symbolsWithStopDistances = calculateSymbolDistancesFromStops(stops, projectedSymbolsInBbox);
   const symbolForEachZone = getSymbolForEachZone(symbolsWithStopDistances);
 
   const miniMapCoordinateHelper = new MapCoordinateHelper(props.miniMapOptions);
@@ -297,7 +306,7 @@ const StopMap = props => {
             subway_entrance: { enabled: true },
             ticket_sales: { enabled: true },
             citybikes: { enabled: props.showCitybikes },
-            ticket_zones: { enabled: true },
+            ticket_zones: { enabled: mapStyle.mapZones },
             text_fisv: { enabled: true },
             print: { enabled: true },
           }}
@@ -416,7 +425,7 @@ const StopMap = props => {
             routes: { enabled: true, hideBusRoutes: true },
             municipal_borders: { enabled: true },
             ticket_zone_labels: { enabled: miniMapStyle.minimapZoneSymbols },
-            ticket_zones: { enabled: true },
+            ticket_zones: { enabled: mapStyle.mapZones },
           }}
           extraLayers={[placeLabelCity]}
         />

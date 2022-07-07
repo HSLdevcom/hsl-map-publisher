@@ -15,6 +15,9 @@ const ZOOM_WEIGHT = 1;
 const STOP_AMOUNT_WEIGHT = 5;
 const DISTANCES_FROM_CENTRE = [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3];
 const ANGLES = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
+const TEXT_ALIGNMENT_OFFSET = 60;
+const CIRCLE_RADIUS = 150;
+const MIN_DISTANCE_TO_ZONE_BORDER = 100;
 
 function viewportContains(viewport, place, width, height, miniMapStartX, miniMapStartY) {
   const [x, y] = viewport.project([place.lon, place.lat], { topLeft: true });
@@ -243,7 +246,14 @@ function calculateStopsViewport(options) {
     });
   });
 
-  const projectedSymbols = [];
+  const allProjectedSymbols = [];
+  const zoneSymbolObject = (zone, sx, sy, textAlignLeft, latLon) => ({
+    zone,
+    sx,
+    sy: textAlignLeft ? sy - TEXT_ALIGNMENT_OFFSET : sy,
+    textAlignLeft,
+    latLon,
+  });
 
   zoneBorderLinesInBbox.forEach(zoneBorderLineInBbox => {
     zoneBorderLineInBbox.geometry.coordinates.forEach((coordinates, index) => {
@@ -263,9 +273,6 @@ function calculateStopsViewport(options) {
         const [ex, ey] = bestViewPort.project(nextCoordinates);
         const [mx, my] = bestViewPort.project(midCoordinates);
 
-        const CIRCLE_RADIUS = 150;
-        const TEXT_ALIGNMENT_OFFSET = 60;
-
         const angle = toDegrees(cx, cy, ex, ey) + 90;
         const radians = toRadians(angle);
         const sy = mx + CIRCLE_RADIUS * Math.cos(radians);
@@ -279,28 +286,36 @@ function calculateStopsViewport(options) {
         const [sy2Lon, sy2Lat] = bestViewPort.unproject([sy2, sx2]);
 
         TicketZones.features.forEach(ticketZone => {
-          if (sx > 0 && polygonContainsPoint(ticketZone, turf.point([syLon, syLat]))) {
+          const zone = ticketZone.properties.Zone;
+          if (polygonContainsPoint(ticketZone, turf.point([syLon, syLat]))) {
             const textAlignLeft = sy < mx;
-            projectedSymbols.push({
-              zone: ticketZone.properties.Zone,
-              sx,
-              sy: textAlignLeft ? sy - TEXT_ALIGNMENT_OFFSET : sy,
-              textAlignLeft,
-            });
+            allProjectedSymbols.push(zoneSymbolObject(zone, sx, sy, textAlignLeft, [syLon, syLat]));
           }
-          if (sx2 > 0 && polygonContainsPoint(ticketZone, turf.point([sy2Lon, sy2Lat]))) {
+          if (polygonContainsPoint(ticketZone, turf.point([sy2Lon, sy2Lat]))) {
             const textAlignLeft = sy2 < mx;
-            projectedSymbols.push({
-              zone: ticketZone.properties.Zone,
-              sx: sx2,
-              sy: textAlignLeft ? sy2 - TEXT_ALIGNMENT_OFFSET : sy2,
-              textAlignLeft,
-            });
+            allProjectedSymbols.push(
+              zoneSymbolObject(zone, sx2, sy2, textAlignLeft, [sy2Lon, sy2Lat]),
+            );
           }
         });
       }
     });
   });
+
+  const projectedSymbolsWithDistanceToZoneLine = allProjectedSymbols.map(symbol => {
+    const pt = turf.point(symbol.latLon);
+    const distances = zoneBorderLinesInBbox.map(line =>
+      turf.pointToLineDistance(pt, line, { units: 'meters' }),
+    );
+    const closest = Math.min(...distances);
+    const symbolWithDistance = symbol;
+    symbolWithDistance.distanceToZoneBorder = closest;
+    return symbolWithDistance;
+  });
+
+  const projectedSymbols = projectedSymbolsWithDistanceToZoneLine.filter(
+    symbol => symbol.distanceToZoneBorder > MIN_DISTANCE_TO_ZONE_BORDER,
+  );
 
   return {
     projectedStops,
