@@ -265,7 +265,9 @@ const StopMap = props => {
   // Filter out zone symbols that are behind the mini map
   // Added extra buffed width because zone symbols might be cut half by minimap
   const projectedSymbols = props.projectedSymbols.filter(
-    symbol => symbol.sy < miniMapStyle.left - 100 || symbol.sx < miniMapStyle.top,
+    symbol =>
+      symbol.sy < miniMapStyle.left - ZONE_SYMBOL_MAP_PADDING ||
+      symbol.sx < miniMapStyle.top + ZONE_SYMBOL_MAP_PADDING,
   );
 
   // Avoid map edges so zone symbol and text is fully visible
@@ -355,11 +357,7 @@ const StopMap = props => {
             symbolForEachZone.length > 0 &&
             symbolForEachZone.map((symbol, index) => (
               <ItemFixed key={index} left={symbol.sy} top={symbol.sx}>
-                <ZoneSymbol
-                  zone={symbol.zone}
-                  size={LOCATION_RADIUS}
-                  textAlignLeft={symbol.textAlignLeft}
-                />
+                <ZoneSymbol zone={symbol.zone} size={LOCATION_RADIUS} />
               </ItemFixed>
             ))}
 
