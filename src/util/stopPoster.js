@@ -1,11 +1,6 @@
 import { PerspectiveMercatorViewport } from 'viewport-mercator-project';
-import FixedZoneSymbols from '../components/map/hsl-zones-publisher-v6.json';
 import TicketZones from '../components/map/ticket-zones.json';
 import * as turf from '@turf/turf';
-import filter from 'lodash/filter';
-// import polygonize from '@turf/polygonize';
-// import lineString from '@turf/lineString';
-// import lineToPolygon from '@turf/lineToPolygon';
 
 const STOPS_PER_PIXEL = 0.000006;
 const MAJOR_TRANSPORT_WEIGHT = 5;
@@ -273,6 +268,10 @@ function calculateStopsViewport(options) {
         const [ex, ey] = bestViewPort.project(nextCoordinates);
         const [mx, my] = bestViewPort.project(midCoordinates);
 
+        // Calculate angle between two zone line points.
+        // Then add 90 or 270 degrees to that angle to get a point perpendicular from the zone line
+        // Convert calculated degrees to radians and use them to calculate the coordinates for the zone symbol
+        // Get lonLat for later to filter out points that are too close to the zone lines.
         const angle = toDegrees(cx, cy, ex, ey) + 90;
         const radians = toRadians(angle);
         const sy = mx + CIRCLE_RADIUS * Math.cos(radians);

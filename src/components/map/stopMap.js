@@ -357,7 +357,7 @@ const StopMap = props => {
             symbolForEachZone.length > 0 &&
             symbolForEachZone.map((symbol, index) => (
               <ItemFixed key={index} left={symbol.sy} top={symbol.sx}>
-                <ZoneSymbol zone={symbol.zone} size={LOCATION_RADIUS} />
+                <ZoneSymbol zone={symbol.zone} size={LOCATION_RADIUS * 2} />
               </ItemFixed>
             ))}
 
@@ -423,7 +423,7 @@ const StopMap = props => {
             routes: { enabled: true, hideBusRoutes: true },
             municipal_borders: { enabled: true },
             ticket_zone_labels: { enabled: miniMapStyle.minimapZoneSymbols },
-            ticket_zones: { enabled: mapStyle.mapZones },
+            ticket_zones: { enabled: miniMapStyle.minimapZones },
           }}
           extraLayers={[placeLabelCity]}
         />

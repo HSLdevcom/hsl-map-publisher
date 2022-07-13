@@ -21,11 +21,7 @@ const Destinations = props => {
         <WrappingRow key={groupIndex} style={{ marginBottom: 5 }}>
           {destinations.map((destination, index) => (
             <Row key={index}>
-              <div
-                className={classNames(styles.routeId)}
-                style={{ color: getColor(destinations[0]) }}>
-                {destination.routeId}
-              </div>
+              <div className={styles.routeId}>{destination.routeId}</div>
             </Row>
           ))}
           <Column style={{ flexBasis: '100%' }}>
