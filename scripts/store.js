@@ -103,14 +103,14 @@ async function addBuild({ title }) {
 async function updateBuild({ id, status }) {
   await knex('build')
     .where({ id })
-    .update({ status });
+    .update({ status, updated_at: knex.fn.now() });
   return { id };
 }
 
 async function removeBuild({ id }) {
   await knex('build')
     .where({ id })
-    .update({ status: 'REMOVED' });
+    .update({ status: 'REMOVED', updated_at: knex.fn.now() });
   return { id };
 }
 
@@ -145,20 +145,28 @@ async function addPoster({ buildId, component, template, props, order }) {
     ),
     order,
   });
+  await knex('build')
+    .where('id', buildId)
+    .update({ updated_at: knex.fn.now() });
+
   return { id };
 }
 
 async function updatePoster({ id, status }) {
   await knex('poster')
     .where({ id })
-    .update({ status });
+    .update({ status, updated_at: knex.fn.now() });
   return { id };
 }
 
 async function removePoster({ id }) {
-  await knex('poster')
+  const buildId = await knex('poster')
+    .returning('build_id')
     .where({ id })
-    .update({ status: 'REMOVED' });
+    .update({ status: 'REMOVED', updated_at: knex.fn.now() });
+  await knex('build')
+    .where('id', buildId[0].build_id)
+    .update({ updated_at: knex.fn.now() });
   return { id };
 }
 
@@ -273,7 +281,7 @@ async function saveAreaImages(slots) {
       if (existingImage) {
         await knex('template_images')
           .where({ name: imageName })
-          .update(newImage);
+          .update({ ...newImage, updated_at: knex.fn.now() });
       } else {
         await knex('template_images').insert(newImage);
       }
@@ -302,7 +310,7 @@ async function saveTemplate(template) {
   if (existingTemplate) {
     await knex('template')
       .where({ id })
-      .update(newTemplate);
+      .update({ ...newTemplate, updated_at: knex.fn.now() });
   } else {
     await knex('template').insert(template);
   }
