@@ -5,7 +5,7 @@
   align-items: center;
   background: white;
   border-radius: 15px;
-  padding: 10px;
+  padding: 5px;
   white-space: nowrap;
   overflow: hidden;
   font-size: 28px;
@@ -28,14 +28,21 @@
 .zoneHeading {
   display: flex;
   color: black;
-  font-size: 18px;
+  font-size: 15px;
   font-family: GothamRounded-Medium;
+  color: var(--timetable-text-color);
 }
 .zoneLetter {
   display: flex;
   color: black;
-  font-size: 2em;
+  font-size: 1.9em;
   font-family: GothamRounded-Medium;
+  width: 60px;
+  height: 60px;
+  color: rgb(255 255 255);
+  background: var(--timetable-text-color);
+  border-radius: 50%;
+  justify-content: space-evenly;
 }
 
 .routesContainer {
@@ -87,7 +94,7 @@
 }
 
 .stopIdTitle {
-  font-size: 18px;
+  font-size: 10px;
   color: var(--timetable-text-color);
   font-family: GothamRounded-Medium;
 }
