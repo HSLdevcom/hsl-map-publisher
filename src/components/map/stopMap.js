@@ -278,7 +278,10 @@ const StopMap = props => {
       symbol.sy < mapStyle.width - ZONE_SYMBOL_MAP_PADDING &&
       symbol.sx < mapStyle.height - ZONE_SYMBOL_MAP_PADDING,
   );
-  const symbolsWithStopDistances = calculateSymbolDistancesFromStops(stops, projectedSymbolsInBbox);
+  const symbolsWithStopDistances = calculateSymbolDistancesFromStops(
+    stops.concat(props.currentStop),
+    projectedSymbolsInBbox,
+  );
   const symbolForEachZone = getSymbolForEachZone(symbolsWithStopDistances);
 
   const miniMapCoordinateHelper = new MapCoordinateHelper(props.miniMapOptions);

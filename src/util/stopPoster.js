@@ -1,5 +1,6 @@
 import { PerspectiveMercatorViewport } from 'viewport-mercator-project';
 import TicketZones from '../components/map/ticket-zones.json';
+import { groupBy } from 'lodash';
 import * as turf from '@turf/turf';
 
 const STOPS_PER_PIXEL = 0.000006;
@@ -43,6 +44,14 @@ function withinBounds(lat, lon, maxLat, minLat, maxLon, minLon) {
 
 function polygonContainsPoint(poly, point) {
   return turf.booleanContains(poly, point);
+}
+
+function getCoordinatesByAngle(mx, my, bestViewPort, angle) {
+  const radians = toRadians(angle);
+  const sy = mx + CIRCLE_RADIUS * Math.cos(radians);
+  const sx = my + CIRCLE_RADIUS * Math.sin(radians);
+  const [syLon, syLat] = bestViewPort.unproject([sy, sx]);
+  return { sy, sx, syLon, syLat };
 }
 
 function calculateStopsViewport(options) {
@@ -241,7 +250,7 @@ function calculateStopsViewport(options) {
     });
   });
 
-  const allProjectedSymbols = [];
+  const projectedSymbols = [];
   const zoneSymbolObject = (zone, sx, sy, textAlignLeft, latLon) => ({
     zone,
     sx,
@@ -268,53 +277,54 @@ function calculateStopsViewport(options) {
         const [ex, ey] = bestViewPort.project(nextCoordinates);
         const [mx, my] = bestViewPort.project(midCoordinates);
 
-        // Calculate angle between two zone line points.
-        // Then add 90 or 270 degrees to that angle to get a point perpendicular from the zone line
-        // Convert calculated degrees to radians and use them to calculate the coordinates for the zone symbol
-        // Get lonLat for later to filter out points that are too close to the zone lines.
-        const angle = toDegrees(cx, cy, ex, ey) + 90;
-        const radians = toRadians(angle);
-        const sy = mx + CIRCLE_RADIUS * Math.cos(radians);
-        const sx = my + CIRCLE_RADIUS * Math.sin(radians);
-        const [syLon, syLat] = bestViewPort.unproject([sy, sx]);
+        // We calculate point for every degree around the zone line point so 360 coordinates for each zone line coordinate
+        const allsymbols = [];
+        let angleIncrement = 0;
+        while (angleIncrement < 360) {
+          const angle = toDegrees(cx, cy, ex, ey) + angleIncrement;
+          const symbolSpot = getCoordinatesByAngle(mx, my, bestViewPort, angle);
+          TicketZones.features.forEach(ticketZone => {
+            if (
+              polygonContainsPoint(ticketZone, turf.point([symbolSpot.syLon, symbolSpot.syLat]))
+            ) {
+              symbolSpot.zone = ticketZone.properties.Zone;
+              const distances = zoneBorderLinesInBbox.map(line =>
+                turf.pointToLineDistance(turf.point([symbolSpot.syLon, symbolSpot.syLat]), line, {
+                  units: 'meters',
+                }),
+              );
+              const closest = Math.min(...distances);
+              symbolSpot.distanceToZoneLine = closest;
+              allsymbols.push(symbolSpot);
+            }
+          });
+          angleIncrement += 1;
+        }
 
-        const angle2 = toDegrees(cx, cy, ex, ey) + 270;
-        const radians2 = toRadians(angle2);
-        const sy2 = mx + CIRCLE_RADIUS * Math.cos(radians2);
-        const sx2 = my + CIRCLE_RADIUS * Math.sin(radians2);
-        const [sy2Lon, sy2Lat] = bestViewPort.unproject([sy2, sx2]);
+        // Group the 360 coordinates by zone (e.g "A" and "B") and calculate distance to closest zone line coordinate
+        // [{"A": [symbol1, symbol2, ...]}, {"B": [symbol1, symbol2, ...]}]
+        const symbolsByZone = groupBy(allsymbols, 'zone');
 
-        TicketZones.features.forEach(ticketZone => {
-          const zone = ticketZone.properties.Zone;
-          if (polygonContainsPoint(ticketZone, turf.point([syLon, syLat]))) {
-            const textAlignLeft = sy < mx;
-            allProjectedSymbols.push(zoneSymbolObject(zone, sx, sy, textAlignLeft, [syLon, syLat]));
-          }
-          if (polygonContainsPoint(ticketZone, turf.point([sy2Lon, sy2Lat]))) {
-            const textAlignLeft = sy2 < mx;
-            allProjectedSymbols.push(
-              zoneSymbolObject(zone, sx2, sy2, textAlignLeft, [sy2Lon, sy2Lat]),
-            );
-          }
+        // Get point for each zone that is furthest away from zone line.
+        const symbolsFurthestFromZoneLine = Object.keys(symbolsByZone).map(zone => {
+          const symbols = symbolsByZone[zone];
+          const furthestSymbol = symbols.reduce((prev, curr) =>
+            prev.distanceToZoneLine > curr.distanceToZoneLine ? prev : curr,
+          );
+          return furthestSymbol;
+        });
+
+        symbolsFurthestFromZoneLine.forEach(symbol => {
+          projectedSymbols.push(
+            zoneSymbolObject(symbol.zone, symbol.sx, symbol.sy, false, [
+              symbol.syLon,
+              symbol.syLat,
+            ]),
+          );
         });
       }
     });
   });
-
-  const projectedSymbolsWithDistanceToZoneLine = allProjectedSymbols.map(symbol => {
-    const pt = turf.point(symbol.latLon);
-    const distances = zoneBorderLinesInBbox.map(line =>
-      turf.pointToLineDistance(pt, line, { units: 'meters' }),
-    );
-    const closest = Math.min(...distances);
-    const symbolWithDistance = symbol;
-    symbolWithDistance.distanceToZoneBorder = closest;
-    return symbolWithDistance;
-  });
-
-  const projectedSymbols = projectedSymbolsWithDistanceToZoneLine.filter(
-    symbol => symbol.distanceToZoneBorder > MIN_DISTANCE_TO_ZONE_BORDER,
-  );
 
   return {
     projectedStops,
