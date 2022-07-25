@@ -13,7 +13,6 @@ const DISTANCES_FROM_CENTRE = [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3];
 const ANGLES = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
 const TEXT_ALIGNMENT_OFFSET = 60;
 const CIRCLE_RADIUS = 150;
-const MIN_DISTANCE_TO_ZONE_BORDER = 100;
 
 function viewportContains(viewport, place, width, height, miniMapStartX, miniMapStartY) {
   const [x, y] = viewport.project([place.lon, place.lat], { topLeft: true });
@@ -277,11 +276,10 @@ function calculateStopsViewport(options) {
         const [ex, ey] = bestViewPort.project(nextCoordinates);
         const [mx, my] = bestViewPort.project(midCoordinates);
 
-        // We calculate point for every degree around the zone line point so 360 coordinates for each zone line coordinate
+        // We calculate point for every degree around the zone line point so 360 coordinates for each zone line coordinate.
         const allsymbols = [];
-        let angleIncrement = 0;
-        while (angleIncrement < 360) {
-          const angle = toDegrees(cx, cy, ex, ey) + angleIncrement;
+        for (let i = 0; i < 360; i++) {
+          const angle = toDegrees(cx, cy, ex, ey) + i;
           const symbolSpot = getCoordinatesByAngle(mx, my, bestViewPort, angle);
           TicketZones.features.forEach(ticketZone => {
             if (
@@ -298,7 +296,6 @@ function calculateStopsViewport(options) {
               allsymbols.push(symbolSpot);
             }
           });
-          angleIncrement += 1;
         }
 
         // Group the 360 coordinates by zone (e.g "A" and "B") and calculate distance to closest zone line coordinate
