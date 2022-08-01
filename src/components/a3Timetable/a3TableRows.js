@@ -1,9 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Row, WrappingRow } from 'components/util';
-import sortBy from 'lodash/sortBy';
-import keys from 'lodash/keys';
-import pickBy from 'lodash/pickBy';
+import { sortBy, keys, pickBy, groupBy } from 'lodash';
 import { trimRouteId } from 'util/domain';
 import classnames from 'classnames';
 import TableHeader from './a3TableHeader';
@@ -43,6 +41,21 @@ const TableRow = props => (
   </Row>
 );
 
+const SEGMENT_TEXTS = {
+  'Maanantai - Perjantai': {
+    sv: 'Måndag - Fredag',
+    en: 'Monday - Friday',
+  },
+  Lauantai: {
+    sv: 'Lördag',
+    en: 'Saturday',
+  },
+  Sunnuntai: {
+    sv: 'Söndag',
+    en: 'Sunday',
+  },
+};
+
 TableRow.propTypes = {
   hours: PropTypes.string.isRequired,
   departures: PropTypes.arrayOf(PropTypes.shape(Departure.propTypes)).isRequired,
@@ -51,18 +64,20 @@ TableRow.propTypes = {
 const TableRows = props => {
   // Split columns to multiple divs if there's a day divider.
   const indexesToSplit = keys(pickBy(props.departures, 'segment'));
-  indexesToSplit.push(props.departures.length);
-  const arrs = [];
-  let startIndex = 0;
-  indexesToSplit.forEach((splitIndex, index) => {
-    const splitHere = parseInt(splitIndex, 10);
-    const splitted = props.departures.slice(startIndex, splitHere);
-    startIndex = splitIndex;
-    arrs.push(splitted);
-  });
   const diagramExists = keys(pickBy(props.departures, 'diagram'));
+  const departureSegments = [];
+  indexesToSplit.push(props.departures.length);
+
+  let startIndex = 0;
+  indexesToSplit.forEach(splitIndex => {
+    const splitHere = parseInt(splitIndex, 10);
+    const departuresChunk = props.departures.slice(startIndex, splitHere);
+    startIndex = splitIndex;
+    departureSegments.push(departuresChunk);
+  });
+
   if (diagramExists.length > 0) {
-    arrs.push({ diagram: true });
+    departureSegments.push({ diagram: true });
   }
   const getRowAndHeader = (departuresHour, index) => (
     <div>
@@ -70,8 +85,8 @@ const TableRows = props => {
         <div className={styles.a3tableHeaderContainer}>
           <TableHeader
             title={departuresHour.segment}
-            subtitleSw="Lördag"
-            subtitleEn="Saturday"
+            subtitleSw={SEGMENT_TEXTS[departuresHour.segment].sv}
+            subtitleEn={SEGMENT_TEXTS[departuresHour.segment].en}
             extended={props.useWide}
             printAsA3
           />
@@ -90,8 +105,8 @@ const TableRows = props => {
         [styles.wide]: props.useWide,
         [styles.diagram]: diagramExists.length > 0,
       })}>
-      {arrs.map(arr => {
-        if (arr.diagram) {
+      {departureSegments.map((departureSegment, index) => {
+        if (departureSegment.diagram) {
           if (!props.diagram) {
             return null;
           }
@@ -107,14 +122,15 @@ const TableRows = props => {
           );
         }
         const content = [];
-        arr.forEach((departuresHour, index) => {
+        departureSegment.forEach((departuresHour, i) => {
           if (departuresHour.hour) {
-            content.push(getRowAndHeader(departuresHour, index));
+            content.push(getRowAndHeader(departuresHour, i));
           }
         });
-        if (!!arr.length && !!content.length) {
+        if (!!departureSegment.length && !!content.length) {
           return (
             <div
+              key={`tableRows_${index}`}
               className={classnames(styles.a3root, {
                 [styles.summer]: props.isSummerTimetable,
               })}>
