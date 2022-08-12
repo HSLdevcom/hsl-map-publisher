@@ -101,7 +101,30 @@ const errorHandler = async (ctx, next) => {
   } catch (error) {
     ctx.status = error.status || 500;
     ctx.body = { message: error.message };
-    console.error(error); // eslint-disable-line no-console
+    if (ctx.status !== 401) {
+      console.error(error); // eslint-disable-line no-console
+    }
+  }
+};
+
+const authMiddleware = async (ctx, next) => {
+  const endpointsNotRequiringAuthentication = ['/login', '/logout', '/session'];
+  if (endpointsNotRequiringAuthentication.includes(ctx.path)) {
+    // Do not check the authentication beforehands for session related paths.
+    await next();
+  } else {
+    const authResponse = await authEndpoints.checkExistingSession(
+      ctx.request,
+      ctx.response,
+      ctx.session,
+    );
+
+    if (!authResponse.body.isOk) {
+      // Not authenticated, throw 401
+      ctx.throw(401);
+    } else {
+      await next();
+    }
   }
 };
 
@@ -364,6 +387,7 @@ async function main() {
         credentials: true,
       }),
     )
+    .use(authMiddleware)
     .use(jsonBody({ fallback: true, limit: '10mb' }))
     .use(router.routes())
     .use(router.allowedMethods())
