@@ -96,7 +96,46 @@ const errorHandler = async (ctx, next) => {
   } catch (error) {
     ctx.status = error.status || 500;
     ctx.body = { message: error.message };
-    console.error(error); // eslint-disable-line no-console
+    if (ctx.status !== 401) {
+      console.error(error); // eslint-disable-line no-console
+    }
+  }
+};
+
+const authMiddleware = async (ctx, next) => {
+  // Helper function to allow specific requests without authentication
+  const allowAuthException = ctx2 => {
+    // Allow session related requests
+    if (['/login', '/logout', '/session'].includes(ctx2.path)) {
+      return true;
+    }
+    // Allow GET localhost:4000/templates/..., so that puppeteer can get the template.
+    if (
+      ctx2.path.startsWith('/templates/') &&
+      ctx.method === 'GET' &&
+      ctx.host === 'localhost:4000'
+    ) {
+      return true;
+    }
+    return false;
+  };
+
+  if (allowAuthException(ctx)) {
+    // Do not check the authentication beforehands for session related paths.
+    await next();
+  } else {
+    const authResponse = await authEndpoints.checkExistingSession(
+      ctx.request,
+      ctx.response,
+      ctx.session,
+    );
+
+    if (!authResponse.body.isOk) {
+      // Not authenticated, throw 401
+      ctx.throw(401);
+    } else {
+      await next();
+    }
   }
 };
 
@@ -347,6 +386,7 @@ async function main() {
         credentials: true,
       }),
     )
+    .use(authMiddleware)
     .use(jsonBody({ fallback: true, limit: '10mb' }))
     .use(router.routes())
     .use(router.allowedMethods())
