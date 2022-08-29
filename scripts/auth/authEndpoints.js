@@ -51,7 +51,7 @@ const authorize = async (req, res, session) => {
       status: 401,
     };
   }
-  const tokenResponse = await AuthService.requestAccessToken(authRequest.code);
+  const tokenResponse = await AuthService.requestAccessToken(authRequest.code, isTesting);
 
   if (session && tokenResponse.access_token) {
     modifiedSession.accessToken = tokenResponse.access_token;
