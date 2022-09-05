@@ -8,6 +8,10 @@
   width: 589.5px;
 }
 
+.emptyColumn {
+  width: 0px;
+}
+
 .diagram {
   /* width: fit-content; */
   min-width: 389.5px;
@@ -28,7 +32,7 @@
 }
 
 .a3tableHeaderContainer {
-  margin-bottom: 10px;
+  margin-bottom: 3px;
   border-radius: 15px;
 }
 
