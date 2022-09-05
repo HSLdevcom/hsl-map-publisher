@@ -8,7 +8,6 @@ const allowedDomains = DOMAINS_ALLOWED_TO_LOGIN.split(',');
 const hasAllowedDomain = async userInfo => {
   const groups = get(userInfo, 'groups');
   const domain = last(userInfo.email.toLowerCase().split('@')) || '';
-
   if (groups.includes(PUBLISHER_TEST_GROUP)) {
     return true;
   }
@@ -47,11 +46,16 @@ const authorize = async (req, res, session) => {
     return {
       body: {
         isOk: false,
+        message: 'No authorization code',
       },
       status: 401,
     };
   }
-  const tokenResponse = await AuthService.requestAccessToken(authRequest.code, isTesting);
+
+  const tokenResponse = await AuthService.requestAccessToken({
+    code: authRequest.code,
+    isTesting,
+  });
 
   if (session && tokenResponse.access_token) {
     modifiedSession.accessToken = tokenResponse.access_token;

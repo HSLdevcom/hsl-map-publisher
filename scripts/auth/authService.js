@@ -6,9 +6,9 @@ const { CLIENT_SECRET, API_CLIENT_SECRET, TESTING_REDIRECT_URI } = require('../.
 
 const authHash = Buffer.from(`${API_CLIENT_ID}:${API_CLIENT_SECRET}`).toString('base64');
 
-const requestAccessToken = async (code, isTesting) => {
-  const redirectUri = isTesting ? TESTING_REDIRECT_URI : REDIRECT_URI;
-  const url = `${LOGIN_PROVIDER_URI}/openid/token?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&grant_type=authorization_code&code=${code}&redirect_uri=${redirectUri}`;
+const requestAccessToken = async props => {
+  const redirectUri = props.isTesting ? TESTING_REDIRECT_URI : REDIRECT_URI;
+  const url = `${LOGIN_PROVIDER_URI}/openid/token?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&grant_type=authorization_code&code=${props.code}&redirect_uri=${redirectUri}`;
   const response = await fetch(url, {
     method: 'POST',
     headers: {
