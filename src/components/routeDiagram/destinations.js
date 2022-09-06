@@ -21,9 +21,7 @@ const Destinations = props => {
         <WrappingRow key={groupIndex} style={{ marginBottom: 5 }}>
           {destinations.map((destination, index) => (
             <Row key={index}>
-              <div
-                className={classNames(styles.routeId)}
-                style={{ color: getColor(destinations[0]) }}>
+              <div className={classNames(styles.routeId)} style={{ color: getColor(destination) }}>
                 {destination.routeId}
               </div>
             </Row>
