@@ -111,7 +111,7 @@ const checkExistingSession = async (req, res, session) => {
       body: response,
     };
   }
-  console.log('No existing session');
+  // console.log('No existing session');
   const response = {
     isOk: false,
   };
