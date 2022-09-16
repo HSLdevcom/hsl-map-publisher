@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { hot } from 'react-hot-loader';
-import { chunk, last, groupBy } from 'lodash';
+import { chunk, last, groupBy, findIndex } from 'lodash';
 import renderQueue from 'util/renderQueue';
 
 import TableRows from './a3TableRows';
@@ -11,7 +11,13 @@ import styles from './a3Timetable.css';
 
 const COLUMNS_PER_PAGE = 3;
 const MAX_DIAGRAM_RETRIES = 3;
-const PAGE_HEIGHT = 842;
+const PAGE_HEIGHT = 840;
+const SINGLE_COLUMN_MIN_DEPARTURES = 200;
+const SEGMENT_NAMES = {
+  weekdays: 'Maanantai - Perjantai',
+  saturdays: 'Lauantai',
+  sundays: 'Sunnuntai',
+};
 
 class Timetable extends Component {
   constructor(props) {
@@ -38,22 +44,18 @@ class Timetable extends Component {
     const saturdays = this.rowsByHour(this.props.saturdays);
     const sundays = this.rowsByHour(this.props.sundays);
 
-    if (weekdays.length) {
-      weekdays[0].segment = 'Maanantai - Perjantai';
-      departures = departures.concat(weekdays);
+    if (weekdays.length > 0) {
+      weekdays[0].segment = SEGMENT_NAMES.weekdays;
     }
-    if (saturdays.length) {
-      saturdays[0].segment = 'Lauantai';
-      departures = departures.concat(saturdays);
+    if (saturdays.length > 0) {
+      saturdays[0].segment = SEGMENT_NAMES.saturdays;
     }
-    if (sundays.length) {
-      sundays[0].segment = 'Sunnuntai';
-      departures = departures.concat(sundays);
+    if (sundays.length > 0) {
+      sundays[0].segment = SEGMENT_NAMES.sundays;
     }
-    departures = [departures];
-    if (this.props.groupedRows) {
-      departures = this.props.groupedRows;
-    }
+    departures = this.props.groupedRows
+      ? this.props.groupedRows
+      : this.defaultColumns({ weekdays, saturdays, sundays });
 
     this.setState({
       weekdays: {
@@ -78,27 +80,26 @@ class Timetable extends Component {
     renderQueue.remove(this, { error: new Error(error) });
   }
 
-  formatDate = date => {
-    const monthNames = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
+  defaultColumns = props => {
+    const { weekdays, saturdays, sundays } = props;
+    const segments = [weekdays, saturdays, sundays];
+    const departuresLength = segments
+      .flat()
+      .reduce((acc, element) => acc + element.departures.length, 0);
+    const useSingleColumn = departuresLength < SINGLE_COLUMN_MIN_DEPARTURES;
+    let departures = [];
+    for (let i = 0; i < segments.length; i++) {
+      const segment = segments[i];
+      if (segment.length > 0) {
+        if (useSingleColumn) {
+          departures = departures.concat(segment);
+        } else {
+          departures.push(segment);
+        }
+      }
+    }
 
-    const day = date.getDate();
-    const monthIndex = date.getMonth();
-    const year = date.getFullYear();
-
-    return `${day} ${monthNames[monthIndex]} ${year}`;
+    return useSingleColumn ? [departures] : departures;
   };
 
   getZoneLetterStyle = zone => ({
@@ -208,16 +209,26 @@ class Timetable extends Component {
   updateLayout() {
     const overflow = this.hasOverflow();
     const { weekdays } = this.state;
+    const { groupedRows, removedRows } = weekdays;
+    let { diagramRetries } = this.state;
+    // True if no overflows, departures exist in grouped rows and no removed rows to add as new column
+    const allOk =
+      !overflow.vertical &&
+      !overflow.horizontal &&
+      weekdays.removedRows.length === 0 &&
+      weekdays.groupedRows.length > 0;
 
     // If diagram retries reach maximum remove diagram and empty columns
     if (this.state.diagramRetries > MAX_DIAGRAM_RETRIES) {
-      const { groupedRows } = this.state.weekdays;
-
       while (last(groupedRows).length === 0) {
         groupedRows.pop();
         weekdays.groupedRows = groupedRows;
       }
 
+      while (last(groupedRows)[0].emptyColumn) {
+        groupedRows.pop();
+        weekdays.groupedRows = groupedRows;
+      }
       while (true) {
         const lastGroupedRows = last(groupedRows);
         const lastRow = last(lastGroupedRows);
@@ -229,62 +240,58 @@ class Timetable extends Component {
           break;
         }
       }
-      this.setState({
-        useDiagram: true,
-        weekdays,
-      });
       renderQueue.remove(this);
       this.props.updateHook(weekdays.groupedRows);
       return;
     }
 
-    if (
-      !overflow.vertical &&
-      !overflow.horizontal &&
-      weekdays.removedRows.length === 0 &&
-      weekdays.groupedRows.length > 0 &&
-      this.state.useDiagram
-    ) {
+    // If everything ok and using diagram remove process from queue and return
+    if (allOk && this.state.useDiagram) {
       renderQueue.remove(this);
       this.props.updateHook(weekdays.groupedRows);
       return;
     }
-    if (overflow.horizontal || overflow.vertical || weekdays.removedRows.length > 0) {
-      const { groupedRows } = this.state.weekdays;
-      const { removedRows } = this.state.weekdays;
-      if (overflow.vertical || overflow.horizontal) {
-        const lastGroupedRows = groupedRows.pop();
-        const removedRow = lastGroupedRows.pop();
+
+    // Fix vertical overflow by removing rows and adding them to removed rows list. Removed rows list will be added in as new column.
+    if (overflow.horizontal || overflow.vertical) {
+      const lastGroupedRows = groupedRows.pop();
+      const removedRow = lastGroupedRows.pop();
+
+      // if is diagram and diagramRetries is maxed dont remove last row
+      if (lastGroupedRows.length > 0) {
         groupedRows.push(lastGroupedRows);
-        if (removedRows) {
-          removedRows.push(removedRow);
-        }
-        let { diagramRetries } = this.state;
-        if (removedRow.diagram) {
-          diagramRetries += 1;
-        }
-        this.setState({
-          weekdays: {
-            removedRows,
-            groupedRows,
-          },
-          diagramRetries,
-        });
-        return;
       }
-      if ((!overflow.vertical || !overflow.horizontal) && removedRows.length > 0) {
-        const newGroupedRow = this.state.weekdays.removedRows.reverse();
-        groupedRows.push(newGroupedRow);
-        this.setState({
-          weekdays: {
-            removedRows: [],
-            groupedRows,
-          },
-        });
-        return;
+      if (removedRow && removedRows) {
+        removedRows.push(removedRow);
       }
-    }
 
+      // If overflowing element is diagram add empty columns to trigger next page
+      if (removedRow && removedRow.diagram) {
+        removedRows.push({ emptyColumn: true });
+        diagramRetries += 1;
+      }
+      this.setState({
+        weekdays: {
+          removedRows,
+          groupedRows,
+        },
+        diagramRetries,
+      });
+      return;
+    }
+    // Add removed rows as new column
+    if (removedRows.length > 0) {
+      const newGroupedRow = removedRows.reverse();
+      groupedRows.push(newGroupedRow);
+      this.setState({
+        weekdays: {
+          removedRows: [],
+          groupedRows,
+        },
+      });
+      return;
+    }
+    // After departure overflows are fixed, add last row as diagram. It will be parsed in a3TableRows as a special case.
     if (
       !overflow.vertical &&
       weekdays.removedRows.length === 0 &&
@@ -292,9 +299,8 @@ class Timetable extends Component {
       !this.state.useDiagram &&
       this.state.diagramRetries < MAX_DIAGRAM_RETRIES
     ) {
-      const { groupedRows } = this.state.weekdays;
-      const lastGroupedRows = groupedRows[groupedRows.length - 1];
-      const lastRow = lastGroupedRows[lastGroupedRows.length - 1];
+      const lastGroupedRows = last(groupedRows);
+      const lastRow = last(lastGroupedRows);
       // Adding last row as diagram. It will be parsed in a3TableRows as a special case.
       if (lastRow && !lastRow.diagram) {
         groupedRows[groupedRows.length - 1].push({ diagram: true });
@@ -318,7 +324,7 @@ class Timetable extends Component {
     const weekdaysRows = this.rowsByHour(this.state.weekdays);
     const chunkedRows = chunk(this.state.weekdays.groupedRows, COLUMNS_PER_PAGE);
     // Header is excluded from first page.
-    const contentContainerStyle = { height: PAGE_HEIGHT - 115 };
+    const contentContainerStyle = { height: PAGE_HEIGHT - 97 };
     // ChunkedRow is 3 columns and 3 colums is the maximum for one page. If more
     // than 3 colums we need to increase height so rest of the timetable rows can fit.
     // After first page the height is increased by one A3 page height.
@@ -360,15 +366,22 @@ class Timetable extends Component {
             }}>
             {chunkedRows.map((chunkedRow, index) => {
               // Use wider timetable columns:
-              // - if one or two columns with 5 rows overflowing
-              // - if three columns and last one is empty
-              // - if less than three columns and diagram is next to be added
-              const useWide =
-                (chunkedRow.length <= 2 && this.state.weekdays.removedRows.length < 5) ||
+              // - If last column is an empty column
+              // - If three columns and last one is empty
+              // - If less than three columns and diagram is next to be added
+              const lastOnPage = last(last(chunkedRow));
+              let useWide =
+                lastOnPage.emptyColumn ||
                 (chunkedRow.length === COLUMNS_PER_PAGE && last(chunkedRow).length === 0) ||
-                (chunkedRow.length < COLUMNS_PER_PAGE &&
-                  last(last(chunkedRow)) &&
-                  last(last(chunkedRow)).diagram);
+                (chunkedRow.length < COLUMNS_PER_PAGE && lastOnPage && lastOnPage.diagram);
+
+              const flatChunkedRow = chunkedRow.flat();
+              const hasDiagram = findIndex(flatChunkedRow, { diagram: true }) !== -1;
+
+              // No wide columns when diagram on same page
+              if (hasDiagram) {
+                useWide = false;
+              }
 
               return (
                 <div className={styles.tableRowsContainer}>

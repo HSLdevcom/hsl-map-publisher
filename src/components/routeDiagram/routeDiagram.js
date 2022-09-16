@@ -15,7 +15,8 @@ const RouteDiagram = props => (
         ? styles.root
         : classNames(styles.root, styles.a3, props.useWide ? styles.useWide : '')
     }>
-    <div className={styles.componentName}>
+    <div
+      className={classNames(styles.componentName, { [styles.componentNameA3]: props.printAsA3 })}>
       <div className={!props.printAsA3 ? styles.title : styles.titleA3}>Linjojen reitit</div>
       <div className={!props.printAsA3 ? styles.subtitle : styles.subtitleA3}>
         Linjernas rutter / Routes
@@ -23,7 +24,7 @@ const RouteDiagram = props => (
     </div>
     <div className={styles.start}>
       <InlineSVG src={markerIcon} className={styles.icon} />
-      <div className={styles.title}>
+      <div className={classNames(styles.title, { [styles.titleA3]: props.printAsA3 })}>
         Olet tässä&nbsp;&nbsp;
         <span className={styles.subtitle}>Du är här&nbsp;&nbsp;</span>
         <span className={styles.subtitle}>You are here</span>
