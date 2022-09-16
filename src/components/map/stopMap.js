@@ -33,7 +33,8 @@ const SALES_POINT_RADIUS = 9;
 const STOP_RADIUS = 20;
 const LOCATION_RADIUS = 30;
 const LOCATION_RADIUS_MINI = 10;
-const ZONE_SYMBOL_MAP_PADDING = 150;
+const ZONE_SYMBOL_MAP_PADDING = 100;
+const ZONE_SYMBOL_MAP_PADDING_EXTRA = 200;
 
 // Overlays
 const INFO_MARGIN_BOTTOM = 78;
@@ -62,6 +63,10 @@ const getZoneIcon = zone => {
     case 'C':
       return <InlineSVG src={cZone} style={{ width: '100%' }} />;
     case 'D':
+      return <InlineSVG src={dZone} style={{ width: '100%' }} />;
+    case 'D1':
+      return <InlineSVG src={dZone} style={{ width: '100%' }} />;
+    case 'D2':
       return <InlineSVG src={dZone} style={{ width: '100%' }} />;
     default:
       return <div />;
@@ -266,8 +271,8 @@ const StopMap = props => {
   // Added extra buffed width because zone symbols might be cut half by minimap
   const projectedSymbols = props.projectedSymbols.filter(
     symbol =>
-      symbol.sy < miniMapStyle.left - ZONE_SYMBOL_MAP_PADDING ||
-      symbol.sx < miniMapStyle.top + ZONE_SYMBOL_MAP_PADDING,
+      symbol.sx < miniMapStyle.top - ZONE_SYMBOL_MAP_PADDING ||
+      symbol.sy < miniMapStyle.left - ZONE_SYMBOL_MAP_PADDING_EXTRA,
   );
 
   // Avoid map edges so zone symbol and text is fully visible
@@ -275,13 +280,14 @@ const StopMap = props => {
     symbol =>
       symbol.sy > ZONE_SYMBOL_MAP_PADDING &&
       symbol.sx > ZONE_SYMBOL_MAP_PADDING &&
-      symbol.sy < mapStyle.width - ZONE_SYMBOL_MAP_PADDING &&
+      symbol.sy < mapStyle.width - ZONE_SYMBOL_MAP_PADDING_EXTRA &&
       symbol.sx < mapStyle.height - ZONE_SYMBOL_MAP_PADDING,
   );
   const symbolsWithStopDistances = calculateSymbolDistancesFromStops(
     stops.concat(props.currentStop),
     projectedSymbolsInBbox,
   );
+
   const symbolForEachZone = getSymbolForEachZone(symbolsWithStopDistances);
 
   const miniMapCoordinateHelper = new MapCoordinateHelper(props.miniMapOptions);
