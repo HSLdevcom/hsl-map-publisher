@@ -7,7 +7,7 @@ const qs = require('qs');
 const log = require('./util/log');
 const { uploadPosterToCloud } = require('./cloudService');
 
-const { addEvent, updatePoster, getPoster } = require('./store');
+const { addEvent, updatePoster } = require('./store');
 
 const {
   AZURE_STORAGE_ACCOUNT,
@@ -17,10 +17,8 @@ const {
 
 const CLIENT_URL = 'http://localhost:5000';
 const RENDER_TIMEOUT = 10 * 60 * 1000;
-const A3_RENDER_TIMEOUT = 2 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
 const SCALE = 96 / 72;
-let currentJob = null;
 
 let browser = null;
 const cwd = process.cwd();
@@ -44,7 +42,7 @@ async function initialize() {
  */
 async function renderComponent(options) {
   const { id, component, template, props, onInfo, onError } = options;
-  props.id = id;
+
   const page = await browser.newPage();
 
   await page.exposeFunction('serverLog', log);
@@ -67,7 +65,7 @@ async function renderComponent(options) {
   console.log(`Opening ${pageUrl} in Puppeteer.`);
 
   await page.goto(pageUrl, {
-    timeout: component === 'A3StopPoster' ? A3_RENDER_TIMEOUT : RENDER_TIMEOUT,
+    timeout: RENDER_TIMEOUT,
   });
 
   const { error = null, width, height } = await page.evaluate(
@@ -99,14 +97,6 @@ async function renderComponent(options) {
       scale: SCALE,
     };
   }
-  if (component === 'A3StopPoster') {
-    printOptions = {
-      printBackground: true,
-      width: 1191,
-      height: 842,
-      margin: 0,
-    };
-  }
 
   const contents = await page.pdf(printOptions);
 
@@ -119,15 +109,10 @@ async function renderComponent(options) {
 }
 
 async function renderComponentRetry(options) {
-  const { onInfo, onError, component } = options;
+  const { onInfo, onError } = options;
 
   for (let i = 0; i < MAX_RENDER_ATTEMPTS; i++) {
     /* eslint-disable no-await-in-loop */
-    const poster = await getPoster({ id: options.id });
-    if (poster.status === 'FAILED' || !poster) {
-      onInfo('Failed or canceled');
-      return { success: false };
-    }
     try {
       onInfo(i > 0 ? 'Retrying' : 'Rendering');
       if (!browser) {
@@ -135,11 +120,7 @@ async function renderComponentRetry(options) {
         await initialize();
       }
       const timeout = new Promise((resolve, reject) =>
-        setTimeout(
-          reject,
-          component === 'A3StopPoster' ? A3_RENDER_TIMEOUT : RENDER_TIMEOUT,
-          new Error('Render timeout'),
-        ),
+        setTimeout(reject, RENDER_TIMEOUT, new Error('Render timeout')),
       );
 
       const posterUploaded = await Promise.race([renderComponent(options), timeout]);
@@ -164,7 +145,7 @@ async function renderComponentRetry(options) {
 
 async function generate(options) {
   const { id } = options;
-  currentJob = id;
+
   const onInfo = (message = 'No message.') => {
     console.log(`${id}: ${message}`); // eslint-disable-line no-console
     addEvent({
@@ -232,33 +213,9 @@ worker.on('failed', (job, err) => {
 
 worker.on('drained', () => console.log('Job queue empty! Waiting for new jobs...'));
 
-const cancelSignalRedis = new Redis(REDIS_CONNECTION_STRING);
-
-cancelSignalRedis.subscribe('cancel', err => {
-  if (err) {
-    console.error('Failed to start listening to cancellation signals: %s', err.message);
-  } else {
-    console.log('Listening to cancellation signals.');
-  }
-});
-
-cancelSignalRedis.on('message', (channel, message) => {
-  if (channel === 'cancel') {
-    console.log(`Received cancellation signal for id ${message}`);
-    if (message === currentJob) {
-      console.log('The job was in progress on this worker! Terminating it...');
-      if (browser) {
-        browser.close();
-      }
-    }
-  }
-});
-
 process.on('SIGINT', () => {
   console.log('Shutting down worker...');
   worker.close(true);
   queueScheduler.close();
-  cancelSignalRedis.disconnect();
-  cancelSignalRedis.quit();
   process.exit(0);
 });
