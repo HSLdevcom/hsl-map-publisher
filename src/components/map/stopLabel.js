@@ -29,8 +29,11 @@ const mapRoutesByDestination = routes => {
   return Object.values(routeSet);
 };
 
-const routeIdsComponent = (routeId, mode, isNewLine, content) => (
-  <span className={styles.route} key={routeId} style={{ color: getColor({ routeId, mode }) }}>
+const routeIdsComponent = (routeId, mode, isNewLine, content, trunkRoute) => (
+  <span
+    className={styles.route}
+    key={routeId}
+    style={{ color: getColor({ routeId, mode, trunkRoute }) }}>
     {isNewLine && <br />}
     {content}
   </span>
@@ -58,7 +61,7 @@ const RouteList = props => {
           const content = `${route.routeId}${index < routes.length - 1 ? ', ' : ''}`;
           const isNewLine = rowLength + content.length > MAX_LABEL_CHARS;
           rowLength = isNewLine ? content.length : rowLength + content.length;
-          return routeIdsComponent(route.routeId, route.mode, isNewLine, content);
+          return routeIdsComponent(route.routeId, route.mode, isNewLine, content, route.trunkRoute);
         })}
       </div>
     );
@@ -79,7 +82,7 @@ const RouteList = props => {
                 const content = `${routeId}${i < route.routeIds.length - 1 ? ', ' : ''}`;
                 const isNewLine = rowLength + content.length > MAX_ROUTEID_CHARS;
                 rowLength = isNewLine ? content.length : rowLength + content.length;
-                return routeIdsComponent(routeId, route.mode, isNewLine, content);
+                return routeIdsComponent(routeId, route.mode, isNewLine, content, route.trunkRoute);
               })}
             </div>
             <Spacer width={6} />
