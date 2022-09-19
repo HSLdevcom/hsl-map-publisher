@@ -23,6 +23,7 @@ class CustomMap extends Component {
     showSalesPoint: PropTypes.bool,
     minimapZoneSymbols: PropTypes.bool,
     minimapZones: PropTypes.bool,
+    legend: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -31,6 +32,7 @@ class CustomMap extends Component {
     showSalesPoint: false,
     minimapZoneSymbols: false,
     minimapZones: false,
+    legend: false,
   };
 
   state = {
@@ -87,6 +89,7 @@ class CustomMap extends Component {
       showSalesPoint,
       minimapZoneSymbols,
       minimapZones,
+      legend,
     } = this.props;
     const { mapWidth, mapHeight } = this.state;
 
@@ -153,6 +156,7 @@ class CustomMap extends Component {
                 showSalesPoint={showSalesPoint}
                 minimapZoneSymbols={minimapZoneSymbols}
                 minimapZones={minimapZones}
+                legend={legend}
               />
             ) : null}
           </div>

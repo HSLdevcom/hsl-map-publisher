@@ -16,10 +16,26 @@
   --line-border: var(--line-width) solid var(--line-color);
 }
 
+.a3 {
+  padding: 15px 0px 5px 15px;
+  border-radius: 30px;
+  width: fit-content;
+  min-width: 350px;
+}
+
+.useWide {
+  min-width: 548px;
+}
+
 .componentName {
   padding: 0px 0px 20px;
   font-size: 30px;
   color: var(--hsl-blue);
+}
+
+.componentNameA3 {
+  font-size: 20px;
+  padding: 0px 0px 10px;
 }
 
 .componentName > .title {
@@ -51,6 +67,13 @@
   line-height: 22px;
 }
 
-.start .subtitle {
+.start .titleA3 {
+  font-family: GothamRounded-Medium;
+  font-size: 0.8em;
+  line-height: 22px;
+}
+
+.subtitleA3 {
   font-family: GothamRounded-Book;
+  font-size: 0.75em;
 }

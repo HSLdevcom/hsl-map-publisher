@@ -320,8 +320,8 @@ class StopPoster extends Component {
       salesPoint,
       minimapZoneSymbols,
       minimapZones,
+      legend,
     } = this.props;
-
     if (!hasRoutesProp) {
       return null;
     }
@@ -372,13 +372,13 @@ class StopPoster extends Component {
               }}>
               <Spacer width="100%" height={50} />
               {hasRoutes && hasRoutesOnTop && (
-                <Routes stopId={stopId} date={date} routeFilter={this.props.routeFilter} />
+                <Routes stopIds={[stopId]} date={date} routeFilter={this.props.routeFilter} />
               )}
               {hasRoutes && hasRoutesOnTop && <Spacer height={10} />}
               <div className={styles.columns}>
                 <div className={hasStretchedLeftColumn ? styles.leftStretched : styles.left}>
                   {hasRoutes && !hasRoutesOnTop && (
-                    <Routes stopId={stopId} date={date} routeFilter={this.props.routeFilter} />
+                    <Routes stopIds={[stopId]} date={date} routeFilter={this.props.routeFilter} />
                   )}
                   {hasRoutes && !hasRoutesOnTop && <Spacer height={10} />}
                   {hasColumnTimetable && (
@@ -442,6 +442,7 @@ class StopPoster extends Component {
                           showSalesPoint={salesPoint}
                           minimapZoneSymbols={minimapZoneSymbols}
                           minimapZones={minimapZones}
+                          legend={legend}
                         />
                       )}
 
@@ -449,7 +450,7 @@ class StopPoster extends Component {
                       {useDiagram && (
                         <RouteDiagram
                           height={this.state.diagramOptions.diagramStopCount}
-                          stopId={stopId}
+                          stopIds={[stopId]}
                           date={date}
                           routeFilter={this.props.routeFilter}
                         />
@@ -492,6 +493,7 @@ StopPoster.propTypes = {
   minimapZoneSymbols: PropTypes.bool,
   minimapZones: PropTypes.bool,
   routeFilter: PropTypes.string,
+  legend: PropTypes.bool,
 };
 
 StopPoster.defaultProps = {
@@ -504,6 +506,7 @@ StopPoster.defaultProps = {
   minimapZoneSymbols: false,
   minimapZones: false,
   routeFilter: '',
+  legend: false,
 };
 
 export default hot(module)(StopPoster);

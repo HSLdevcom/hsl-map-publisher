@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import chunk from 'lodash/chunk';
 import sortBy from 'lodash/sortBy';
-import { Row, Column, InlineSVG } from 'components/util';
+import { Row, Column, InlineSVG, PlatformSymbol } from 'components/util';
 import routesContainer from './routesContainer';
 import renderQueue from 'util/renderQueue';
-import { isTrunkRoute, getColor, getIcon } from 'util/domain';
+import { getColor, getIcon } from 'util/domain';
 
 import styles from './routes.css';
 
@@ -20,6 +20,15 @@ class Routes extends Component {
         destinationSe: PropTypes.string,
       }),
     ).isRequired,
+    platformInfo: PropTypes.bool,
+    betterLayoutAvailable: PropTypes.bool,
+    triggerAnotherLayout: PropTypes.func,
+  };
+
+  static defaultProps = {
+    platformInfo: false,
+    betterLayoutAvailable: false,
+    triggerAnotherLayout: () => {},
   };
 
   constructor(props) {
@@ -29,10 +38,6 @@ class Routes extends Component {
 
   componentDidMount() {
     this.updateLayout();
-  }
-
-  componentWillReceiveProps() {
-    this.setState({ columns: MAX_COLUMNS });
   }
 
   componentDidUpdate() {
@@ -54,8 +59,10 @@ class Routes extends Component {
         this.setState(state => ({ columns: state.columns - 1 }));
         return;
       }
-      renderQueue.remove(this, { error: new Error('Failed to remove routes overflow') });
-      return;
+      if (!this.props.betterLayoutAvailable) {
+        renderQueue.remove(this, { error: new Error('Failed to remove routes overflow') });
+      }
+      this.props.triggerAnotherLayout();
     }
     renderQueue.remove(this);
   }
@@ -63,10 +70,9 @@ class Routes extends Component {
   render() {
     const routesPerColumn = Math.ceil(this.props.routes.length / this.state.columns);
     const routeColumns = chunk(
-      sortBy(this.props.routes, route => !isTrunkRoute(route.routeId)),
+      sortBy(this.props.routes, route => !route.trunkRoute),
       routesPerColumn,
     );
-
     return (
       <div
         className={styles.root}
@@ -103,6 +109,24 @@ class Routes extends Component {
                 </div>
               ))}
             </Column>
+            {this.props.platformInfo && (
+              <Column>
+                {routes.map((route, index) => (
+                  <div key={index} className={styles.group}>
+                    <div style={{ display: 'flex', flexDirection: 'row' }}>
+                      {route.platforms.map((platform, platIndex) => (
+                        <PlatformSymbol
+                          key={platIndex}
+                          platform={platform}
+                          size={50}
+                          color={getColor(route)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </Column>
+            )}
           </Row>
         ))}
       </div>

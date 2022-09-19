@@ -1,11 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
+import find from 'lodash/find';
 import ItemContainer from 'components/labelPlacement/itemContainer';
 import ItemFixed from 'components/labelPlacement/itemFixed';
 import ItemPositioned from 'components/labelPlacement/itemPositioned';
 import { Row, InlineSVG } from 'components/util';
 
 import locationIcon from 'icons/marker.svg';
+import subwayStationIcon from 'icons/icon-subway-station.svg';
 import ticketMachineIcon from 'icons/icon-ticket-machine.svg';
 import ticketSalesPointIcon from 'icons/icon-tickets-sales-point.svg';
 
@@ -30,6 +33,8 @@ const SALES_POINT_RADIUS = 9;
 const STOP_RADIUS = 20;
 const LOCATION_RADIUS = 30;
 const LOCATION_RADIUS_MINI = 10;
+const ZONE_SYMBOL_MAP_PADDING = 100;
+const ZONE_SYMBOL_MAP_PADDING_EXTRA = 200;
 
 // Overlays
 const INFO_MARGIN_BOTTOM = 78;
@@ -58,6 +63,10 @@ const getZoneIcon = zone => {
     case 'C':
       return <InlineSVG src={cZone} style={{ width: '100%' }} />;
     case 'D':
+      return <InlineSVG src={dZone} style={{ width: '100%' }} />;
+    case 'D1':
+      return <InlineSVG src={dZone} style={{ width: '100%' }} />;
+    case 'D2':
       return <InlineSVG src={dZone} style={{ width: '100%' }} />;
     default:
       return <div />;
@@ -120,6 +129,123 @@ const calculateSymbolDistancesFromStops = (stops, symbols) => {
   return symbolsWithStopDistances;
 };
 
+const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
+  const modes = [];
+  stops.forEach(stop => {
+    stop.routes.forEach(route => {
+      const { mode } = route;
+      if (mode && !modes.includes(mode)) {
+        modes.push(mode);
+      }
+      if (route.trunkRoute && !modes.includes('TRUNK')) {
+        modes.push('TRUNK');
+      }
+    });
+  });
+
+  const legendContent = modes.map(mode => {
+    switch (mode) {
+      case 'BUS':
+        return (
+          <div key={mode} className={styles.legendRow}>
+            <div className={classNames(styles.legendLine, styles.bus)} />
+            <div className={classNames(styles.legendIcon, styles.bus)} />
+            <div className={styles.legendText}>Bussi / Buss / Bus</div>
+          </div>
+        );
+      case 'TRAM':
+        return (
+          <div key={mode} className={styles.legendRow}>
+            <div className={classNames(styles.legendLine, styles.tram)} />
+            <div className={classNames(styles.legendIcon, styles.tram)} />
+            <div className={styles.legendText}>Raitiovaunu / Spårvagn / Tram</div>
+          </div>
+        );
+      case 'SUBWAY':
+        return (
+          <div key={mode} className={styles.legendRow}>
+            <div className={classNames(styles.legendLine, styles.subway)} />
+            <div className={classNames(styles.legendIcon, styles.subway)} />
+            <div className={styles.legendText}>Metro</div>
+          </div>
+        );
+      case 'RAIL':
+        return (
+          <div key={mode} className={styles.legendRow}>
+            <div className={classNames(styles.legendLine, styles.rail)} />
+            <div className={classNames(styles.legendIcon, styles.rail)} />
+            <div className={styles.legendText}>Juna / Rail</div>
+          </div>
+        );
+      case 'TRUNK':
+        return (
+          <div key={mode} className={styles.legendRow}>
+            <div className={classNames(styles.legendLine, styles.trunk)} />
+            <div className={classNames(styles.legendIcon, styles.trunk)} />
+            <div className={styles.legendText}>Runkolinja / Trunk route</div>
+          </div>
+        );
+      default:
+        return '';
+    }
+  });
+
+  let legendHeight = legendContent.length * 25;
+
+  const svgStyles = {
+    display: 'block',
+    width: '20px',
+    height: '20px',
+  };
+
+  if (subwayEntrances) {
+    const subwayEntrance = find(subwayEntrances, ['type', 'subway_entrance']);
+    if (subwayEntrance) {
+      legendHeight += 30;
+      legendContent.push(
+        <div key={subwayEntrance.type} className={styles.legendRow}>
+          <InlineSVG style={svgStyles} src={subwayStationIcon} />
+          <div className={styles.legendText}>
+            Metron sisäänkäynti / Metrons ingång / Metro entrance
+          </div>
+        </div>,
+      );
+    }
+  }
+
+  if (projectedSalesPoints) {
+    const ticketSalesPoint = find(projectedSalesPoints, ['type', 'Myyntipiste']);
+    const ticketSalesMachine = find(projectedSalesPoints, ['type', 'Monilippuautomaatti']);
+    if (ticketSalesPoint) {
+      legendHeight += 30;
+      legendContent.push(
+        <div key="Myyntipiste" className={styles.legendRow}>
+          <InlineSVG style={svgStyles} src={ticketSalesPointIcon} />
+          <div className={styles.legendText}>
+            Lipunmyyntipiste / Biljettförsäljning / Ticket sales
+          </div>
+        </div>,
+      );
+    }
+    if (ticketSalesMachine) {
+      legendHeight += 30;
+      legendContent.push(
+        <div key="Monilippuautomaatti" className={styles.legendRow}>
+          <InlineSVG style={svgStyles} src={ticketMachineIcon} />
+          <div className={styles.legendText}>Lippuautomaatti / Ticket sales machine</div>
+        </div>,
+      );
+    }
+  }
+
+  legendHeight += 100; // Offset, scaleBar and attribution
+
+  return {
+    content: legendContent,
+    height: legendHeight,
+  };
+};
+
 const StopMap = props => {
   const mapStyle = {
     width: props.mapOptions.width,
@@ -142,10 +268,26 @@ const StopMap = props => {
   );
 
   // Filter out zone symbols that are behind the mini map
+  // Added extra buffed width because zone symbols might be cut half by minimap
   const projectedSymbols = props.projectedSymbols.filter(
-    symbol => symbol.sy < miniMapStyle.left || symbol.sx < miniMapStyle.top,
+    symbol =>
+      symbol.sx < miniMapStyle.top - ZONE_SYMBOL_MAP_PADDING ||
+      symbol.sy < miniMapStyle.left - ZONE_SYMBOL_MAP_PADDING_EXTRA,
   );
-  const symbolsWithStopDistances = calculateSymbolDistancesFromStops(stops, projectedSymbols);
+
+  // Avoid map edges so zone symbol and text is fully visible
+  const projectedSymbolsInBbox = projectedSymbols.filter(
+    symbol =>
+      symbol.sy > ZONE_SYMBOL_MAP_PADDING &&
+      symbol.sx > ZONE_SYMBOL_MAP_PADDING &&
+      symbol.sy < mapStyle.width - ZONE_SYMBOL_MAP_PADDING_EXTRA &&
+      symbol.sx < mapStyle.height - ZONE_SYMBOL_MAP_PADDING,
+  );
+  const symbolsWithStopDistances = calculateSymbolDistancesFromStops(
+    stops.concat(props.currentStop),
+    projectedSymbolsInBbox,
+  );
+
   const symbolForEachZone = getSymbolForEachZone(symbolsWithStopDistances);
 
   const miniMapCoordinateHelper = new MapCoordinateHelper(props.miniMapOptions);
@@ -154,8 +296,15 @@ const StopMap = props => {
     newPosition.viewport,
   );
 
-  const { nearestSalePoint } = props;
+  const { nearestSalePoint, isTerminal } = props;
   const salesPointIcon = nearestSalePoint && getSalesPointIcon(nearestSalePoint.type);
+
+  const legend = getLegend(stops, props.projectedSalesPoints, props.subwayEntrances);
+
+  const legendStyle = {
+    left: mapStyle.width - props.miniMapOptions.marginRight - props.miniMapOptions.width - 300,
+    top: mapStyle.height - legend.height,
+  };
 
   return (
     <div className={styles.root} style={mapStyle}>
@@ -163,13 +312,14 @@ const StopMap = props => {
         <MapImage
           options={props.mapOptions}
           components={{
-            text_fisv: { enabled: true },
-            routes: { enabled: true },
-            citybikes: { enabled: props.showCitybikes },
-            print: { enabled: true },
-            ticket_sales: { enabled: true },
             municipal_borders: { enabled: true },
+            routes: { enabled: true },
+            subway_entrance: { enabled: true },
+            ticket_sales: { enabled: true },
+            citybikes: { enabled: props.showCitybikes },
             ticket_zones: { enabled: mapStyle.mapZones },
+            text_fisv: { enabled: true },
+            print: { enabled: true },
           }}
           date={props.date}
         />
@@ -187,26 +337,30 @@ const StopMap = props => {
             </ItemFixed>
           ))}
 
-          <ItemFixed
-            top={props.currentStop.y - STOP_RADIUS}
-            left={props.currentStop.x - STOP_RADIUS}>
-            <StopSymbol
-              platform={props.currentStop.stops.nodes[0].platform}
-              routes={props.currentStop.routes}
-              size={STOP_RADIUS * 2}
-            />
-          </ItemFixed>
+          {!isTerminal && (
+            <ItemFixed
+              top={props.currentStop.y - STOP_RADIUS}
+              left={props.currentStop.x - STOP_RADIUS}>
+              <StopSymbol
+                platform={props.currentStop.stops.nodes[0].platform}
+                routes={props.currentStop.routes}
+                size={STOP_RADIUS * 2}
+              />
+            </ItemFixed>
+          )}
 
-          <ItemFixed
-            top={props.currentStop.y - 2.2 * LOCATION_RADIUS}
-            left={props.currentStop.x - LOCATION_RADIUS}>
-            <Row style={{ height: LOCATION_RADIUS * 2 }}>
-              <LocationSymbol size={LOCATION_RADIUS * 2} />
-              <div className={styles.title}>Olet tässä</div>
-              <div className={styles.subtitle}>Du är här</div>
-              <div className={styles.subtitle}>You are here</div>
-            </Row>
-          </ItemFixed>
+          {!isTerminal && (
+            <ItemFixed
+              top={props.currentStop.y - 2.2 * LOCATION_RADIUS}
+              left={props.currentStop.x - LOCATION_RADIUS}>
+              <Row style={{ height: LOCATION_RADIUS * 2 }}>
+                <LocationSymbol size={LOCATION_RADIUS * 2} />
+                <div className={styles.title}>Olet tässä</div>
+                <div className={styles.subtitle}>Du är här</div>
+                <div className={styles.subtitle}>You are here</div>
+              </Row>
+            </ItemFixed>
+          )}
 
           {symbolForEachZone &&
             symbolForEachZone.length > 0 &&
@@ -247,13 +401,18 @@ const StopMap = props => {
             </ItemPositioned>
           )}
 
+          {legend.content.length > 1 && props.legend && (
+            <ItemFixed top={legendStyle.top} left={10}>
+              <div className={styles.legend}>{legend.content}</div>
+            </ItemFixed>
+          )}
+
           <ItemFixed top={mapStyle.height - INFO_MARGIN_BOTTOM} left={INFO_MARGIN_LEFT}>
             <div>
               <Scalebar targetWidth={250} pixelsPerMeter={props.pixelsPerMeter} />
               <Attribution />
             </div>
           </ItemFixed>
-
           <ItemFixed top={miniMapStyle.top} left={miniMapStyle.left}>
             <div style={miniMapStyle} />
           </ItemFixed>
@@ -267,11 +426,12 @@ const StopMap = props => {
             center: newPosition.mapCenter,
           }}
           components={{
-            text: { enabled: false },
+            text: { enabled: true },
+            text_fisv: { enabled: true },
             print: { enabled: true },
             routes: { enabled: true, hideBusRoutes: true },
             municipal_borders: { enabled: true },
-            ticket_zone_labels_fixed: { enabled: miniMapStyle.minimapZoneSymbols },
+            ticket_zone_labels: { enabled: miniMapStyle.minimapZoneSymbols },
             ticket_zones: { enabled: miniMapStyle.minimapZones },
           }}
           extraLayers={[placeLabelCity]}
@@ -298,8 +458,8 @@ const StopType = PropTypes.shape({
     PropTypes.shape({
       routeId: PropTypes.string.isRequired,
     }).isRequired,
-  ).isRequired,
-  stopIds: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+  ),
+  stopIds: PropTypes.arrayOf(PropTypes.string.isRequired),
   calculatedHeading: PropTypes.number,
 });
 
@@ -307,7 +467,7 @@ const nearestSalePointType = PropTypes.shape({
   id: PropTypes.number.isRequired,
   type: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  address: PropTypes.string.isRequired,
+  address: PropTypes.string,
   lat: PropTypes.number.isRequired,
   lon: PropTypes.number.isRequired,
   distance: PropTypes.number.isRequired,
@@ -316,6 +476,10 @@ const nearestSalePointType = PropTypes.shape({
 StopMap.defaultProps = {
   projectedSymbols: null,
   nearestSalePoint: null,
+  isTerminal: false,
+  projectedSalesPoints: null,
+  subwayEntrances: null,
+  legend: false,
 };
 
 StopMap.propTypes = {
@@ -328,6 +492,10 @@ StopMap.propTypes = {
   showCitybikes: PropTypes.bool.isRequired,
   projectedSymbols: PropTypes.arrayOf(Object),
   nearestSalePoint: nearestSalePointType,
+  isTerminal: PropTypes.bool,
+  projectedSalesPoints: PropTypes.arrayOf(Object),
+  subwayEntrances: PropTypes.arrayOf(Object),
+  legend: PropTypes.bool,
 };
 
 export default StopMap;

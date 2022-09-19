@@ -68,6 +68,11 @@ const nearbyItemsQuery = gql`
                 viaFi
                 viaSe
                 stopIndex
+                line {
+                  nodes {
+                    trunkRoute
+                  }
+                }
                 route {
                   nodes {
                     destinationFi
@@ -116,7 +121,6 @@ const stopsMapper = stopGroup => ({
         const destinationSe = mergedRouteSegment.destinationSe
           ? mergedRouteSegment.destinationSe
           : get(mergedRouteSegment, 'route.nodes[0].destinationSe');
-
         return {
           routeId: trimRouteId(mergedRouteSegment.routeId),
           destinationFi,
@@ -124,6 +128,8 @@ const stopsMapper = stopGroup => ({
           viaFi: mergedRouteSegment.viaFi,
           viaSe: mergedRouteSegment.viaSe,
           mode: mergedRouteSegment.route.nodes[0].mode,
+          trunkRoute:
+            mergedRouteSegment.line.nodes && mergedRouteSegment.line.nodes[0].trunkRoute === '1',
         };
       }),
   ).sort(routeCompare),
@@ -163,7 +169,6 @@ const nearbyItemsMapper = mapProps(props => {
 
   const currentStop = projectedStops.find(({ stopIds }) => stopIds.includes(props.stopId));
   const nearbyStops = projectedStops.filter(({ stopIds }) => !stopIds.includes(props.stopId));
-
   // Calculate distances to sale points and get the nearest one
   const nearestSalePoint = props.showSalesPoint
     ? projectedSalePoints
@@ -178,6 +183,18 @@ const nearbyItemsMapper = mapProps(props => {
         })
         .reduce((prev, curr) => (prev && curr.distance > prev.distance ? prev : curr), null)
     : null;
+
+  const projectedSalesPoints = [];
+  props.salePoints.forEach(salePoint => {
+    if (
+      salePoint.lon > minLon &&
+      salePoint.lon < maxLon &&
+      salePoint.lat < minLat &&
+      salePoint.lat > maxLat
+    ) {
+      projectedSalesPoints.push(salePoint);
+    }
+  });
 
   const mapOptions = {
     center: [viewport.longitude, viewport.latitude],
@@ -216,24 +233,29 @@ const nearbyItemsMapper = mapProps(props => {
     maxLat,
     projectedSymbols,
     nearestSalePoint,
+    projectedSalesPoints,
   };
 });
 
 const mapPositionQuery = gql`
   query mapPositionQuery($stopId: String!) {
     stop: stopByStopId(stopId: $stopId) {
-      stopId
       lat
       lon
-      platform
+    }
+    terminal: terminalByTerminalId(terminalId: $stopId) {
+      lat
+      lon
     }
   }
 `;
 
 const mapInterestsMapper = mapProps(props => {
-  const longitude = props.data.stop.lon;
-  const latitude = props.data.stop.lat;
-  const { platform } = props.data.stop;
+  const { stop, terminal } = props.data;
+  // Use either stop or terminal information, depending on which query has succeeded.
+  const longitude = stop ? stop.lon : terminal.lon;
+  const latitude = stop ? stop.lat : terminal.lat;
+  const isTerminal = terminal !== null;
 
   const maxDimensionsForInterests = {
     height: props.height * 2,
@@ -256,7 +278,7 @@ const mapInterestsMapper = mapProps(props => {
     ...props,
     longitude,
     latitude,
-    platform,
+    isTerminal,
     minInterestLat,
     minInterestLon,
     maxInterestLat,
@@ -285,9 +307,32 @@ const getSalePoints = () =>
         }),
     );
 
+const fetchOSMObjects = async props => {
+  let results;
+  try {
+    const osmData = await fetch(
+      `https://nominatim.openstreetmap.org/search.php?q=subway_entrance&
+      viewbox=${props.maxInterestLon}%2C${props.maxInterestLat}%2C${props.minInterestLon}%2C${props.minInterestLat}
+      &bounded=1&format=json&namedetails=1`,
+    );
+    results = await osmData.json();
+  } catch (e) {
+    console.log('Subway entrances fetch error:', e);
+  }
+  return results;
+};
+
+const osmPointsMapper = mapProps(props => {
+  const subwayEntrances = fetchOSMObjects(props);
+  return {
+    ...props,
+    subwayEntrances,
+  };
+});
+
 const salePointsMapper = mapProps(props => {
   // If sales points are not configured, do not fetch them but return empty array
-  const salePoints = props.showSalesPoint ? getSalePoints() : Promise.resolve([]);
+  const salePoints = props.showSalesPoint || props.legend ? getSalePoints() : Promise.resolve([]);
   return {
     ...props,
     salePoints,
@@ -300,6 +345,8 @@ const hoc = compose(
   graphql(nearbyItemsQuery),
   salePointsMapper,
   promiseWrapper('salePoints'),
+  osmPointsMapper,
+  promiseWrapper('subwayEntrances'),
   apolloWrapper(nearbyItemsMapper),
 );
 

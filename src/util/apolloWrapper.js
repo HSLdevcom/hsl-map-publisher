@@ -29,9 +29,11 @@ const updateQueueOnChange = lifecycle({
   },
 });
 
-const renderNull = branch(
-  props => props.data.error || props.data.loading,
-  () => () => null,
-);
+const renderNull = branch(props => props.data.error || props.data.loading, () => () => null);
 
-export default hoc => compose(updateQueueOnChange, renderNull, hoc);
+export default hoc =>
+  compose(
+    updateQueueOnChange,
+    renderNull,
+    hoc,
+  );

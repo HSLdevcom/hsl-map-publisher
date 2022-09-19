@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-font_dir=~/.local/share/fonts/opentype
+font_dir=~/.local/share/fonts/
 mkdir -p $font_dir
 
 # Check if the fonts already exist. Hey, we might be lucky!
@@ -17,28 +17,22 @@ if [ -f .env ]; then
 fi
 
 # Find Azure credentials from secrets if not found from env
-if [ -z "$AZURE_STORAGE_KEY" ] || [ -z "$AZURE_STORAGE_ACCOUNT" ]; then
+if [ -z "$AZURE_FONTS_SAS_URL" ]; then
   # Path to the Azure credentials supplied by Docker secrets
-  key_secret=/run/secrets/AZURE_STORAGE_KEY
-  account_secret=/run/secrets/AZURE_STORAGE_ACCOUNT
+  sas_url=/run/secrets/AZURE_FONTS_SAS_URL
 
   # Check if the secrets exits, otherwise use just default fonts
-  if [ ! -f "$key_secret" ]; then
-    echo "Azure key not set. Fonts not downloaded."
-    exit 0
-  fi
-  if [ ! -f "$account_secret" ]; then
-    echo "Azure account not set. Fonts not downloaded."
+  if [ ! -f "$sas_url" ]; then
+    echo "Azure sas url not set. Fonts not downloaded."
     exit 0
   fi
 
   # Read the credentials to envs
-  AZURE_STORAGE_KEY=$(<$key_secret)
-  AZURE_STORAGE_ACCOUNT=$(<$account_secret)
+  AZURE_FONTS_SAS_URL=$(<$sas_url)
 fi
 
-container_name=${AZURE_STORAGE_CONTAINER:=fonts}
+sas_url=${AZURE_FONTS_SAS_URL}
 
-az storage blob download-batch --destination $font_dir --source $container_name --pattern *.otf --no-progress --account-name $AZURE_STORAGE_ACCOUNT --account-key $AZURE_STORAGE_KEY
+azcopy copy $sas_url $font_dir --recursive=true
 
 echo "Fonts downloaded."

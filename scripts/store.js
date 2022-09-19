@@ -5,6 +5,7 @@ const pMap = require('p-map');
 const merge = require('lodash/merge');
 const get = require('lodash/get');
 const flatMap = require('lodash/flatMap');
+const fetch = require('node-fetch');
 
 const config = require('../knexfile');
 // eslint-disable-next-line import/order

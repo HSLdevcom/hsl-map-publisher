@@ -1,17 +1,16 @@
-FROM node:12-buster-slim
+FROM node:16-buster-slim
 
 RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -yq wget curl gnupg pdftk fontconfig fonts-liberation --no-install-recommends \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -yq wget curl gnupg fontconfig fonts-liberation ca-certificates --no-install-recommends \
     # This installs the necessary libs to make the bundled version of Chromium that Puppeteer installs work
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+    && sh -c 'echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -yq google-chrome-stable libxss1 --no-install-recommends \
+    && wget -O azcopy_v10.tar.gz https://aka.ms/downloadazcopy-v10-linux && tar -xf azcopy_v10.tar.gz --strip-components=1 \
+    && cp ./azcopy /usr/bin/ \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Azure CLI to download the fonts
-# TODO: This takes almost 1G size in the docker image. Change Azure CLI to azcopy. See MM-262
-RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash && rm -rf /var/lib/apt/lists/*
 
 ENV WORK /opt/publisher
 

@@ -12,7 +12,7 @@ Install dependencies:
 yarn
 ```
 
-Install `pdftk`. It should be present in your system's package manager (Use Homebrew on Mac).
+Also install Chrome. Refer the installation instructions of Chrome for your operating system.
 
 ### About the app
 

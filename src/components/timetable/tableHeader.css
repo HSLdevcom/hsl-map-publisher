@@ -9,6 +9,10 @@
   padding-top: 0.25em;
 }
 
+.root.noPaddingTop {
+  margin: 0;
+}
+
 .strong {
   font-family: GothamXNarrow-Medium;
   font-size: 1.115em;
@@ -30,4 +34,8 @@
 
 .subtitle > *:first-child {
   min-width: 4.2em;
+}
+
+.a3Title {
+  font-size: 0.8em;
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { chunk, cloneDeep, sortBy } from 'lodash';
-import { routeGeneralizer, isTrunkRoute } from 'util/domain';
+import { routeGeneralizer } from 'util/domain';
 
 import { Column } from '../util';
 
@@ -36,14 +36,20 @@ function SimpleRoutes(props) {
   const routes = mapRoutesByDestination(props.routes);
   const routesPerColumn = Math.ceil(routes.length / 2);
   const routeColumns = chunk(
-    sortBy(routes, route => !isTrunkRoute(route.routeId)),
+    sortBy(routes, route => !route.trunkRoute),
     routesPerColumn,
   );
 
+  let containerStyle = [styles.root, styles.simple].join(' ');
+  let columnStyle = styles.column;
+  if (props.printAsA3) {
+    containerStyle = [containerStyle, styles.a3].join(' ');
+    columnStyle = [styles.column, styles.a3].join(' ');
+  }
   return (
-    <div className={[styles.root, styles.simple].join(' ')}>
+    <div className={containerStyle}>
       {routeColumns.map((routeColumn, i) => (
-        <Column className={styles.column} key={i}>
+        <Column className={columnStyle} key={i}>
           {routeColumn.map(route => (
             <div className={styles.groupA4} key={`route_row_${route.routeId}`}>
               <div className={styles.routeIdsContainer}>
@@ -77,6 +83,10 @@ function SimpleRoutes(props) {
   );
 }
 
+SimpleRoutes.defaultProps = {
+  printAsA3: false,
+};
+
 SimpleRoutes.propTypes = {
   routes: PropTypes.arrayOf(
     PropTypes.shape({
@@ -85,6 +95,7 @@ SimpleRoutes.propTypes = {
       destinationSe: PropTypes.string,
     }),
   ).isRequired,
+  printAsA3: PropTypes.bool,
 };
 
 export default routesContainer(SimpleRoutes);

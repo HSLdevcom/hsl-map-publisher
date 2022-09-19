@@ -55,7 +55,7 @@ function truncate(node) {
  * @param {Array} routes
  * @returns {Object}
  */
-function routesToTree(routes, { stopZone, shortId }, height = 'auto') {
+function routesToTree(routes, { stopZone, shortId }, height = 'auto', width = MAX_WIDTH) {
   const currentZone = stopZone;
 
   const itemLists = routes.map(route =>
@@ -94,7 +94,7 @@ function routesToTree(routes, { stopZone, shortId }, height = 'auto') {
 
   generalizeTree(root, {
     height,
-    width: MAX_WIDTH,
+    width: width || MAX_WIDTH,
     prune,
     truncate,
   });

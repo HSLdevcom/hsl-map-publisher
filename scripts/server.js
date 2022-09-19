@@ -28,6 +28,7 @@ const {
   removeBuild,
   getPoster,
   addPoster,
+  updatePoster,
   removePoster,
   getTemplates,
   addTemplate,
@@ -49,9 +50,13 @@ const bullRedisConnection = new Redis(REDIS_CONNECTION_STRING, {
 });
 const queue = new Queue('publisher', { connection: bullRedisConnection });
 
+const cancelSignalRedis = new Redis(REDIS_CONNECTION_STRING);
+
 async function generatePoster(buildId, component, props, index) {
   const { stopId, date, template, selectedRuleTemplates } = props;
-  const data = await getStopInfo({ stopId, date });
+
+  // RuleTemplates are not available for TerminalPoster
+  const data = component !== 'TerminalPoster' ? await getStopInfo({ stopId, date }) : null;
 
   // Checks if any rule template will match the stop, and returns *the first one*.
   // If no match, returns the default template.
@@ -271,6 +276,18 @@ async function main() {
   router.delete('/posters/:id', async ctx => {
     const { id } = ctx.params;
     const poster = await removePoster({ id });
+    ctx.body = poster;
+  });
+
+  router.post('/cancelPoster', async ctx => {
+    const { item } = ctx.request.body;
+    const jobId = item.id;
+    const poster = await updatePoster({ id: jobId, status: 'FAILED' });
+    const success = await queue.remove(jobId);
+    if (!success) {
+      cancelSignalRedis.publish('cancel', jobId);
+    }
+
     ctx.body = poster;
   });
 

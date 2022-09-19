@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -8,14 +9,22 @@ import Path from './path';
 import styles from './routeDiagram.css';
 
 const RouteDiagram = props => (
-  <div className={styles.root}>
-    <div className={styles.componentName}>
-      <div className={styles.title}>Linjojen reitit</div>
-      <div className={styles.subtitle}>Linjernas rutter / Routes</div>
+  <div
+    className={
+      !props.printAsA3
+        ? styles.root
+        : classNames(styles.root, styles.a3, props.useWide ? styles.useWide : '')
+    }>
+    <div
+      className={classNames(styles.componentName, { [styles.componentNameA3]: props.printAsA3 })}>
+      <div className={!props.printAsA3 ? styles.title : styles.titleA3}>Linjojen reitit</div>
+      <div className={!props.printAsA3 ? styles.subtitle : styles.subtitleA3}>
+        Linjernas rutter / Routes
+      </div>
     </div>
     <div className={styles.start}>
       <InlineSVG src={markerIcon} className={styles.icon} />
-      <div className={styles.title}>
+      <div className={classNames(styles.title, { [styles.titleA3]: props.printAsA3 })}>
         Olet tässä&nbsp;&nbsp;
         <span className={styles.subtitle}>Du är här&nbsp;&nbsp;</span>
         <span className={styles.subtitle}>You are here</span>
@@ -25,8 +34,15 @@ const RouteDiagram = props => (
   </div>
 );
 
+RouteDiagram.defaultProps = {
+  printAsA3: false,
+  useWide: false,
+};
+
 RouteDiagram.propTypes = {
   tree: PropTypes.shape(Path.propTypes).isRequired,
+  printAsA3: PropTypes.bool,
+  useWide: PropTypes.bool,
 };
 
 export default RouteDiagram;
