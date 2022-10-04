@@ -86,6 +86,8 @@ const timetableQuery = gql`
       stopId
       stopZone
       platform
+      addressFi
+      addressSe
       siblings {
         nodes {
           routeSegments: routeSegmentsForDate(date: $date) {
@@ -256,6 +258,8 @@ const propsMapper = mapProps(props => {
     stopNameSe: props.data.stop.nameSe,
     stopShortId: props.data.stop.shortId,
     stopId: props.data.stop.stopId,
+    addressFi: props.data.stop.addressFi,
+    addressSe: props.data.stop.addressSe,
     stopZone: props.data.stop.stopZone,
     platform: props.data.stop.platform,
     printableAsA4: props.printTimetablesAsA4,

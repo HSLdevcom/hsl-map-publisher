@@ -59,6 +59,9 @@ const Timetable = props => {
   if (!props.hasDepartures) {
     return null;
   }
+  const opts = { year: 'numeric', month: 'numeric', day: 'numeric' };
+  const today = new Date().toLocaleDateString('fi', opts);
+
   return (
     <div
       className={classNames(styles.root, {
@@ -87,6 +90,8 @@ const Timetable = props => {
             <div className={styles.shortId}>
               {props.stopShortId && `${props.stopShortId.replace(/\s+/g, '')}`}
             </div>
+            <div className={styles.address}>{props.addressFi}</div>
+            <div className={styles.date}>{today}</div>
             <div className={styles.title}>Aikataulut voimassa</div>
             <div>Tidtabeller giltiga/Timetables valid</div>
             <div>
@@ -181,6 +186,7 @@ Timetable.defaultProps = {
   platformInfo: false,
   specialSymbols: [],
   platform: null,
+  addressFi: null,
 };
 
 Timetable.propTypes = {
@@ -198,6 +204,7 @@ Timetable.propTypes = {
   printableAsA4: PropTypes.bool,
   stopShortId: PropTypes.string.isRequired,
   stopId: PropTypes.string.isRequired,
+  addressFi: PropTypes.string,
   stopZone: PropTypes.string.isRequired,
   platform: PropTypes.string,
   date: PropTypes.string.isRequired,
