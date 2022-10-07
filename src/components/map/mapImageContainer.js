@@ -9,6 +9,14 @@ import MapImage from './mapImage';
 
 const propsMapper = mapProps(({ options, components, date, extraLayers }) => {
   const mapStyle = hslMapStyle.generateStyle({
+    sourcesUrl: process.env.DIGITRANSIT_URL,
+    queryParams: [
+      {
+        url: process.env.DIGITRANSIT_URL,
+        name: 'digitransit-subscription-key',
+        value: process.env.DIGITRANSIT_APIKEY,
+      },
+    ],
     components,
     joreDate: date,
   });
