@@ -39,7 +39,8 @@ jobs:
           push: true
           tags: ${{ format('hsldevcom/hsl-map-publisher:stage-{0}-{1}', steps.timestamp.outputs.timestamp, steps.commit_hash.outputs.hash) }}
           build-args: |
-            BUILD_ENV=dev
+            BUILD_ENV=stage
+            DIGITRANSIT_APIKEY=${{ secrets.KARTAT_DIGITRANSITAPIKEY_PROD }}
 
       - name: Build and push
         uses: docker/build-push-action@v2
@@ -49,3 +50,4 @@ jobs:
           tags: hsldevcom/hsl-map-publisher:stage
           build-args: |
             BUILD_ENV=stage
+            DIGITRANSIT_APIKEY=${{ secrets.KARTAT_DIGITRANSITAPIKEY_PROD }}
