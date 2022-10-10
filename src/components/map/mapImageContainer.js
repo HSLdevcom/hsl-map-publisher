@@ -25,6 +25,17 @@ const propsMapper = mapProps(({ options, components, date, extraLayers }) => {
     mapStyle.layers = [...mapStyle.layers, ...extraLayers];
   }
 
+  // Remove source containing bus routes (rail and subway routes have separate sources)
+  if (components.routes && components.routes.enabled && components.routes.hideBusRoutes) {
+    mapStyle.sources.routes = {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    };
+  }
+
   return { src: fetchMap(options, mapStyle) };
 });
 
