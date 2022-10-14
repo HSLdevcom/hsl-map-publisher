@@ -71,7 +71,8 @@ const Timetable = props => {
         [styles.greyscale]: props.greyscale,
       })}>
       <span className={styles.address}>
-        {props.addressFi} {today}
+        {props.addressFi}
+        {props.addressFi ? ',' : ''} {today}
       </span>
       <div className={styles.header}>
         {props.showStopInformation && (
