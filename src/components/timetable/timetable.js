@@ -70,6 +70,9 @@ const Timetable = props => {
         [styles.standalone]: props.standalone,
         [styles.greyscale]: props.greyscale,
       })}>
+      <span className={styles.address}>
+        {props.addressFi} {today}
+      </span>
       <div className={styles.header}>
         {props.showStopInformation && (
           <div style={{ display: 'flex' }}>
@@ -90,8 +93,6 @@ const Timetable = props => {
             <div className={styles.shortId}>
               {props.stopShortId && `${props.stopShortId.replace(/\s+/g, '')}`}
             </div>
-            <div className={styles.address}>{props.addressFi}</div>
-            <div className={styles.date}>{today}</div>
             <div className={styles.title}>Aikataulut voimassa</div>
             <div>Tidtabeller giltiga/Timetables valid</div>
             <div>
