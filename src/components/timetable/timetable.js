@@ -61,7 +61,11 @@ const Timetable = props => {
   }
   const opts = { year: 'numeric', month: 'numeric', day: 'numeric' };
   const today = new Date().toLocaleDateString('fi', opts);
-
+  const address = props.addressFi ? ` ${props.addressFi},` : '';
+  const addressInfo = `${props.stopNameFi} (${props.stopShortId.replace(
+    /\s+/g,
+    '',
+  )}),${address} ${today}`;
   return (
     <div
       className={classNames(styles.root, {
@@ -70,10 +74,7 @@ const Timetable = props => {
         [styles.standalone]: props.standalone,
         [styles.greyscale]: props.greyscale,
       })}>
-      <span className={styles.address}>
-        {props.addressFi}
-        {props.addressFi ? ',' : ''} {today}
-      </span>
+      <span className={styles.address}>{addressInfo}</span>
       <div className={styles.header}>
         {props.showStopInformation && (
           <div style={{ display: 'flex' }}>
