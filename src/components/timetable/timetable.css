@@ -89,7 +89,7 @@
   font-size: 0.5rem;
   color: black;
   position: absolute;
-  top: 0px;
+  top: 28px;
   right: var(--border-radius);
 }
 
