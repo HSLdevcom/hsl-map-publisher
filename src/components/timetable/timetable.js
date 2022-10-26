@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Spacer, PlatformSymbol } from 'components/util';
 import classNames from 'classnames';
@@ -8,6 +8,9 @@ import TableRows from './tableRows';
 import SimpleRoutes from './simpleRoutes';
 
 import styles from './timetable.css';
+
+const A4_PAGE_HEIGHT = 1110;
+const TEXT_HEIGHT = 12;
 
 const formatDate = date => {
   const monthNames = [
@@ -55,125 +58,161 @@ const getNotes = (notes, symbols) => {
   return parsedNotes;
 };
 
-const Timetable = props => {
-  if (!props.hasDepartures) {
-    return null;
+class Timetable extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      renderAddressInfo: false,
+    };
   }
-  const opts = { year: 'numeric', month: 'numeric', day: 'numeric' };
-  const today = new Date().toLocaleDateString('fi', opts);
-  const address = props.addressFi ? ` ${props.addressFi},` : '';
-  const addressInfo = `${props.stopNameFi} (${props.stopShortId.replace(
-    /\s+/g,
-    '',
-  )}),${address} ${today}`;
-  return (
-    <div
-      className={classNames(styles.root, {
-        [styles.summer]: props.isSummerTimetable,
-        [styles.printable]: props.printableAsA4,
-        [styles.standalone]: props.standalone,
-        [styles.greyscale]: props.greyscale,
-      })}>
-      <span className={styles.address}>{addressInfo}</span>
-      <div className={styles.header}>
-        {props.showStopInformation && (
-          <div style={{ display: 'flex' }}>
-            <div className={styles.headerTitle}>
-              <div className={styles.title}>
-                {props.stopNameFi}
-                &nbsp;&nbsp;
-              </div>
-              <div className={styles.subtitle}>{props.stopNameSe}</div>
-            </div>
-            <div>
-              {props.platformInfo && props.platform && <PlatformSymbol platform={props.platform} />}
-            </div>
-          </div>
-        )}
-        {props.showValidityPeriod && (
-          <div className={styles.validity}>
-            <div className={styles.shortId}>
-              {props.stopShortId && `${props.stopShortId.replace(/\s+/g, '')}`}
-            </div>
-            <div className={styles.title}>Aikataulut voimassa</div>
-            <div>Tidtabeller giltiga/Timetables valid</div>
-            <div>
-              {new Date(props.dateBegin).toLocaleDateString('fi')}
-              &nbsp;-&nbsp;
-              {new Date(props.dateEnd).toLocaleDateString('fi')}
-            </div>
-            <div>
-              {formatDate(new Date(props.dateBegin))}
-              &nbsp;-&nbsp;
-              {formatDate(new Date(props.dateEnd))}
-            </div>
-          </div>
-        )}
-      </div>
-      {props.showComponentName && (
-        <div className={styles.componentName}>
-          <div className={styles.title}>Pysäkkiaikataulu&nbsp;&nbsp;</div>
-          <div className={styles.subtitle}>Hållplatstidtabell</div>
-          <div className={styles.subtitle}>Stop timetable</div>
-        </div>
-      )}
-      {props.standalone && (
-        <React.Fragment>
-          <div className={styles.stopZone}>
-            <div className={styles.zoneTitle}>Vyöhyke</div>
-            <div className={styles.zoneSubtitle}>Zon/Zone</div>
-            <div className={styles.zone}>
-              <span className={styles.zoneLetter} style={getZoneLetterStyle(props.stopZone)}>
-                {props.stopZone}
-              </span>
-            </div>
-          </div>
-          <SimpleRoutes stopId={props.stopId} date={props.date} />
-        </React.Fragment>
-      )}
-      {props.weekdays && props.weekdays.length > 0 && (
-        <div>
-          <TableHeader
-            title="Maanantai - Perjantai"
-            subtitleSw="Måndag - Fredag"
-            subtitleEn="Monday - Friday"
-            printingAsA4={props.printableAsA4}
-          />
-          <TableRows departures={props.weekdays} />
-        </div>
-      )}
-      {props.saturdays && props.saturdays.length > 0 && (
-        <div>
-          <TableHeader
-            title="Lauantai"
-            subtitleSw="Lördag"
-            subtitleEn="Saturday"
-            printingAsA4={props.printableAsA4}
-          />
-          <TableRows departures={props.saturdays} />
-        </div>
-      )}
-      {props.sundays && props.sundays.length > 0 && (
-        <div>
-          <TableHeader
-            title="Sunnuntai"
-            subtitleSw="Söndag"
-            subtitleEn="Sunday"
-            printingAsA4={props.printableAsA4}
-          />
-          <TableRows departures={props.sundays} />
-        </div>
-      )}
-      {props.showNotes && props.notes.length !== 0 && <Spacer height={20} />}
-      {props.showNotes &&
-        getNotes(props.notes, props.specialSymbols).map(note => (
-          <div key={note} className={styles.footnote}>
-            {note}
-          </div>
+
+  componentDidMount() {
+    const { renderAddressInfo } = this.state;
+    if (!renderAddressInfo && this.props.printableAsA4) {
+      this.setState({ renderAddressInfo: true });
+    }
+  }
+
+  render() {
+    if (!this.props.hasDepartures) {
+      return null;
+    }
+    const opts = { year: 'numeric', month: 'numeric', day: 'numeric' };
+    const today = new Date().toLocaleDateString('fi', opts);
+    const address = this.props.addressFi ? ` ${this.props.addressFi},` : '';
+    const addressInfo = `${this.props.stopNameFi} (${this.props.stopShortId.replace(
+      /\s+/g,
+      '',
+    )}),${address} ${today}`;
+
+    const addressInfoPositions = [];
+    if (this.state.renderAddressInfo) {
+      const { scrollHeight } = this.content;
+      const pages = Math.ceil(scrollHeight / A4_PAGE_HEIGHT);
+      let j = 0;
+      for (let i = 1; i < pages + 1; i++) {
+        addressInfoPositions.push(i * A4_PAGE_HEIGHT + j * TEXT_HEIGHT);
+        j++;
+      }
+    }
+    return (
+      <div
+        className={classNames(styles.root, {
+          [styles.summer]: this.props.isSummerTimetable,
+          [styles.printable]: this.props.printableAsA4,
+          [styles.standalone]: this.props.standalone,
+          [styles.greyscale]: this.props.greyscale,
+        })}
+        ref={ref => {
+          this.content = ref;
+        }}>
+        {addressInfoPositions.map(height => (
+          <span className={styles.address} style={{ top: `${height}px` }}>
+            {addressInfo}
+          </span>
         ))}
-    </div>
-  );
-};
+        <div className={styles.header}>
+          {this.props.showStopInformation && (
+            <div style={{ display: 'flex' }}>
+              <div className={styles.headerTitle}>
+                <div className={styles.title}>
+                  {this.props.stopNameFi}
+                  &nbsp;&nbsp;
+                </div>
+                <div className={styles.subtitle}>{this.props.stopNameSe}</div>
+              </div>
+              <div>
+                {this.props.platformInfo && this.props.platform && (
+                  <PlatformSymbol platform={this.props.platform} />
+                )}
+              </div>
+            </div>
+          )}
+          {this.props.showValidityPeriod && (
+            <div className={styles.validity}>
+              <div className={styles.shortId}>
+                {this.props.stopShortId && `${this.props.stopShortId.replace(/\s+/g, '')}`}
+              </div>
+              <div className={styles.title}>Aikataulut voimassa</div>
+              <div>Tidtabeller giltiga/Timetables valid</div>
+              <div>
+                {new Date(this.props.dateBegin).toLocaleDateString('fi')}
+                &nbsp;-&nbsp;
+                {new Date(this.props.dateEnd).toLocaleDateString('fi')}
+              </div>
+              <div>
+                {formatDate(new Date(this.props.dateBegin))}
+                &nbsp;-&nbsp;
+                {formatDate(new Date(this.props.dateEnd))}
+              </div>
+            </div>
+          )}
+        </div>
+        {this.props.showComponentName && (
+          <div className={styles.componentName}>
+            <div className={styles.title}>Pysäkkiaikataulu&nbsp;&nbsp;</div>
+            <div className={styles.subtitle}>Hållplatstidtabell</div>
+            <div className={styles.subtitle}>Stop timetable</div>
+          </div>
+        )}
+        {this.props.standalone && (
+          <React.Fragment>
+            <div className={styles.stopZone}>
+              <div className={styles.zoneTitle}>Vyöhyke</div>
+              <div className={styles.zoneSubtitle}>Zon/Zone</div>
+              <div className={styles.zone}>
+                <span className={styles.zoneLetter} style={getZoneLetterStyle(this.props.stopZone)}>
+                  {this.props.stopZone}
+                </span>
+              </div>
+            </div>
+            <SimpleRoutes stopId={this.props.stopId} date={this.props.date} />
+          </React.Fragment>
+        )}
+        {this.props.weekdays && this.props.weekdays.length > 0 && (
+          <div>
+            <TableHeader
+              title="Maanantai - Perjantai"
+              subtitleSw="Måndag - Fredag"
+              subtitleEn="Monday - Friday"
+              printingAsA4={this.props.printableAsA4}
+            />
+            <TableRows departures={this.props.weekdays} />
+          </div>
+        )}
+        {this.props.saturdays && this.props.saturdays.length > 0 && (
+          <div>
+            <TableHeader
+              title="Lauantai"
+              subtitleSw="Lördag"
+              subtitleEn="Saturday"
+              printingAsA4={this.props.printableAsA4}
+            />
+            <TableRows departures={this.props.saturdays} />
+          </div>
+        )}
+        {this.props.sundays && this.props.sundays.length > 0 && (
+          <div>
+            <TableHeader
+              title="Sunnuntai"
+              subtitleSw="Söndag"
+              subtitleEn="Sunday"
+              printingAsA4={this.props.printableAsA4}
+            />
+            <TableRows departures={this.props.sundays} />
+          </div>
+        )}
+        {this.props.showNotes && this.props.notes.length !== 0 && <Spacer height={20} />}
+        {this.props.showNotes &&
+          getNotes(this.props.notes, this.props.specialSymbols).map(note => (
+            <div key={note} className={styles.footnote}>
+              {note}
+            </div>
+          ))}
+      </div>
+    );
+  }
+}
 
 Timetable.defaultProps = {
   weekdays: null,
