@@ -33,6 +33,8 @@ const secretsEnv = mapValues(process.env, (value, key) => {
 module.exports = {
   PG_CONNECTION_STRING: secretsEnv.PG_CONNECTION_STRING || '',
   REDIS_CONNECTION_STRING: secretsEnv.REDIS_CONNECTION_STRING || '',
+  DIGITRANSIT_URL: secretsEnv.DIGITRANSIT_URL || '',
+  DIGITRANSIT_APIKEY: secretsEnv.DIGITRANSIT_APIKEY || '',
   JORE_GRAPHQL_URL: secretsEnv.JORE_GRAPHQL_URL || '',
   GENERATE_API_URL: secretsEnv.GENERATE_API_URL || '',
   AZURE_FONTS_SAS_URL: secretsEnv.AZURE_FONTS_SAS_URL || '',

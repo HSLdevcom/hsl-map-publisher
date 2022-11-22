@@ -19,3 +19,4 @@ jobs:
           tags: hsldevcom/hsl-map-publisher:dev
           build-args: |
             BUILD_ENV=dev
+            DIGITRANSIT_APIKEY=${{ secrets.KARTAT_DIGITRANSITAPIKEY_DEV }}
