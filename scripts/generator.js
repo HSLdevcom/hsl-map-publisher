@@ -5,8 +5,6 @@ const qs = require('qs');
 const log = require('./util/log');
 const { uploadPosterToCloud } = require('./cloudService');
 
-const { addEvent, updatePoster } = require('./store');
-
 const { AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_KEY } = require('../constants');
 
 const CLIENT_URL = 'http://localhost:5000';
@@ -102,7 +100,7 @@ async function renderComponent(options) {
   return posterUploaded;
 }
 
-async function renderComponentRetry(options) {
+async function generate(options) {
   const { onInfo, onError } = options;
 
   for (let i = 0; i < MAX_RENDER_ATTEMPTS; i++) {
@@ -135,38 +133,6 @@ async function renderComponentRetry(options) {
   }
 
   return { success: false };
-}
-
-async function generate(options) {
-  const { id } = options;
-
-  const onInfo = (message = 'No message.') => {
-    console.log(`${id}: ${message}`); // eslint-disable-line no-console
-    addEvent({
-      posterId: id,
-      type: 'INFO',
-      message,
-    });
-  };
-  const onError = error => {
-    console.error(`${id}: ${error.message} ${error.stack}`); // eslint-disable-line no-console
-    addEvent({
-      posterId: id,
-      type: 'ERROR',
-      message: error.message,
-    });
-  };
-
-  const { success, uploaded } = await renderComponentRetry({
-    ...options,
-    onInfo,
-    onError,
-  });
-
-  updatePoster({
-    id,
-    status: success && uploaded ? 'READY' : 'FAILED',
-  });
 }
 
 module.exports = {

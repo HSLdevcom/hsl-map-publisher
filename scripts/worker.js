@@ -2,8 +2,40 @@ const { Worker, QueueScheduler } = require('bullmq');
 const Redis = require('ioredis');
 
 const { generate } = require('./generator');
-
+const { addEvent, updatePoster } = require('./store');
 const { REDIS_CONNECTION_STRING } = require('../constants');
+
+async function processJob(options) {
+  const { id } = options;
+
+  const onInfo = (message = 'No message.') => {
+    console.log(`${id}: ${message}`); // eslint-disable-line no-console
+    addEvent({
+      posterId: id,
+      type: 'INFO',
+      message,
+    });
+  };
+  const onError = error => {
+    console.error(`${id}: ${error.message} ${error.stack}`); // eslint-disable-line no-console
+    addEvent({
+      posterId: id,
+      type: 'ERROR',
+      message: error.message,
+    });
+  };
+
+  const { success, uploaded } = await generate({
+    ...options,
+    onInfo,
+    onError,
+  });
+
+  updatePoster({
+    id,
+    status: success && uploaded ? 'READY' : 'FAILED',
+  });
+}
 
 const bullRedisConnection = new Redis(REDIS_CONNECTION_STRING, {
   maxRetriesPerRequest: null,
@@ -20,7 +52,7 @@ const worker = new Worker(
   'publisher',
   async job => {
     const { options } = job.data;
-    await generate(options);
+    await processJob(options);
   },
   {
     connection: bullRedisConnection,
