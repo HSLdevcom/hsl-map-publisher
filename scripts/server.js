@@ -160,6 +160,7 @@ async function main() {
 
   const app = new Koa();
   const router = new Router();
+  const unAuthorizedRouter = new Router();
 
   router.get('/images', async ctx => {
     ctx.body = await getImages();
@@ -387,6 +388,10 @@ async function main() {
     ctx.response.status = authResponse.status;
   });
 
+  unAuthorizedRouter.get('/health', async ctx => {
+    ctx.status = 200;
+  });
+
   app.keys = ['secret key'];
 
   const CONFIG = {
@@ -403,6 +408,7 @@ async function main() {
         credentials: true,
       }),
     )
+    .use(unAuthorizedRouter.routes())
     .use(authMiddleware)
     .use(jsonBody({ fallback: true, limit: '10mb' }))
     .use(router.routes())
