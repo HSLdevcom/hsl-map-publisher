@@ -97,7 +97,7 @@
     "hsl-map-style": "hsldevcom/hsl-map-style#master",
     "html-webpack-plugin": "^4.0.0-alpha",
     "ioredis": "^5.0.6",
-    "knex": "^2.0.0",
+    "knex": "^2.4.0",
     "koa": "^2.5.3",
     "koa-json-body": "^5.3.0",
     "koa-router": "^7.4.0",
