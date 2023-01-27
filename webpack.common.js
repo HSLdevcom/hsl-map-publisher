@@ -10,7 +10,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Stop poster',
     }),
-    new Dotenv(),
+    new Dotenv({ systemvars: true }),
   ],
   resolve: {
     modules: ['node_modules', 'src'],

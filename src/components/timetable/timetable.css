@@ -84,6 +84,15 @@
   font-size: 1.75em;
 }
 
+.address {
+  font-family: GothamRounded-Medium;
+  font-size: 0.6rem;
+  color: black;
+  position: absolute;
+  top: 1110px;
+  right: var(--border-radius);
+}
+
 .validity .title {
   font-family: GothamRounded-Medium;
 }
