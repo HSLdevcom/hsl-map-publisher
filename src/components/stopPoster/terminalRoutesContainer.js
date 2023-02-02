@@ -12,30 +12,27 @@ import apolloWrapper from 'util/apolloWrapper';
 import routeCompare from 'util/routeCompare';
 
 const routesQuery = gql`
-  query stopPosterQuery($stopId: String!, $date: Date!) {
-    stop: stopByStopId(stopId: $stopId) {
-      shortId
-      siblings {
-        nodes {
-          platform
-          routeSegments: routeSegmentsForDate(date: $date) {
-            nodes {
-              routeId
-              viaFi
-              viaSe
-              hasRegularDayDepartures(date: $date)
-              pickupDropoffType
-              line {
-                nodes {
-                  trunkRoute
-                }
+  query routesQuery($stopIds: [String], $date: Date!) {
+    stops: getStopsByIds(stopIds: $stopIds) {
+      nodes {
+        platform
+        routeSegments: routeSegmentsForDate(date: $date) {
+          nodes {
+            routeId
+            viaFi
+            viaSe
+            hasRegularDayDepartures(date: $date)
+            pickupDropoffType
+            line {
+              nodes {
+                trunkRoute
               }
-              route {
-                nodes {
-                  destinationFi
-                  destinationSe
-                  mode
-                }
+            }
+            route {
+              nodes {
+                destinationFi
+                destinationSe
+                mode
               }
             }
           }
@@ -48,7 +45,7 @@ const routesQuery = gql`
 const propsMapper = mapProps(props => {
   const { data, routeFilter, ...propsToForward } = props;
   const stops = flatMap(
-    data.stop.siblings.nodes.map(s =>
+    data.stops.nodes.map(s =>
       s.routeSegments.nodes
         .map(routeSegment => ({ ...routeSegment, platform: s.platform }))
         .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
@@ -92,7 +89,7 @@ export default component => {
   const RoutesContainer = hoc(component);
 
   RoutesContainer.propTypes = {
-    stopId: PropTypes.string.isRequired,
+    stopIds: PropTypes.array.isRequired,
     date: PropTypes.string.isRequired,
   };
 

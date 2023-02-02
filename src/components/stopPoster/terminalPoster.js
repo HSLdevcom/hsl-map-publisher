@@ -16,7 +16,7 @@ import Metadata from 'components/metadata';
 import Header from './headerContainer';
 import Footer from './footer';
 
-import Routes from './routes';
+import Routes from './terminalRoutes';
 import AdContainer from './adContainer';
 
 import styles from './stopPoster.css';
