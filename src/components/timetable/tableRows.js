@@ -55,11 +55,12 @@ const isEqualDepartureHour = (a, b) => {
   for (let i = 0; i < a.length; i++) {
     const curA = a[i];
     const curB = b[i];
-
     if (!curA || !curB) {
       return false;
     }
-
+    if (curA.routeId !== curB.routeId) {
+      return false;
+    }
     if (curA.minutes !== curB.minutes) {
       return false;
     }
@@ -108,7 +109,6 @@ const TableRows = props => {
     });
     i = cutOff;
   }
-
   return (
     <div className={styles.root}>
       {rowsByHour.map(departuresHour => (
