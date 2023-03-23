@@ -5,9 +5,9 @@ const qs = require('qs');
 const log = require('./util/log');
 const { uploadPosterToCloud } = require('./cloudService');
 
-const { AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_KEY } = require('../constants');
+const { AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_KEY, PUBLISHER_RENDER_URL } = require('../constants');
 
-const CLIENT_URL = 'http://localhost:5000';
+const CLIENT_URL = PUBLISHER_RENDER_URL;
 const RENDER_TIMEOUT = 10 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
 const SCALE = 96 / 72;
