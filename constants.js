@@ -33,6 +33,7 @@ const secretsEnv = mapValues(process.env, (value, key) => {
 module.exports = {
   PG_CONNECTION_STRING: secretsEnv.PG_CONNECTION_STRING || '',
   REDIS_CONNECTION_STRING: secretsEnv.REDIS_CONNECTION_STRING || '',
+  PUBLISHER_RENDER_URL: secretsEnv.PUBLISHER_RENDER_URL || 'http://localhost:5000/',
   DIGITRANSIT_URL: secretsEnv.DIGITRANSIT_URL || '',
   DIGITRANSIT_APIKEY: secretsEnv.DIGITRANSIT_APIKEY || '',
   JORE_GRAPHQL_URL: secretsEnv.JORE_GRAPHQL_URL || '',
