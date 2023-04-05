@@ -16,7 +16,10 @@ Also install Chrome. Refer the installation instructions of Chrome for your oper
 
 ### About the app
 
-This project is split in two parts. The first is a server that receives the poster requests and fires up a Puppeteer instance which runs a React app that renders the posters. This component lives in the `scripts` directory. The other part is the React app itself which lives in the `src` directory. It is a more complicated app, as it needs to load data from both the publisher database as well as from the JORE database.
+This app is split into three parts:
+- Server (receives poster requests and stores them into the Redis database)
+- Worker (Fetches poster jobs from Redis, fires up Puppeteer to render and save the posters)
+- Render (Receives worker's requests for certain poster parameters, fetches relevant data and renders the poster in the browser for Worker's Puppeteer instance to save into PDFs)
 
 ### Writing components
 
@@ -92,7 +95,7 @@ Then, start generator worker. (You can start multiple workers.)
 yarn worker
 ```
 
-Finally, start the React app
+Finally, start the React app/Rendering
 ```bash
 yarn start
 ```
@@ -133,8 +136,19 @@ Build the Docker image with the following command:
 docker build --build-arg BUILD_ENV=local -t hsl-map-publisher .
 ```
 
-And run the Docker container with this command (you can leave font-directory mounting away if you don't have them locally):
+And run the Docker container with these commands (you can leave font-directory mounting away if you don't have them locally):
 
+Server:
 ```bash
-docker run -d -p 4000:4000 --name publisher -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres --link redis hsl-map-publisher
+docker run -d -p 4000:4000 --name publisher-server -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres --link redis -e SERVICE=server:production hsl-map-publisher
+```
+
+Worker:
+```bash
+docker run -d --name publisher-worker -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres --link redis --link publisher-render -e SERVICE=worker:production hsl-map-publisher
+```
+
+Rendering:
+```bash
+docker run -d -p 5000:5000 --name publisher-render -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres --link redis -e SERVICE=start:production hsl-map-publisher
 ```
