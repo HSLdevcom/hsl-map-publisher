@@ -4,6 +4,9 @@ This project is the server-side component of the poster publisher (the UI can be
 
 In production everything runs from a docker container that takes care of all dependencies and environment setup.
 
+## Development
+If ticket zone regions are changed, remember to update [ticket-zones-polygons.json](./src/components/map/ticket-zones-polygons.json) to reflect the new zones !
+
 ### Dependencies
 
 Install dependencies:

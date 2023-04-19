@@ -1,5 +1,5 @@
 import { PerspectiveMercatorViewport } from 'viewport-mercator-project';
-import TicketZones from '../components/map/ticket-zones.json';
+import TicketZones from '../components/map/ticket-zones-polygons.json';
 import { groupBy } from 'lodash';
 import * as turf from '@turf/turf';
 
