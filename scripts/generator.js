@@ -28,6 +28,12 @@ async function initialize() {
   });
 }
 
+function generateRenderUrl(component, template, props) {
+  const encodedProps = qs.stringify({ component, props, template });
+  const pageUrl = `${PUBLISHER_RENDER_URL}/?${encodedProps}`;
+  return pageUrl;
+}
+
 /**
  * Renders component to PDF file
  * @returns {Promise}
@@ -51,8 +57,7 @@ async function renderComponent(options) {
     }
   });
 
-  const encodedProps = qs.stringify({ component, props, template });
-  const pageUrl = `${CLIENT_URL}/?${encodedProps}`;
+  const pageUrl = generateRenderUrl(component, template, props);
 
   console.log(`Opening ${pageUrl} in Puppeteer.`);
 
@@ -137,4 +142,5 @@ async function generate(options) {
 
 module.exports = {
   generate,
+  generateRenderUrl,
 };
