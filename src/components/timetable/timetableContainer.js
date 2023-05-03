@@ -268,6 +268,7 @@ const propsMapper = mapProps(props => {
     specialSymbols,
     platformInfo: props.platformInfo,
     hasDepartures: departures.length > 0,
+    showAddressInfo: props.showAddressInfo,
   };
 });
 
@@ -287,6 +288,7 @@ TimetableContainer.defaultProps = {
   printTimetablesAsGreyscale: false,
   specialSymbols: [],
   showStopInformation: false,
+  showAddressInfo: true,
 };
 
 TimetableContainer.propTypes = {
@@ -304,6 +306,7 @@ TimetableContainer.propTypes = {
   printTimetablesAsGreyscale: PropTypes.bool,
   specialSymbols: PropTypes.array,
   showStopInformation: PropTypes.bool,
+  showAddressInfo: PropTypes.bool,
 };
 
 export default TimetableContainer;

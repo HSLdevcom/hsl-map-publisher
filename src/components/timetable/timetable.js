@@ -68,7 +68,7 @@ class Timetable extends Component {
 
   componentDidMount() {
     const { renderAddressInfo } = this.state;
-    if (!renderAddressInfo && this.props.printableAsA4) {
+    if (!renderAddressInfo && this.props.printableAsA4 && this.props.showAddressInfo) {
       this.setState({ renderAddressInfo: true });
     }
   }
@@ -229,6 +229,7 @@ Timetable.defaultProps = {
   specialSymbols: [],
   platform: null,
   addressFi: null,
+  showAddressInfo: true,
 };
 
 Timetable.propTypes = {
@@ -257,6 +258,7 @@ Timetable.propTypes = {
   platformInfo: PropTypes.bool,
   specialSymbols: PropTypes.array,
   hasDepartures: PropTypes.bool.isRequired,
+  showAddressInfo: PropTypes.bool,
 };
 
 export default Timetable;
