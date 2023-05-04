@@ -58,6 +58,14 @@ const getNotes = (notes, symbols) => {
   return parsedNotes;
 };
 
+const PrintButton = props => (
+  <div className={styles.noPrint}>
+    <button className={styles.printBtn} type="button" onClick={window.print}>
+      TULOSTA AIKATAULU
+    </button>
+  </div>
+);
+
 class Timetable extends Component {
   constructor(props) {
     super(props);
@@ -126,6 +134,7 @@ class Timetable extends Component {
                   <PlatformSymbol platform={this.props.platform} />
                 )}
               </div>
+              {this.props.showPrintButton ? <PrintButton /> : ''}
             </div>
           )}
           {this.props.showValidityPeriod && (
@@ -230,6 +239,7 @@ Timetable.defaultProps = {
   platform: null,
   addressFi: null,
   showAddressInfo: true,
+  showPrintButton: false,
 };
 
 Timetable.propTypes = {
@@ -259,6 +269,7 @@ Timetable.propTypes = {
   specialSymbols: PropTypes.array,
   hasDepartures: PropTypes.bool.isRequired,
   showAddressInfo: PropTypes.bool,
+  showPrintButton: PropTypes.bool,
 };
 
 export default Timetable;
