@@ -110,7 +110,7 @@
 }
 
 .title {
-  padding-right: 0.893em;
+  /* padding-right: 0.893em; */ /* Removed to allow more space for overflow */
   font-family: GothamXNarrow-Medium;
   font-size: 0.83em;
 }
