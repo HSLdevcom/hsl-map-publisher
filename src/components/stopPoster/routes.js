@@ -49,7 +49,9 @@ class Routes extends Component {
   }
 
   hasOverflow() {
-    return this.root.scrollWidth > this.root.clientWidth;
+    // Allow extra 50px room for text to enter the padding to prevent failure with overflow removal
+    // Remove if that causes problems
+    return this.root.scrollWidth > this.root.clientWidth + 50;
   }
 
   updateLayout() {
