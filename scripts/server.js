@@ -20,6 +20,7 @@ const {
   DOMAINS_ALLOWED_TO_GENERATE,
   PUBLISHER_TEST_GROUP,
   REDIS_CONNECTION_STRING,
+  PUBLISHER_SERVER_URL,
 } = require('../constants');
 
 const {
@@ -121,11 +122,11 @@ const authMiddleware = async (ctx, next) => {
     if (['/login', '/logout', '/session'].includes(ctx2.path)) {
       return true;
     }
-    // Allow GET localhost:4000/templates/..., so that puppeteer can get the template.
+    // Allow GET /templates/..., so that puppeteer can get the template.
     if (
       ctx2.path.startsWith('/templates/') &&
       ctx.method === 'GET' &&
-      ctx.host === 'localhost:4000'
+      ctx.host === PUBLISHER_SERVER_URL
     ) {
       return true;
     }
