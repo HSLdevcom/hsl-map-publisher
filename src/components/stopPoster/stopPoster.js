@@ -22,8 +22,6 @@ import AdContainer from './adContainer';
 import styles from './stopPoster.css';
 import CustomMap from '../map/customMap';
 
-const { PUBLISHER_SERVER_URL } = require('../../../constants');
-
 const ROUTE_DIAGRAM_MAX_HEIGHT = 25;
 const ROUTE_DIAGRAM_MIN_HEIGHT = 10;
 
@@ -72,7 +70,7 @@ class StopPoster extends Component {
         // This url will probably always be the same. If you find yourself
         // changing it, please make an .env setup while you're at it.
         templateReq = await window.fetch(
-          `${PUBLISHER_SERVER_URL}/templates/${this.props.template}`,
+          `${process.env.REACT_APP_PUBLISHER_SERVER_URL}/templates/${this.props.template}`,
         );
         templateBody = await templateReq.json();
       } catch (err) {

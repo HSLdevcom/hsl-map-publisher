@@ -73,7 +73,7 @@ class TerminalPoster extends Component {
         // This url will probably always be the same. If you find yourself
         // changing it, please make an .env setup while you're at it.
         templateReq = await window.fetch(
-          `${PUBLISHER_SERVER_URL}/templates/${this.props.template}`,
+          `${process.env.REACT_APP_PUBLISHER_SERVER_URL}/templates/${this.props.template}`,
         );
         templateBody = await templateReq.json();
       } catch (err) {

@@ -20,7 +20,6 @@ const {
   DOMAINS_ALLOWED_TO_GENERATE,
   PUBLISHER_TEST_GROUP,
   REDIS_CONNECTION_STRING,
-  PUBLISHER_SERVER_URL,
 } = require('../constants');
 
 const {
@@ -126,7 +125,7 @@ const authMiddleware = async (ctx, next) => {
     if (
       ctx2.path.startsWith('/templates/') &&
       ctx.method === 'GET' &&
-      ctx.host === PUBLISHER_SERVER_URL
+      ctx.host === process.env.REACT_APP_PUBLISHER_SERVER_URL
     ) {
       return true;
     }
