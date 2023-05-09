@@ -146,12 +146,12 @@ Server:
 docker run -d -p 4000:4000 --name publisher-server -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres --link redis -e SERVICE=server:production hsl-map-publisher
 ```
 
-Worker:
-```bash
-docker run -d --name publisher-worker -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres --link redis --link publisher-render -e SERVICE=worker:production hsl-map-publisher
-```
-
 Rendering:
 ```bash
 docker run -d -p 5000:5000 --name publisher-render -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres --link redis -e SERVICE=start:production hsl-map-publisher
+```
+
+And finally a Worker, which is linked to the rendering instance:
+```bash
+docker run -d --name publisher-worker -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres --link redis --link publisher-render -e SERVICE=worker:production hsl-map-publisher
 ```
