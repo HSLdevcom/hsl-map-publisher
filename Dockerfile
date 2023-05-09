@@ -1,4 +1,4 @@
-FROM node:16-buster-slim
+FROM node:16.20-buster-slim
 
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -yq wget curl gnupg fontconfig fonts-liberation ca-certificates --no-install-recommends \

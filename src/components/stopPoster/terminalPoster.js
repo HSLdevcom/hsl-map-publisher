@@ -21,7 +21,6 @@ import AdContainer from './adContainer';
 
 import styles from './stopPoster.css';
 import CustomMap from '../map/customMap';
-import { PUBLISHER_SERVER_URL } from '../../../constants';
 
 const ROUTE_DIAGRAM_MAX_HEIGHT = 25;
 const ROUTE_DIAGRAM_MIN_HEIGHT = 10;
