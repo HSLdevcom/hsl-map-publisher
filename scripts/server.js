@@ -117,6 +117,7 @@ const errorHandler = async (ctx, next) => {
 const authMiddleware = async (ctx, next) => {
   // Helper function to allow specific requests without authentication
   const allowAuthException = ctx2 => {
+    const envHostUrl = new URL(process.env.REACT_APP_PUBLISHER_SERVER_URL);
     // Allow session related requests
     if (['/login', '/logout', '/session'].includes(ctx2.path)) {
       return true;
@@ -125,7 +126,7 @@ const authMiddleware = async (ctx, next) => {
     if (
       ctx2.path.startsWith('/templates/') &&
       ctx.method === 'GET' &&
-      ctx.host === process.env.REACT_APP_PUBLISHER_SERVER_URL
+      ctx.host === envHostUrl.host
     ) {
       return true;
     }
