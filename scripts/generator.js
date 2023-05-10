@@ -4,6 +4,7 @@ const puppeteer = require('puppeteer');
 const qs = require('qs');
 const log = require('./util/log');
 const { uploadPosterToCloud } = require('./cloudService');
+const moment = require('moment');
 
 const { AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_KEY, PUBLISHER_RENDER_URL } = require('../constants');
 
@@ -29,7 +30,10 @@ async function initialize() {
 }
 
 function generateRenderUrl(component, template, props) {
-  const encodedProps = qs.stringify({ component, props, template });
+  const generationProps = props.date
+    ? props
+    : Object.assign(props, { date: moment(Date()).format('YYYY-MM-DD') }); // Add current date by default if request props do not contain it
+  const encodedProps = qs.stringify({ component, props: generationProps, template });
   const pageUrl = `${PUBLISHER_RENDER_URL}/?${encodedProps}`;
   return pageUrl;
 }
