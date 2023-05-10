@@ -406,7 +406,11 @@ async function main() {
     const component = RENDER_URL_COMPONENTS.TIMETABLE; // Restrict unauthorized API generation only for quick timetable generations
     const renderUrl = generateRenderUrl(component, template, props);
 
-    ctx.body = { renderUrl };
+    if (props.redirect) {
+      ctx.redirect(renderUrl);
+    } else {
+      ctx.body = { renderUrl };
+    }
   });
 
   app.keys = ['secret key'];
