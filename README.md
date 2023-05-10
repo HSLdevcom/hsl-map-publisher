@@ -145,7 +145,7 @@ docker run -d -p 4000:4000 --name publisher-server -v $(pwd)/output:/output -v $
 
 Worker:
 ```bash
-docker run -d --name publisher-worker -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres --link redis --link publisher-render -e SERVICE=worker:production hsl-map-publisher
+docker run -d --name publisher-worker -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres --link redis --link publisher-render --link publisher-server -e SERVICE=worker:production hsl-map-publisher
 ```
 
 Rendering:
