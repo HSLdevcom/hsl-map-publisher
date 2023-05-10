@@ -69,7 +69,9 @@ class StopPoster extends Component {
       try {
         // This url will probably always be the same. If you find yourself
         // changing it, please make an .env setup while you're at it.
-        templateReq = await window.fetch(`http://localhost:4000/templates/${this.props.template}`);
+        templateReq = await window.fetch(
+          `${process.env.REACT_APP_PUBLISHER_SERVER_URL}/templates/${this.props.template}`,
+        );
         templateBody = await templateReq.json();
       } catch (err) {
         this.onError(err);

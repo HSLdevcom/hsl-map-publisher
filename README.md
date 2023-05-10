@@ -153,5 +153,5 @@ docker run -d -p 5000:5000 --name publisher-render -v $(pwd)/output:/output -v $
 
 And finally a Worker, which is linked to the rendering instance:
 ```bash
-docker run -d --name publisher-worker -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres --link redis --link publisher-render -e SERVICE=worker:production hsl-map-publisher
+docker run -d --name publisher-worker -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres --link redis --link publisher-render --link publisher-server -e SERVICE=worker:production hsl-map-publisher
 ```

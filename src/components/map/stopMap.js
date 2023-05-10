@@ -461,6 +461,7 @@ const StopType = PropTypes.shape({
   ),
   stopIds: PropTypes.arrayOf(PropTypes.string.isRequired),
   calculatedHeading: PropTypes.number,
+  stops: PropTypes.array,
 });
 
 const nearestSalePointType = PropTypes.shape({
@@ -471,6 +472,8 @@ const nearestSalePointType = PropTypes.shape({
   lat: PropTypes.number.isRequired,
   lon: PropTypes.number.isRequired,
   distance: PropTypes.number.isRequired,
+  x: PropTypes.number.isRequired,
+  y: PropTypes.number.isRequired,
 });
 
 StopMap.defaultProps = {

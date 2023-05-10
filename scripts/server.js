@@ -117,15 +117,16 @@ const errorHandler = async (ctx, next) => {
 const authMiddleware = async (ctx, next) => {
   // Helper function to allow specific requests without authentication
   const allowAuthException = ctx2 => {
+    const envHostUrl = new URL(process.env.REACT_APP_PUBLISHER_SERVER_URL);
     // Allow session related requests
     if (['/login', '/logout', '/session'].includes(ctx2.path)) {
       return true;
     }
-    // Allow GET localhost:4000/templates/..., so that puppeteer can get the template.
+    // Allow GET /templates/..., so that puppeteer can get the template.
     if (
       ctx2.path.startsWith('/templates/') &&
       ctx.method === 'GET' &&
-      ctx.host === 'localhost:4000'
+      ctx.host === envHostUrl.host
     ) {
       return true;
     }
