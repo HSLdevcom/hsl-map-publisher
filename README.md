@@ -83,24 +83,17 @@ REDIS_CONNECTION_STRING=redis://localhost:6379
 
 In development, start the Publisher backend server like this, (make sure you have connection strings in `.env`)
 ```bash
-yarn run server:hot
-```
-
-That command will run a Forever instance that watches for changes and restarts the server when they happen.
-
-Alternatively, to run the server with plain Node, leave off `hot`:
-```bash
 yarn run server
 ```
 
 Then, start generator worker. (You can start multiple workers.)
-```
-yarn worker
+```bash
+yarn run worker
 ```
 
 Finally, start the React app/Rendering
 ```bash
-yarn start
+yarn run start
 ```
 
 Now you can use the UI with the server, or open a poster separately in your browser. The poster app needs `component` and `props` query parameters, and the server will echo the currently rendering URL in its console. But if you just need to open the poster app, you can use this link that will show H0454, Snellmaninkatu:

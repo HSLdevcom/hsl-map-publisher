@@ -33,9 +33,4 @@ RUN yarn run build
 ARG SERVICE='start:production'
 ENV SERVICE=${SERVICE}
 
-CMD \
-  ./fonts.sh && \
-  fc-cache -f -v && \
-  yarn run ${SERVICE} && \
-  sleep 3 && \
-  node_modules/.bin/forever -f logs 0
+CMD yarn run ${SERVICE}
