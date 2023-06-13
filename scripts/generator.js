@@ -55,9 +55,12 @@ async function renderComponent(options) {
     onError(error);
   });
 
-  page.on('console', ({ type, text }) => {
-    if (['error', 'warning', 'log'].includes(type)) {
-      onInfo(`Console(${type}): ${text}`);
+  page.on('console', message => {
+    const { url, lineNumber, columnNumber } = message.location();
+    if (['error', 'warning', 'log'].includes(message.type())) {
+      onInfo(
+        `Console(${message.type()}) on (${url}:${lineNumber}:${columnNumber}):\n${message.text()}`,
+      );
     }
   });
 
