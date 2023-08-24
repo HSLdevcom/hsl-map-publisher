@@ -99,15 +99,30 @@ const TableRows = props => {
   const rowsByHour = [];
   for (let i = 0; i < rows.length; i++) {
     const cutOff = getDuplicateCutOff(i, rows);
-    const hours =
+    let hours =
       rows[i].hour === rows[cutOff].hour
         ? `${formatHour(rows[i].hour)}`
         : `${formatHour(rows[i].hour)}-${formatHour(rows[cutOff].hour)}`;
-    rowsByHour.push({
-      hour: hours,
-      departures: rows[i].departures,
-    });
-    i = cutOff;
+    if (rows.length === 2) {
+      hours = `${formatHour(rows[i].hour)}`;
+
+      rowsByHour.push({
+        hour: hours,
+        departures: rows[i].departures,
+      });
+
+      rowsByHour.push({
+        hour: `${formatHour(rows[rows.length - 1].hour)}`,
+        departures: rows[rows.length - 1].departures,
+      });
+      i = cutOff;
+    } else {
+      rowsByHour.push({
+        hour: hours,
+        departures: rows[i].departures,
+      });
+      i = cutOff;
+    }
   }
   return (
     <div className={styles.root}>
