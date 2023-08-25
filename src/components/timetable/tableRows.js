@@ -4,6 +4,7 @@ import groupBy from 'lodash/groupBy';
 import { Row, WrappingRow } from 'components/util';
 import sortBy from 'lodash/sortBy';
 import { trimRouteId } from 'util/domain';
+import { uniqBy } from 'lodash';
 
 import styles from './tableRows.css';
 
@@ -84,6 +85,10 @@ const getDuplicateCutOff = (startIndex, rows) => {
   return cutOffIndex;
 };
 
+const filterDuplicateDepartureHours = departureRows => {
+  return uniqBy(departureRows, 'departures');
+};
+
 const TableRows = props => {
   const departuresByHour = groupBy(
     props.departures,
@@ -99,19 +104,34 @@ const TableRows = props => {
   const rowsByHour = [];
   for (let i = 0; i < rows.length; i++) {
     const cutOff = getDuplicateCutOff(i, rows);
-    const hours =
+    let hours =
       rows[i].hour === rows[cutOff].hour
         ? `${formatHour(rows[i].hour)}`
         : `${formatHour(rows[i].hour)}-${formatHour(rows[cutOff].hour)}`;
-    rowsByHour.push({
-      hour: hours,
-      departures: rows[i].departures,
-    });
-    i = cutOff;
+    if (rows.length === 2) {
+      hours = `${formatHour(rows[i].hour)}`;
+      const firstHour = { hour: hours, departures: rows[i].departures };
+      const secondHour = {
+        hour: `${formatHour(rows[rows.length - 1].hour)}`,
+        departures: rows[rows.length - 1].departures,
+      };
+
+      rowsByHour.push(firstHour, secondHour);
+      i = cutOff;
+    } else {
+      rowsByHour.push({
+        hour: hours,
+        departures: rows[i].departures,
+      });
+      i = cutOff;
+    }
   }
+
+  const filteredDepartures = filterDuplicateDepartureHours(rowsByHour);
+
   return (
     <div className={styles.root}>
-      {rowsByHour.map(departuresHour => (
+      {filteredDepartures.map(departuresHour => (
         <TableRow
           key={`${departuresHour.hour}${departuresHour.departures}`}
           hours={departuresHour.hour}
