@@ -89,7 +89,6 @@ const getDuplicateCutOff = (startIndex, rows) => {
 };
 
 const filterDuplicateDepartureHours = departureRows => {
-  console.log(uniqBy(departureRows, 'departures'));
   return uniqBy(departureRows, 'departures');
 };
 
