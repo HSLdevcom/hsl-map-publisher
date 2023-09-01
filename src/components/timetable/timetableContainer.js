@@ -38,6 +38,111 @@ function groupDepartures(departures) {
   };
 }
 
+function groupDeparturesByDay(departures) {
+  return {
+    mondays: departures.filter(departure => departure.dayType.includes('Ma')),
+    tuesdays: departures.filter(departure => departure.dayType.includes('Ti')),
+    wednesdays: departures.filter(departure => departure.dayType.includes('Ke')),
+    thursdays: departures.filter(departure => departure.dayType.includes('To')),
+    fridays: departures.filter(departure => departure.dayType.includes('Pe')),
+    saturdays: departures.filter(departure => departure.dayType.includes('La')),
+    sundays: departures.filter(departure => departure.dayType.includes('Su')),
+  };
+}
+
+// Compare two individual departure objects for equality
+function areDeparturesEqual(a, b) {
+  return (
+    a.hours === b.hours &&
+    a.minutes === b.minutes &&
+    a.routeId === b.routeId &&
+    a.direction === b.direction
+  );
+}
+
+// Compare two arrays of departure objects for equality
+function areDepartureArraysEqual(arr1, arr2) {
+  // Filter out departures with note set to 'pe' from both arrays
+  // We want 'pe' departures to still be shown as they are used to
+  const filteredArr1 = arr1.filter(departure => departure.note !== 'pe');
+  const filteredArr2 = arr2.filter(departure => departure.note !== 'pe');
+
+  // Different lengths mean they can't be equal
+  if (filteredArr1.length !== filteredArr2.length) {
+    return false;
+  }
+
+  // Compare each pair of departures in the two arrays
+  for (let i = 0; i < filteredArr1.length; i++) {
+    if (!areDeparturesEqual(filteredArr1[i], filteredArr2[i])) {
+      return false;
+    }
+  }
+
+  // If we get here, all pairs were equal
+  return true;
+}
+
+function combineConsecutiveDays(daysObject) {
+  const orderedDays = [
+    'mondays',
+    'tuesdays',
+    'wednesdays',
+    'thursdays',
+    'fridays',
+    'saturdays',
+    'sundays',
+  ];
+
+  // Initialize variables to keep track of the current sequence of equal days
+  let currentStartDay = null;
+  let currentDepartures = null;
+
+  const combinedDays = {};
+
+  const flushCurrentSequence = endDay => {
+    const combinedKey =
+      currentStartDay === endDay ? currentStartDay : `${currentStartDay}-${endDay}`;
+
+    // If endDay is friday use the departures from that day so we have the 'pe' departures in the timetables
+    combinedDays[combinedKey] =
+      endDay === 'fridays' ? daysObject[endDay] : daysObject[currentStartDay];
+  };
+
+  // Loop through each day of the week
+  for (let i = 0; i < orderedDays.length; i++) {
+    const day = orderedDays[i];
+    const departures = daysObject[day];
+
+    // If we are starting a new sequence, initialize currentStartDay and currentDepartures
+    if (currentDepartures === null) {
+      currentStartDay = day;
+      currentDepartures = departures;
+    }
+    // Check if the current day's departures are equal to the current sequence's departures
+    else if (areDepartureArraysEqual(currentDepartures, departures)) {
+      if (i === orderedDays.length - 1) {
+        flushCurrentSequence(day);
+      }
+    }
+    // If we're here, the current day's departures are different from the current sequence's
+    else {
+      // End the current sequence and add it to the output object
+      flushCurrentSequence(orderedDays[i - 1]);
+
+      // Start a new sequence with the current day
+      currentStartDay = day;
+      currentDepartures = departures;
+
+      if (i === orderedDays.length - 1) {
+        flushCurrentSequence(day);
+      }
+    }
+  }
+
+  return combinedDays;
+}
+
 function getNotes(isSummerTimetable) {
   // because apparently there may be many
   let didForceShowPNote = false;
@@ -229,7 +334,7 @@ const propsMapper = mapProps(props => {
     ),
   }));
 
-  const { weekdays, saturdays, sundays } = pick(groupDepartures(departures), props.segments);
+  const { weekdays } = pick(groupDepartures(departures), props.segments);
   const dateBegin =
     props.dateBegin ||
     flatMap(props.data.stop.siblings.nodes, stop =>
@@ -241,10 +346,30 @@ const propsMapper = mapProps(props => {
       stop.departures.nodes.map(departure => departure.dateEnd),
     ).sort((a, b) => a.localeCompare(b))[0];
 
+  const {
+    mondays,
+    tuesdays,
+    wednesdays,
+    thursdays,
+    fridays,
+    saturdays,
+    sundays,
+  } = groupDeparturesByDay(departures);
+  const combinedDays = combineConsecutiveDays({
+    mondays,
+    tuesdays,
+    wednesdays,
+    thursdays,
+    fridays,
+    saturdays,
+    sundays,
+  });
+
   return {
     weekdays,
     saturdays,
     sundays,
+    combinedDays,
     notes,
     dateBegin,
     dateEnd,
@@ -310,6 +435,7 @@ TimetableContainer.propTypes = {
   showStopInformation: PropTypes.bool,
   showAddressInfo: PropTypes.bool,
   showPrintButton: PropTypes.bool,
+  combinedDays: PropTypes.object,
 };
 
 export default TimetableContainer;
