@@ -84,63 +84,76 @@ function areDepartureArraysEqual(arr1, arr2) {
 }
 
 function combineConsecutiveDays(daysObject) {
-  const orderedDays = [
-    'mondays',
-    'tuesdays',
-    'wednesdays',
-    'thursdays',
-    'fridays',
-    'saturdays',
-    'sundays',
-  ];
-
-  // Initialize variables to keep track of the current sequence of equal days
   let currentStartDay = null;
   let currentDepartures = null;
 
   const combinedDays = {};
 
-  const flushCurrentSequence = endDay => {
-    const combinedKey =
-      currentStartDay === endDay ? currentStartDay : `${currentStartDay}-${endDay}`;
-
-    // If endDay is friday use the departures from that day so we have the 'pe' departures in the timetables
-    combinedDays[combinedKey] =
-      endDay === 'fridays' ? daysObject[endDay] : daysObject[currentStartDay];
+  const flushCurrentSequence = (startDay, endDay) => {
+    const combinedKey = startDay === endDay ? startDay : `${startDay}-${endDay}`;
+    // If endDay is 'fridays', use the departures from that day so we have the 'pe' departures in the timetables
+    combinedDays[combinedKey] = endDay === 'fridays' ? daysObject[endDay] : daysObject[startDay];
   };
 
-  // Loop through each day of the week
-  for (let i = 0; i < orderedDays.length; i++) {
-    const day = orderedDays[i];
-    const departures = daysObject[day];
+  const weekdays = ['mondays', 'tuesdays', 'wednesdays', 'thursdays', 'fridays'];
+  const weekend = ['saturdays', 'sundays'];
 
-    // If we are starting a new sequence, initialize currentStartDay and currentDepartures
-    if (currentDepartures === null) {
-      currentStartDay = day;
-      currentDepartures = departures;
-    }
-    // Check if the current day's departures are equal to the current sequence's departures
-    else if (areDepartureArraysEqual(currentDepartures, departures)) {
-      if (i === orderedDays.length - 1) {
-        flushCurrentSequence(day);
+  // Function to process a set of consecutive days (either weekdays or weekend)
+  const processConsecutiveDays = dayList => {
+    currentStartDay = null;
+    currentDepartures = null;
+    for (let i = 0; i < dayList.length; i++) {
+      const day = dayList[i];
+      const departures = daysObject[day];
+
+      // Starting a new sequence
+      if (currentDepartures === null) {
+        currentStartDay = day;
+        currentDepartures = departures;
+      }
+      // Current day's departures are equal to current sequence's departures
+      else if (areDepartureArraysEqual(currentDepartures, departures)) {
+        if (i === dayList.length - 1) {
+          flushCurrentSequence(currentStartDay, day);
+        }
+      }
+      // Current day's departures are different
+      else {
+        flushCurrentSequence(currentStartDay, dayList[i - 1]);
+        currentStartDay = day;
+        currentDepartures = departures;
+        if (i === dayList.length - 1) {
+          flushCurrentSequence(currentStartDay, day);
+        }
       }
     }
-    // If we're here, the current day's departures are different from the current sequence's
-    else {
-      // End the current sequence and add it to the output object
-      flushCurrentSequence(orderedDays[i - 1]);
+  };
 
-      // Start a new sequence with the current day
-      currentStartDay = day;
-      currentDepartures = departures;
+  // Process weekdays and weekend separately
+  processConsecutiveDays(weekdays);
+  processConsecutiveDays(weekend);
 
-      if (i === orderedDays.length - 1) {
-        flushCurrentSequence(day);
+  // Remove empty arrays
+  const filteredDepartures = Object.fromEntries(
+    Object.entries(combinedDays).filter(([key, value]) => value.length !== 0),
+  );
+
+  const removePeNotes = departures =>
+    departures.map(departure => {
+      if (departure.note === 'pe') {
+        const { note, ...rest } = departure;
+        return rest;
       }
-    }
-  }
+      return departure;
+    });
 
-  return combinedDays;
+  // Is friday's departures are own their own. Dont show "pe" notes
+  Object.keys(filteredDepartures).forEach(key => {
+    if (key === 'fridays') {
+      filteredDepartures[key] = removePeNotes(filteredDepartures[key]);
+    }
+  });
+  return filteredDepartures;
 }
 
 function getNotes(isSummerTimetable) {
