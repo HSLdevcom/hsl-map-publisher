@@ -146,6 +146,49 @@ const PlatformSymbol = ({ platform, size, color }) => (
   </svg>
 );
 
+const translations = {
+  fi: {
+    mondays: 'Maanantai',
+    tuesdays: 'Tiistai',
+    wednesdays: 'Keskiviikko',
+    thursdays: 'Torstai',
+    fridays: 'Perjantai',
+    saturdays: 'Lauantai',
+    sundays: 'Sunnuntai',
+  },
+  sv: {
+    mondays: 'Måndag',
+    tuesdays: 'Tisdag',
+    wednesdays: 'Onsdag',
+    thursdays: 'Torsdag',
+    fridays: 'Fredag',
+    saturdays: 'Lördag',
+    sundays: 'Söndag',
+  },
+  en: {
+    mondays: 'Monday',
+    tuesdays: 'Tuesday',
+    wednesdays: 'Wednesday',
+    thursdays: 'Thursday',
+    fridays: 'Friday',
+    saturdays: 'Saturday',
+    sundays: 'Sunday',
+  },
+};
+
+const getWeekdayName = (dayName, lang = 'en') => {
+  let selectedLanguage = lang;
+  if (!translations[selectedLanguage]) {
+    console.warn(`Language ${lang} not supported. Falling back to English.`);
+    selectedLanguage = 'en';
+  }
+  if (!translations[selectedLanguage][dayName]) {
+    console.warn(`Day name ${dayName} not supported.`);
+    return null;
+  }
+  return translations[selectedLanguage][dayName];
+};
+
 PlatformSymbol.propTypes = {
   platform: PropTypes.string.isRequired,
   size: PropTypes.number,
@@ -168,4 +211,5 @@ export {
   FlexSpacer,
   InlineSVG,
   PlatformSymbol,
+  getWeekdayName,
 };

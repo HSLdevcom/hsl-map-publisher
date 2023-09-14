@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Spacer, PlatformSymbol } from 'components/util';
+import { Spacer, PlatformSymbol, getWeekdayName } from 'components/util';
 import classNames from 'classnames';
 
 import TableHeader from './tableHeader';
@@ -169,39 +169,32 @@ class Timetable extends Component {
             <SimpleRoutes stopId={this.props.stopId} date={this.props.date} />
           </React.Fragment>
         )}
-        {this.props.weekdays && this.props.weekdays.length > 0 && (
-          <div>
-            <TableHeader
-              title="Maanantai - Perjantai"
-              subtitleSw="Måndag - Fredag"
-              subtitleEn="Monday - Friday"
-              printingAsA4={this.props.printableAsA4}
-            />
-            <TableRows departures={this.props.weekdays} />
-          </div>
-        )}
-        {this.props.saturdays && this.props.saturdays.length > 0 && (
-          <div>
-            <TableHeader
-              title="Lauantai"
-              subtitleSw="Lördag"
-              subtitleEn="Saturday"
-              printingAsA4={this.props.printableAsA4}
-            />
-            <TableRows departures={this.props.saturdays} />
-          </div>
-        )}
-        {this.props.sundays && this.props.sundays.length > 0 && (
-          <div>
-            <TableHeader
-              title="Sunnuntai"
-              subtitleSw="Söndag"
-              subtitleEn="Sunday"
-              printingAsA4={this.props.printableAsA4}
-            />
-            <TableRows departures={this.props.sundays} />
-          </div>
-        )}
+        {Object.keys(this.props.combinedDays).map(combinedDay => {
+          const dayNames = combinedDay.split('-');
+          const fiTitle =
+            dayNames.length > 1
+              ? `${getWeekdayName(dayNames[0], 'fi')} - ${getWeekdayName(dayNames[1], 'fi')}`
+              : `${getWeekdayName(dayNames[0], 'fi')}`;
+          const svTitle =
+            dayNames.length > 1
+              ? `${getWeekdayName(dayNames[0], 'sv')} - ${getWeekdayName(dayNames[1], 'sv')}`
+              : `${getWeekdayName(dayNames[0], 'sv')}`;
+          const enTitle =
+            dayNames.length > 1
+              ? `${getWeekdayName(dayNames[0], 'en')} - ${getWeekdayName(dayNames[1], 'en')}`
+              : `${getWeekdayName(dayNames[0], 'en')}`;
+          return (
+            <div>
+              <TableHeader
+                title={fiTitle}
+                subtitleSw={svTitle}
+                subtitleEn={enTitle}
+                printingAsA4={this.props.printableAsA4}
+              />
+              <TableRows departures={this.props.combinedDays[combinedDay]} />
+            </div>
+          );
+        })}
         {this.props.showNotes && this.props.notes.length !== 0 && <Spacer height={20} />}
         {this.props.showNotes &&
           getNotes(this.props.notes, this.props.specialSymbols).map(note => (
@@ -257,6 +250,7 @@ Timetable.propTypes = {
   platformInfo: PropTypes.bool,
   specialSymbols: PropTypes.array,
   hasDepartures: PropTypes.bool.isRequired,
+  combinedDays: PropTypes.object.isRequired,
 };
 
 export default Timetable;
