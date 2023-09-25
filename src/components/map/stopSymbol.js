@@ -13,21 +13,9 @@ const StopSymbol = props => {
   if (props.routes.some(route => route.trunkRoute)) {
     colors.push(colorsByMode.TRUNK);
   }
-  if (modes.includes('TRAM')) {
-    colors.push(colorsByMode.TRAM);
-  }
-  if (modes.includes('RAIL')) {
-    colors.push(colorsByMode.RAIL);
-  }
-  if (modes.includes('SUBWAY')) {
-    colors.push(colorsByMode.SUBWAY);
-  }
-  if (modes.includes('FERRY')) {
-    colors.push(colorsByMode.FERRY);
-  }
-  if (modes.includes('BUS') && props.routes.some(route => !route.trunkRoute)) {
-    colors.push(colorsByMode.BUS);
-  }
+  modes.forEach(mode => {
+    colors.push(colorsByMode[mode]);
+  });
 
   const maxRadius = props.size / 2 - (strokeWidth / 2) * (4 - colors.length);
 
@@ -35,7 +23,6 @@ const StopSymbol = props => {
     const radius = maxRadius - index * (strokeWidth + 1);
     return { color, radius };
   });
-
   return (
     <svg width={props.size} height={props.size} style={{ display: 'block' }}>
       <circle cx={props.size / 2} cy={props.size / 2} r={outlines[0].radius} fill="#fff" />
