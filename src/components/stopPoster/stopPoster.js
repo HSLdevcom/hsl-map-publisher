@@ -27,7 +27,12 @@ const ROUTE_DIAGRAM_MIN_HEIGHT = 10;
 
 const trunkStopStyle = {
   '--background': colorsByMode.TRUNK,
-  '--light-background': '#FFE0D1',
+  '--light-background': colorsByMode.LIGHT_TRUNK,
+};
+
+const lighRailStyle = {
+  '--background': colorsByMode.L_RAIL,
+  '--light-background': colorsByMode.LIGHT_L_RAIL,
 };
 
 const defaultDiagramOptions = {
@@ -312,6 +317,7 @@ class StopPoster extends Component {
       shortId,
       stopId,
       isTrunkStop,
+      isLightRail,
       hasRoutes: hasRoutesProp,
       date,
       isSummerTimetable,
@@ -362,9 +368,16 @@ class StopPoster extends Component {
       </div>
     );
 
+    let alternativeStyle = null;
+    if (isTrunkStop) {
+      alternativeStyle = trunkStopStyle;
+    }
+    if (isLightRail) {
+      alternativeStyle = lighRailStyle;
+    }
     return (
       <CropMarks>
-        <div className={styles.root} style={isTrunkStop ? trunkStopStyle : null}>
+        <div className={styles.root} style={alternativeStyle}>
           <JustifiedColumn>
             <Header stopId={stopId} />
             <div
@@ -486,6 +499,7 @@ StopPoster.propTypes = {
   dateEnd: PropTypes.string,
   hasRoutes: PropTypes.bool.isRequired,
   isTrunkStop: PropTypes.bool.isRequired,
+  isLightRail: PropTypes.bool.isRequired,
   isTramStop: PropTypes.bool.isRequired,
   shortId: PropTypes.string.isRequired,
   template: PropTypes.any.isRequired,
