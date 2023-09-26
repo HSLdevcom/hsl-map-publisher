@@ -98,12 +98,14 @@ function getZoneName(shortId) {
 
 const colorsByMode = {
   TRUNK: '#ff6319',
+  LIGHT_TRUNK: '#FFE0D1',
   TRAM: '#00985f',
   RAIL: '#8c4799',
   SUBWAY: '#ff6319',
   BUS: '#007AC9',
   FERRY: '#00B9E4',
-  L_RAIL: '#00B2A9',
+  L_RAIL: '#007E79',
+  LIGHT_L_RAIL: '#e5f2f1',
 };
 
 const iconsByMode = {
