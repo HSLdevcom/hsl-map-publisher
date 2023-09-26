@@ -185,6 +185,14 @@ const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
             <div className={styles.legendText}>Runkolinja / Trunk route</div>
           </div>
         );
+      case 'L_RAIL':
+        return (
+          <div key={mode} className={styles.legendRow}>
+            <div className={classNames(styles.legendLine, styles.l_rail)} />
+            <div className={classNames(styles.legendIcon, styles.l_rail)} />
+            <div className={styles.legendText}>Pikaratikka / Snabbspårvagn / Light rail</div>
+          </div>
+        );
       default:
         return '';
     }

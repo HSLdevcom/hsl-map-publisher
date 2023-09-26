@@ -103,6 +103,7 @@ const colorsByMode = {
   SUBWAY: '#ff6319',
   BUS: '#007AC9',
   FERRY: '#00B9E4',
+  L_RAIL: '#00B2A9',
 };
 
 const iconsByMode = {
