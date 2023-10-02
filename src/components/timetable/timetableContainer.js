@@ -144,6 +144,12 @@ function combineConsecutiveDays(daysObject) {
         const { note, ...rest } = departure;
         return rest;
       }
+      if (departure.note && departure.note.includes('pe')) {
+        return {
+          ...departure,
+          note: departure.note.replace('pe', '').trim(),
+        };
+      }
       return departure;
     });
 
@@ -324,17 +330,6 @@ const propsMapper = mapProps(props => {
         duplicateRoutes.push(direction.routeId);
       }),
     );
-
-  departures.forEach(departure => {
-    if (departure.note && !specialSymbols.includes(departure.note)) {
-      specialSymbols.push(departure.note);
-    }
-  });
-
-  if (departures.some(departure => departure.routeId.includes('H'))) {
-    specialSymbols.push('H');
-  }
-
   departures = departures.map(departure => ({
     ...departure,
     note: modifyNote(
@@ -377,6 +372,17 @@ const propsMapper = mapProps(props => {
     saturdays,
     sundays,
   });
+
+  const combinedDepartures = [].concat(...Object.values(combinedDays));
+  combinedDepartures.forEach(departure => {
+    if (departure.note && !specialSymbols.includes(departure.note)) {
+      specialSymbols.push(departure.note);
+    }
+  });
+
+  if (combinedDepartures.some(departure => departure.routeId.includes('H'))) {
+    specialSymbols.push('H');
+  }
 
   return {
     weekdays,
