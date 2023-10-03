@@ -71,6 +71,10 @@
   border: 2px solid rgb(255, 99, 25);
 }
 
+.legendLine.l_rail {
+  border: 2px solid #0098a1;
+}
+
 .legendIcon {
   width: 10px;
   height: 10px;
@@ -98,6 +102,10 @@
 
 .legendIcon.trunk {
   border: 2px solid rgb(255, 99, 25);
+}
+
+.legendIcon.l_rail {
+  border: 2px solid #0098a1;
 }
 
 .overlays {

@@ -5988,8 +5988,8 @@ hosted-git-info@^2.1.4:
   integrity sha512-f/wzC2QaWBs7t9IYqB4T3sR1xviIViXJRJTWBlx2Gf3g0Xi5vI7Yy4koXQ1c9OYDGHN9sBy1DQ2AB8fqZBWhUg==
 
 hsl-map-style@hsldevcom/hsl-map-style#master:
-  version "1.0.0"
-  resolved "https://codeload.github.com/hsldevcom/hsl-map-style/tar.gz/843f3057d9e05610c705dffeb610a4b52f2d8835"
+  version "1.1.2"
+  resolved "https://codeload.github.com/hsldevcom/hsl-map-style/tar.gz/207a8de2664c9a50b5a5f886d30f5b1628f995c7"
   dependencies:
     lodash "^4.17.4"
 

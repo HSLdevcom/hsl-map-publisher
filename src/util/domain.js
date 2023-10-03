@@ -4,6 +4,7 @@ import railIcon from 'icons/icon_rail.svg';
 import subwayIcon from 'icons/icon_subway.svg';
 import ferryIcon from 'icons/icon_ferry.svg';
 import trunkIcon from 'icons/icon_trunk.svg';
+import lRailIcon from 'icons/icon_L_rail.svg';
 
 import zoneByShortId from 'data/zoneByShortId';
 
@@ -98,11 +99,14 @@ function getZoneName(shortId) {
 
 const colorsByMode = {
   TRUNK: '#ff6319',
+  LIGHT_TRUNK: '#FFE0D1',
   TRAM: '#00985f',
   RAIL: '#8c4799',
   SUBWAY: '#ff6319',
   BUS: '#007AC9',
   FERRY: '#00B9E4',
+  L_RAIL: '#0098A1',
+  LIGHT_L_RAIL: '#e5f4f5',
 };
 
 const iconsByMode = {
@@ -112,6 +116,7 @@ const iconsByMode = {
   SUBWAY: subwayIcon,
   FERRY: ferryIcon,
   TRUNK: trunkIcon,
+  L_RAIL: lRailIcon,
 };
 
 function getColor(route) {
