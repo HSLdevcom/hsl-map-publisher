@@ -59,6 +59,7 @@ const propsMapper = withProps(props => {
       routeSegment => routeSegment.line.nodes && routeSegment.line.nodes[0].trunkRoute === '1',
     ),
     isTramStop: modes.some(mode => mode === 'TRAM'),
+    isLightRail: modes.some(mode => mode === 'L_RAIL'),
   };
 });
 
