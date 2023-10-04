@@ -108,6 +108,24 @@ If Azure credentials are not set in the .env file the posters will be stored loc
 
 See [hsl-map-publisher-ui](https://github.com/HSLdevcom/hsl-map-publisher-ui) for UI.
 
+### Setup local environment using Docker Compose
+
+Ensure you have the correct environment variables defined in your .env file (by default `.env.local`):
+
+Remember to also include `DIGITRANSIT_APIKEY` !
+
+Build the local version of `hsl-map-publisher`:
+
+``` 
+docker build --build-arg BUILD_ENV=local -t hsl-map-publisher .
+```
+
+Setup the development environment:
+
+```
+docker compose up
+```
+
 ### Running in local Docker
 
 As before, make sure you are running a database and broker for the publisher:
