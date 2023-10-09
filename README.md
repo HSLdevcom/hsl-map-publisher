@@ -108,7 +108,35 @@ If Azure credentials are not set in the .env file the posters will be stored loc
 
 See [hsl-map-publisher-ui](https://github.com/HSLdevcom/hsl-map-publisher-ui) for UI.
 
-### Running in local Docker
+
+## Two different ways to setup local environment:
+
+### A) Setup local environment using Docker Compose
+
+For fonts you have three options:
+- Create `fonts/` -directory inside project folder. Place `Gotham Rounded` and `Gotham XNarrow` OpenType fonts there from Azure.
+- Place `AZURE_STORAGE_ACCOUNT` and `AZURE_STORAGE_KEY` either via `.env.local` or Docker secrets. Fonts will be downloaded from Azure on startup.
+- If no fonts or credentials are provided, the app use just the default fonts found inside Debian image.
+
+Due to licensing, we cannot include the fonts in the public repository.
+
+Ensure you have the correct environment variables defined in your .env file (by default `.env.local`):
+
+Remember to also include `DIGITRANSIT_APIKEY` !
+
+Build the local version of `hsl-map-publisher`:
+
+``` 
+docker build --build-arg BUILD_ENV=local -t hsl-map-publisher .
+```
+
+Setup the development environment:
+
+```
+docker compose up
+```
+
+### B) Manually setup local Docker environment
 
 As before, make sure you are running a database and broker for the publisher:
 
