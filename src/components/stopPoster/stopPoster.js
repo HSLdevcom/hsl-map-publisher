@@ -315,6 +315,7 @@ class StopPoster extends Component {
       shortId,
       stopId,
       isTrunkStop,
+      isTramStop,
       isLightRail,
       hasRoutes: hasRoutesProp,
       date,
@@ -343,11 +344,11 @@ class StopPoster extends Component {
       hasColumnTimetable,
     } = this.state;
 
-    const { isTramStop } = this.props;
     const src = get(template, 'areas', []).find(t => t.key === 'tram');
     const tramImage = get(src, 'slots[0].image.svg', '');
-    let useDiagram = hasDiagram || (hasDiagram && isTramStop && !tramImage);
-    if (isTramStop && tramImage) useDiagram = false;
+    // Use diagram, if it's available, except on tram and lightrail stops with tramimage
+    const useTramDiagram = (isTramStop || isLightRail) && tramImage;
+    const useDiagram = hasDiagram && !useTramDiagram;
 
     const StopPosterTimetable = props => (
       <div className={styles.timetable}>
@@ -468,7 +469,7 @@ class StopPoster extends Component {
                           routeFilter={this.props.routeFilter}
                         />
                       )}
-                      {isTramStop && tramImage && <TramDiagram svg={tramImage} />}
+                      {useTramDiagram && <TramDiagram svg={tramImage} />}
                     </div>
                   )}
                 </Measure>
