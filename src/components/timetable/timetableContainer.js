@@ -408,6 +408,7 @@ const propsMapper = mapProps(props => {
     hasDepartures: departures.length > 0,
     showAddressInfo: props.showAddressInfo,
     showPrintButton: props.showPrintButton,
+    lang: props.lang,
   };
 });
 
@@ -429,6 +430,7 @@ TimetableContainer.defaultProps = {
   showStopInformation: false,
   showAddressInfo: true,
   showPrintButton: false,
+  lang: 'fi',
 };
 
 TimetableContainer.propTypes = {
@@ -449,6 +451,7 @@ TimetableContainer.propTypes = {
   showAddressInfo: PropTypes.bool,
   showPrintButton: PropTypes.bool,
   combinedDays: PropTypes.object,
+  lang: PropTypes.string,
 };
 
 export default TimetableContainer;
