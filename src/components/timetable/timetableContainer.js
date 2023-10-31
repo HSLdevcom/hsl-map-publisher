@@ -400,7 +400,6 @@ const propsMapper = mapProps(props => {
   })();
 
   return {
-    weekdays,
     saturdays,
     sundays,
     combinedDays,
