@@ -61,7 +61,7 @@ const getNotes = (notes, symbols) => {
 const PrintButton = lang => {
   const PRINT_TEXT = {
     fi: 'TULOSTA AIKATAULU',
-    sv: 'UTSKRIVA TIDTABEL',
+    sv: 'SKRIV UT TIDTABEL',
     en: 'PRINT SCHEDULE',
   };
 
