@@ -368,18 +368,38 @@ const propsMapper = mapProps(props => {
     saturdays,
     sundays,
   } = groupDeparturesByDay(departures);
-  const combinedDays = combineConsecutiveDays({
-    mondays,
-    tuesdays,
-    wednesdays,
-    thursdays,
-    fridays,
-    saturdays,
-    sundays,
-  });
+  const segmentMap = {
+    weekdays: 'mondays-fridays',
+    saturdays: 'saturdays',
+    sundays: 'sundays',
+  };
+
+  const combinedDays = (() => {
+    if (props.segments.length > 0) {
+      const result = {};
+      const groupedDepartures = groupDepartures(departures);
+      const pickedDepartures = pick(groupedDepartures, props.segments);
+
+      for (const segment of props.segments) {
+        if (segmentMap[segment]) {
+          result[segmentMap[segment]] = pickedDepartures[segment];
+        }
+      }
+
+      return result;
+    }
+    return combineConsecutiveDays({
+      mondays,
+      tuesdays,
+      wednesdays,
+      thursdays,
+      fridays,
+      saturdays,
+      sundays,
+    });
+  })();
 
   return {
-    weekdays,
     saturdays,
     sundays,
     combinedDays,
