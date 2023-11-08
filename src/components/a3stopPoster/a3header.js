@@ -120,7 +120,7 @@ class A3Header extends Component {
         {this.state.simpleRoutes && !this.state.hideDestinations && (
           <SimpleRoutes
             printAsA3
-            stopIds={[this.props.variables.stopId]}
+            stopId={this.props.variables.stopId}
             date={this.props.variables.date}
           />
         )}
