@@ -353,7 +353,7 @@ class Timetable extends Component {
                 </span>
               </div>
             </div>
-            <SimpleRoutes stopIds={[this.props.stopId]} date={this.props.date} />
+            <SimpleRoutes stopId={this.props.stopId} date={this.props.date} />
           </React.Fragment>
         )}
 
