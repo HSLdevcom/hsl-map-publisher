@@ -225,7 +225,6 @@ class Timetable extends Component {
 }
 
 Timetable.defaultProps = {
-  weekdays: null,
   saturdays: null,
   sundays: null,
   isSummerTimetable: false,
@@ -245,7 +244,6 @@ Timetable.defaultProps = {
 };
 
 Timetable.propTypes = {
-  weekdays: PropTypes.arrayOf(PropTypes.shape(TableRows.propTypes.departures)),
   saturdays: PropTypes.arrayOf(PropTypes.shape(TableRows.propTypes.departures)),
   sundays: PropTypes.arrayOf(PropTypes.shape(TableRows.propTypes.departures)),
   notes: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
@@ -274,6 +272,7 @@ Timetable.propTypes = {
   showPrintButton: PropTypes.bool,
   combinedDays: PropTypes.object.isRequired,
   lang: PropTypes.string,
+  combinedDays: PropTypes.object.isRequired,
 };
 
 export default Timetable;

@@ -56,7 +56,6 @@ const isEqualDepartureHour = (a, b) => {
   for (let i = 0; i < a.length; i++) {
     const curA = a[i];
     const curB = b[i];
-
     if (!curA || !curB) {
       return false;
     }
@@ -64,7 +63,6 @@ const isEqualDepartureHour = (a, b) => {
     if (curA.routeId !== curB.routeId) {
       return false;
     }
-
     if (curA.minutes !== curB.minutes) {
       return false;
     }
