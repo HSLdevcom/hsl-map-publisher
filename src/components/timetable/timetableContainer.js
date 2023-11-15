@@ -472,7 +472,6 @@ TimetableContainer.propTypes = {
   showPrintButton: PropTypes.bool,
   combinedDays: PropTypes.object,
   lang: PropTypes.string,
-  combinedDays: PropTypes.object,
 };
 
 export default TimetableContainer;

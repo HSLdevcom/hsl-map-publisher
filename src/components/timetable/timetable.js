@@ -272,7 +272,6 @@ Timetable.propTypes = {
   showPrintButton: PropTypes.bool,
   combinedDays: PropTypes.object.isRequired,
   lang: PropTypes.string,
-  combinedDays: PropTypes.object.isRequired,
 };
 
 export default Timetable;
