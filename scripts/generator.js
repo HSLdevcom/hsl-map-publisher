@@ -4,10 +4,11 @@ const puppeteer = require('puppeteer');
 const qs = require('qs');
 const log = require('./util/log');
 const { uploadPosterToCloud } = require('./cloudService');
+const moment = require('moment');
 
-const { AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_KEY } = require('../constants');
+const { AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_KEY, PUBLISHER_RENDER_URL } = require('../constants');
 
-const CLIENT_URL = 'http://localhost:5000';
+const CLIENT_URL = PUBLISHER_RENDER_URL;
 const RENDER_TIMEOUT = 10 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
 const SCALE = 96 / 72;
@@ -28,6 +29,15 @@ async function initialize() {
   });
 }
 
+function generateRenderUrl(component, template, props) {
+  const generationProps = props.date
+    ? props
+    : Object.assign(props, { date: moment(Date()).format('YYYY-MM-DD') }); // Add current date by default if request props do not contain it
+  const encodedProps = qs.stringify({ component, props: generationProps, template });
+  const pageUrl = `${PUBLISHER_RENDER_URL}/?${encodedProps}`;
+  return pageUrl;
+}
+
 /**
  * Renders component to PDF file
  * @returns {Promise}
@@ -45,14 +55,16 @@ async function renderComponent(options) {
     onError(error);
   });
 
-  page.on('console', ({ type, text }) => {
-    if (['error', 'warning', 'log'].includes(type)) {
-      onInfo(`Console(${type}): ${text}`);
+  page.on('console', message => {
+    const { url, lineNumber, columnNumber } = message.location();
+    if (['error', 'warning', 'log'].includes(message.type())) {
+      onInfo(
+        `Console(${message.type()}) on (${url}:${lineNumber}:${columnNumber}):\n${message.text()}`,
+      );
     }
   });
 
-  const encodedProps = qs.stringify({ component, props, template });
-  const pageUrl = `${CLIENT_URL}/?${encodedProps}`;
+  const pageUrl = generateRenderUrl(component, template, props);
 
   console.log(`Opening ${pageUrl} in Puppeteer.`);
 
@@ -137,4 +149,5 @@ async function generate(options) {
 
 module.exports = {
   generate,
+  generateRenderUrl,
 };

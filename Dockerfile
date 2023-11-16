@@ -1,4 +1,4 @@
-FROM node:16-buster-slim
+FROM node:16.20-buster-slim
 
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -yq wget curl gnupg fontconfig fonts-liberation ca-certificates --no-install-recommends \
@@ -30,11 +30,7 @@ ARG DIGITRANSIT_APIKEY
 ENV DIGITRANSIT_APIKEY=${DIGITRANSIT_APIKEY}
 RUN yarn run build
 
-CMD \
-  ./fonts.sh && \
-  fc-cache -f -v && \
-  yarn run start:production && \
-  yarn run server:production && \
-  yarn run worker:production && \
-  sleep 3 && \
-  node_modules/.bin/forever -f logs 1
+ARG SERVICE='start:production'
+ENV SERVICE=${SERVICE}
+
+CMD yarn run ${SERVICE}

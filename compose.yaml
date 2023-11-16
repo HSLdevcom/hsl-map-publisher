@@ -1,0 +1,61 @@
+services:
+  
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+
+  publisher-postgres:
+    image: postgres
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - dev_postgres:/var/lib/postgresql/data
+
+  publisher-server:
+    image: hsl-map-publisher
+    ports:
+      - 4000:4000
+    environment:
+      - SERVICE=server:production
+    volumes:
+      - ./output:/output
+      - ./fonts:/fonts
+    depends_on:
+      publisher-postgres:
+        condition: service_started
+      redis:
+        condition: service_started
+  
+  publisher-render:
+    image: hsl-map-publisher
+    ports:
+      - 5000:5000
+    environment:
+      - SERVICE=start:production
+    volumes:
+      - ./output:/output
+      - ./fonts:/fonts
+    depends_on:
+      publisher-postgres:
+        condition: service_started
+      redis:
+        condition: service_started
+  
+  publisher-worker:
+    image: hsl-map-publisher
+    environment:
+      - SERVICE=worker:production
+    volumes:
+      - ./output:/output
+      - ./fonts:/fonts
+    depends_on:
+      publisher-postgres:
+        condition: service_started
+      redis:
+        condition: service_started
+
+volumes:
+  dev_postgres:

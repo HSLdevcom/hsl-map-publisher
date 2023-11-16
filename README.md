@@ -4,6 +4,9 @@ This project is the server-side component of the poster publisher (the UI can be
 
 In production everything runs from a docker container that takes care of all dependencies and environment setup.
 
+## Development
+If ticket zone regions are changed, remember to update [ticket-zones-polygons.json](./src/components/map/ticket-zones-polygons.json) to reflect the new zones !
+
 ### Dependencies
 
 Install dependencies:
@@ -16,7 +19,10 @@ Also install Chrome. Refer the installation instructions of Chrome for your oper
 
 ### About the app
 
-This project is split in two parts. The first is a server that receives the poster requests and fires up a Puppeteer instance which runs a React app that renders the posters. This component lives in the `scripts` directory. The other part is the React app itself which lives in the `src` directory. It is a more complicated app, as it needs to load data from both the publisher database as well as from the JORE database.
+This app is split into three parts:
+- Server (receives poster requests and stores them into the Redis database)
+- Worker (Fetches poster jobs from Redis, fires up Puppeteer to render and save the posters)
+- Render (Receives worker's requests for certain poster parameters, fetches relevant data and renders the poster in the browser for Worker's Puppeteer instance to save into PDFs)
 
 ### Writing components
 
@@ -77,24 +83,17 @@ REDIS_CONNECTION_STRING=redis://localhost:6379
 
 In development, start the Publisher backend server like this, (make sure you have connection strings in `.env`)
 ```bash
-yarn run server:hot
-```
-
-That command will run a Forever instance that watches for changes and restarts the server when they happen.
-
-Alternatively, to run the server with plain Node, leave off `hot`:
-```bash
 yarn run server
 ```
 
 Then, start generator worker. (You can start multiple workers.)
-```
-yarn worker
+```bash
+yarn run worker
 ```
 
-Finally, start the React app
+Finally, start the React app/Rendering
 ```bash
-yarn start
+yarn run start
 ```
 
 Now you can use the UI with the server, or open a poster separately in your browser. The poster app needs `component` and `props` query parameters, and the server will echo the currently rendering URL in its console. But if you just need to open the poster app, you can use this link that will show H0454, Snellmaninkatu:
@@ -109,7 +108,35 @@ If Azure credentials are not set in the .env file the posters will be stored loc
 
 See [hsl-map-publisher-ui](https://github.com/HSLdevcom/hsl-map-publisher-ui) for UI.
 
-### Running in local Docker
+
+## Two different ways to setup local environment:
+
+### A) Setup local environment using Docker Compose
+
+For fonts you have three options:
+- Create `fonts/` -directory inside project folder. Place `Gotham Rounded` and `Gotham XNarrow` OpenType fonts there from Azure.
+- Place `AZURE_STORAGE_ACCOUNT` and `AZURE_STORAGE_KEY` either via `.env.local` or Docker secrets. Fonts will be downloaded from Azure on startup.
+- If no fonts or credentials are provided, the app use just the default fonts found inside Debian image.
+
+Due to licensing, we cannot include the fonts in the public repository.
+
+Ensure you have the correct environment variables defined in your .env file (by default `.env.local`):
+
+Remember to also include `DIGITRANSIT_APIKEY` !
+
+Build the local version of `hsl-map-publisher`:
+
+``` 
+docker build --build-arg BUILD_ENV=local -t hsl-map-publisher .
+```
+
+Setup the development environment:
+
+```
+docker compose up
+```
+
+### B) Manually setup local Docker environment
 
 As before, make sure you are running a database and broker for the publisher:
 
@@ -133,8 +160,19 @@ Build the Docker image with the following command:
 docker build --build-arg BUILD_ENV=local -t hsl-map-publisher .
 ```
 
-And run the Docker container with this command (you can leave font-directory mounting away if you don't have them locally):
+And run the Docker container with these commands (you can leave font-directory mounting away if you don't have them locally):
 
+Server:
 ```bash
-docker run -d -p 4000:4000 --name publisher -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres --link redis hsl-map-publisher
+docker run -d -p 4000:4000 --name publisher-server -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres --link redis -e SERVICE=server:production hsl-map-publisher
+```
+
+Rendering:
+```bash
+docker run -d -p 5000:5000 --name publisher-render -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres --link redis -e SERVICE=start:production hsl-map-publisher
+```
+
+And finally a Worker, which is linked to the rendering instance:
+```bash
+docker run -d --name publisher-worker -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres --link redis --link publisher-render --link publisher-server -e SERVICE=worker:production hsl-map-publisher
 ```

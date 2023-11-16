@@ -8,10 +8,13 @@ const jsonBody = require('koa-json-body');
 const fs = require('fs-extra');
 const { Queue } = require('bullmq');
 const Redis = require('ioredis');
+const { koaBody } = require('koa-body');
 
 const fileHandler = require('./fileHandler');
 const authEndpoints = require('./auth/authEndpoints');
 const { matchStopDataToRules } = require('./util/rules');
+
+const { generateRenderUrl } = require('./generator');
 
 const {
   DOMAINS_ALLOWED_TO_GENERATE,
@@ -43,6 +46,10 @@ const {
 const { downloadPostersFromCloud } = require('./cloudService');
 
 const PORT = 4000;
+
+const RENDER_URL_COMPONENTS = {
+  TIMETABLE: 'Timetable',
+};
 
 const bullRedisConnection = new Redis(REDIS_CONNECTION_STRING, {
   maxRetriesPerRequest: null,
@@ -110,15 +117,16 @@ const errorHandler = async (ctx, next) => {
 const authMiddleware = async (ctx, next) => {
   // Helper function to allow specific requests without authentication
   const allowAuthException = ctx2 => {
+    const envHostUrl = new URL(process.env.REACT_APP_PUBLISHER_SERVER_URL);
     // Allow session related requests
     if (['/login', '/logout', '/session'].includes(ctx2.path)) {
       return true;
     }
-    // Allow GET localhost:4000/templates/..., so that puppeteer can get the template.
+    // Allow GET /templates/..., so that puppeteer can get the template.
     if (
       ctx2.path.startsWith('/templates/') &&
       ctx.method === 'GET' &&
-      ctx.host === 'localhost:4000'
+      ctx.host === envHostUrl.host
     ) {
       return true;
     }
@@ -390,6 +398,19 @@ async function main() {
 
   unAuthorizedRouter.get('/health', async ctx => {
     ctx.status = 200;
+  });
+
+  unAuthorizedRouter.post('/generateRenderUrl', koaBody(), async ctx => {
+    const { props } = ctx.request.body;
+    const { template } = props;
+    const component = RENDER_URL_COMPONENTS.TIMETABLE; // Restrict unauthorized API generation only for quick timetable generations
+    const renderUrl = generateRenderUrl(component, template, props);
+
+    if (props.redirect) {
+      ctx.redirect(renderUrl);
+    } else {
+      ctx.body = { renderUrl };
+    }
   });
 
   app.keys = ['secret key'];

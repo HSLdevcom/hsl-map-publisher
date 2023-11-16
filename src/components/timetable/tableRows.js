@@ -59,6 +59,7 @@ const isEqualDepartureHour = (a, b) => {
     if (!curA || !curB) {
       return false;
     }
+
     if (curA.routeId !== curB.routeId) {
       return false;
     }

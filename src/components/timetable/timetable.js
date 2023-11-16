@@ -58,6 +58,22 @@ const getNotes = (notes, symbols) => {
   return parsedNotes;
 };
 
+const PrintButton = lang => {
+  const PRINT_TEXT = {
+    fi: 'TULOSTA AIKATAULU',
+    sv: 'SKRIV UT TIDTABEL',
+    en: 'PRINT SCHEDULE',
+  };
+
+  return (
+    <div className={styles.noPrint}>
+      <button className={styles.printBtn} type="button" onClick={window.print}>
+        {PRINT_TEXT[lang.lang]}
+      </button>
+    </div>
+  );
+};
+
 class Timetable extends Component {
   constructor(props) {
     super(props);
@@ -68,7 +84,7 @@ class Timetable extends Component {
 
   componentDidMount() {
     const { renderAddressInfo } = this.state;
-    if (!renderAddressInfo && this.props.printableAsA4) {
+    if (!renderAddressInfo && this.props.printableAsA4 && this.props.showAddressInfo) {
       this.setState({ renderAddressInfo: true });
     }
   }
@@ -126,6 +142,7 @@ class Timetable extends Component {
                   <PlatformSymbol platform={this.props.platform} />
                 )}
               </div>
+              {this.props.showPrintButton ? <PrintButton lang={this.props.lang} /> : ''}
             </div>
           )}
           {this.props.showValidityPeriod && (
@@ -221,6 +238,9 @@ Timetable.defaultProps = {
   specialSymbols: [],
   platform: null,
   addressFi: null,
+  showAddressInfo: true,
+  showPrintButton: false,
+  lang: 'fi',
 };
 
 Timetable.propTypes = {
@@ -248,7 +268,10 @@ Timetable.propTypes = {
   platformInfo: PropTypes.bool,
   specialSymbols: PropTypes.array,
   hasDepartures: PropTypes.bool.isRequired,
+  showAddressInfo: PropTypes.bool,
+  showPrintButton: PropTypes.bool,
   combinedDays: PropTypes.object.isRequired,
+  lang: PropTypes.string,
 };
 
 export default Timetable;

@@ -400,7 +400,6 @@ const propsMapper = mapProps(props => {
   })();
 
   return {
-    weekdays,
     saturdays,
     sundays,
     combinedDays,
@@ -427,6 +426,9 @@ const propsMapper = mapProps(props => {
     specialSymbols,
     platformInfo: props.platformInfo,
     hasDepartures: departures.length > 0,
+    showAddressInfo: props.showAddressInfo,
+    showPrintButton: props.showPrintButton,
+    lang: props.lang,
   };
 });
 
@@ -446,6 +448,9 @@ TimetableContainer.defaultProps = {
   printTimetablesAsGreyscale: false,
   specialSymbols: [],
   showStopInformation: false,
+  showAddressInfo: true,
+  showPrintButton: false,
+  lang: 'fi',
 };
 
 TimetableContainer.propTypes = {
@@ -463,7 +468,10 @@ TimetableContainer.propTypes = {
   printTimetablesAsGreyscale: PropTypes.bool,
   specialSymbols: PropTypes.array,
   showStopInformation: PropTypes.bool,
+  showAddressInfo: PropTypes.bool,
+  showPrintButton: PropTypes.bool,
   combinedDays: PropTypes.object,
+  lang: PropTypes.string,
 };
 
 export default TimetableContainer;
