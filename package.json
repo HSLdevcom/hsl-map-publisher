@@ -22,7 +22,8 @@
     "docker:rm": "docker rm publisher",
     "docker:rebuild": "yarn run docker:stop && yarn run docker:rm && yarn run docker:build && yarn run docker:run",
     "docker:logs": "docker logs publisher",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test": "node -r dotenv/config test/testStops"
   },
   "lint-staged": {
     "*.js": [
