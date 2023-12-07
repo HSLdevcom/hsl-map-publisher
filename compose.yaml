@@ -46,6 +46,8 @@ services:
   
   publisher-worker:
     image: hsl-map-publisher
+    deploy:
+      replicas: 2
     environment:
       - SERVICE=worker:production
     volumes:

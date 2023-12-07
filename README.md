@@ -136,7 +136,14 @@ Setup the development environment:
 docker compose up
 ```
 
-### B) Manually setup local Docker environment
+Shutdown the environmnet:
+
+```
+docker compose down
+```
+You can add the `--volumes` flag to delete volumes involved in the compose setup. Especially useful if there's one poster generation erroring and taking a lot of time and holding up rendering.
+
+ ### B) Manually setup local Docker environment
 
 As before, make sure you are running a database and broker for the publisher:
 
@@ -176,3 +183,6 @@ And finally a Worker, which is linked to the rendering instance:
 ```bash
 docker run -d --name publisher-worker -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres --link redis --link publisher-render --link publisher-server -e SERVICE=worker:production hsl-map-publisher
 ```
+
+### Testing
+After setting up the local dev environment you can run `yarn test` to generate a list of test stops.
