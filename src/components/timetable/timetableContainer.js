@@ -381,7 +381,11 @@ const propsMapper = mapProps(props => {
       const pickedDepartures = pick(groupedDepartures, props.segments);
 
       for (const segment of props.segments) {
-        if (segmentMap[segment]) {
+        if (
+          segmentMap[segment] &&
+          pickedDepartures[segment] &&
+          pickedDepartures[segment].length > 0
+        ) {
           result[segmentMap[segment]] = pickedDepartures[segment];
         }
       }
