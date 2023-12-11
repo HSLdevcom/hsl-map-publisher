@@ -5,7 +5,7 @@ const _ = require('lodash');
 const stopIds = ['1020105', '1284188', '6301068', '1040411'];
 
 const POSTER_COMPONENTS = {
-  TIMETABLE: 'TimeTable',
+  TIMETABLE: 'Timetable',
   STOP_POSTER: 'StopPoster',
   A3_STOP_POSTER: 'A3StopPoster',
 };
