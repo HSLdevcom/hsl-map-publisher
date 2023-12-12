@@ -13,10 +13,8 @@ const TEST_RESULTS_PATH = './test/results';
 
 const POSTER_COMPONENTS = {
   TIMETABLE: 'Timetable',
-  /*
   STOP_POSTER: 'StopPoster',
   A3_STOP_POSTER: 'A3StopPoster',
-  */
 };
 
 async function sleep(millis) {
