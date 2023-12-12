@@ -1,17 +1,30 @@
+/* eslint-disable no-await-in-loop */
 const { TEST_PUBLISHER_SERVER_URL } = require('../constants');
 const fetch = require('node-fetch');
 const _ = require('lodash');
+const fs = require('fs');
+const { mkdir } = require('fs/promises');
+const { finished } = require('node:stream/promises');
+const path = require('path');
 
 const stopIds = ['1020105', '1284188', '6301068', '1040411'];
 
+const TEST_RESULTS_PATH = './test/results';
+
 const POSTER_COMPONENTS = {
   TIMETABLE: 'Timetable',
+  /*
   STOP_POSTER: 'StopPoster',
   A3_STOP_POSTER: 'A3StopPoster',
+  */
 };
 
+async function sleep(millis) {
+  return new Promise(resolve => setTimeout(resolve, millis));
+}
+
 // Build the body for the poster generation requests
-async function buildGenerationRequestBody(buildId, component, printAsA4) {
+function buildGenerationRequestBody(buildId, component, printAsA4) {
   const props = stopIds.map(stopId => {
     return {
       date: new Date().toISOString().split('T')[0],
@@ -38,6 +51,17 @@ async function buildGenerationRequestBody(buildId, component, printAsA4) {
   };
 }
 
+async function sendBuildRequest(requestBody) {
+  const buildUrl = `${TEST_PUBLISHER_SERVER_URL}/posters`;
+  await fetch(buildUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(requestBody),
+  });
+}
+
 async function initTestRenderList(buildListName) {
   // First check if list already exists
   const listResponse = await fetch(`${TEST_PUBLISHER_SERVER_URL}/builds`);
@@ -61,25 +85,87 @@ async function initTestRenderList(buildListName) {
   return response.json();
 }
 
+async function pollForCompletedPosters(listId) {
+  console.log('Waiting for posters to generate, this may take a while..');
+
+  let allDownloaded = false;
+  const completedPosters = [];
+  const failedPosters = [];
+  for (allDownloaded; allDownloaded !== true; ) {
+    // Slowing down polling..
+    await sleep(1000);
+
+    const buildListResponse = await fetch(`${TEST_PUBLISHER_SERVER_URL}/builds/${listId}`);
+    const body = await buildListResponse.json();
+    _.forEach(body.posters, poster => {
+      if (poster.status === 'READY') {
+        if (completedPosters.indexOf(poster.id) === -1) {
+          completedPosters.push(poster.id);
+        }
+      }
+      if (poster.status === 'FAILED') {
+        if (failedPosters.indexOf(poster.id) === -1) {
+          failedPosters.push(poster.id);
+        }
+      }
+    });
+    const unFinishedPosters = _.filter(body.posters, poster => {
+      return poster.status !== 'READY' && poster.status !== 'FAILED';
+    });
+    if (_.isEqual(unFinishedPosters, [])) {
+      console.log('All completed posters downloaded !');
+      allDownloaded = true;
+    }
+  }
+  console.log(
+    `Completed posters
+    ${completedPosters.length}/${stopIds.length * Object.keys(POSTER_COMPONENTS).length}`,
+  );
+  return completedPosters;
+}
+
+async function downloadPosters(buildId) {
+  if (fs.existsSync(TEST_RESULTS_PATH)) {
+    console.log('Cleaning up old results from', TEST_RESULTS_PATH);
+    await fs.rmSync(TEST_RESULTS_PATH, { recursive: true, force: false });
+  }
+  await fs.mkdirSync(TEST_RESULTS_PATH);
+
+  console.log('Downloading poster PDF..');
+  try {
+    const pdfRequest = await fetch(`${TEST_PUBLISHER_SERVER_URL}/downloadBuild/${buildId}`);
+    const pdfDestination = path.resolve(TEST_RESULTS_PATH, `${buildId}.pdf`);
+    const stream = fs.createWriteStream(pdfDestination, { flags: 'wx' });
+    await finished(pdfRequest.body.pipe(stream));
+  } catch (e) {
+    console.log("Couldn't download PDF:", e);
+  }
+}
+
 async function generateTestPDFs() {
   const buildListName = `LOCAL_TEST_RENDERS`;
-  const printAsA4 = false;
 
   const { id } = await initTestRenderList(buildListName);
 
   // Generate PDFs for each component
   console.log(`Adding test poster generations to build list ${id}...`);
-  _.forEach(POSTER_COMPONENTS, async component => {
-    const requestBody = await buildGenerationRequestBody(id, component, printAsA4);
-    const buildUrl = `${TEST_PUBLISHER_SERVER_URL}/posters`;
-    const buildResponse = await fetch(buildUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-    });
+
+  const buildRequestBodies = _.map(POSTER_COMPONENTS, component => {
+    if (component === POSTER_COMPONENTS.TIMETABLE) {
+      return buildGenerationRequestBody(id, component, true);
+    }
+    return buildGenerationRequestBody(id, component, false);
   });
+
+  _.forEach(buildRequestBodies, async buildRequestBody => {
+    await sendBuildRequest(buildRequestBody);
+  });
+
+  // Waiting for backend to catch up...
+  await sleep(3000);
+
+  await pollForCompletedPosters(id);
+  await downloadPosters(id);
 }
 
 // Call the function to execute the HTTP POST calls
