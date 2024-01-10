@@ -1,4 +1,4 @@
-FROM node:16.20-buster-slim
+FROM node:18-buster-slim
 
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -yq wget curl gnupg fontconfig fonts-liberation ca-certificates --no-install-recommends \
@@ -11,6 +11,7 @@ RUN apt-get update \
     && cp ./azcopy /usr/bin/ \
     && rm -rf /var/lib/apt/lists/*
 
+ENV NODE_OPTIONS=--openssl-legacy-provider
 
 ENV WORK /opt/publisher
 
