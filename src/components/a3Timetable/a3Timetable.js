@@ -33,11 +33,8 @@ class Timetable extends Component {
     };
   }
 
-  componentWillMount() {
-    renderQueue.add(this);
-  }
-
   componentDidMount() {
+    renderQueue.add(this);
     let departures = [];
     const weekdays = this.rowsByHour(this.props.weekdays);
     const saturdays = this.rowsByHour(this.props.saturdays);
@@ -228,6 +225,7 @@ class Timetable extends Component {
         groupedRows.pop();
         weekdays.groupedRows = groupedRows;
       }
+      // eslint-disable-next-line no-constant-condition
       while (true) {
         const lastGroupedRows = last(groupedRows);
         const lastRow = last(lastGroupedRows);

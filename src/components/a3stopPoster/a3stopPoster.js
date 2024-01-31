@@ -31,11 +31,8 @@ class A3StopPoster extends Component {
     };
   }
 
-  componentWillMount() {
-    renderQueue.add(this);
-  }
-
   componentDidMount() {
+    renderQueue.add(this);
     this.updateLayout();
     renderQueue.onEmpty(error => !error && this.updateLayout(), {
       ignore: this,
