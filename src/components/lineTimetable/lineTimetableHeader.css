@@ -1,0 +1,24 @@
+.header {
+  display: flex;
+}
+
+.lineId {
+  font-size: 4rem;
+  font-weight: bold;
+  margin: 2rem 2rem 0 2rem;
+}
+
+.nameContainer {
+  display: block;
+  padding-top: 2rem;
+}
+
+.lineName {
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.lineNameSecondary {
+  font-size: 25px;
+  font-weight: normal;
+}

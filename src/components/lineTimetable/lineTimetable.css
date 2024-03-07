@@ -1,0 +1,169 @@
+.root {
+  position: relative;
+  width: 100%;
+  padding: var(--border-radius);
+  padding-top: calc(var(--border-radius) - 15px);
+  border-radius: var(--border-radius);
+  color: var(--hsl-blue);
+  background: var(--light-background);
+  --timetable-accent-color: white;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.root.a3 {
+  border-radius: 30px;
+  padding: 15px 0px 30px 0px;
+}
+
+.root.standalone {
+  font-size: 22px;
+}
+
+.root.summer {
+  background: white;
+  --timetable-accent-color: var(--light-background);
+}
+
+.root.greyscale {
+  background: white;
+  color: black;
+  --timetable-accent-color: #eaeaea;
+}
+
+.root.printable {
+  width: auto;
+  border-radius: 0;
+}
+
+.header {
+  padding: 0 0 0 0.4em;
+}
+
+.headerTitle {
+  font-size: 1.75em;
+}
+
+.componentName {
+  padding: 0 0 0 0.205em;
+  font-size: 1.875em;
+}
+
+.title {
+  font-family: GothamRounded-Medium;
+  white-space: nowrap;
+  font-size: 0.9em;
+}
+
+.subtitle {
+  font-family: GothamRounded-Book;
+  font-size: 0.9em;
+}
+
+.footnote {
+  padding: 0.125em 0.625em;
+  font-family: GothamXNarrow-Book;
+  font-size: 0.813em;
+}
+
+.validity {
+  font-family: GothamXNarrow-Book;
+  font-size: 0.75em;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  text-align: right;
+  margin-left: auto;
+  position: absolute;
+  margin-top: -5px;
+  top: calc(var(--border-radius));
+  right: var(--border-radius);
+}
+
+.validity .shortId {
+  font-family: GothamRounded-Medium;
+  font-size: 1.75em;
+}
+
+.address {
+  font-family: GothamRounded-Medium;
+  font-size: 0.6rem;
+  color: black;
+  position: absolute;
+  top: 1110px;
+  right: var(--border-radius);
+}
+
+.validity .title {
+  font-family: GothamRounded-Medium;
+}
+
+.stopZone {
+  padding-left: 0.5em;
+  margin-top: 0.875em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.zoneTitle {
+  font-size: 0.75em;
+  line-height: 1.1;
+  font-family: GothamRounded-Medium;
+  white-space: nowrap;
+  margin-right: 0.4em;
+}
+
+.zoneSubtitle {
+  font-size: 0.75em;
+  composes: zoneTitle;
+  font-family: GothamRounded-Book;
+}
+
+.zone {
+  position: relative;
+  box-sizing: border-box;
+  flex: none;
+  width: 1.5em;
+  height: 1.5em;
+  color: white;
+  background: var(--hsl-blue);
+  border-radius: 50%;
+}
+
+.zoneLetter {
+  font-size: 1.25em;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  line-height: 1;
+  font-family: GothamRounded-Medium;
+  text-transform: uppercase;
+}
+
+.printBtn {
+  margin-left: 2rem;
+  background-color: var(--hsl-blue);
+  margin-top: 1.5rem;
+  height: 2rem;
+  width: fit-content;
+  padding: 0 1rem 0 1rem;
+  font-size: 0.9rem;
+  border-radius: 10px;
+  color: white;
+  border: none;
+}
+
+.printBtn:hover {
+  background-color: white;
+  cursor: pointer;
+  color: var(--hsl-blue);
+  border: 1px solid var(--hsl-blue);
+}
+
+@media print {
+  .noPrint,
+  .noPrint * {
+    display: none !important;
+  }
+}

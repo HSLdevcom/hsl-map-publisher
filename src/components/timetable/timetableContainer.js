@@ -38,7 +38,7 @@ function groupDepartures(departures) {
   };
 }
 
-function groupDeparturesByDay(departures) {
+export function groupDeparturesByDay(departures) {
   return {
     mondays: departures.filter(departure => departure.dayType.includes('Ma')),
     tuesdays: departures.filter(departure => departure.dayType.includes('Ti')),
