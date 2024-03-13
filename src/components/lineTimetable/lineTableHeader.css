@@ -1,7 +1,3 @@
-.headerContainer {
-  display: flex;
-}
-
 .stop {
   flex-grow: 1;
 }

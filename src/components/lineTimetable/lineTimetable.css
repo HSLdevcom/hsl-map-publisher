@@ -161,9 +161,31 @@
   border: 1px solid var(--hsl-blue);
 }
 
+.timetableDays {
+  margin: 0 1rem 1rem 2rem;
+  font-size: 20px;
+}
+
+.timetableDates {
+  margin: 0 1rem 1rem 35%;
+  font-size: 20px;
+}
+
+.pageBreak {
+  display: none;
+}
+
 @media print {
   .noPrint,
   .noPrint * {
     display: none !important;
+  }
+  .pageBreak {
+    display: block;
+    page-break-before: always;
+  }
+
+  body {
+    overflow-y: visible;
   }
 }

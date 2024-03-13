@@ -1,5 +1,7 @@
 .header {
   display: flex;
+  page-break-before: always;
+  margin-bottom: 1rem;
 }
 
 .lineId {

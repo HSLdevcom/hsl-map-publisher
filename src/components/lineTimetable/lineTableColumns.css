@@ -1,0 +1,34 @@
+.departureRowContainer {
+  max-width: 1171px;
+}
+
+.departureRowContainer > *:nth-child(odd) {
+  background-color: #e8e8e8;
+}
+
+.departureRow {
+  font-size: 1.2rem;
+  margin-left: 2rem;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.departureColumnContainer {
+  flex-grow: 1;
+  align-items: normal;
+}
+
+.tableContainer {
+  display: flex;
+  margin-top: 1rem;
+}
+
+.stopNameContainer {
+  margin-bottom: 10px;
+}
+
+@media print {
+  .departureRow {
+    page-break-inside: avoid;
+  }
+}

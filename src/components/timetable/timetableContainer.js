@@ -83,7 +83,7 @@ function areDepartureArraysEqual(arr1, arr2) {
   return true;
 }
 
-function combineConsecutiveDays(daysObject) {
+export function combineConsecutiveDays(daysObject) {
   let currentStartDay = null;
   let currentDepartures = null;
 

@@ -4,7 +4,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import mapProps from 'recompose/mapProps';
 import compose from 'recompose/compose';
-import { filter } from 'lodash';
+import { filter, find } from 'lodash';
 
 import apolloWrapper from 'util/apolloWrapper';
 
@@ -96,27 +96,30 @@ const departureQuery = gql`
 `;
 
 const filterTimedStopsListFromLineQuery = props => {
-  const stopList = props.data.line.routes.nodes[0].routeSegments.nodes;
+  const routeForSelectedDirection = find(props.data.line.routes.nodes, route => {
+    return route.direction === props.routeDirection;
+  });
+  const stopList = routeForSelectedDirection.routeSegments.nodes;
   const filteredStopsList = filter(stopList, stop => {
     return stop.stopIndex <= 1 || stop.timingStopType > 0;
   });
-  return filteredStopsList;
+  return { timedStops: filteredStopsList, allStops: stopList };
 };
 
 const lineQueryMapper = mapProps(props => {
-  const { dateBegin, dateEnd } = props;
+  const { dateBegin, dateEnd, routeDirection } = props;
   const { line } = props.data;
-  const timedStops = filterTimedStopsListFromLineQuery(props);
+  const { timedStops, allStops } = filterTimedStopsListFromLineQuery(props);
 
   return {
-    routes: props.data.routes,
     line,
     dateBegin,
     dateEnd,
     timedStops,
+    allStops,
     date: props.date,
     routeIdentifier: line.routes.nodes[0].routeId,
-    routeDirection: line.routes.nodes[0].direction,
+    routeDirection,
   };
 });
 
@@ -134,11 +137,12 @@ const departuresMapper = mapProps(props => {
   });
 
   return {
-    routes: props.routes,
     line: props.line,
     dateBegin: props.dateBegin,
     dateEnd: props.dateEnd,
     departures: departuresByStop,
+    timedStops: props.timedStops,
+    allStops: props.allStops,
   };
 });
 
@@ -155,6 +159,7 @@ LineTimetableContainer.defaultProps = {
   dateBegin: null,
   dateEnd: null,
   date: null,
+  routeDirection: '1',
 };
 
 LineTimetableContainer.propTypes = {
@@ -163,6 +168,7 @@ LineTimetableContainer.propTypes = {
   dateBegin: PropTypes.string,
   dateEnd: PropTypes.string,
   date: PropTypes.string,
+  routeDirection: PropTypes.string,
 };
 
 export default LineTimetableContainer;
