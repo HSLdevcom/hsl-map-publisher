@@ -118,12 +118,13 @@ const lineQueryMapper = mapProps(props => {
     timedStops,
     allStops,
     date: props.date,
-    routeIdentifier: line.routes.nodes[0].routeId,
+    routeIdentifier: props.lineId,
     routeDirection,
   };
 });
 
 const departuresMapper = mapProps(props => {
+  console.log(props);
   const departures = props.data.departures.nodes;
 
   const departuresByStop = props.timedStops.map(timedStop => {
