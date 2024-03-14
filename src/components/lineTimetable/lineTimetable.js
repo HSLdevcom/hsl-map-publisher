@@ -31,30 +31,7 @@ const formatDate = date => {
   const monthIndex = date.getMonth();
   const year = date.getFullYear();
 
-  return `${day} ${monthNames[monthIndex]} ${year}`;
-};
-
-const getZoneLetterStyle = zone => ({
-  transform:
-    zone === 'B'
-      ? 'translate(calc(-50%), calc(-50% + 2px))'
-      : zone === 'C'
-      ? 'translate(calc(-50% - 2px), calc(-50% + 2px))'
-      : zone === 'D'
-      ? 'translate(calc(-50% + 2px), calc(-50% + 2px))'
-      : 'translate(-50%, -50%)', // No px adjustments for zone A and the "else" case.
-});
-
-const getNotes = (notes, symbols) => {
-  const parsedNotes = [];
-  symbols.forEach(symbol => {
-    notes.forEach(note => {
-      if (note.substring(0, symbol.length) === symbol && !parsedNotes.includes(note)) {
-        parsedNotes.push(note);
-      }
-    });
-  });
-  return parsedNotes;
+  return `${day}.${monthIndex}.${year}`;
 };
 
 const PrintButton = lang => {
@@ -92,7 +69,7 @@ class LineTimetable extends Component {
         <span className={styles.timetableDays}>Maanantai-Perjantai</span>
         <span className={styles.timetableDays}>Måndag-Fredag</span>
         <span className={styles.timetableDates}>
-          {this.props.dateBegin} - {this.props.dateEnd}
+          {formatDate(new Date(this.props.dateBegin))}-{formatDate(new Date(this.props.dateEnd))}
         </span>
         <LineTableColumns
           departures={this.props.departures}

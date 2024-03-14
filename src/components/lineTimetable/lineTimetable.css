@@ -9,6 +9,7 @@
   --timetable-accent-color: white;
   font-size: 16px;
   margin-bottom: 10px;
+  font-family: GothamRounded-Medium;
 }
 
 .root.a3 {
@@ -163,12 +164,14 @@
 
 .timetableDays {
   margin: 0 1rem 1rem 2rem;
-  font-size: 20px;
+  font-size: 1em;
+  font-family: GothamRounded-Book;
 }
 
 .timetableDates {
-  margin: 0 1rem 1rem 35%;
-  font-size: 20px;
+  margin: 0 1rem 1rem 4rem;
+  font-size: 1em;
+  font-family: GothamRounded-Book;
 }
 
 .pageBreak {

@@ -8,6 +8,7 @@
   font-size: 4rem;
   font-weight: bold;
   margin: 2rem 2rem 0 2rem;
+  font-family: GothamRounded-Medium;
 }
 
 .nameContainer {
@@ -18,9 +19,11 @@
 .lineName {
   font-size: 30px;
   font-weight: bold;
+  font-family: GothamRounded-Medium;
 }
 
 .lineNameSecondary {
   font-size: 25px;
   font-weight: normal;
+  font-family: GothamRounded-Book;
 }

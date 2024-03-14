@@ -1,5 +1,6 @@
 .departureRowContainer {
   max-width: 1171px;
+  font-family: GothamRounded-Medium;
 }
 
 .departureRowContainer > *:nth-child(odd) {
@@ -21,10 +22,6 @@
 .tableContainer {
   display: flex;
   margin-top: 1rem;
-}
-
-.stopNameContainer {
-  margin-bottom: 10px;
 }
 
 @media print {

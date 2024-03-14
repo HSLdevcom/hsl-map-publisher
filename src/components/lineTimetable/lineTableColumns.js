@@ -30,9 +30,7 @@ const DeparturesColumn = props => {
 
   return (
     <div>
-      <div className={styles.stopNameContainer}>
-        <LineTableHeader stop={stop} />
-      </div>
+      <LineTableHeader stop={stop} />
       <div className={styles.departureRowContainer}>{departureRows}</div>
     </div>
   );
