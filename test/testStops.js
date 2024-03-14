@@ -9,12 +9,20 @@ const path = require('path');
 
 const stopIds = ['1020105', '1284188', '6301068', '1040411'];
 
+// Lines for testing the LineTimetable component
+const testLines = [
+  { lineId: '2015', routeDirection: '2', dateBegin: '1999-02-02', dateEnd: '2050-12-31' },
+  { lineId: '1052', routeDirection: '1', dateBegin: '2021-12-13', dateEnd: '2050-12-31' },
+  { lineId: '1500', routeDirection: '1', dateBegin: '2023-10-12', dateEnd: '2050-12-31' },
+];
+
 const TEST_RESULTS_PATH = './test/results';
 
 const POSTER_COMPONENTS = {
   TIMETABLE: 'Timetable',
   STOP_POSTER: 'StopPoster',
   A3_STOP_POSTER: 'A3StopPoster',
+  LINE_TIMETABLE: 'LineTimetable',
 };
 
 async function sleep(millis) {
@@ -23,24 +31,41 @@ async function sleep(millis) {
 
 // Build the body for the poster generation requests
 function buildGenerationRequestBody(buildId, component, printAsA4) {
-  const props = stopIds.map(stopId => {
-    return {
-      date: new Date().toISOString().split('T')[0],
-      isSummerTime: false,
-      legend: true,
-      mapZoneSymbols: true,
-      mapZones: true,
-      minimapZoneSymbols: true,
-      minimapZones: true,
-      printTimetablesAsA4: printAsA4,
-      printTimetablesAsGreyscale: false,
-      routeFilter: '',
-      salesPoint: true,
-      selectedRuleTemplates: [],
-      stopId,
-      template: 'default',
-    };
-  });
+  let props = null;
+
+  if (component === POSTER_COMPONENTS.LINE_TIMETABLE) {
+    props = testLines.map(line => {
+      const { lineId, routeDirection, dateBegin, dateEnd } = line;
+      return {
+        lineId,
+        routeDirection,
+        dateBegin,
+        dateEnd,
+        date: new Date().toISOString().split('T')[0],
+        selectedRuleTemplates: [],
+        template: 'default', // Server throws error if template and selectedRuleTemplate aren't included in properties, however they aren't needed for rendering though
+      };
+    });
+  } else {
+    props = stopIds.map(stopId => {
+      return {
+        date: new Date().toISOString().split('T')[0],
+        isSummerTime: false,
+        legend: true,
+        mapZoneSymbols: true,
+        mapZones: true,
+        minimapZoneSymbols: true,
+        minimapZones: true,
+        printTimetablesAsA4: printAsA4,
+        printTimetablesAsGreyscale: false,
+        routeFilter: '',
+        salesPoint: true,
+        selectedRuleTemplates: [],
+        stopId,
+        template: 'default',
+      };
+    });
+  }
 
   return {
     buildId,
@@ -117,7 +142,7 @@ async function pollForCompletedPosters(listId) {
   }
   console.log(
     `Completed posters
-    ${completedPosters.length}/${stopIds.length * Object.keys(POSTER_COMPONENTS).length}`,
+    ${completedPosters.length}/${completedPosters.length + failedPosters.length}`,
   );
   return completedPosters;
 }
