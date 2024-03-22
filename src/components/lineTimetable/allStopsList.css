@@ -1,0 +1,26 @@
+.stopListsContainer {
+  margin-top: 2rem;
+  max-width: 1171px;
+}
+
+.stopList {
+  margin-bottom: 2rem;
+  padding-left: 1.2rem;
+}
+
+.lineInfoText {
+  font-family: GothamRounded-Medium;
+  font-weight: bold;
+  font-size: 2rem;
+}
+
+.stopListText {
+  font-size: medium;
+  font-family: GothamRounded-Book;
+}
+
+@media print {
+  .stopListsContainer {
+    page-break-inside: avoid;
+  }
+}
