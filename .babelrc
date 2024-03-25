@@ -1,4 +1,16 @@
 {
-    "presets": ["react", "env", "stage-0"],
-    "plugins": ["transform-runtime", "react-hot-loader/babel"]
-}
+    "presets": [
+        "@babel/preset-react",
+        "@babel/preset-env"
+    ],
+    "plugins": [
+        "@babel/plugin-transform-runtime"
+    ],
+    "env": {
+      "development": {
+        "plugins": [
+            "react-refresh/babel"
+        ]
+      }
+    }
+  }

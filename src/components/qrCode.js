@@ -13,9 +13,9 @@ class QrCode extends Component {
     this.updateCode(this.props.url);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.url !== this.props.url) {
-      this.updateCode(nextProps.url);
+  componentDidUpdate(prevProps) {
+    if (this.props.url !== prevProps.url) {
+      this.updateCode(this.props.url);
     }
   }
 
