@@ -201,7 +201,7 @@ class Timetable extends Component {
               ? `${getWeekdayName(dayNames[0], 'en')} - ${getWeekdayName(dayNames[1], 'en')}`
               : `${getWeekdayName(dayNames[0], 'en')}`;
           return (
-            <div>
+            <div key={`tableheader_container_${fiTitle}`}>
               <TableHeader
                 title={fiTitle}
                 subtitleSw={svTitle}
