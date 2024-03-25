@@ -62,8 +62,11 @@ const cancelSignalRedis = new Redis(REDIS_CONNECTION_STRING);
 async function generatePoster(buildId, component, props, index) {
   const { stopId, date, template, selectedRuleTemplates } = props;
 
-  // RuleTemplates are not available for TerminalPoster
-  const data = component !== 'TerminalPoster' ? await getStopInfo({ stopId, date }) : null;
+  // RuleTemplates are not available for TerminalPoster and LineTimetable
+  const data =
+    component !== 'TerminalPoster' && component !== 'LineTimetable'
+      ? await getStopInfo({ stopId, date })
+      : null;
 
   // Checks if any rule template will match the stop, and returns *the first one*.
   // If no match, returns the default template.
