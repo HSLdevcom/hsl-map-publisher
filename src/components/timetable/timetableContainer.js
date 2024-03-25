@@ -38,7 +38,7 @@ function groupDepartures(departures) {
   };
 }
 
-function groupDeparturesByDay(departures) {
+export function groupDeparturesByDay(departures) {
   return {
     mondays: departures.filter(departure => departure.dayType.includes('Ma')),
     tuesdays: departures.filter(departure => departure.dayType.includes('Ti')),
@@ -83,7 +83,7 @@ function areDepartureArraysEqual(arr1, arr2) {
   return true;
 }
 
-function combineConsecutiveDays(daysObject) {
+export function combineConsecutiveDays(daysObject) {
   let currentStartDay = null;
   let currentDepartures = null;
 

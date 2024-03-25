@@ -1,0 +1,9 @@
+.stop {
+  flex-grow: 1;
+}
+
+.stopName {
+  font-size: 1.2em;
+  margin: 0 0 0 2rem;
+  font-family: GothamRounded-Medium;
+}

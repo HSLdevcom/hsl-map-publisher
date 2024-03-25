@@ -1,5 +1,5 @@
 import React from 'react';
-import { createRoot } from 'react-dom/client';
+import { render } from 'react-dom';
 import App from 'components/app';
 import 'styles/base.css';
 import './util/mockGetTemplate';
@@ -8,7 +8,6 @@ if (!window.serverLog) {
   window.serverLog = console.log.bind(console);
 }
 
-const container = document.body.appendChild(document.createElement('div'));
-const root = createRoot(container);
+const root = document.body.appendChild(document.createElement('div'));
 
-root.render(<App />);
+render(<App />, root);

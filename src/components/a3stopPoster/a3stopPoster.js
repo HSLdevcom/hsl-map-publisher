@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { hot } from 'react-hot-loader';
 import { JustifiedColumn } from 'components/util';
 import renderQueue from 'util/renderQueue';
 import { colorsByMode } from 'util/domain';
@@ -31,8 +32,11 @@ class A3StopPoster extends Component {
     };
   }
 
-  componentDidMount() {
+  componentWillMount() {
     renderQueue.add(this);
+  }
+
+  componentDidMount() {
     this.updateLayout();
     renderQueue.onEmpty(error => !error && this.updateLayout(), {
       ignore: this,
@@ -199,4 +203,4 @@ A3StopPoster.defaultProps = {
   routeFilter: '',
 };
 
-export default A3StopPoster;
+export default hot(module)(A3StopPoster);

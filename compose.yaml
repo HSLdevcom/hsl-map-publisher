@@ -16,12 +16,18 @@ services:
 
   publisher-server:
     image: hsl-map-publisher
+    build:
+      context: .
+      args:
+        - BUILD_ENV=local
+      platforms:
+        - "linux/amd64"
     ports:
       - 4000:4000
     environment:
       - SERVICE=server:production
     volumes:
-      - ./output:/output
+      - ./output:/opt/publisher/output
       - ./fonts:/fonts
     depends_on:
       publisher-postgres:
@@ -31,12 +37,12 @@ services:
   
   publisher-render:
     image: hsl-map-publisher
+    pull_policy: never # use the same build as publisher-server
     ports:
       - 5000:5000
     environment:
       - SERVICE=start:production
     volumes:
-      - ./output:/output
       - ./fonts:/fonts
     depends_on:
       publisher-postgres:
@@ -46,10 +52,13 @@ services:
   
   publisher-worker:
     image: hsl-map-publisher
+    pull_policy: never # use the same build as publisher-server
+    deploy:
+      replicas: 2
     environment:
       - SERVICE=worker:production
     volumes:
-      - ./output:/output
+      - ./output:/opt/publisher/output
       - ./fonts:/fonts
     depends_on:
       publisher-postgres:

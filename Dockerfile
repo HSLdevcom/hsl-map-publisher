@@ -1,4 +1,4 @@
-FROM node:18-buster-slim
+FROM node:16.20-buster-slim
 
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -yq wget curl gnupg fontconfig fonts-liberation ca-certificates --no-install-recommends \
@@ -11,7 +11,6 @@ RUN apt-get update \
     && cp ./azcopy /usr/bin/ \
     && rm -rf /var/lib/apt/lists/*
 
-ENV NODE_OPTIONS=--openssl-legacy-provider
 
 ENV WORK /opt/publisher
 
@@ -29,6 +28,7 @@ COPY .env.${BUILD_ENV} ${WORK}/.env
 
 ARG DIGITRANSIT_APIKEY
 ENV DIGITRANSIT_APIKEY=${DIGITRANSIT_APIKEY}
+ENV BUILD_ENV=${BUILD_ENV}
 RUN yarn run build
 
 ARG SERVICE='start:production'

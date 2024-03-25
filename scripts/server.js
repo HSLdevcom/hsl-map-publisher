@@ -62,8 +62,11 @@ const cancelSignalRedis = new Redis(REDIS_CONNECTION_STRING);
 async function generatePoster(buildId, component, props, index) {
   const { stopId, date, template, selectedRuleTemplates } = props;
 
-  // RuleTemplates are not available for TerminalPoster
-  const data = component !== 'TerminalPoster' ? await getStopInfo({ stopId, date }) : null;
+  // RuleTemplates are not available for TerminalPoster and LineTimetable
+  const data =
+    component !== 'TerminalPoster' && component !== 'LineTimetable'
+      ? await getStopInfo({ stopId, date })
+      : null;
 
   // Checks if any rule template will match the stop, and returns *the first one*.
   // If no match, returns the default template.
@@ -102,6 +105,8 @@ async function generatePoster(buildId, component, props, index) {
   return { id };
 }
 
+const isRunningOnLocalEnv = () => process.env.BUILD_ENV === 'local';
+
 const errorHandler = async (ctx, next) => {
   try {
     await next();
@@ -118,6 +123,12 @@ const authMiddleware = async (ctx, next) => {
   // Helper function to allow specific requests without authentication
   const allowAuthException = ctx2 => {
     const envHostUrl = new URL(process.env.REACT_APP_PUBLISHER_SERVER_URL);
+
+    // Allow API testing in local environment without authentication
+    if (isRunningOnLocalEnv()) {
+      return true;
+    }
+
     // Allow session related requests
     if (['/login', '/logout', '/session'].includes(ctx2.path)) {
       return true;
@@ -153,6 +164,7 @@ const authMiddleware = async (ctx, next) => {
 };
 
 const allowedToGenerate = user => {
+  if (isRunningOnLocalEnv()) return true;
   if (!user || !user.email) return false;
   const domain = user.email.split('@')[1];
   const parsedAllowedDomains = DOMAINS_ALLOWED_TO_GENERATE.split(',');
