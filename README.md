@@ -127,7 +127,7 @@ Remember to also include `DIGITRANSIT_APIKEY` !
 Build the local version of `hsl-map-publisher`:
 
 ``` 
-docker build --build-arg BUILD_ENV=local -t hsl-map-publisher .
+docker compose build
 ```
 
 Setup the development environment:
