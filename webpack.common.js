@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 
-const isDevelopment = process.env.NODE_ENV !== 'production';
+const isDevelopment = process.env.BUILD_ENV === 'local';
 
 module.exports = {
   entry: ['babel-polyfill', './src/index.js'],
