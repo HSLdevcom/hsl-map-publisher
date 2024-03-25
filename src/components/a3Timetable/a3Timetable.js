@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
+import { hot } from 'react-hot-loader';
 import { chunk, last, groupBy, findIndex } from 'lodash';
 import renderQueue from 'util/renderQueue';
 
@@ -33,8 +34,11 @@ class Timetable extends Component {
     };
   }
 
-  componentDidMount() {
+  componentWillMount() {
     renderQueue.add(this);
+  }
+
+  componentDidMount() {
     let departures = [];
     const weekdays = this.rowsByHour(this.props.weekdays);
     const saturdays = this.rowsByHour(this.props.saturdays);
@@ -225,7 +229,6 @@ class Timetable extends Component {
         groupedRows.pop();
         weekdays.groupedRows = groupedRows;
       }
-      // eslint-disable-next-line no-constant-condition
       while (true) {
         const lastGroupedRows = last(groupedRows);
         const lastRow = last(lastGroupedRows);
@@ -451,4 +454,4 @@ Timetable.propTypes = {
   updateHook: PropTypes.func.isRequired,
 };
 
-export default Timetable;
+export default hot(module)(Timetable);

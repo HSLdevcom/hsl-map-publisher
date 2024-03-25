@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { hot } from 'react-hot-loader';
 import { get, cloneDeep } from 'lodash';
 import { JustifiedColumn, Spacer } from 'components/util';
 import renderQueue from 'util/renderQueue';
@@ -525,4 +526,4 @@ StopPoster.defaultProps = {
   legend: false,
 };
 
-export default StopPoster;
+export default hot(module)(StopPoster);
