@@ -1,10 +1,7 @@
 const path = require('path');
-
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
-
-const isDevelopment = process.env.NODE_ENV !== 'production';
 
 module.exports = {
   entry: ['babel-polyfill', './src/index.js'],
@@ -61,14 +58,6 @@ module.exports = {
       {
         test: /\.svg$/,
         loader: 'raw-loader',
-      },
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: /node_modules/,
-        options: {
-          plugins: [isDevelopment && require.resolve('react-refresh/babel')].filter(Boolean),
-        },
       },
     ],
   },
