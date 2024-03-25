@@ -66,9 +66,6 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
-        options: {
-          plugins: [isDevelopment && require.resolve('react-refresh/babel')].filter(Boolean),
-        },
       },
     ],
   },
