@@ -7,7 +7,7 @@
     "eslint-check": "eslint --print-config . | eslint-config-prettier-check",
     "prettier": "prettier \"src/**/*.{js,css}\" \"scripts/**/*.js\" \"migrations/**/*.js\" \"seeds/**/*.js\" \"*.js\" --write",
     "lint": "eslint \"src/**/*.js\" \"scripts/**/*.js\" --fix",
-    "build": "webpack --config webpack.prod.js",
+    "build": "cross-env NODE_ENV=production webpack --config webpack.prod.js",
     "serve": "serve -l 5000 dist",
     "start": "webpack-serve ./webpack.dev.js",
     "start:production": "serve -l 5000 dist",
