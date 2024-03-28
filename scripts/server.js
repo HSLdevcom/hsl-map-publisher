@@ -49,6 +49,7 @@ const PORT = 4000;
 
 const RENDER_URL_COMPONENTS = {
   TIMETABLE: 'Timetable',
+  LINE_TIMETABLE: 'LineTimetable',
 };
 
 const bullRedisConnection = new Redis(REDIS_CONNECTION_STRING, {
@@ -413,9 +414,17 @@ async function main() {
   });
 
   unAuthorizedRouter.post('/generateRenderUrl', koaBody(), async ctx => {
-    const { props } = ctx.request.body;
+    const { props, component } = ctx.request.body;
     const { template } = props;
-    const component = RENDER_URL_COMPONENTS.TIMETABLE; // Restrict unauthorized API generation only for quick timetable generations
+    if (
+      component !== RENDER_URL_COMPONENTS.TIMETABLE &&
+      component !== RENDER_URL_COMPONENTS.LINE_TIMETABLE
+    ) {
+      // Return error if wrong components is requested, restrict render API only to less resource intensive timetables.
+      ctx.body = 'Requested component missing or invalid';
+      ctx.status = 400;
+      return;
+    }
     const renderUrl = generateRenderUrl(component, template, props);
 
     if (props.redirect) {
