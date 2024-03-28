@@ -171,7 +171,6 @@ LineTimetableContainer.defaultProps = {
 
 LineTimetableContainer.propTypes = {
   lineId: PropTypes.string.isRequired,
-  stopId: PropTypes.string.isRequired,
   dateBegin: PropTypes.string,
   dateEnd: PropTypes.string,
   date: PropTypes.string,
