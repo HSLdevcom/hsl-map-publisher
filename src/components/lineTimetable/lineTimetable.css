@@ -142,26 +142,6 @@
   text-transform: uppercase;
 }
 
-.printBtn {
-  margin-left: 2rem;
-  background-color: var(--hsl-blue);
-  margin-top: 1.5rem;
-  height: 2rem;
-  width: fit-content;
-  padding: 0 1rem 0 1rem;
-  font-size: 0.9rem;
-  border-radius: 10px;
-  color: white;
-  border: none;
-}
-
-.printBtn:hover {
-  background-color: white;
-  cursor: pointer;
-  color: var(--hsl-blue);
-  border: 1px solid var(--hsl-blue);
-}
-
 .timetableDays {
   margin: 0 1rem 1rem 2rem;
   font-size: 1em;
@@ -190,5 +170,8 @@
 
   body {
     overflow-y: visible;
+  }
+  div {
+    break-inside: avoid;
   }
 }

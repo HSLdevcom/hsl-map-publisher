@@ -1,23 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 
 import styles from './lineTimetableHeader.css';
+import { PrintButton } from '../util';
 
 const LineTimetableHeader = props => {
+  const { showPrintBtn, lang, lineIdParsed, nameFi, nameSe } = props;
   return (
     <div className={styles.header}>
       <div className={styles.lineId}>
-        <span className={styles.strong}>{props.lineIdParsed}</span>
+        <span className={styles.strong}>{lineIdParsed}</span>
       </div>
       <div className={styles.nameContainer}>
         <div className={styles.lineName}>
-          <span>{props.nameFi}</span>
+          <span>{nameFi}</span>
         </div>
         <div className={styles.lineNameSecondary}>
-          <span>{props.nameSe}</span>
+          <span>{nameSe}</span>
         </div>
       </div>
+      <div className={styles.printBtnContainer}>{showPrintBtn && <PrintButton lang={lang} />}</div>
     </div>
   );
 };
@@ -25,12 +27,16 @@ const LineTimetableHeader = props => {
 LineTimetableHeader.defaultProps = {
   nameFi: '',
   nameSe: '',
+  showPrintBtn: false,
+  lang: 'fi',
 };
 
 LineTimetableHeader.propTypes = {
   lineIdParsed: PropTypes.string.isRequired,
   nameFi: PropTypes.string,
   nameSe: PropTypes.string,
+  showPrintBtn: PropTypes.bool,
+  lang: PropTypes.string,
 };
 
 export default LineTimetableHeader;

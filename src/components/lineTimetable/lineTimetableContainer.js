@@ -107,7 +107,7 @@ const filterTimedStopsListFromLineQuery = props => {
 };
 
 const lineQueryMapper = mapProps(props => {
-  const { dateBegin, dateEnd, routeDirection } = props;
+  const { dateBegin, dateEnd, routeDirection, showPrintBtn, lang } = props;
   const { line } = props.data;
   const { timedStops, allStops } = filterTimedStopsListFromLineQuery(props);
 
@@ -120,6 +120,8 @@ const lineQueryMapper = mapProps(props => {
     date: props.date,
     routeIdentifier: props.lineId,
     routeDirection,
+    showPrintBtn,
+    lang,
   };
 });
 
@@ -144,6 +146,8 @@ const departuresMapper = mapProps(props => {
     departures: departuresByStop,
     timedStops: props.timedStops,
     allStops: props.allStops,
+    showPrintBtn: props.showPrintBtn,
+    lang: props.lang,
   };
 });
 
@@ -161,6 +165,8 @@ LineTimetableContainer.defaultProps = {
   dateEnd: null,
   date: null,
   routeDirection: '1',
+  showPrintBtn: false,
+  lang: 'fi',
 };
 
 LineTimetableContainer.propTypes = {
@@ -170,6 +176,8 @@ LineTimetableContainer.propTypes = {
   dateEnd: PropTypes.string,
   date: PropTypes.string,
   routeDirection: PropTypes.string,
+  showPrintBtn: PropTypes.bool,
+  lang: PropTypes.string,
 };
 
 export default LineTimetableContainer;
