@@ -12,42 +12,11 @@ const SCHEDULE_SEGMENT = {
 };
 
 const formatDate = date => {
-  const monthNames = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
-
   const day = date.getDate();
   const monthIndex = date.getMonth();
   const year = date.getFullYear();
 
   return `${day}.${monthIndex}.${year}`;
-};
-
-const PrintButton = lang => {
-  const PRINT_TEXT = {
-    fi: 'TULOSTA AIKATAULU',
-    sv: 'SKRIV UT TIDTABEL',
-    en: 'PRINT SCHEDULE',
-  };
-
-  return (
-    <div className={styles.noPrint}>
-      <button className={styles.printBtn} type="button" onClick={window.print}>
-        {PRINT_TEXT[lang.lang]}
-      </button>
-    </div>
-  );
 };
 
 class LineTimetable extends Component {
@@ -60,11 +29,17 @@ class LineTimetable extends Component {
 
   render() {
     const { lineIdParsed, nameFi, nameSe } = this.props.line;
-    const { allStops } = this.props;
+    const { allStops, showPrintBtn, lang } = this.props;
 
     return (
       <div>
-        <LineTimetableHeader lineIdParsed={lineIdParsed} nameFi={nameFi} nameSe={nameSe} />
+        <LineTimetableHeader
+          lineIdParsed={lineIdParsed}
+          nameFi={nameFi}
+          nameSe={nameSe}
+          showPrintBtn={showPrintBtn}
+          lang={lang}
+        />
         <h1>{this.state.isMultiLineTimetable}</h1>
         <span className={styles.timetableDays}>Maanantai-Perjantai</span>
         <span className={styles.timetableDays}>Måndag-Fredag</span>
@@ -106,6 +81,8 @@ LineTimetable.defaultProps = {
   departures: {},
   timedStops: {},
   allStops: [],
+  showPrintBtn: false,
+  lang: 'fi',
 };
 
 LineTimetable.propTypes = {
@@ -115,6 +92,8 @@ LineTimetable.propTypes = {
   departures: PropTypes.object,
   timedStops: PropTypes.object,
   allStops: PropTypes.array,
+  showPrintBtn: PropTypes.bool,
+  lang: PropTypes.string,
 };
 
 export default LineTimetable;

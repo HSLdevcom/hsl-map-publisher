@@ -27,3 +27,8 @@
   font-weight: normal;
   font-family: GothamRounded-Book;
 }
+
+.printBtnContainer {
+  display: inline;
+  margin-top: 1rem;
+}

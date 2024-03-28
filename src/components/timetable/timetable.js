@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Spacer, PlatformSymbol, getWeekdayName } from 'components/util';
+import { Spacer, PlatformSymbol, getWeekdayName, PrintButton } from 'components/util';
 import classNames from 'classnames';
 
 import TableHeader from './tableHeader';
@@ -56,22 +56,6 @@ const getNotes = (notes, symbols) => {
     });
   });
   return parsedNotes;
-};
-
-const PrintButton = lang => {
-  const PRINT_TEXT = {
-    fi: 'TULOSTA AIKATAULU',
-    sv: 'SKRIV UT TIDTABEL',
-    en: 'PRINT SCHEDULE',
-  };
-
-  return (
-    <div className={styles.noPrint}>
-      <button className={styles.printBtn} type="button" onClick={window.print}>
-        {PRINT_TEXT[lang.lang]}
-      </button>
-    </div>
-  );
 };
 
 class Timetable extends Component {

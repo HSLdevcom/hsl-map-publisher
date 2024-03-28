@@ -126,6 +126,26 @@ InlineSVG.propTypes = {
   src: PropTypes.string.isRequired,
 };
 
+const PrintButton = lang => {
+  const PRINT_TEXT = {
+    fi: 'TULOSTA AIKATAULU',
+    sv: 'SKRIV UT TIDTABEL',
+    en: 'PRINT SCHEDULE',
+  };
+
+  return (
+    <div className={styles.noPrint}>
+      <button className={styles.printBtn} type="button" onClick={window.print}>
+        {PRINT_TEXT[lang.lang]}
+      </button>
+    </div>
+  );
+};
+
+PrintButton.propTypes = {
+  lang: PropTypes.string.isRequired,
+};
+
 const PlatformSymbol = ({ platform, size, color }) => (
   <svg className={styles.PScontainer} width={size} height={size}>
     <circle
@@ -212,4 +232,5 @@ export {
   InlineSVG,
   PlatformSymbol,
   getWeekdayName,
+  PrintButton,
 };
