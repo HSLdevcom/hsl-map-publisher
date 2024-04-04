@@ -70,13 +70,18 @@ const LineTableColumns = props => {
   });
 
   const departureColums = mapWeekdayDepartures.map(departures => {
+    const hasDepartures = Object.keys(departures.combinedDays).length > 0;
     return (
-      <Column className={styles.departureColumnContainer}>
-        <DeparturesColumn
-          departures={departures.combinedDays[selectedDepartureDays]}
-          stop={departures.stop}
-        />
-      </Column>
+      <div>
+        {hasDepartures && (
+          <Column className={styles.departureColumnContainer}>
+            <DeparturesColumn
+              departures={departures.combinedDays[selectedDepartureDays]}
+              stop={departures.stop}
+            />
+          </Column>
+        )}
+      </div>
     );
   });
 

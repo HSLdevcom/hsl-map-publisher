@@ -33,6 +33,7 @@ const lineQuery = gql`
           dateEnd
           mode
           nameFi
+          nameSe
           line {
             nodes {
               trunkRoute
@@ -74,12 +75,8 @@ const lineQuery = gql`
 `;
 
 const departureQuery = gql`
-  query getTimedStopDepartures($routeIdentifier: String!, $routeDirection: String!, $date: Date!) {
-    departures: getRouteDeparturesForTimedStops(
-      routeIdentifier: $routeIdentifier
-      routeDirection: $routeDirection
-      date: $date
-    ) {
+  query getTimedStopDepartures($routeIdentifier: String!, $date: Date!) {
+    departures: getRouteDeparturesForTimedStops(routeIdentifier: $routeIdentifier, date: $date) {
       nodes {
         stopId
         routeId
@@ -95,57 +92,62 @@ const departureQuery = gql`
   }
 `;
 
-const filterTimedStopsListFromLineQuery = props => {
-  const routeForSelectedDirection = find(props.data.line.routes.nodes, route => {
-    return route.direction === props.routeDirection;
+const filterTimedStopsForRoutes = props => {
+  const routes = props.data.line.routes.nodes;
+
+  const routesWithFilteredStops = routes.map(route => {
+    return {
+      ...route,
+      timedStops: filter(route.routeSegments.nodes, segment => {
+        return segment.stopIndex <= 1 || segment.timingStopType > 0;
+      }),
+    };
   });
-  const stopList = routeForSelectedDirection.routeSegments.nodes;
-  const filteredStopsList = filter(stopList, stop => {
-    return stop.stopIndex <= 1 || stop.timingStopType > 0;
-  });
-  return { timedStops: filteredStopsList, allStops: stopList };
+
+  return routesWithFilteredStops;
 };
 
 const lineQueryMapper = mapProps(props => {
-  const { dateBegin, dateEnd, routeDirection, showPrintBtn, lang } = props;
+  const { dateBegin, dateEnd, showPrintBtn, lang } = props;
   const { line } = props.data;
-  const { timedStops, allStops } = filterTimedStopsListFromLineQuery(props);
+  const routesWithFilteredStops = filterTimedStopsForRoutes(props);
 
   return {
     line,
     dateBegin,
     dateEnd,
-    timedStops,
-    allStops,
+    routesWithFilteredStops,
     date: props.date,
     routeIdentifier: props.lineId,
-    routeDirection,
     showPrintBtn,
     lang,
   };
 });
 
 const departuresMapper = mapProps(props => {
-  console.log(props);
   const departures = props.data.departures.nodes;
 
-  const departuresByStop = props.timedStops.map(timedStop => {
-    const stopDepartures = departures.filter(
-      departure => departure.stopId === timedStop.stop.stopId,
-    );
-    return {
-      stop: timedStop.stop,
-      departures: groupDeparturesByDay(stopDepartures),
-    };
+  const routeDeparturesByStop = props.routesWithFilteredStops.map(route => {
+    const timedStopDepartures = route.timedStops.map(timedStop => {
+      // Iterate each timed stop for a given route and get all departures belonging to that stop and route direction
+      const stopDepartures = departures.filter(
+        departure =>
+          departure.stopId === timedStop.stop.stopId && departure.direction === route.direction,
+      );
+      return {
+        stop: timedStop.stop,
+        departures: groupDeparturesByDay(stopDepartures),
+        route,
+      };
+    });
+    return { ...route, departuresByStop: timedStopDepartures };
   });
 
   return {
     line: props.line,
     dateBegin: props.dateBegin,
     dateEnd: props.dateEnd,
-    departures: departuresByStop,
-    timedStops: props.timedStops,
-    allStops: props.allStops,
+    departures: routeDeparturesByStop,
     showPrintBtn: props.showPrintBtn,
     lang: props.lang,
   };
@@ -164,7 +166,6 @@ LineTimetableContainer.defaultProps = {
   dateBegin: null,
   dateEnd: null,
   date: null,
-  routeDirection: '1',
   showPrintBtn: false,
   lang: 'fi',
 };
@@ -174,7 +175,6 @@ LineTimetableContainer.propTypes = {
   dateBegin: PropTypes.string,
   dateEnd: PropTypes.string,
   date: PropTypes.string,
-  routeDirection: PropTypes.string,
   showPrintBtn: PropTypes.bool,
   lang: PropTypes.string,
 };

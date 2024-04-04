@@ -19,68 +19,99 @@ const formatDate = date => {
   return `${day}.${monthIndex}.${year}`;
 };
 
-class LineTimetable extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isMultiLineTimetable: false, // Placeholder for implementation of "multiple lines" version
-    };
-  }
+const RouteDepartures = props => {
+  const {
+    showPrintBtn,
+    lang,
+    departuresByStop,
+    lineIdParsed,
+    nameFi,
+    nameSe,
+    dateBegin,
+    dateEnd,
+  } = props;
 
-  render() {
-    const { lineIdParsed, nameFi, nameSe } = this.props.line;
-    const { allStops, showPrintBtn, lang } = this.props;
+  return (
+    <div>
+      <LineTimetableHeader
+        lineIdParsed={lineIdParsed}
+        nameFi={nameFi}
+        nameSe={nameSe}
+        showPrintBtn={showPrintBtn}
+        lang={lang}
+      />
+      <span className={styles.timetableDays}>Maanantai-Perjantai</span>
+      <span className={styles.timetableDays}>Måndag-Fredag</span>
+      <span className={styles.timetableDates}>
+        {formatDate(new Date(dateBegin))}-{formatDate(new Date(dateEnd))}
+      </span>
+      <LineTableColumns departures={departuresByStop} days={SCHEDULE_SEGMENT.weekdays} />
 
-    return (
-      <div>
-        <LineTimetableHeader
-          lineIdParsed={lineIdParsed}
-          nameFi={nameFi}
-          nameSe={nameSe}
-          showPrintBtn={showPrintBtn}
-          lang={lang}
-        />
-        <h1>{this.state.isMultiLineTimetable}</h1>
-        <span className={styles.timetableDays}>Maanantai-Perjantai</span>
-        <span className={styles.timetableDays}>Måndag-Fredag</span>
-        <span className={styles.timetableDates}>
-          {formatDate(new Date(this.props.dateBegin))}-{formatDate(new Date(this.props.dateEnd))}
-        </span>
-        <LineTableColumns
-          departures={this.props.departures}
-          stopSequence={this.props.timedStops}
-          days={SCHEDULE_SEGMENT.weekdays}
-        />
+      <div className={styles.pageBreak}>&nbsp;</div>
+      <LineTimetableHeader lineIdParsed={lineIdParsed} nameFi={nameFi} nameSe={nameSe} />
+      <span className={styles.timetableDays}>Lauantai/Lördag</span>
+      <LineTableColumns departures={departuresByStop} days={SCHEDULE_SEGMENT.saturdays} />
+      <div className={styles.pageBreak}>&nbsp;</div>
+      <LineTimetableHeader lineIdParsed={lineIdParsed} nameFi={nameFi} nameSe={nameSe} />
+      <span className={styles.timetableDays}>Sunnuntai/Söndag</span>
+      <LineTableColumns departures={departuresByStop} days={SCHEDULE_SEGMENT.sundays} />
+      <div className={styles.pageBreak}>&nbsp;</div>
+    </div>
+  );
+};
 
-        <div className={styles.pageBreak}>&nbsp;</div>
-        <LineTimetableHeader lineIdParsed={lineIdParsed} nameFi={nameFi} nameSe={nameSe} />
-        <span className={styles.timetableDays}>Lauantai/Lördag</span>
-        <LineTableColumns
-          departures={this.props.departures}
-          stopSequence={this.props.timedStops}
-          days={SCHEDULE_SEGMENT.saturdays}
-        />
-        <div className={styles.pageBreak}>&nbsp;</div>
-        <LineTimetableHeader lineIdParsed={lineIdParsed} nameFi={nameFi} nameSe={nameSe} />
-        <span className={styles.timetableDays}>Sunnuntai/Söndag</span>
-        <LineTableColumns
-          departures={this.props.departures}
-          stopSequence={this.props.timedStops}
-          days={SCHEDULE_SEGMENT.sundays}
-        />
-        <div className={styles.pageBreak}>&nbsp;</div>
-        <AllStopsList stops={allStops} lineId={lineIdParsed} />
-      </div>
-    );
-  }
+RouteDepartures.defaultProps = {
+  lineIdParsed: '',
+  nameFi: '',
+  nameSe: '',
+  showPrintBtn: '',
+  lang: '',
+  departuresByStop: {},
+  dateBegin: '',
+  dateEnd: '',
+};
+
+RouteDepartures.propTypes = {
+  lineIdParsed: PropTypes.string,
+  nameFi: PropTypes.string,
+  nameSe: PropTypes.string,
+  showPrintBtn: PropTypes.string,
+  lang: PropTypes.string,
+  departuresByStop: PropTypes.object,
+  dateBegin: PropTypes.string,
+  dateEnd: PropTypes.string,
+};
+
+function LineTimetable(props) {
+  return (
+    <div>
+      {props.departures.map(routeWithDepartures => {
+        const { nameFi, nameSe, departuresByStop, dateBegin, dateEnd, line } = routeWithDepartures;
+        const { lineIdParsed } = line.nodes[0];
+        return (
+          <div>
+            <RouteDepartures
+              lineIdParsed={lineIdParsed}
+              nameFi={nameFi}
+              nameSe={nameSe}
+              showPrintBtn={props.showPrintBtn}
+              lang={props.lang}
+              departuresByStop={departuresByStop}
+              dateBegin={dateBegin}
+              dateEnd={dateEnd}
+            />
+            <AllStopsList stops={routeWithDepartures.routeSegments.nodes} lineId={lineIdParsed} />
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 LineTimetable.defaultProps = {
   dateBegin: null,
   dateEnd: null,
   departures: {},
-  timedStops: {},
-  allStops: [],
   showPrintBtn: false,
   lang: 'fi',
 };
@@ -90,8 +121,6 @@ LineTimetable.propTypes = {
   dateBegin: PropTypes.string,
   dateEnd: PropTypes.string,
   departures: PropTypes.object,
-  timedStops: PropTypes.object,
-  allStops: PropTypes.array,
   showPrintBtn: PropTypes.bool,
   lang: PropTypes.string,
 };
