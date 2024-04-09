@@ -4,6 +4,7 @@ import { combineConsecutiveDays } from '../timetable/timetableContainer';
 import { Column, Row, WrappingRow } from '../util';
 import LineTableHeader from './lineTableHeader';
 import styles from './lineTableColumns.css';
+import classNames from 'classnames';
 
 const LineTimetableRow = props => {
   const { hours, minutes } = props;
@@ -43,6 +44,7 @@ DeparturesColumn.propTypes = {
 
 const LineTableColumns = props => {
   const selectedDepartureDays = props.days;
+  const { showDivider } = props;
 
   const mapWeekdayDepartures = props.departures.map(departuresForStop => {
     const {
@@ -69,12 +71,15 @@ const LineTableColumns = props => {
     };
   });
 
-  const departureColums = mapWeekdayDepartures.map(departures => {
+  const departureColums = mapWeekdayDepartures.map((departures, index) => {
     const hasDepartures = Object.keys(departures.combinedDays).length > 0;
     return (
       <div>
         {hasDepartures && (
-          <Column className={styles.departureColumnContainer}>
+          <Column
+            className={classNames(styles.departureColumnContainer, {
+              [styles.wider]: showDivider,
+            })}>
             <DeparturesColumn
               departures={departures.combinedDays[selectedDepartureDays]}
               stop={departures.stop}
@@ -92,6 +97,7 @@ LineTableColumns.propTypes = {
   departures: PropTypes.arrayOf(PropTypes.any).isRequired,
   stopSequence: PropTypes.arrayOf(PropTypes.string).isRequired,
   days: PropTypes.string.isRequired,
+  showDivider: PropTypes.bool.isRequired,
 };
 
 export default LineTableColumns;

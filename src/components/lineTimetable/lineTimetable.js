@@ -4,6 +4,7 @@ import styles from './lineTimetable.css';
 import LineTimetableHeader from './lineTimetableHeader';
 import LineTableColumns from './lineTableColumns';
 import AllStopsList from './allStopsList';
+import { filter, groupBy, flatten } from 'lodash';
 
 const SCHEDULE_SEGMENT = {
   weekdays: 'mondays-fridays',
@@ -19,6 +20,10 @@ const formatDate = date => {
   return `${day}.${monthIndex}.${year}`;
 };
 
+const hasTimedStopRoutes = departuresByRoute => {
+  return filter(departuresByRoute, route => route.departuresByStop.length > 1).length > 0;
+};
+
 const RouteDepartures = props => {
   const {
     showPrintBtn,
@@ -29,8 +34,8 @@ const RouteDepartures = props => {
     nameSe,
     dateBegin,
     dateEnd,
+    showTimedStops,
   } = props;
-
   return (
     <div>
       <LineTimetableHeader
@@ -45,16 +50,28 @@ const RouteDepartures = props => {
       <span className={styles.timetableDates}>
         {formatDate(new Date(dateBegin))}-{formatDate(new Date(dateEnd))}
       </span>
-      <LineTableColumns departures={departuresByStop} days={SCHEDULE_SEGMENT.weekdays} />
+      <LineTableColumns
+        showDivider={!showTimedStops}
+        departures={departuresByStop}
+        days={SCHEDULE_SEGMENT.weekdays}
+      />
 
       <div className={styles.pageBreak}>&nbsp;</div>
       <LineTimetableHeader lineIdParsed={lineIdParsed} nameFi={nameFi} nameSe={nameSe} />
       <span className={styles.timetableDays}>Lauantai/Lördag</span>
-      <LineTableColumns departures={departuresByStop} days={SCHEDULE_SEGMENT.saturdays} />
+      <LineTableColumns
+        showDivider={!showTimedStops}
+        departures={departuresByStop}
+        days={SCHEDULE_SEGMENT.saturdays}
+      />
       <div className={styles.pageBreak}>&nbsp;</div>
       <LineTimetableHeader lineIdParsed={lineIdParsed} nameFi={nameFi} nameSe={nameSe} />
       <span className={styles.timetableDays}>Sunnuntai/Söndag</span>
-      <LineTableColumns departures={departuresByStop} days={SCHEDULE_SEGMENT.sundays} />
+      <LineTableColumns
+        showDivider={!showTimedStops}
+        departures={departuresByStop}
+        days={SCHEDULE_SEGMENT.sundays}
+      />
       <div className={styles.pageBreak}>&nbsp;</div>
     </div>
   );
@@ -69,6 +86,7 @@ RouteDepartures.defaultProps = {
   departuresByStop: {},
   dateBegin: '',
   dateEnd: '',
+  showTimedStops: true,
 };
 
 RouteDepartures.propTypes = {
@@ -80,12 +98,60 @@ RouteDepartures.propTypes = {
   departuresByStop: PropTypes.object,
   dateBegin: PropTypes.string,
   dateEnd: PropTypes.string,
+  showTimedStops: PropTypes.bool,
 };
 
 function LineTimetable(props) {
+  const { departures } = props;
+
+  const showTimedStops = hasTimedStopRoutes(departures);
+
+  if (showTimedStops) {
+    return (
+      <div>
+        {departures.map(routeWithDepartures => {
+          const {
+            nameFi,
+            nameSe,
+            departuresByStop,
+            dateBegin,
+            dateEnd,
+            line,
+          } = routeWithDepartures;
+          const { lineIdParsed } = line.nodes[0];
+          return (
+            <div>
+              <RouteDepartures
+                lineIdParsed={lineIdParsed}
+                nameFi={nameFi}
+                nameSe={nameSe}
+                showPrintBtn={props.showPrintBtn}
+                lang={props.lang}
+                departuresByStop={departuresByStop}
+                dateBegin={dateBegin}
+                dateEnd={dateEnd}
+                showTimedStops={showTimedStops}
+              />
+              <AllStopsList stops={routeWithDepartures.routeSegments.nodes} lineId={lineIdParsed} />
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  const groupedDepartures = groupBy(departures, 'routeId'); // Group by route ID
+  const combinedDeparturesForBothDirections = Object.values(groupedDepartures).map(route => {
+    const bothStopDepartures = route.map(direction => {
+      return direction.departuresByStop;
+    });
+    // Combine both starting stops into the same route so they show up side by side in RouteDepartures
+    return { ...route[0], departuresByStop: flatten(bothStopDepartures) };
+  });
+
   return (
     <div>
-      {props.departures.map(routeWithDepartures => {
+      {combinedDeparturesForBothDirections.map(routeWithDepartures => {
         const { nameFi, nameSe, departuresByStop, dateBegin, dateEnd, line } = routeWithDepartures;
         const { lineIdParsed } = line.nodes[0];
         return (
@@ -99,6 +165,7 @@ function LineTimetable(props) {
               departuresByStop={departuresByStop}
               dateBegin={dateBegin}
               dateEnd={dateEnd}
+              showTimedStops={showTimedStops}
             />
             <AllStopsList stops={routeWithDepartures.routeSegments.nodes} lineId={lineIdParsed} />
           </div>
