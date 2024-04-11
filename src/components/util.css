@@ -82,4 +82,7 @@
   .noPrint * {
     display: none !important;
   }
+  .row * {
+    page-break-inside: avoid;
+  }
 }

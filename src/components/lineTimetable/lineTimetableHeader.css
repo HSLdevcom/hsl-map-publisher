@@ -33,3 +33,9 @@
   display: inline;
   margin-top: 1rem;
 }
+
+@media print {
+  .header {
+    page-break-before: always;
+  }
+}
