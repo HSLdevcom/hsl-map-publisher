@@ -83,7 +83,6 @@
     "apollo-client": "^2.0.3",
     "apollo-link": "^1.2.2",
     "apollo-link-http": "^1.2.0",
-    
     "babel-polyfill": "^6.26.0",
     "bullmq": "^1.86.2",
     "cheerio": "=1.0.0-rc.3",
