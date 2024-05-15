@@ -9,20 +9,37 @@ const path = require('path');
 
 const stopIds = ['1020105', '1284188', '6301068', '1040411'];
 
+const testTerminalPosters = [
+  {
+    terminalId: '1000004',
+    selectedStopIds: ['1173105', '1173106', '1173148', '1174128', '1174147'],
+    isSmallTerminalPoster: false,
+  },
+  {
+    terminalId: '1000004',
+    selectedStopIds: ['1173105', '1173106', '1173148', '1174128', '1174147'],
+    isSmallTerminalPoster: true,
+  },
+];
+
 // Lines for testing the LineTimetable component
 const testLines = [
-  { lineId: '2015', routeDirection: '2', dateBegin: '1999-02-02', dateEnd: '2050-12-31' },
-  { lineId: '1052', routeDirection: '1', dateBegin: '2021-12-13', dateEnd: '2050-12-31' },
-  { lineId: '1500', routeDirection: '1', dateBegin: '2023-10-12', dateEnd: '2050-12-31' },
+  /* { lineId: '2015', dateBegin: '1999-02-02', dateEnd: '2050-12-31' },
+  { lineId: '1052', dateBegin: '2021-12-13', dateEnd: '2050-12-31' },
+  { lineId: '1500', dateBegin: '2023-10-12', dateEnd: '2050-12-31' },
+  { lineId: '1016', dateBegin: '2016-10-04', dateEnd: '2050-12-31' },
+  { lineId: '4570', dateBegin: '2022-08-15', dateEnd: '2050-12-31' }, */
+  { lineId: '6211U', dateBegin: '2024-05-05', dateEnd: '2050-06-16' },
 ];
 
 const TEST_RESULTS_PATH = './test/results';
 
 const POSTER_COMPONENTS = {
-  TIMETABLE: 'Timetable',
-  STOP_POSTER: 'StopPoster',
-  A3_STOP_POSTER: 'A3StopPoster',
+  // TIMETABLE: 'Timetable',
+  // STOP_POSTER: 'StopPoster',
+  // A3_STOP_POSTER: 'A3StopPoster',
   LINE_TIMETABLE: 'LineTimetable',
+  // TERMINAL_POSTER: 'TerminalPoster',
 };
 
 async function sleep(millis) {
@@ -41,9 +58,32 @@ function buildGenerationRequestBody(buildId, component, printAsA4) {
         routeDirection,
         dateBegin,
         dateEnd,
+        printTimetablesAsA4: true,
         date: new Date().toISOString().split('T')[0],
         selectedRuleTemplates: [],
         template: 'default', // Server throws error if template and selectedRuleTemplate aren't included in properties, however they aren't needed for rendering though
+      };
+    });
+  } else if (component === POSTER_COMPONENTS.TERMINAL_POSTER) {
+    props = testTerminalPosters.map(terminalPoster => {
+      const { terminalId, selectedStopIds, isSmallTerminalPoster } = terminalPoster;
+      return {
+        date: new Date().toISOString().split('T')[0],
+        isSummerTime: false,
+        legend: true,
+        mapZoneSymbols: true,
+        mapZones: true,
+        minimapZoneSymbols: true,
+        minimapZones: true,
+        printTimetablesAsA4: printAsA4,
+        printTimetablesAsGreyscale: false,
+        routeFilter: '',
+        salesPoint: true,
+        selectedRuleTemplates: [],
+        stopId: terminalId,
+        selectedStops: selectedStopIds.toString(),
+        isSmallTerminalPoster,
+        template: 'default',
       };
     });
   } else {
