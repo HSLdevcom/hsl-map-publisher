@@ -13,61 +13,58 @@ import { groupDeparturesByDay } from '../timetable/timetableContainer';
 
 const lineQuery = gql`
   query lineQuery($lineId: String!, $dateBegin: Date!, $dateEnd: Date!) {
-    line: lineByLineIdAndDateBeginAndDateEnd(
-      lineId: $lineId
-      dateBegin: $dateBegin
-      dateEnd: $dateEnd
+    lines: getLinesWithIdAndUserDateRange(
+      id: $lineId
+      lineDateBegin: $dateBegin
+      lineDateEnd: $dateEnd
     ) {
-      lineId
-      lineIdParsed
-      nameFi
-      nameSe
-      dateBegin
-      dateEnd
-      trunkRoute
-      routes {
-        nodes {
-          routeId
-          direction
-          dateBegin
-          dateEnd
-          mode
-          nameFi
-          nameSe
-          line {
-            nodes {
-              trunkRoute
-              lineIdParsed
-            }
-          }
-          routeSegments {
-            nodes {
-              stopIndex
-              timingStopType
-              duration
-              line {
-                nodes {
-                  trunkRoute
+      nodes {
+        lineId
+        lineIdParsed
+        nameFi
+        nameSe
+        dateBegin
+        dateEnd
+        trunkRoute
+        routes: routesForDateRange(routeDateBegin: $dateBegin, routeDateEnd: $dateEnd) {
+          nodes {
+            routeId
+            direction
+            dateBegin
+            dateEnd
+            mode
+            nameFi
+            nameSe
+            lineId
+            routeSegments {
+              nodes {
+                stopIndex
+                timingStopType
+                duration
+                line {
+                  nodes {
+                    trunkRoute
+                  }
                 }
-              }
-              stop: stopByStopId {
-                stopId
-                lat
-                lon
-                shortId
-                nameFi
-                nameSe
-                platform
+                stop: stopByStopId {
+                  stopId
+                  lat
+                  lon
+                  shortId
+                  nameFi
+                  nameSe
+                  platform
+                }
               }
             }
           }
         }
-      }
-      notes {
-        nodes {
-          noteType
-          noteText
-          dateEnd
+        notes {
+          nodes {
+            noteType
+            noteText
+            dateEnd
+          }
         }
       }
     }
@@ -92,8 +89,8 @@ const departureQuery = gql`
   }
 `;
 
-const filterTimedStopsForRoutes = props => {
-  const routes = props.data.line.routes.nodes;
+const filterTimedStopsForRoutes = line => {
+  const routes = line.routes.nodes;
 
   const routesWithFilteredStops = routes.map(route => {
     return {
@@ -108,17 +105,20 @@ const filterTimedStopsForRoutes = props => {
 };
 
 const lineQueryMapper = mapProps(props => {
+  const line = props.data.lines.nodes[0];
   const { dateBegin, dateEnd, showPrintBtn, lang } = props;
-  const { line } = props.data;
-  const routesWithFilteredStops = filterTimedStopsForRoutes(props);
+
+  console.log(props);
+
+  const routesWithFilteredStops = filterTimedStopsForRoutes(line);
 
   return {
     line,
     dateBegin,
     dateEnd,
     routesWithFilteredStops,
-    date: props.date,
-    routeIdentifier: props.lineId,
+    date: dateBegin,
+    routeIdentifier: line.lineId,
     showPrintBtn,
     lang,
   };
@@ -163,8 +163,6 @@ const hoc = compose(
 const LineTimetableContainer = hoc(LineTimetable);
 
 LineTimetableContainer.defaultProps = {
-  dateBegin: null,
-  dateEnd: null,
   date: null,
   showPrintBtn: false,
   lang: 'fi',
@@ -172,8 +170,8 @@ LineTimetableContainer.defaultProps = {
 
 LineTimetableContainer.propTypes = {
   lineId: PropTypes.string.isRequired,
-  dateBegin: PropTypes.string,
-  dateEnd: PropTypes.string,
+  dateBegin: PropTypes.string.isRequired,
+  dateEnd: PropTypes.string.isRequired,
   date: PropTypes.string,
   showPrintBtn: PropTypes.bool,
   lang: PropTypes.string,

@@ -59,6 +59,9 @@ const RouteDepartures = props => {
       <div className={styles.pageBreak}>&nbsp;</div>
       <LineTimetableHeader lineIdParsed={lineIdParsed} nameFi={nameFi} nameSe={nameSe} />
       <span className={styles.timetableDays}>Lauantai/Lördag</span>
+      <span className={styles.timetableDates}>
+        {formatDate(new Date(dateBegin))}-{formatDate(new Date(dateEnd))}
+      </span>
       <LineTableColumns
         showDivider={!showTimedStops}
         departures={departuresByStop}
@@ -67,6 +70,9 @@ const RouteDepartures = props => {
       <div className={styles.pageBreak}>&nbsp;</div>
       <LineTimetableHeader lineIdParsed={lineIdParsed} nameFi={nameFi} nameSe={nameSe} />
       <span className={styles.timetableDays}>Sunnuntai/Söndag</span>
+      <span className={styles.timetableDates}>
+        {formatDate(new Date(dateBegin))}-{formatDate(new Date(dateEnd))}
+      </span>
       <LineTableColumns
         showDivider={!showTimedStops}
         departures={departuresByStop}
@@ -103,22 +109,14 @@ RouteDepartures.propTypes = {
 
 function LineTimetable(props) {
   const { departures } = props;
-
   const showTimedStops = hasTimedStopRoutes(departures);
 
   if (showTimedStops) {
     return (
       <div>
         {departures.map(routeWithDepartures => {
-          const {
-            nameFi,
-            nameSe,
-            departuresByStop,
-            dateBegin,
-            dateEnd,
-            line,
-          } = routeWithDepartures;
-          const { lineIdParsed } = line.nodes[0];
+          const { nameFi, nameSe, departuresByStop, dateBegin, dateEnd } = routeWithDepartures;
+          const { lineIdParsed } = props.line;
           return (
             <div>
               <RouteDepartures
@@ -152,8 +150,8 @@ function LineTimetable(props) {
   return (
     <div>
       {combinedDeparturesForBothDirections.map(routeWithDepartures => {
-        const { nameFi, nameSe, departuresByStop, dateBegin, dateEnd, line } = routeWithDepartures;
-        const { lineIdParsed } = line.nodes[0];
+        const { nameFi, nameSe, departuresByStop, dateBegin, dateEnd } = routeWithDepartures;
+        const { lineIdParsed } = props.line;
         return (
           <div>
             <RouteDepartures

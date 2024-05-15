@@ -25,14 +25,28 @@ LineTimetableRow.propTypes = {
 
 const DeparturesColumn = props => {
   const { departures, stop } = props;
-  const departureRows = departures.map(departure => (
-    <LineTimetableRow hours={departure.hours} minutes={departure.minutes} />
-  ));
+
+  if (departures) {
+    const departureRows = departures.map(departure => (
+      <LineTimetableRow hours={departure.hours} minutes={departure.minutes} />
+    ));
+
+    return (
+      <div>
+        <LineTableHeader stop={stop} />
+        <div
+          className={classNames(styles.departureRowContainer, {
+            [styles.firstStopDivider]: stop.index === 0,
+          })}>
+          {departureRows}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
       <LineTableHeader stop={stop} />
-      <div className={styles.departureRowContainer}>{departureRows}</div>
     </div>
   );
 };
@@ -82,7 +96,7 @@ const LineTableColumns = props => {
             })}>
             <DeparturesColumn
               departures={departures.combinedDays[selectedDepartureDays]}
-              stop={departures.stop}
+              stop={{ ...departures.stop, index }}
             />
           </Column>
         )}
