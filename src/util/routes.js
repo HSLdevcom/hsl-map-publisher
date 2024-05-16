@@ -67,6 +67,7 @@ function routesToTree(routes, { stopZone, shortId }, height = 'auto', width = MA
             routeId: route.routeId,
             titleFi: route.destinationFi,
             titleSe: route.destinationSe,
+            trunkRoute: route.trunkRoute,
           },
         ];
       }
