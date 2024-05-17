@@ -33,22 +33,22 @@ const testTerminalPosters = [
 
 // LineTimetable tests
 const testLines = [
-  { lineId: '2015', dateBegin: '2024-12-01', dateEnd: '2024-12-10' },
-  { lineId: '1007', dateBegin: '2024-12-01', dateEnd: '2024-12-10' },
-  { lineId: '1005', dateBegin: '2024-12-01', dateEnd: '2024-12-10' },
-  { lineId: '1052', dateBegin: '2024-12-01', dateEnd: '2024-12-10' },
-  { lineId: '2510', dateBegin: '2024-12-01', dateEnd: '2024-12-10' },
+  { lineId: '2015', dateBegin: '2025-08-01', dateEnd: '2025-09-10' },
+  { lineId: '1007', dateBegin: '2025-08-01', dateEnd: '2025-09-10' },
+  { lineId: '1005', dateBegin: '2025-08-01', dateEnd: '2025-09-10' },
+  { lineId: '1052', dateBegin: '2025-08-01', dateEnd: '2025-09-10' },
+  { lineId: '2510', dateBegin: '2025-08-01', dateEnd: '2025-09-10' },
 ];
 
 const TEST_RESULTS_PATH = './test/results';
 
 const POSTER_COMPONENTS = {
-  // TIMETABLE: 'Timetable',
+  TIMETABLE: 'Timetable',
   // STOP_POSTER: 'StopPoster',
   // A3_STOP_POSTER: 'A3StopPoster',
   // LINE_TIMETABLE: 'LineTimetable',
   // TERMINAL_POSTER: 'TerminalPoster',
-  STOP_ROUTE_PLATE: 'StopRoutePlate',
+  // STOP_ROUTE_PLATE: 'StopRoutePlate',
 };
 
 async function sleep(millis) {
@@ -85,7 +85,7 @@ function buildGenerationRequestBody(buildId, component, printAsA4) {
         printTimetablesAsA4: printAsA4,
         printTimetablesAsGreyscale: false,
         routeFilter: '',
-        salesPoint: true,
+        salesPoint: false,
         selectedRuleTemplates: [],
         stopId: terminalId,
         selectedStops: selectedStopIds.toString(),
@@ -117,10 +117,10 @@ function buildGenerationRequestBody(buildId, component, printAsA4) {
         mapZones: true,
         minimapZoneSymbols: true,
         minimapZones: true,
-        printTimetablesAsA4: printAsA4,
+        printTimetablesAsA4: false,
         printTimetablesAsGreyscale: false,
         routeFilter: '',
-        salesPoint: true,
+        salesPoint: false,
         selectedRuleTemplates: [],
         stopId,
         template: 'default',

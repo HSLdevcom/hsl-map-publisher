@@ -65,7 +65,13 @@ function getOverlapCost(positions, indexes) {
  * @param {boolean}
  */
 function hasIntersectingLines(a, b) {
-  return !!segseg(a.x, a.y, a.x + a.cx, a.y + a.cy, b.x, b.y, b.x + b.cx, b.y + b.cy);
+  return segseg(
+    [NaN, NaN],
+    [a.x, a.y],
+    [a.x + a.cx, a.y + a.cy],
+    [b.x, b.y],
+    [b.x + b.cx, b.y + b.cy],
+  );
 }
 
 /**
@@ -111,10 +117,14 @@ function getFixedIntersectionCost(positions, indexes) {
       const bl = [b.left, b.top + b.height];
       const br = [b.left + b.width, b.top + b.height];
 
-      const p1 = segseg(a0, a1, tl, tr);
-      const p2 = segseg(a0, a1, tl, bl);
-      const p3 = segseg(a0, a1, bl, br);
-      const p4 = segseg(a0, a1, tr, br);
+      const p1 = [NaN, NaN];
+      segseg(p1, a0, a1, tl, tr);
+      const p2 = [NaN, NaN];
+      segseg(p2, a0, a1, tl, bl);
+      const p3 = [NaN, NaN];
+      segseg(p3, a0, a1, bl, br);
+      const p4 = [NaN, NaN];
+      segseg(p4, a0, a1, tr, br);
 
       const intersections = [p1, p2, p3, p4].filter(p => Array.isArray(p));
 
