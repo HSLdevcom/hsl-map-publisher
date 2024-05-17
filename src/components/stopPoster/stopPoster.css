@@ -34,12 +34,12 @@
 
 .left {
   composes: column;
-  width: 689px;
+  width: 639px;
 }
 
 .leftStretched {
   composes: column;
-  width: 820px;
+  width: 780px;
 }
 
 .right {
