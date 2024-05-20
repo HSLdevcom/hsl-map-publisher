@@ -10,35 +10,13 @@ import { sizedSvg } from '../../util/sizedSvg';
 const MAP_MIN_HEIGHT = 500;
 
 class CustomMap extends Component {
-  static propTypes = {
-    stopId: PropTypes.string.isRequired,
-    date: PropTypes.string.isRequired,
-    // eslint-disable-next-line react/require-default-props
-    isSummerTimetable: PropTypes.bool,
-    // eslint-disable-next-line react/require-default-props
-    template: PropTypes.any,
-    setMapHeight: PropTypes.func.isRequired,
-    mapZoneSymbols: PropTypes.bool,
-    mapZones: PropTypes.bool,
-    showSalesPoint: PropTypes.bool,
-    minimapZoneSymbols: PropTypes.bool,
-    minimapZones: PropTypes.bool,
-    legend: PropTypes.bool,
-  };
-
-  static defaultProps = {
-    mapZoneSymbols: false,
-    mapZones: false,
-    showSalesPoint: false,
-    minimapZoneSymbols: false,
-    minimapZones: false,
-    legend: false,
-  };
-
-  state = {
-    mapWidth: -1,
-    mapHeight: -1,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      mapWidth: -1,
+      mapHeight: -1,
+    };
+  }
 
   componentDidMount() {
     renderQueue.add(this);
@@ -141,7 +119,8 @@ class CustomMap extends Component {
               width: '100%',
               height: wrapperHeight,
             }}
-            ref={measureRef}>
+            ref={measureRef}
+          >
             {renderMap === 'svg' ? (
               <InlineSVG style={mapImageStyle} src={svgSrc} />
             ) : renderMap === 'local' ? (
@@ -165,5 +144,30 @@ class CustomMap extends Component {
     );
   }
 }
+
+CustomMap.propTypes = {
+  stopId: PropTypes.string.isRequired,
+  date: PropTypes.string.isRequired,
+  // eslint-disable-next-line react/require-default-props
+  isSummerTimetable: PropTypes.bool,
+  // eslint-disable-next-line react/require-default-props
+  template: PropTypes.any,
+  setMapHeight: PropTypes.func.isRequired,
+  mapZoneSymbols: PropTypes.bool,
+  mapZones: PropTypes.bool,
+  showSalesPoint: PropTypes.bool,
+  minimapZoneSymbols: PropTypes.bool,
+  minimapZones: PropTypes.bool,
+  legend: PropTypes.bool,
+};
+
+CustomMap.defaultProps = {
+  mapZoneSymbols: false,
+  mapZones: false,
+  showSalesPoint: false,
+  minimapZoneSymbols: false,
+  minimapZones: false,
+  legend: false,
+};
 
 export default CustomMap;

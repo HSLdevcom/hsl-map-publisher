@@ -76,13 +76,13 @@ async function renderComponent(options) {
 
   await page.exposeFunction('serverLog', log);
 
-  page.on('error', error => {
+  page.on('error', (error) => {
     page.close();
     browser.close();
     onError(error);
   });
 
-  page.on('console', message => {
+  page.on('console', (message) => {
     const { url, lineNumber, columnNumber } = message.location();
     if (['error', 'warning', 'log'].includes(message.type())) {
       onInfo(
@@ -119,10 +119,14 @@ async function renderComponent(options) {
     timeout: RENDER_TIMEOUT,
   });
 
-  const { error = null, width, height } = await page.evaluate(
+  const {
+    error = null,
+    width,
+    height,
+  } = await page.evaluate(
     () =>
-      new Promise(resolve => {
-        window.callPhantom = opts => resolve(opts);
+      new Promise((resolve) => {
+        window.callPhantom = (opts) => resolve(opts);
       }),
   );
 
@@ -178,9 +182,9 @@ async function generate(options) {
         onInfo('Creating new browser instance');
         await initialize();
       }
-      const timeout = new Promise((resolve, reject) =>
-        setTimeout(reject, RENDER_TIMEOUT, new Error('Render timeout')),
-      );
+      const timeout = new Promise((resolve, reject) => {
+        setTimeout(reject, RENDER_TIMEOUT, new Error('Render timeout'));
+      });
 
       const posterUploaded = await Promise.race([renderComponent(options), timeout]);
       const uploadFailed = !posterUploaded && AZURE_STORAGE_ACCOUNT && AZURE_STORAGE_KEY;

@@ -1,15 +1,14 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 
 module.exports = {
-  entry: ['babel-polyfill', './src/index.js'],
   plugins: [
-    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       title: 'Stop poster',
     }),
+    new ESLintPlugin({ cache: true }),
     new Dotenv({ systemvars: true }),
   ],
   resolve: {
@@ -17,20 +16,12 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, 'dist'),
+    clean: true,
     filename: 'bundle.js',
     globalObject: 'this',
   },
   module: {
     rules: [
-      {
-        test: /\.js$/,
-        loader: 'eslint-loader',
-        enforce: 'pre',
-        exclude: /node_modules/,
-        options: {
-          cache: true,
-        },
-      },
       {
         test: /\.js$/,
         loader: 'babel-loader',
@@ -58,7 +49,7 @@ module.exports = {
       },
       {
         test: /\.svg$/,
-        loader: 'raw-loader',
+        type: 'asset/source',
       },
     ],
   },

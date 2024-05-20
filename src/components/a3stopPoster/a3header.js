@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { chunk, cloneDeep, sortBy } from 'lodash';
-import { Row, Column, InlineSVG } from 'components/util';
+import { chunk, sortBy } from 'lodash';
+import { Row, Column } from 'components/util';
 import a3headerContainer from './a3headerContainer';
 import renderQueue from 'util/renderQueue';
 import { getColor } from 'util/domain';
@@ -12,16 +12,6 @@ import styles from './a3header.css';
 const MAX_COLUMNS = 5;
 
 class A3Header extends Component {
-  static propTypes = {
-    routes: PropTypes.arrayOf(
-      PropTypes.shape({
-        routeId: PropTypes.string.isRequired,
-        destinationFi: PropTypes.string.isRequired,
-        destinationSe: PropTypes.string,
-      }),
-    ).isRequired,
-  };
-
   constructor(props) {
     super(props);
     this.state = {
@@ -71,10 +61,10 @@ class A3Header extends Component {
   render() {
     const routesPerColumn = Math.ceil(this.props.routes.length / MAX_COLUMNS);
     const routeColumns = chunk(
-      sortBy(this.props.routes, route => !route.trunkRoute),
+      sortBy(this.props.routes, (route) => !route.trunkRoute),
       routesPerColumn,
     );
-    const routeIds = this.props.routes.map(route => route.routeId);
+    const routeIds = this.props.routes.map((route) => route.routeId);
 
     const zone = this.props.stop.stopZone;
 
@@ -82,9 +72,10 @@ class A3Header extends Component {
     return (
       <div
         className={styles.root}
-        ref={ref => {
+        ref={(ref) => {
           this.root = ref;
-        }}>
+        }}
+      >
         <div className={styles.stopTitleContainer}>
           <div className={styles.stopTitle}>{this.props.stop.nameFi}</div>
           <div className={styles.stopTitle}>{this.props.stop.nameSe}</div>
@@ -102,7 +93,8 @@ class A3Header extends Component {
                       <div
                         key={index}
                         className={styles.destinations}
-                        style={{ color: getColor(route) }}>
+                        style={{ color: getColor(route) }}
+                      >
                         <div className={styles.title}>
                           {route.destinationFi + (route.viaFi ? ` kautta ${route.viaFi}` : '')}
                         </div>
@@ -147,6 +139,13 @@ class A3Header extends Component {
 A3Header.propTypes = {
   stop: PropTypes.object.isRequired,
   variables: PropTypes.object.isRequired,
+  routes: PropTypes.arrayOf(
+    PropTypes.shape({
+      routeId: PropTypes.string.isRequired,
+      destinationFi: PropTypes.string.isRequired,
+      destinationSe: PropTypes.string,
+    }),
+  ).isRequired,
 };
 
 export default a3headerContainer(A3Header);

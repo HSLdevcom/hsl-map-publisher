@@ -1,21 +1,10 @@
 const merge = require('webpack-merge');
+const ESLintPlugin = require('eslint-webpack-plugin');
+
 const webpackCommon = require('./webpack.common');
 
 module.exports = merge.smart(webpackCommon, {
   mode: 'production',
   devtool: 'source-map',
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        loader: 'eslint-loader',
-        enforce: 'pre',
-        exclude: /node_modules/,
-        options: {
-          fix: true,
-          cache: true,
-        },
-      },
-    ],
-  },
+  plugins: [new ESLintPlugin({ cache: true, fix: true })],
 });
