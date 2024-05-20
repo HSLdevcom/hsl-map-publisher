@@ -135,7 +135,7 @@ export function combineConsecutiveDays(daysObject) {
 
   // Remove empty arrays
   const filteredDepartures = Object.fromEntries(
-    Object.entries(combinedDays).filter(([key, value]) => value.length !== 0),
+    Object.entries(combinedDays).filter((value) => value.length !== 0),
   );
 
   const removePeNotes = (departures) =>
@@ -353,7 +353,6 @@ const propsMapper = mapProps((props) => {
     ),
   }));
 
-  const { weekdays } = pick(groupDepartures(departures), props.segments);
   const dateBegin =
     props.dateBegin ||
     flatMap(props.data.stop.siblings.nodes, (stop) =>

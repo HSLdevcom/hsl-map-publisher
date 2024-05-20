@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Row, WrappingRow } from 'components/util';
-import { sortBy, keys, pickBy, groupBy } from 'lodash';
+import { sortBy, keys, pickBy } from 'lodash';
 import { trimRouteId } from 'util/domain';
 import classnames from 'classnames';
 import TableHeader from './a3TableHeader';
@@ -9,7 +9,7 @@ import RouteDiagram from 'components/routeDiagram/routeDiagramContainer';
 
 import styles from './a3TableRows.css';
 
-const Departure = props => (
+const Departure = (props) => (
   <div className={styles.item}>
     <div className={styles.minutes}>
       {props.minutes < 10 && '0'}
@@ -30,11 +30,11 @@ Departure.propTypes = {
   note: PropTypes.string,
 };
 
-const TableRow = props => (
+const TableRow = (props) => (
   <Row>
     <div className={styles.hours}>{props.hours}</div>
     <WrappingRow>
-      {sortBy(props.departures, a => a.minutes).map((departure, index) => (
+      {sortBy(props.departures, (a) => a.minutes).map((departure, index) => (
         <Departure key={index} {...departure} />
       ))}
     </WrappingRow>
@@ -61,7 +61,7 @@ TableRow.propTypes = {
   departures: PropTypes.arrayOf(PropTypes.shape(Departure.propTypes)).isRequired,
 };
 
-const TableRows = props => {
+const TableRows = (props) => {
   // Split columns to multiple divs if there's a day divider.
   const indexesToSplit = keys(pickBy(props.departures, 'segment'));
   const diagramExists = keys(pickBy(props.departures, 'diagram'));
@@ -69,7 +69,7 @@ const TableRows = props => {
   indexesToSplit.push(props.departures.length);
 
   let startIndex = 0;
-  indexesToSplit.forEach(splitIndex => {
+  indexesToSplit.forEach((splitIndex) => {
     const splitHere = parseInt(splitIndex, 10);
     const departuresChunk = props.departures.slice(startIndex, splitHere);
     startIndex = splitIndex;
@@ -104,7 +104,8 @@ const TableRows = props => {
       className={classnames(styles.a3container, {
         [styles.wide]: props.useWide,
         [styles.diagram]: diagramExists.length > 0,
-      })}>
+      })}
+    >
       {departureSegments.map((departureSegment, index) => {
         if (departureSegment.diagram) {
           if (!props.diagram) {
@@ -133,7 +134,8 @@ const TableRows = props => {
               key={`tableRows_${index}`}
               className={classnames(styles.a3root, {
                 [styles.summer]: props.isSummerTimetable,
-              })}>
+              })}
+            >
               {content}
             </div>
           );

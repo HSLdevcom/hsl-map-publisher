@@ -59,14 +59,14 @@ class Timetable extends Component {
         groupedRows: departures,
       },
     });
-    renderQueue.onEmpty(error => !error && this.updateLayout(), {
+    renderQueue.onEmpty((error) => !error && this.updateLayout(), {
       ignore: this,
     });
   }
 
   componentDidUpdate() {
     window.setTimeout(() => {
-      renderQueue.onEmpty(error => !error && this.updateLayout(), {
+      renderQueue.onEmpty((error) => !error && this.updateLayout(), {
         ignore: this,
       });
     }, 50);
@@ -76,7 +76,7 @@ class Timetable extends Component {
     renderQueue.remove(this, { error: new Error(error) });
   }
 
-  defaultColumns = props => {
+  defaultColumns = (props) => {
     const { weekdays, saturdays, sundays } = props;
     const segments = [weekdays, saturdays, sundays];
     const departuresLength = segments
@@ -98,21 +98,21 @@ class Timetable extends Component {
     return useSingleColumn ? [departures] : departures;
   };
 
-  getZoneLetterStyle = zone => ({
+  getZoneLetterStyle = (zone) => ({
     transform:
       zone === 'B'
         ? 'translate(calc(-50%), calc(-50% + 2px))'
         : zone === 'C'
-        ? 'translate(calc(-50% - 2px), calc(-50% + 2px))'
-        : zone === 'D'
-        ? 'translate(calc(-50% + 2px), calc(-50% + 2px))'
-        : 'translate(-50%, -50%)', // No px adjustments for zone A and the "else" case.
+          ? 'translate(calc(-50% - 2px), calc(-50% + 2px))'
+          : zone === 'D'
+            ? 'translate(calc(-50% + 2px), calc(-50% + 2px))'
+            : 'translate(-50%, -50%)', // No px adjustments for zone A and the "else" case.
   });
 
   getNotes = (notes, symbols) => {
     const parsedNotes = [];
-    symbols.forEach(symbol => {
-      notes.forEach(note => {
+    symbols.forEach((symbol) => {
+      notes.forEach((note) => {
         if (note.substring(0, symbol.length) === symbol && !parsedNotes.includes(note)) {
           parsedNotes.push(note);
         }
@@ -121,12 +121,12 @@ class Timetable extends Component {
     return parsedNotes;
   };
 
-  nullOrEmpty = arr => !arr || arr.length === 0;
+  nullOrEmpty = (arr) => !arr || arr.length === 0;
 
-  rowsByHour = rowDepartures => {
+  rowsByHour = (rowDepartures) => {
     const departuresByHour = groupBy(
       rowDepartures,
-      departure => (departure.isNextDay ? 24 : 0) + departure.hours,
+      (departure) => (departure.isNextDay ? 24 : 0) + departure.hours,
     );
     const rows = Object.entries(departuresByHour).map(([hours, departures]) => ({
       hour: hours,
@@ -159,7 +159,7 @@ class Timetable extends Component {
       return true;
     };
 
-    const formatHour = hour => `${hour % 24 < 10 ? '0' : ''}${hour % 24}`;
+    const formatHour = (hour) => `${hour % 24 < 10 ? '0' : ''}${hour % 24}`;
 
     const getDuplicateCutOff = (startIndex, rowArray) => {
       const startRow = rowArray[startIndex];
@@ -336,32 +336,35 @@ class Timetable extends Component {
           [styles.a3]: true,
           [styles.standalone]: this.props.standalone,
           [styles.greyscale]: this.props.greyscale,
-        })}>
+        })}
+      >
         {this.props.standalone && (
-          <React.Fragment>
+          <>
             <div className={styles.stopZone}>
               <div className={styles.zoneTitle}>Vyöhyke</div>
               <div className={styles.zoneSubtitle}>Zon/Zone</div>
               <div className={styles.zone}>
                 <span
                   className={styles.zoneLetter}
-                  style={this.getZoneLetterStyle(this.props.stopZone)}>
+                  style={this.getZoneLetterStyle(this.props.stopZone)}
+                >
                   {this.props.stopZone}
                 </span>
               </div>
             </div>
             <SimpleRoutes stopId={this.props.stopId} date={this.props.date} />
-          </React.Fragment>
+          </>
         )}
 
         {weekdaysRows.length > 0 && (
           <div
             className={styles.tableContentContainer}
             style={contentContainerStyle}
-            ref={ref => {
+            ref={(ref) => {
               this.content = ref;
-            }}>
-            {chunkedRows.map((chunkedRow, index) => {
+            }}
+          >
+            {chunkedRows.map((chunkedRow) => {
               // Use wider timetable columns:
               // - If last column is an empty column
               // - If three columns and last one is empty
@@ -382,7 +385,7 @@ class Timetable extends Component {
 
               return (
                 <div className={styles.tableRowsContainer}>
-                  {chunkedRow.map(rows => (
+                  {chunkedRow.map((rows) => (
                     <TableRows
                       diagram={this.props.diagram}
                       departures={rows}

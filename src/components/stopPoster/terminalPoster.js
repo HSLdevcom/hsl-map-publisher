@@ -88,13 +88,13 @@ class TerminalPoster extends Component {
       });
     }
 
-    renderQueue.onEmpty(error => !error && this.updateLayout(), {
+    renderQueue.onEmpty((error) => !error && this.updateLayout(), {
       ignore: this,
     });
   }
 
   componentDidUpdate() {
-    renderQueue.onEmpty(error => !error && this.updateLayout(), {
+    renderQueue.onEmpty((error) => !error && this.updateLayout(), {
       ignore: this,
     });
   }
@@ -124,10 +124,10 @@ class TerminalPoster extends Component {
   removeAdsFromTemplate(ads) {
     const { template } = this.state;
     const removedAds = [];
-    ads.slots.forEach(slot => {
+    ads.slots.forEach((slot) => {
       if (slot.image) removedAds.push(slot);
     });
-    template.areas.find(t => t.key === 'ads').slots = [];
+    template.areas.find((t) => t.key === 'ads').slots = [];
     this.setState({
       removedAds,
       template,
@@ -143,7 +143,7 @@ class TerminalPoster extends Component {
     // Remove ads from template and try to add them later when there's no overflow.
     // i.e when this.state.adsPhase = true
     if (this.state.template && !this.state.removedAds) {
-      const ads = get(this.state.template, 'areas', []).find(t => t.key === 'ads');
+      const ads = get(this.state.template, 'areas', []).find((t) => t.key === 'ads');
       if (ads.slots.length > 0) {
         this.removeAdsFromTemplate(ads);
         return;
@@ -153,7 +153,7 @@ class TerminalPoster extends Component {
     // If we get overflow we remove ad from template.
     if (this.state.adsPhase) {
       const { template, removedAds } = this.state;
-      const ads = get(template, 'areas', []).find(t => t.key === 'ads');
+      const ads = get(template, 'areas', []).find((t) => t.key === 'ads');
 
       if (
         !removedAds ||
@@ -169,7 +169,7 @@ class TerminalPoster extends Component {
         ads.slots.push(removedAds.pop());
       }
 
-      template.areas.find(t => t.key === 'ads').slots = ads.slots;
+      template.areas.find((t) => t.key === 'ads').slots = ads.slots;
 
       window.setTimeout(() => {
         this.setState({
@@ -253,7 +253,7 @@ class TerminalPoster extends Component {
 
       const template = cloneDeep(this.state.template);
       const mapTemplate = template
-        ? get(template, 'areas', []).find(t => t.key === 'map' || t.key === 'tram')
+        ? get(template, 'areas', []).find((t) => t.key === 'map' || t.key === 'tram')
         : null;
       if (mapTemplate) {
         for (let i = 0; i < template.areas.length; i++) {
@@ -283,7 +283,7 @@ class TerminalPoster extends Component {
 
     if (this.state.template && this.state.removedAds && this.state.removedAds.length > 0) {
       const { template } = this.state;
-      const svg = get(template, 'areas', []).find(t => t.key === 'map').slots[0];
+      const svg = get(template, 'areas', []).find((t) => t.key === 'map').slots[0];
       //  If using svg postpone adsPhase untill we have mapHeight.
       if (!svg.image) {
         this.setState({ adsPhase: true });
@@ -353,15 +353,15 @@ class TerminalPoster extends Component {
     } = this.state;
 
     const { isTramStop } = this.props;
-    const src = get(template, 'areas', []).find(t => t.key === 'tram');
+    const src = get(template, 'areas', []).find((t) => t.key === 'tram');
     const tramImage = get(src, 'slots[0].image.svg', '');
     let useDiagram = this.state.hasDiagram;
 
     if (tramImage) useDiagram = false;
 
-    const TerminalPosterTimetable = props => (
-      <React.Fragment>
-        {stops.map(id => (
+    const TerminalPosterTimetable = (props) => (
+      <>
+        {stops.map((id) => (
           <div className={styles.timetable} key={id}>
             <Timetable
               stopId={id}
@@ -379,7 +379,7 @@ class TerminalPoster extends Component {
             />
           </div>
         ))}
-      </React.Fragment>
+      </>
     );
 
     return (
@@ -388,14 +388,16 @@ class TerminalPoster extends Component {
           className={classNames(styles.root, {
             [styles.smallTerminalPoster]: isSmallTerminalPoster,
           })}
-          style={isTrunkStop ? trunkStopStyle : null}>
+          style={isTrunkStop ? trunkStopStyle : null}
+        >
           <JustifiedColumn>
             <Header stopId={terminalId} />
             <div
               className={styles.content}
-              ref={ref => {
+              ref={(ref) => {
                 this.content = ref;
-              }}>
+              }}
+            >
               <Spacer width="100%" height={50} />
               {hasRoutes && hasRoutesOnTop && (
                 <Routes
@@ -438,7 +440,7 @@ class TerminalPoster extends Component {
                       key={`poster_ads_${hasRoutes}${hasRoutesOnTop}${hasStretchedLeftColumn}${useDiagram}`}
                       shortId={shortId}
                       template={
-                        template ? get(template, 'areas', []).find(t => t.key === 'ads') : {}
+                        template ? get(template, 'areas', []).find((t) => t.key === 'ads') : {}
                       }
                     />
                   </div>
@@ -460,7 +462,7 @@ class TerminalPoster extends Component {
                           isSummerTimetable={isSummerTimetable}
                           template={
                             template
-                              ? get(template, 'areas', []).find(t => t.key === 'map')
+                              ? get(template, 'areas', []).find((t) => t.key === 'map')
                               : template // null if template is loading, false if no template
                           }
                           mapZoneSymbols={mapZoneSymbols}
@@ -492,7 +494,7 @@ class TerminalPoster extends Component {
             </div>
             <Footer
               onError={this.onError}
-              template={template ? get(template, 'areas', []).find(t => t.key === 'footer') : {}}
+              template={template ? get(template, 'areas', []).find((t) => t.key === 'footer') : {}}
               shortId={shortId}
               isTrunkStop={isTrunkStop}
               isSmallTerminalPoster={isSmallTerminalPoster}

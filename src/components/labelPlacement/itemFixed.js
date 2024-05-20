@@ -1,3 +1,5 @@
+/* eslint-disable react/no-unused-class-component-methods */
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
@@ -31,10 +33,11 @@ class ItemFixed extends Component {
     }
     return (
       <div
-        ref={ref => {
+        ref={(ref) => {
           this.root = ref;
         }}
-        style={style}>
+        style={style}
+      >
         {this.props.children}
       </div>
     );

@@ -31,7 +31,7 @@ function prune(branch) {
 
 function truncate(node) {
   const { items } = node;
-  const gap = items.find(item => item.type === 'gap');
+  const gap = items.find((item) => item.type === 'gap');
 
   if (gap) {
     const index = items.indexOf(gap);
@@ -55,10 +55,10 @@ function truncate(node) {
  * @param {Array} routes
  * @returns {Object}
  */
-function routesToTree(routes, { stopZone, shortId }, height = 'auto', width = MAX_WIDTH) {
+function routesToTree(routes, { stopZone }, height = 'auto', width = MAX_WIDTH) {
   const currentZone = stopZone;
 
-  const itemLists = routes.map(route =>
+  const itemLists = routes.map((route) =>
     route.stops.map((stop, index, stops) => {
       const item = {
         ...stop,
@@ -92,7 +92,7 @@ function routesToTree(routes, { stopZone, shortId }, height = 'auto', width = MA
     }),
   );
 
-  const itemsListWithZoneBorders = itemLists.map(items =>
+  const itemsListWithZoneBorders = itemLists.map((items) =>
     items.reduce((prev, item) => {
       if (prev.length === 0 && currentZone !== item.zone) {
         return [{ type: 'zone', from: currentZone, to: item.zone }, item];

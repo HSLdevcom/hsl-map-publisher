@@ -90,13 +90,13 @@ class StopPoster extends Component {
       });
     }
 
-    renderQueue.onEmpty(error => !error && this.updateLayout(), {
+    renderQueue.onEmpty((error) => !error && this.updateLayout(), {
       ignore: this,
     });
   }
 
   componentDidUpdate() {
-    renderQueue.onEmpty(error => !error && this.updateLayout(), {
+    renderQueue.onEmpty((error) => !error && this.updateLayout(), {
       ignore: this,
     });
   }
@@ -125,10 +125,10 @@ class StopPoster extends Component {
   removeAdsFromTemplate(ads) {
     const { template } = this.state;
     const removedAds = [];
-    ads.slots.forEach(slot => {
+    ads.slots.forEach((slot) => {
       if (slot.image) removedAds.push(slot);
     });
-    template.areas.find(t => t.key === 'ads').slots = [];
+    template.areas.find((t) => t.key === 'ads').slots = [];
     this.setState({
       removedAds,
       template,
@@ -144,7 +144,7 @@ class StopPoster extends Component {
     // Remove ads from template and try to add them later when there's no overflow.
     // i.e when this.state.adsPhase = true
     if (this.state.template && !this.state.removedAds) {
-      const ads = get(this.state.template, 'areas', []).find(t => t.key === 'ads');
+      const ads = get(this.state.template, 'areas', []).find((t) => t.key === 'ads');
       if (ads.slots.length > 0) {
         this.removeAdsFromTemplate(ads);
         return;
@@ -154,7 +154,7 @@ class StopPoster extends Component {
     // If we get overflow we remove ad from template.
     if (this.state.adsPhase) {
       const { template, removedAds } = this.state;
-      const ads = get(template, 'areas', []).find(t => t.key === 'ads');
+      const ads = get(template, 'areas', []).find((t) => t.key === 'ads');
 
       if (
         !removedAds ||
@@ -170,7 +170,7 @@ class StopPoster extends Component {
         ads.slots.push(removedAds.pop());
       }
 
-      template.areas.find(t => t.key === 'ads').slots = ads.slots;
+      template.areas.find((t) => t.key === 'ads').slots = ads.slots;
 
       window.setTimeout(() => {
         this.setState({
@@ -251,7 +251,7 @@ class StopPoster extends Component {
 
       const template = cloneDeep(this.state.template);
       const mapTemplate = template
-        ? get(template, 'areas', []).find(t => t.key === 'map' || t.key === 'tram')
+        ? get(template, 'areas', []).find((t) => t.key === 'map' || t.key === 'tram')
         : null;
       if (mapTemplate) {
         for (let i = 0; i < template.areas.length; i++) {
@@ -287,7 +287,7 @@ class StopPoster extends Component {
 
     if (this.state.template && this.state.removedAds.length > 0) {
       const { template } = this.state;
-      const svg = get(template, 'areas', []).find(t => t.key === 'map').slots[0];
+      const svg = get(template, 'areas', []).find((t) => t.key === 'map').slots[0];
       //  If using svg postpone adsPhase untill we have mapHeight.
       if (!svg.image) {
         this.setState({ adsPhase: true });
@@ -336,7 +336,6 @@ class StopPoster extends Component {
 
     const {
       template,
-      mapHeight,
       hasRoutesOnTop,
       hasDiagram,
       hasStretchedLeftColumn,
@@ -345,13 +344,13 @@ class StopPoster extends Component {
       hasColumnTimetable,
     } = this.state;
 
-    const src = get(template, 'areas', []).find(t => t.key === 'tram');
+    const src = get(template, 'areas', []).find((t) => t.key === 'tram');
     const tramImage = get(src, 'slots[0].image.svg', '');
     // Use diagram, if it's available, except on tram and lightrail stops with tramimage
     const useTramDiagram = (isTramStop || isLightRail) && tramImage;
     const useDiagram = hasDiagram && !useTramDiagram;
 
-    const StopPosterTimetable = props => (
+    const StopPosterTimetable = (props) => (
       <div className={styles.timetable}>
         <Timetable
           stopId={stopId}
@@ -382,9 +381,10 @@ class StopPoster extends Component {
             <Header stopId={stopId} />
             <div
               className={styles.content}
-              ref={ref => {
+              ref={(ref) => {
                 this.content = ref;
-              }}>
+              }}
+            >
               <Spacer width="100%" height={50} />
               {hasRoutes && hasRoutesOnTop && (
                 <Routes stopId={stopId} date={date} routeFilter={this.props.routeFilter} />
@@ -409,19 +409,16 @@ class StopPoster extends Component {
                   <AdContainer
                     key={`poster_ads_${hasRoutes}${hasRoutesOnTop}${hasStretchedLeftColumn}${useDiagram}`}
                     shortId={shortId}
-                    template={template ? get(template, 'areas', []).find(t => t.key === 'ads') : {}}
+                    template={
+                      template ? get(template, 'areas', []).find((t) => t.key === 'ads') : {}
+                    }
                   />
                 </div>
 
                 <Spacer width={10} />
 
                 <Measure client>
-                  {({
-                    measureRef,
-                    contentRect: {
-                      client: { height: rightColumnHeight },
-                    },
-                  }) => (
+                  {({ measureRef }) => (
                     <div className={styles.right} ref={measureRef}>
                       {!hasColumnTimetable && (
                         <div className={styles.timetables}>
@@ -449,7 +446,7 @@ class StopPoster extends Component {
                           isSummerTimetable={isSummerTimetable}
                           template={
                             template
-                              ? get(template, 'areas', []).find(t => t.key === 'map')
+                              ? get(template, 'areas', []).find((t) => t.key === 'map')
                               : template // null if template is loading, false if no template
                           }
                           mapZoneSymbols={mapZoneSymbols}
@@ -479,7 +476,7 @@ class StopPoster extends Component {
             </div>
             <Footer
               onError={this.onError}
-              template={template ? get(template, 'areas', []).find(t => t.key === 'footer') : {}}
+              template={template ? get(template, 'areas', []).find((t) => t.key === 'footer') : {}}
               shortId={shortId}
               isTrunkStop={isTrunkStop}
             />
