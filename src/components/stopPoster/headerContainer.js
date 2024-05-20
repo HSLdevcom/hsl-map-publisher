@@ -10,6 +10,7 @@ import Header from './header';
 const headerQuery = gql`
   query headerQuery($stopId: String!) {
     stop: stopByStopId(stopId: $stopId) {
+      nodeId
       shortId
       nameFi
       nameSe

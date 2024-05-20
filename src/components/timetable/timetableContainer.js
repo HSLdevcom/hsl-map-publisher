@@ -204,6 +204,7 @@ function getNotes(isSummerTimetable) {
 const timetableQuery = gql`
   query timetableQuery($stopId: String!, $date: Date!) {
     stop: stopByStopId(stopId: $stopId) {
+      nodeId
       nameFi
       nameSe
       shortId
@@ -214,6 +215,7 @@ const timetableQuery = gql`
       addressSe
       siblings {
         nodes {
+          nodeId
           routeSegments: routeSegmentsForDate(date: $date) {
             nodes {
               routeId

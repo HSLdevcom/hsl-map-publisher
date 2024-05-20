@@ -11,8 +11,6 @@ RUN apt-get -y update \
     && cp ./azcopy /usr/bin/ \
     && rm -rf /var/lib/apt/lists/*
 
-ENV NODE_OPTIONS=--openssl-legacy-provider
-
 ENV WORK /opt/publisher
 
 RUN mkdir -p ${WORK}

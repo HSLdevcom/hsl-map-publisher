@@ -26,7 +26,13 @@ const graphqlUrl = process.env.JORE_GRAPHQL_URL || 'https://kartat.hsl.fi/jore/g
 
 const client = new ApolloClient({
   uri: graphqlUrl,
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Stop: {
+        keyFields: ['nodeId'],
+      },
+    },
+  }),
 });
 
 class App extends Component {
