@@ -1,3 +1,5 @@
+/* eslint-disable react/no-unused-class-component-methods */
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
@@ -27,10 +29,11 @@ class ItemPositioned extends Component {
     const style = { ...this.state, position: 'absolute' };
     return (
       <div
-        ref={ref => {
+        ref={(ref) => {
           this.root = ref;
         }}
-        style={style}>
+        style={style}
+      >
         {this.props.children}
       </div>
     );

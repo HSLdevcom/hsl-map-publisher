@@ -12,7 +12,7 @@ import styles from './timetable.css';
 const A4_PAGE_HEIGHT = 1110;
 const TEXT_HEIGHT = 12;
 
-const formatDate = date => {
+const formatDate = (date) => {
   const monthNames = [
     'January',
     'February',
@@ -35,21 +35,21 @@ const formatDate = date => {
   return `${day} ${monthNames[monthIndex]} ${year}`;
 };
 
-const getZoneLetterStyle = zone => ({
+const getZoneLetterStyle = (zone) => ({
   transform:
     zone === 'B'
       ? 'translate(calc(-50%), calc(-50% + 2px))'
       : zone === 'C'
-      ? 'translate(calc(-50% - 2px), calc(-50% + 2px))'
-      : zone === 'D'
-      ? 'translate(calc(-50% + 2px), calc(-50% + 2px))'
-      : 'translate(-50%, -50%)', // No px adjustments for zone A and the "else" case.
+        ? 'translate(calc(-50% - 2px), calc(-50% + 2px))'
+        : zone === 'D'
+          ? 'translate(calc(-50% + 2px), calc(-50% + 2px))'
+          : 'translate(-50%, -50%)', // No px adjustments for zone A and the "else" case.
 });
 
 const getNotes = (notes, symbols) => {
   const parsedNotes = [];
-  symbols.forEach(symbol => {
-    notes.forEach(note => {
+  symbols.forEach((symbol) => {
+    notes.forEach((note) => {
       if (note.substring(0, symbol.length) === symbol && !parsedNotes.includes(note)) {
         parsedNotes.push(note);
       }
@@ -103,10 +103,11 @@ class Timetable extends Component {
           [styles.standalone]: this.props.standalone,
           [styles.greyscale]: this.props.greyscale,
         })}
-        ref={ref => {
+        ref={(ref) => {
           this.content = ref;
-        }}>
-        {addressInfoPositions.map(height => (
+        }}
+      >
+        {addressInfoPositions.map((height) => (
           <span className={styles.address} style={{ top: `${height}px` }}>
             {addressInfo}
           </span>
@@ -157,7 +158,7 @@ class Timetable extends Component {
           </div>
         )}
         {this.props.standalone && (
-          <React.Fragment>
+          <>
             <div className={styles.stopZone}>
               <div className={styles.zoneTitle}>Vyöhyke</div>
               <div className={styles.zoneSubtitle}>Zon/Zone</div>
@@ -168,9 +169,9 @@ class Timetable extends Component {
               </div>
             </div>
             <SimpleRoutes stopId={this.props.stopId} date={this.props.date} />
-          </React.Fragment>
+          </>
         )}
-        {Object.keys(this.props.combinedDays).map(combinedDay => {
+        {Object.keys(this.props.combinedDays).map((combinedDay) => {
           const dayNames = combinedDay.split('-');
           const fiTitle =
             dayNames.length > 1
@@ -198,7 +199,7 @@ class Timetable extends Component {
         })}
         {this.props.showNotes && this.props.notes.length !== 0 && <Spacer height={20} />}
         {this.props.showNotes &&
-          getNotes(this.props.notes, this.props.specialSymbols).map(note => (
+          getNotes(this.props.notes, this.props.specialSymbols).map((note) => (
             <div key={note} className={styles.footnote}>
               {note}
             </div>

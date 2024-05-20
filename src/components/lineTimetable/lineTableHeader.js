@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 
 import styles from './lineTableHeader.css';
 
-const LineTableHeader = props => {
+const LineTableHeader = (props) => {
   const { stop } = props;
   return (
     <div className={styles.stop}>
