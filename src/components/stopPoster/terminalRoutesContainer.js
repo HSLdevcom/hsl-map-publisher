@@ -15,6 +15,7 @@ const routesQuery = gql`
   query routesQuery($stopIds: [String], $date: Date!) {
     stops: getStopsByIds(stopIds: $stopIds) {
       nodes {
+        nodeId
         platform
         routeSegments: routeSegmentsForDate(date: $date) {
           nodes {

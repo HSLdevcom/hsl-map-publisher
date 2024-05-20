@@ -49,6 +49,7 @@ const lineQuery = gql`
                 }
               }
               stop: stopByStopId {
+                nodeId
                 stopId
                 lat
                 lon

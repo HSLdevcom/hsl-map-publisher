@@ -14,9 +14,11 @@ import routeCompare from 'util/routeCompare';
 const routesQuery = gql`
   query stopPosterQuery($stopId: String!, $date: Date!) {
     stop: stopByStopId(stopId: $stopId) {
+      nodeId
       shortId
       siblings {
         nodes {
+          nodeId
           platform
           routeSegments: routeSegmentsForDate(date: $date) {
             nodes {

@@ -58,6 +58,7 @@ const nearbyItemsQuery = gql`
         nameSe
         stops {
           nodes {
+            nodeId
             calculatedHeading
             platform
             routeSegments: routeSegmentsForDate(date: $date) {
@@ -240,6 +241,7 @@ const nearbyItemsMapper = mapProps((props) => {
 const mapPositionQuery = gql`
   query mapPositionQuery($stopId: String!) {
     stop: stopByStopId(stopId: $stopId) {
+      nodeId
       lat
       lon
     }

@@ -13,9 +13,11 @@ import A3StopPoster from './a3stopPoster';
 const stopPosterQuery = gql`
   query stopPosterQuery($stopId: String!, $date: Date!) {
     stop: stopByStopId(stopId: $stopId) {
+      nodeId
       shortId
       siblings {
         nodes {
+          nodeId
           routeSegments: routeSegmentsForDate(date: $date) {
             nodes {
               routeId

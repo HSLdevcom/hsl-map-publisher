@@ -12,12 +12,14 @@ import routeCompare from 'util/routeCompare';
 const routesQuery = gql`
   query routesQuery($stopId: String!, $date: Date!) {
     stop: stopByStopId(stopId: $stopId) {
+      nodeId
       nameFi
       nameSe
       shortId
       stopZone
       siblings {
         nodes {
+          nodeId
           routeSegments: routeSegmentsForDate(date: $date) {
             nodes {
               routeId
