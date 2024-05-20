@@ -56,8 +56,10 @@ const routeDiagramQuery = gql`
                         }
                       }
                       terminalByTerminalId {
+                        nodeId
                         siblings {
                           nodes {
+                            nodeId
                             modes(date: $date) {
                               nodes
                             }

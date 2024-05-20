@@ -247,6 +247,7 @@ const mapPositionQuery = gql`
       lon
     }
     terminal: terminalByTerminalId(terminalId: $stopId) {
+      nodeId
       lat
       lon
     }
