@@ -17,10 +17,12 @@ const headerQuery = gql`
       stopZone
     }
     terminal: terminalByTerminalId(terminalId: $stopId) {
+      nodeId
       nameFi
       nameSe
       stops: stopsByTerminalId {
         nodes {
+          nodeId
           stopZone
         }
       }

@@ -31,6 +31,9 @@ const client = new ApolloClient({
       Stop: {
         keyFields: ['nodeId'],
       },
+      Terminal: {
+        keyFields: ['nodeId'],
+      },
     },
   }),
 });
