@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import mapProps from 'recompose/mapProps';
 import compose from 'recompose/compose';
 import flatMap from 'lodash/flatMap';
@@ -99,16 +99,16 @@ const nearbyItemsQuery = gql`
   }
 `;
 
-const stopsMapper = stopGroup => ({
+const stopsMapper = (stopGroup) => ({
   ...stopGroup,
   // Assume all stops face the same way
   calculatedHeading: stopGroup.stops.nodes[0].calculatedHeading,
-  routes: flatMap(stopGroup.stops.nodes, node =>
+  routes: flatMap(stopGroup.stops.nodes, (node) =>
     node.routeSegments.nodes
-      .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
-      .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
-      .filter(routeSegment => !isDropOffOnly(routeSegment))
-      .map(routeSegment => {
+      .filter((routeSegment) => routeSegment.hasRegularDayDepartures === true)
+      .filter((routeSegment) => !isNumberVariant(routeSegment.routeId))
+      .filter((routeSegment) => !isDropOffOnly(routeSegment))
+      .map((routeSegment) => {
         const mergedRouteSegment = mergeRouteSegments(
           routeSegment,
           get(routeSegment, 'route.nodes[0].routeSegments.nodes', []),
@@ -144,12 +144,12 @@ const stopsMapper = stopGroup => ({
   ).sort(routeCompare),
 });
 
-const nearbyItemsMapper = mapProps(props => {
+const nearbyItemsMapper = mapProps((props) => {
   const stops = props.data.stopGroups.nodes
     // Merge properties from mode-specific stops
     .map(stopsMapper)
     // Filter out stops with no departures
-    .filter(stop => !!stop.routes.length);
+    .filter((stop) => !!stop.routes.length);
 
   const {
     projectedStops,
@@ -181,7 +181,7 @@ const nearbyItemsMapper = mapProps(props => {
   // Calculate distances to sale points and get the nearest one
   const nearestSalePoint = props.showSalesPoint
     ? projectedSalePoints
-        .map(sp => {
+        .map((sp) => {
           // Euclidean distance
           const distance = haversine(
             { latitude: sp.lat, longitude: sp.lon },
@@ -194,7 +194,7 @@ const nearbyItemsMapper = mapProps(props => {
     : null;
 
   const projectedSalesPoints = [];
-  props.salePoints.forEach(salePoint => {
+  props.salePoints.forEach((salePoint) => {
     if (
       salePoint.lon > minLon &&
       salePoint.lon < maxLon &&
@@ -259,7 +259,7 @@ const mapPositionQuery = gql`
   }
 `;
 
-const mapInterestsMapper = mapProps(props => {
+const mapInterestsMapper = mapProps((props) => {
   const { stop, terminal } = props.data;
   // Use either stop or terminal information, depending on which query has succeeded.
   const longitude = stop ? stop.lon : terminal.lon;
@@ -321,7 +321,7 @@ const getSalePoints = () => {
     });
 };
 
-const fetchOSMObjects = async props => {
+const fetchOSMObjects = async (props) => {
   let results;
   try {
     const osmData = await fetch(
@@ -334,7 +334,7 @@ const fetchOSMObjects = async props => {
   return results;
 };
 
-const osmPointsMapper = mapProps(props => {
+const osmPointsMapper = mapProps((props) => {
   const subwayEntrances = fetchOSMObjects(props);
   return {
     ...props,
@@ -342,7 +342,7 @@ const osmPointsMapper = mapProps(props => {
   };
 });
 
-const salePointsMapper = mapProps(props => {
+const salePointsMapper = mapProps((props) => {
   // If sales points are not configured, do not fetch them but return empty array
   const salePoints = props.showSalesPoint ? getSalePoints() : Promise.resolve([]);
   return {

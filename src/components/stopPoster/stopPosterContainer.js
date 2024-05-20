@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import compose from 'recompose/compose';
 import withProps from 'recompose/withProps';
 import flatMap from 'lodash/flatMap';
@@ -39,27 +39,27 @@ const stopPosterQuery = gql`
   }
 `;
 
-const propsMapper = withProps(props => {
-  const routeSegments = flatMap(props.data.stop.siblings.nodes, node =>
+const propsMapper = withProps((props) => {
+  const routeSegments = flatMap(props.data.stop.siblings.nodes, (node) =>
     node.routeSegments.nodes
-      .filter(routeSegment => routeSegment.hasRegularDayDepartures)
-      .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
-      .filter(routeSegment => !isDropOffOnly(routeSegment))
-      .filter(routeSegment =>
+      .filter((routeSegment) => routeSegment.hasRegularDayDepartures)
+      .filter((routeSegment) => !isNumberVariant(routeSegment.routeId))
+      .filter((routeSegment) => !isDropOffOnly(routeSegment))
+      .filter((routeSegment) =>
         filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter }),
       ),
   );
 
-  const routeIds = routeSegments.map(routeSegment => trimRouteId(routeSegment.routeId));
-  const modes = flatMap(routeSegments, node => node.route.nodes.map(route => route.mode));
+  const routeIds = routeSegments.map((routeSegment) => trimRouteId(routeSegment.routeId));
+  const modes = flatMap(routeSegments, (node) => node.route.nodes.map((route) => route.mode));
   return {
     shortId: props.data.stop.shortId,
     hasRoutes: routeIds.length > 0,
     isTrunkStop: routeSegments.some(
-      routeSegment => routeSegment.line.nodes && routeSegment.line.nodes[0].trunkRoute === '1',
+      (routeSegment) => routeSegment.line.nodes && routeSegment.line.nodes[0].trunkRoute === '1',
     ),
-    isTramStop: modes.some(mode => mode === 'TRAM'),
-    isLightRail: modes.some(mode => mode === 'L_RAIL'),
+    isTramStop: modes.some((mode) => mode === 'TRAM'),
+    isLightRail: modes.some((mode) => mode === 'L_RAIL'),
   };
 });
 

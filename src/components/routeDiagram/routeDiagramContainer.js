@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import compose from 'recompose/compose';
 import mapProps from 'recompose/mapProps';
 import flatMap from 'lodash/flatMap';
@@ -93,28 +93,28 @@ const nodeToStop = ({ stopByStopId }) => {
   const transferModes = flatMap(
     terminalByTerminalId.siblings.nodes,
     // Filter out bus terminals, until we have more specs how to handle those
-    sibling => sibling.modes.nodes.filter(mode => mode !== 'BUS'),
+    (sibling) => sibling.modes.nodes.filter((mode) => mode !== 'BUS'),
   );
   return { ...stop, transferModes };
 };
 
-const propsMapper = mapProps(props => {
-  const routes = flatMap(props.data.stops.nodes, s =>
-    flatMap(s.siblings.nodes, stop =>
+const propsMapper = mapProps((props) => {
+  const routes = flatMap(props.data.stops.nodes, (s) =>
+    flatMap(s.siblings.nodes, (stop) =>
       stop.routeSegments.nodes
         // Select regular routes that allow boarding from current stop
-        .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
-        .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
-        .filter(routeSegment => !isDropOffOnly(routeSegment))
-        .filter(routeSegment =>
+        .filter((routeSegment) => routeSegment.hasRegularDayDepartures === true)
+        .filter((routeSegment) => !isNumberVariant(routeSegment.routeId))
+        .filter((routeSegment) => !isDropOffOnly(routeSegment))
+        .filter((routeSegment) =>
           filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter }),
         )
-        .map(routeSegment => ({
+        .map((routeSegment) => ({
           ...routeSegment.route.nodes[0],
           routeId: trimRouteId(routeSegment.routeId),
           trunkRoute: routeSegment.line.nodes[0].trunkRoute === '1',
           // List all stops (including drop-off only) for each route
-          stops: sortBy(routeSegment.nextStops.nodes, node => node.stopIndex).map(nodeToStop),
+          stops: sortBy(routeSegment.nextStops.nodes, (node) => node.stopIndex).map(nodeToStop),
         })),
     ),
   );

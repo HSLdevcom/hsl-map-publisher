@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import compose from 'recompose/compose';
 import mapProps from 'recompose/mapProps';
 import apolloWrapper from 'util/apolloWrapper';
@@ -27,7 +27,7 @@ const headerQuery = gql`
   }
 `;
 
-const propsMapper = mapProps(props => {
+const propsMapper = mapProps((props) => {
   const { stop, terminal } = props.data;
   // Get the details from stop or terminal depending on how the query returned data
   const { shortId, nameFi, nameSe } = stop || terminal;

@@ -1,7 +1,6 @@
-/* eslint-disable no-undef */
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import mapProps from 'recompose/mapProps';
 import compose from 'recompose/compose';
 import { filter, forEach, isEmpty, uniqBy, uniqWith } from 'lodash';

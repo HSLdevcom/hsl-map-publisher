@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import { ApolloClient } from 'apollo-client';
-import { createHttpLink } from 'apollo-link-http';
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import { ApolloProvider } from 'react-apollo';
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import get from 'lodash/get';
 
 import StopPoster from 'components/stopPoster/stopPosterContainer';
@@ -28,7 +25,7 @@ const components = {
 const graphqlUrl = process.env.JORE_GRAPHQL_URL || 'https://kartat.hsl.fi/jore/graphql';
 
 const client = new ApolloClient({
-  link: createHttpLink({ uri: graphqlUrl }),
+  uri: graphqlUrl,
   cache: new InMemoryCache(),
 });
 
@@ -50,7 +47,7 @@ class App extends Component {
 
   async componentDidMount() {
     if (this.root) {
-      renderQueue.onEmpty(error => {
+      renderQueue.onEmpty((error) => {
         if (error) {
           App.handleError(error);
           return;
@@ -139,9 +136,10 @@ class App extends Component {
     return (
       <div
         style={rootStyle}
-        ref={ref => {
+        ref={(ref) => {
           this.root = ref;
-        }}>
+        }}
+      >
         <ApolloProvider client={client}>
           <ComponentToRender {...propsToPass} standalone template={template} />
         </ApolloProvider>
