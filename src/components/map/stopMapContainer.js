@@ -134,6 +134,7 @@ const stopsMapper = (stopGroup) => ({
         };
       }),
   ).sort(routeCompare),
+  stops: stopGroup.stops.nodes,
 });
 
 const nearbyItemsMapper = mapProps((props) => {

@@ -338,7 +338,7 @@ const StopMap = (props) => {
           {stops.map((stop, index) => (
             <ItemFixed key={index} top={stop.y - STOP_RADIUS} left={stop.x - STOP_RADIUS}>
               <StopSymbol
-                platform={stop.stops.nodes[0].platform}
+                platform={stop.stops[0].platform}
                 routes={stop.routes}
                 size={STOP_RADIUS * 2}
               />
@@ -351,7 +351,7 @@ const StopMap = (props) => {
               left={props.currentStop.x - STOP_RADIUS}
             >
               <StopSymbol
-                platform={props.currentStop.stops.nodes[0].platform}
+                platform={props.currentStop.stops[0].platform}
                 routes={props.currentStop.routes}
                 size={STOP_RADIUS * 2}
               />

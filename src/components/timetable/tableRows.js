@@ -8,7 +8,7 @@ import { uniqBy } from 'lodash';
 
 import styles from './tableRows.css';
 
-const Departure = props => (
+const Departure = (props) => (
   <div className={styles.item}>
     <div className={styles.minutes}>
       {props.minutes < 10 && '0'}
@@ -29,11 +29,11 @@ Departure.propTypes = {
   note: PropTypes.string,
 };
 
-const TableRow = props => (
+const TableRow = (props) => (
   <Row>
     <div className={styles.hours}>{props.hours}</div>
     <WrappingRow>
-      {sortBy(props.departures, a => a.minutes).map((departure, index) => (
+      {sortBy(props.departures, (a) => a.minutes).map((departure, index) => (
         <Departure key={index} {...departure} />
       ))}
     </WrappingRow>
@@ -86,21 +86,21 @@ const getDuplicateCutOff = (startIndex, rows) => {
   return cutOffIndex;
 };
 
-const filterDuplicateDepartureHours = departureRows => {
+const filterDuplicateDepartureHours = (departureRows) => {
   return uniqBy(departureRows, 'departures');
 };
 
-const TableRows = props => {
+const TableRows = (props) => {
   const departuresByHour = groupBy(
     props.departures,
-    departure => (departure.isNextDay ? 24 : 0) + departure.hours,
+    (departure) => (departure.isNextDay ? 24 : 0) + departure.hours,
   );
   const rows = Object.entries(departuresByHour).map(([hours, departures]) => ({
     hour: hours,
     departures,
   }));
 
-  const formatHour = hour => `${hour % 24 < 10 ? '0' : ''}${hour % 24}`;
+  const formatHour = (hour) => `${hour % 24 < 10 ? '0' : ''}${hour % 24}`;
 
   const rowsByHour = [];
   for (let i = 0; i < rows.length; i++) {
@@ -132,9 +132,11 @@ const TableRows = props => {
 
   return (
     <div className={styles.root}>
-      {filteredDepartures.map(departuresHour => (
+      {filteredDepartures.map((departuresHour) => (
         <TableRow
-          key={`${departuresHour.hour}${departuresHour.departures}`}
+          key={`${departuresHour.hour}${departuresHour.departures
+            .map((d) => Object.values(d).join('-'))
+            .join('-')}`}
           hours={departuresHour.hour}
           departures={departuresHour.departures}
         />
