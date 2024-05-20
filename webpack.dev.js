@@ -10,5 +10,8 @@ module.exports = merge.smart(webpackCommon, {
   devServer: {
     port: PORT,
     hot: true,
+    client: {
+      overlay: false,
+    },
   },
 });

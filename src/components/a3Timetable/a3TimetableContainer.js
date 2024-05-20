@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import mapProps from 'recompose/mapProps';
 import compose from 'recompose/compose';
 import find from 'lodash/find';
@@ -17,7 +17,7 @@ import A3Timetable from './a3Timetable';
 function filterDepartures(departures, routeSegments, routeFilter) {
   return departures
     .filter(
-      departure =>
+      (departure) =>
         !isDropOffOnly(
           find(routeSegments, {
             routeId: departure.routeId,
@@ -25,16 +25,16 @@ function filterDepartures(departures, routeSegments, routeFilter) {
           }),
         ),
     )
-    .filter(departure => filterRoute({ routeId: departure.routeId, filter: routeFilter }));
+    .filter((departure) => filterRoute({ routeId: departure.routeId, filter: routeFilter }));
 }
 
 function groupDepartures(departures) {
   return {
-    weekdays: departures.filter(departure =>
-      departure.dayType.some(day => ['Ma', 'Ti', 'Ke', 'To', 'Pe'].includes(day)),
+    weekdays: departures.filter((departure) =>
+      departure.dayType.some((day) => ['Ma', 'Ti', 'Ke', 'To', 'Pe'].includes(day)),
     ),
-    saturdays: departures.filter(departure => departure.dayType.includes('La')),
-    sundays: departures.filter(departure => departure.dayType.includes('Su')),
+    saturdays: departures.filter((departure) => departure.dayType.includes('La')),
+    sundays: departures.filter((departure) => departure.dayType.includes('Su')),
   };
 }
 
@@ -69,7 +69,7 @@ function getNotes(isSummerTimetable) {
             (noteType.includes('V') || noteType.includes(isSummerTimetable ? 'K' : 'T'))
           );
         })
-        .map(note => {
+        .map((note) => {
           const noteText = note.noteText || '';
           return noteText.replace(/^(p|pe)(\s=)?\s/, 'pe = ').replace('s', `'s`);
         })
@@ -162,12 +162,12 @@ function modifyNote(departureNote) {
   }
 }
 
-const propsMapper = mapProps(props => {
-  let departures = flatMap(props.data.stop.siblings.nodes, stop =>
+const propsMapper = mapProps((props) => {
+  let departures = flatMap(props.data.stop.siblings.nodes, (stop) =>
     filterDepartures(stop.departures.nodes, stop.routeSegments.nodes, props.routeFilter),
   );
 
-  let notes = flatMap(props.data.stop.siblings.nodes, stop =>
+  let notes = flatMap(props.data.stop.siblings.nodes, (stop) =>
     flatMap(stop.routeSegments.nodes, getNotes(props.isSummerTimetable)),
   );
   // if (props.data.stop.siblings.nodes.some(stop =>
@@ -182,15 +182,15 @@ const propsMapper = mapProps(props => {
   // Search for routes with two different destinations from the same stop and add notes for them
   Object.values(
     groupBy(
-      flatMap(props.data.stop.siblings.nodes, stop => stop.routeSegments.nodes).filter(
-        route => route.hasRegularDayDepartures && !isDropOffOnly(route),
+      flatMap(props.data.stop.siblings.nodes, (stop) => stop.routeSegments.nodes).filter(
+        (route) => route.hasRegularDayDepartures && !isDropOffOnly(route),
       ),
-      route => route.routeId,
+      (route) => route.routeId,
     ),
   )
-    .filter(routes => routes.length > 1)
-    .forEach(directions =>
-      directions.forEach(direction => {
+    .filter((routes) => routes.length > 1)
+    .forEach((directions) =>
+      directions.forEach((direction) => {
         const noteSymbol = `${trimRouteId(direction.routeId)}${'*'.repeat(direction.direction)}`;
         if (!specialSymbols.includes(noteSymbol)) {
           specialSymbols.push(noteSymbol);
@@ -204,17 +204,17 @@ const propsMapper = mapProps(props => {
       }),
     );
 
-  departures.forEach(departure => {
+  departures.forEach((departure) => {
     if (departure.note && !specialSymbols.includes(departure.note)) {
       specialSymbols.push(departure.note);
     }
   });
 
-  if (departures.some(departure => departure.routeId.includes('H'))) {
+  if (departures.some((departure) => departure.routeId.includes('H'))) {
     specialSymbols.push('H');
   }
 
-  departures = departures.map(departure => ({
+  departures = departures.map((departure) => ({
     ...departure,
     note: modifyNote(
       [
@@ -229,13 +229,13 @@ const propsMapper = mapProps(props => {
   const { weekdays, saturdays, sundays } = pick(groupDepartures(departures), props.segments);
   const dateBegin =
     props.dateBegin ||
-    flatMap(props.data.stop.siblings.nodes, stop =>
-      stop.departures.nodes.map(departure => departure.dateBegin),
+    flatMap(props.data.stop.siblings.nodes, (stop) =>
+      stop.departures.nodes.map((departure) => departure.dateBegin),
     ).sort((a, b) => b.localeCompare(a))[0];
   const dateEnd =
     props.dateEnd ||
-    flatMap(props.data.stop.siblings.nodes, stop =>
-      stop.departures.nodes.map(departure => departure.dateEnd),
+    flatMap(props.data.stop.siblings.nodes, (stop) =>
+      stop.departures.nodes.map((departure) => departure.dateEnd),
     ).sort((a, b) => a.localeCompare(b))[0];
   return {
     weekdays,

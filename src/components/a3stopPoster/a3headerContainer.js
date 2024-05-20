@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import compose from 'recompose/compose';
 import mapProps from 'recompose/mapProps';
 import flatMap from 'lodash/flatMap';
@@ -45,18 +45,18 @@ const routesQuery = gql`
   }
 `;
 
-const propsMapper = mapProps(props => ({
+const propsMapper = mapProps((props) => ({
   variables: props.data.variables,
   stop: props.data.stop,
-  routes: flatMap(props.data.stop.siblings.nodes, node =>
+  routes: flatMap(props.data.stop.siblings.nodes, (node) =>
     node.routeSegments.nodes
-      .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
-      .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
-      .filter(routeSegment => !isDropOffOnly(routeSegment))
-      .filter(routeSegment =>
+      .filter((routeSegment) => routeSegment.hasRegularDayDepartures === true)
+      .filter((routeSegment) => !isNumberVariant(routeSegment.routeId))
+      .filter((routeSegment) => !isDropOffOnly(routeSegment))
+      .filter((routeSegment) =>
         filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter }),
       )
-      .map(routeSegment => ({
+      .map((routeSegment) => ({
         ...routeSegment.route.nodes[0],
         viaFi: routeSegment.viaFi,
         viaSe: routeSegment.viaSe,
@@ -69,7 +69,7 @@ const propsMapper = mapProps(props => ({
 
 const hoc = compose(graphql(routesQuery), apolloWrapper(propsMapper));
 
-export default component => {
+export default (component) => {
   const A3HeaderContainer = hoc(component);
 
   A3HeaderContainer.propTypes = {
