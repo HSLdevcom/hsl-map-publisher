@@ -17,7 +17,7 @@ class Path extends Component {
   hasTerminalId = branch => {
     let foundTerminalId = false;
     branch.items.forEach(item => {
-      if (item.terminalId && item.routeSegments.nodes.length > 1) {
+      if (item.terminalId && item.routeSegments.length > 1) {
         foundTerminalId = true;
       }
     });

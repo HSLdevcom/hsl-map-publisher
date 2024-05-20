@@ -56,6 +56,12 @@ const routeDiagramQuery = gql`
                               mode
                             }
                           }
+                          line {
+                            nodes {
+                              lineId
+                              trunkRoute
+                            }
+                          }
                         }
                       }
                       terminalByTerminalId {
