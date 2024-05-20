@@ -5,7 +5,7 @@ const PORT = process.env.PORT || 5000;
 
 module.exports = merge.smart(webpackCommon, {
   mode: 'development',
-  devtool: 'cheap-module-eval-source-map',
+  devtool: 'eval-cheap-module-source-map',
 
   devServer: {
     port: PORT,

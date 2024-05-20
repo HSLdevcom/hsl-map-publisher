@@ -22,7 +22,7 @@ cleanup(() => {
 
 function convertKeys(object, converter) {
   const obj = {};
-  Object.keys(object).forEach(key => {
+  Object.keys(object).forEach((key) => {
     obj[converter(key)] = object[key];
   });
   return obj;
@@ -46,7 +46,7 @@ async function getBuilds() {
     .orderBy('build.created_at', 'desc')
     .groupBy('build.id');
 
-  return rows.map(row => convertKeys(row, camelCase));
+  return rows.map((row) => convertKeys(row, camelCase));
 }
 
 async function getBuild({ id }) {
@@ -87,8 +87,8 @@ async function getBuild({ id }) {
     .groupBy('poster.id');
 
   const build = convertKeys(buildRow, camelCase);
-  const posters = posterRows.map(row => convertKeys(row, camelCase));
-  return Object.assign({}, build, { posters });
+  const posters = posterRows.map((row) => convertKeys(row, camelCase));
+  return { ...build, posters };
 }
 
 async function addBuild({ title }) {
@@ -101,16 +101,12 @@ async function addBuild({ title }) {
 }
 
 async function updateBuild({ id, status }) {
-  await knex('build')
-    .where({ id })
-    .update({ status, updated_at: knex.fn.now() });
+  await knex('build').where({ id }).update({ status, updated_at: knex.fn.now() });
   return { id };
 }
 
 async function removeBuild({ id }) {
-  await knex('build')
-    .where({ id })
-    .update({ status: 'REMOVED', updated_at: knex.fn.now() });
+  await knex('build').where({ id }).update({ status: 'REMOVED', updated_at: knex.fn.now() });
   return { id };
 }
 
@@ -145,17 +141,13 @@ async function addPoster({ buildId, component, template, props, order }) {
     ),
     order,
   });
-  await knex('build')
-    .where('id', buildId)
-    .update({ updated_at: knex.fn.now() });
+  await knex('build').where('id', buildId).update({ updated_at: knex.fn.now() });
 
   return { id };
 }
 
 async function updatePoster({ id, status }) {
-  await knex('poster')
-    .where({ id })
-    .update({ status, updated_at: knex.fn.now() });
+  await knex('poster').where({ id }).update({ status, updated_at: knex.fn.now() });
   return { id };
 }
 
@@ -164,9 +156,7 @@ async function removePoster({ id }) {
     .returning('build_id')
     .where({ id })
     .update({ status: 'REMOVED', updated_at: knex.fn.now() });
-  await knex('build')
-    .where('id', buildId[0].build_id)
-    .update({ updated_at: knex.fn.now() });
+  await knex('build').where('id', buildId[0].build_id).update({ updated_at: knex.fn.now() });
   return { id };
 }
 
@@ -197,11 +187,7 @@ async function getTemplateImage(slot) {
     return emptySlot;
   }
 
-  const dbImg = await knex
-    .select('*')
-    .from('template_images')
-    .where({ name: imageName })
-    .first();
+  const dbImg = await knex.select('*').from('template_images').where({ name: imageName }).first();
 
   if (dbImg) {
     return merge({}, slot, { image: dbImg });
@@ -216,19 +202,17 @@ async function getTemplateImages(template) {
   }
 
   return merge({}, template, {
-    areas: await pMap(template.areas, async area =>
+    areas: await pMap(template.areas, async (area) =>
       merge({}, area, {
-        slots: await pMap(area.slots, slot => getTemplateImage(slot)),
+        slots: await pMap(area.slots, (slot) => getTemplateImage(slot)),
       }),
     ),
   });
 }
 
 async function getTemplates() {
-  const templates = await knex('template')
-    .select('*')
-    .orderBy('created_at', 'asc');
-  return pMap(templates, template => getTemplateImages(template));
+  const templates = await knex('template').select('*').orderBy('created_at', 'asc');
+  return pMap(templates, (template) => getTemplateImages(template));
 }
 
 async function addTemplate({ label }) {
@@ -241,11 +225,7 @@ async function addTemplate({ label }) {
 }
 
 async function getTemplate({ id }, withImages = true) {
-  const templateRow = await knex
-    .select('*')
-    .from('template')
-    .where({ id })
-    .first();
+  const templateRow = await knex.select('*').from('template').where({ id }).first();
 
   if (!withImages) {
     return templateRow;
@@ -256,7 +236,7 @@ async function getTemplate({ id }, withImages = true) {
 
 // Not exported. Saves the passed images into the database.
 async function saveAreaImages(slots) {
-  return pMap(slots, async slot => {
+  return pMap(slots, async (slot) => {
     if (!slot.image) {
       return slot;
     }
@@ -297,7 +277,7 @@ async function saveTemplate(template) {
   const { id } = template;
   const existingTemplate = await getTemplate({ id }, false);
 
-  const savedAreas = await pMap(template.areas, async area =>
+  const savedAreas = await pMap(template.areas, async (area) =>
     merge({}, area, {
       slots: await saveAreaImages(area.slots),
     }),
@@ -325,37 +305,31 @@ async function removeTemplate({ id }) {
     throw error;
   }
 
-  await knex('template')
-    .where({ id })
-    .del();
+  await knex('template').where({ id }).del();
 
   return { id };
 }
 
 async function getImages() {
-  return knex('template_images')
-    .select('*')
-    .orderBy('updated_at', 'asc');
+  return knex('template_images').select('*').orderBy('updated_at', 'asc');
 }
 
 function templateHasImage(template, imageName) {
-  return template.areas.some(area =>
-    area.slots.some(slot => get(slot, 'image.name', '_') === imageName),
+  return template.areas.some((area) =>
+    area.slots.some((slot) => get(slot, 'image.name', '_') === imageName),
   );
 }
 
 async function removeImage({ name }) {
   const templates = await knex('template').select('*');
 
-  if (templates.some(template => templateHasImage(template, name))) {
+  if (templates.some((template) => templateHasImage(template, name))) {
     const error = new Error(`Image '${name}' is in use in one or more templates!`);
     error.status = 400;
     throw error;
   }
 
-  await knex('template_images')
-    .where({ name })
-    .del();
+  await knex('template_images').where({ name }).del();
 
   return { name };
 }
@@ -398,9 +372,9 @@ async function getStopInfo({ stopId, date }) {
   const stopData = await response.json();
   const { stop } = stopData.data;
 
-  const routeSegments = flatMap(stop.siblings.nodes, node => node.routeSegments.nodes);
-  const routeIds = routeSegments.map(routeSegment => routeSegment.routeId);
-  const modes = flatMap(routeSegments, node => node.route.nodes.map(route => route.mode));
+  const routeSegments = flatMap(stop.siblings.nodes, (node) => node.routeSegments.nodes);
+  const routeIds = routeSegments.map((routeSegment) => routeSegment.routeId);
+  const modes = flatMap(routeSegments, (node) => node.route.nodes.map((route) => route.mode));
   const city = stop.shortId.match(/^[a-zA-Z]*/)[0]; // Get the first letters of the id.
   const { stopZone } = stop;
 
