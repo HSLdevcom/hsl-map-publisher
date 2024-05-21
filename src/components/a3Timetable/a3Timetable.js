@@ -18,6 +18,120 @@ const SEGMENT_NAMES = {
   sundays: 'Sunnuntai',
 };
 
+const defaultColumns = (props) => {
+  const { weekdays, saturdays, sundays } = props;
+  const segments = [weekdays, saturdays, sundays];
+  const departuresLength = segments
+    .flat()
+    .reduce((acc, element) => acc + element.departures.length, 0);
+  const useSingleColumn = departuresLength < SINGLE_COLUMN_MIN_DEPARTURES;
+  let departures = [];
+  for (let i = 0; i < segments.length; i++) {
+    const segment = segments[i];
+    if (segment.length > 0) {
+      if (useSingleColumn) {
+        departures = departures.concat(segment);
+      } else {
+        departures.push(segment);
+      }
+    }
+  }
+
+  return useSingleColumn ? [departures] : departures;
+};
+
+const getZoneLetterStyle = (zone) => ({
+  transform:
+    zone === 'B'
+      ? 'translate(calc(-50%), calc(-50% + 2px))'
+      : zone === 'C'
+        ? 'translate(calc(-50% - 2px), calc(-50% + 2px))'
+        : zone === 'D'
+          ? 'translate(calc(-50% + 2px), calc(-50% + 2px))'
+          : 'translate(-50%, -50%)', // No px adjustments for zone A and the "else" case.
+});
+
+const getNotes = (notes, symbols) => {
+  const parsedNotes = [];
+  symbols.forEach((symbol) => {
+    notes.forEach((note) => {
+      if (note.substring(0, symbol.length) === symbol && !parsedNotes.includes(note)) {
+        parsedNotes.push(note);
+      }
+    });
+  });
+  return parsedNotes;
+};
+
+const nullOrEmpty = (arr) => !arr || arr.length === 0;
+
+const rowsByHour = (rowDepartures) => {
+  const departuresByHour = groupBy(
+    rowDepartures,
+    (departure) => (departure.isNextDay ? 24 : 0) + departure.hours,
+  );
+  const rows = Object.entries(departuresByHour).map(([hours, departures]) => ({
+    hour: hours,
+    departures,
+  }));
+
+  const isEqualDepartureHour = (a, b) => {
+    if (!a || !b) {
+      return false;
+    }
+    if (a.length !== b.length) {
+      return false;
+    }
+
+    for (let i = 0; i < a.length; i++) {
+      const curA = a[i];
+      const curB = b[i];
+
+      if (!curA || !curB) {
+        return false;
+      }
+
+      if (curA.minutes !== curB.minutes) {
+        return false;
+      }
+      if (curA.note !== curB.note) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const formatHour = (hour) => `${hour % 24 < 10 ? '0' : ''}${hour % 24}`;
+
+  const getDuplicateCutOff = (startIndex, rowArray) => {
+    const startRow = rowArray[startIndex];
+    let cutOffIndex = startIndex;
+    for (let i = startIndex; i < rowArray.length; i++) {
+      const cur = rowArray[i];
+      if (!isEqualDepartureHour(startRow.departures, cur.departures)) {
+        return cutOffIndex;
+      }
+      cutOffIndex = i;
+    }
+    return cutOffIndex;
+  };
+
+  const rowsByHourArr = [];
+  for (let i = 0; i < rows.length; i++) {
+    const cutOff = getDuplicateCutOff(i, rows);
+    const hours =
+      rows[i].hour === rows[cutOff].hour
+        ? `${formatHour(rows[i].hour)}`
+        : `${formatHour(rows[i].hour)}-${formatHour(rows[cutOff].hour)}`;
+    rowsByHourArr.push({
+      hour: hours,
+      departures: rows[i].departures,
+    });
+    i = cutOff;
+  }
+  return rowsByHourArr;
+};
+
 class Timetable extends Component {
   constructor(props) {
     super(props);
@@ -31,14 +145,13 @@ class Timetable extends Component {
       },
       diagramRetries: this.props.groupedRows ? MAX_DIAGRAM_RETRIES : 0,
     };
+    renderQueue.add(this);
   }
 
   componentDidMount() {
-    renderQueue.add(this);
-    let departures = [];
-    const weekdays = this.rowsByHour(this.props.weekdays);
-    const saturdays = this.rowsByHour(this.props.saturdays);
-    const sundays = this.rowsByHour(this.props.sundays);
+    const weekdays = rowsByHour(this.props.weekdays);
+    const saturdays = rowsByHour(this.props.saturdays);
+    const sundays = rowsByHour(this.props.sundays);
 
     if (weekdays.length > 0) {
       weekdays[0].segment = SEGMENT_NAMES.weekdays;
@@ -49,18 +162,15 @@ class Timetable extends Component {
     if (sundays.length > 0) {
       sundays[0].segment = SEGMENT_NAMES.sundays;
     }
-    departures = this.props.groupedRows
+    const departures = this.props.groupedRows
       ? this.props.groupedRows
-      : this.defaultColumns({ weekdays, saturdays, sundays });
+      : defaultColumns({ weekdays, saturdays, sundays });
 
     this.setState({
       weekdays: {
         removedRows: [],
         groupedRows: departures,
       },
-    });
-    renderQueue.onEmpty((error) => !error && this.updateLayout(), {
-      ignore: this,
     });
   }
 
@@ -75,120 +185,6 @@ class Timetable extends Component {
   onError(error) {
     renderQueue.remove(this, { error: new Error(error) });
   }
-
-  defaultColumns = (props) => {
-    const { weekdays, saturdays, sundays } = props;
-    const segments = [weekdays, saturdays, sundays];
-    const departuresLength = segments
-      .flat()
-      .reduce((acc, element) => acc + element.departures.length, 0);
-    const useSingleColumn = departuresLength < SINGLE_COLUMN_MIN_DEPARTURES;
-    let departures = [];
-    for (let i = 0; i < segments.length; i++) {
-      const segment = segments[i];
-      if (segment.length > 0) {
-        if (useSingleColumn) {
-          departures = departures.concat(segment);
-        } else {
-          departures.push(segment);
-        }
-      }
-    }
-
-    return useSingleColumn ? [departures] : departures;
-  };
-
-  getZoneLetterStyle = (zone) => ({
-    transform:
-      zone === 'B'
-        ? 'translate(calc(-50%), calc(-50% + 2px))'
-        : zone === 'C'
-          ? 'translate(calc(-50% - 2px), calc(-50% + 2px))'
-          : zone === 'D'
-            ? 'translate(calc(-50% + 2px), calc(-50% + 2px))'
-            : 'translate(-50%, -50%)', // No px adjustments for zone A and the "else" case.
-  });
-
-  getNotes = (notes, symbols) => {
-    const parsedNotes = [];
-    symbols.forEach((symbol) => {
-      notes.forEach((note) => {
-        if (note.substring(0, symbol.length) === symbol && !parsedNotes.includes(note)) {
-          parsedNotes.push(note);
-        }
-      });
-    });
-    return parsedNotes;
-  };
-
-  nullOrEmpty = (arr) => !arr || arr.length === 0;
-
-  rowsByHour = (rowDepartures) => {
-    const departuresByHour = groupBy(
-      rowDepartures,
-      (departure) => (departure.isNextDay ? 24 : 0) + departure.hours,
-    );
-    const rows = Object.entries(departuresByHour).map(([hours, departures]) => ({
-      hour: hours,
-      departures,
-    }));
-
-    const isEqualDepartureHour = (a, b) => {
-      if (!a || !b) {
-        return false;
-      }
-      if (a.length !== b.length) {
-        return false;
-      }
-
-      for (let i = 0; i < a.length; i++) {
-        const curA = a[i];
-        const curB = b[i];
-
-        if (!curA || !curB) {
-          return false;
-        }
-
-        if (curA.minutes !== curB.minutes) {
-          return false;
-        }
-        if (curA.note !== curB.note) {
-          return false;
-        }
-      }
-      return true;
-    };
-
-    const formatHour = (hour) => `${hour % 24 < 10 ? '0' : ''}${hour % 24}`;
-
-    const getDuplicateCutOff = (startIndex, rowArray) => {
-      const startRow = rowArray[startIndex];
-      let cutOffIndex = startIndex;
-      for (let i = startIndex; i < rowArray.length; i++) {
-        const cur = rowArray[i];
-        if (!isEqualDepartureHour(startRow.departures, cur.departures)) {
-          return cutOffIndex;
-        }
-        cutOffIndex = i;
-      }
-      return cutOffIndex;
-    };
-
-    const rowsByHourArr = [];
-    for (let i = 0; i < rows.length; i++) {
-      const cutOff = getDuplicateCutOff(i, rows);
-      const hours =
-        rows[i].hour === rows[cutOff].hour
-          ? `${formatHour(rows[i].hour)}`
-          : `${formatHour(rows[i].hour)}-${formatHour(rows[cutOff].hour)}`;
-      rowsByHourArr.push({
-        hour: hours,
-        departures: rows[i].departures,
-      });
-      i = cutOff;
-    }
-    return rowsByHourArr;
-  };
 
   hasOverflow() {
     if (!this.content) {
@@ -237,14 +233,12 @@ class Timetable extends Component {
           break;
         }
       }
-      renderQueue.remove(this);
       this.props.updateHook(weekdays.groupedRows);
       return;
     }
 
     // If everything ok and using diagram remove process from queue and return
     if (allOk && this.state.useDiagram) {
-      renderQueue.remove(this);
       this.props.updateHook(weekdays.groupedRows);
       return;
     }
@@ -308,17 +302,20 @@ class Timetable extends Component {
         weekdays,
       });
     }
+    window.setTimeout(() => {
+      renderQueue.remove(this);
+    }, 1000);
   }
 
   render() {
     const allNullOrEmpty =
-      this.nullOrEmpty(this.props.weekdays) &&
-      this.nullOrEmpty(this.props.saturdays) &&
-      this.nullOrEmpty(this.props.sundays);
+      nullOrEmpty(this.props.weekdays) &&
+      nullOrEmpty(this.props.saturdays) &&
+      nullOrEmpty(this.props.sundays);
     if (allNullOrEmpty) {
       return null;
     }
-    const weekdaysRows = this.rowsByHour(this.state.weekdays);
+    const weekdaysRows = rowsByHour(this.state.weekdays);
     const chunkedRows = chunk(this.state.weekdays.groupedRows, COLUMNS_PER_PAGE);
     // Header is excluded from first page.
     const contentContainerStyle = { height: PAGE_HEIGHT - 97 };
@@ -344,10 +341,7 @@ class Timetable extends Component {
               <div className={styles.zoneTitle}>Vyöhyke</div>
               <div className={styles.zoneSubtitle}>Zon/Zone</div>
               <div className={styles.zone}>
-                <span
-                  className={styles.zoneLetter}
-                  style={this.getZoneLetterStyle(this.props.stopZone)}
-                >
+                <span className={styles.zoneLetter} style={getZoneLetterStyle(this.props.stopZone)}>
                   {this.props.stopZone}
                 </span>
               </div>
@@ -401,7 +395,7 @@ class Timetable extends Component {
 
         {/* {this.props.showNotes && this.props.notes.length !== 0 && <Spacer height={20} />}
         {this.props.showNotes &&
-          this.getNotes(this.props.notes, this.props.specialSymbols).map(note => (
+          getNotes(this.props.notes, this.props.specialSymbols).map(note => (
             <div key={note} className={styles.footnote}>
               {note}
             </div>
