@@ -60,13 +60,25 @@ function routesToTree(routes, { stopZone, shortId }, height = 'auto', width = MA
 
   const itemLists = routes.map(route =>
     route.stops.map((stop, index, stops) => {
-      const item = { ...stop, type: 'stop', zone: stop.stopZone };
+      const item = {
+        ...stop,
+        type: 'stop',
+        zone: stop.stopZone,
+        routeSegments: stop.routeSegments.nodes.map(segment => {
+          const trunkRoute = segment.line.nodes[0].trunkRoute === '1';
+          return {
+            ...segment,
+            trunkRoute,
+          };
+        }),
+      };
       if (index === stops.length - 1) {
         item.destinations = [
           {
             routeId: route.routeId,
             titleFi: route.destinationFi,
             titleSe: route.destinationSe,
+            trunkRoute: route.trunkRoute,
           },
         ];
       }
