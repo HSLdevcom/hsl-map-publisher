@@ -2,11 +2,15 @@ services:
   
   redis:
     image: redis
+    logging:
+      driver: none
     ports:
       - 6379:6379
 
   publisher-postgres:
     image: postgres
+    logging:
+      driver: none
     ports:
       - 5433:5432
     environment:
@@ -39,6 +43,8 @@ services:
   publisher-render:
     image: hsl-map-publisher
     pull_policy: never # use the same build as publisher-server
+    logging:
+      driver: none
     ports:
       - 5000:5000
     environment:
