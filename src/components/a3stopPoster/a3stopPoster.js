@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { JustifiedColumn } from 'components/util';
 import renderQueue from 'util/renderQueue';
 import { colorsByMode } from 'util/domain';
-import { chunk } from 'lodash';
+import { chunk, isEqual } from 'lodash';
 
 import Timetable from 'components/a3Timetable/a3TimetableContainer';
 import Header from './a3header';
@@ -29,12 +29,12 @@ class A3StopPoster extends Component {
       diagramOptions: defaultDiagramOptions,
       pageCount: 1,
     };
+    renderQueue.add(this);
   }
 
   componentDidMount() {
-    renderQueue.add(this);
     this.updateLayout();
-    renderQueue.onEmpty(error => !error && this.updateLayout(), {
+    renderQueue.onEmpty((error) => !error && this.updateLayout(), {
       ignore: this,
     });
   }
@@ -43,7 +43,7 @@ class A3StopPoster extends Component {
     if (this.hasOverflow()) {
       this.updateLayout();
     }
-    renderQueue.onEmpty(error => !error && this.updateLayout(), {
+    renderQueue.onEmpty((error) => !error && this.updateLayout(), {
       ignore: this,
     });
   }
@@ -52,12 +52,13 @@ class A3StopPoster extends Component {
     renderQueue.remove(this, { error: new Error(error) });
   }
 
-  updateHook = groupedRows => {
-    const chunkedRows = chunk(groupedRows, 3);
-    const pageCount = chunkedRows.length;
-
-    this.setState({ groupedRows, pageCount });
-    this.updateLayout();
+  updateHook = (groupedRows) => {
+    if (!isEqual(groupedRows, this.state.groupedRows)) {
+      const chunkedRows = chunk(groupedRows, 3);
+      const pageCount = chunkedRows.length;
+      this.setState({ groupedRows, pageCount });
+      this.updateLayout();
+    }
   };
 
   updateLayout() {
@@ -74,7 +75,7 @@ class A3StopPoster extends Component {
         });
         return;
       }
-      renderQueue.remove(this, { error: new Error('Failed to remove routes overflow') });
+      this.onError('Failed to remove routes overflow');
       return;
     }
     window.setTimeout(() => {
@@ -102,31 +103,13 @@ class A3StopPoster extends Component {
       isSummerTimetable,
       dateBegin,
       dateEnd,
+      routeFilter,
     } = this.props;
 
     if (!hasRoutesProp) {
       return null;
     }
 
-    const printAsA3 = true;
-    const StopPosterTimetable = props => (
-      <Timetable
-        stopId={stopId}
-        date={date}
-        isSummerTimetable={isSummerTimetable}
-        dateBegin={dateBegin}
-        dateEnd={dateEnd}
-        showValidityPeriod={!props.hideDetails}
-        showNotes={!props.hideDetails}
-        showComponentName={!props.hideDetails}
-        segments={props.segments}
-        routeFilter={props.routeFilter}
-        printAsA3={printAsA3}
-        updateHook={props.updateHook}
-        groupedRows={props.groupedRows}
-        diagram={props.diagram}
-      />
-    );
     const containerStyle = {};
     if (isTrunkStop) {
       containerStyle['--background'] = colorsByMode.TRUNK;
@@ -137,26 +120,34 @@ class A3StopPoster extends Component {
       diagramOptions: this.state.diagramOptions,
       stopId,
       date,
-      routeFilter: this.props.routeFilter,
-      printAsA3,
+      routeFilter,
+      printAsA3: true,
     };
     return (
       <div
         className={styles.root}
         style={containerStyle}
-        ref={ref => {
+        ref={(ref) => {
           this.content = ref;
-        }}>
+        }}
+      >
         <JustifiedColumn>
           <div className={styles.content}>
             <Header stopId={stopId} date={date} routeFilter={this.props.routeFilter} />
             <div className={styles.columns}>
               <div className={styles.timetablesContainer}>
                 <div className={styles.timetables}>
-                  <StopPosterTimetable
+                  <Timetable
+                    stopId={stopId}
+                    date={date}
+                    isSummerTimetable={isSummerTimetable}
+                    dateBegin={dateBegin}
+                    dateEnd={dateEnd}
+                    showValidityPeriod={false}
+                    showNotes={false}
+                    showComponentName={false}
                     segments={['weekdays', 'saturdays', 'sundays']}
-                    hideDetails
-                    routeFilter={this.props.routeFilter}
+                    routeFilter={routeFilter}
                     updateHook={this.updateHook}
                     groupedRows={this.state.groupedRows}
                     diagram={diagram}
