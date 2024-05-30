@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { combineConsecutiveDays } from '../timetable/timetableContainer';
 import { Column, Row, WrappingRow } from '../util';
 import LineTableHeader from './lineTableHeader';
 import styles from './lineTableColumns.css';
@@ -58,48 +57,20 @@ DeparturesColumn.propTypes = {
 
 const LineTableColumns = props => {
   const selectedDepartureDays = props.days;
-  const { showDivider } = props;
+  const { showDivider, departuresByStop } = props;
 
-  const mapWeekdayDepartures = props.departures.map(departuresForStop => {
-    const {
-      mondays,
-      tuesdays,
-      wednesdays,
-      thursdays,
-      fridays,
-      saturdays,
-      sundays,
-    } = departuresForStop.departures;
-
-    return {
-      stop: departuresForStop.stop,
-      combinedDays: combineConsecutiveDays({
-        mondays,
-        tuesdays,
-        wednesdays,
-        thursdays,
-        fridays,
-        saturdays,
-        sundays,
-      }),
-    };
-  });
-
-  const departureColums = mapWeekdayDepartures.map((departures, index) => {
-    const hasDepartures = Object.keys(departures.combinedDays).length > 0;
+  const departureColums = departuresByStop.map((departures, index) => {
     return (
       <div>
-        {hasDepartures && (
-          <Column
-            className={classNames(styles.departureColumnContainer, {
-              [styles.wider]: showDivider,
-            })}>
-            <DeparturesColumn
-              departures={departures.combinedDays[selectedDepartureDays]}
-              stop={{ ...departures.stop, index }}
-            />
-          </Column>
-        )}
+        <Column
+          className={classNames(styles.departureColumnContainer, {
+            [styles.wider]: showDivider,
+          })}>
+          <DeparturesColumn
+            departures={departures.combinedDays[selectedDepartureDays]}
+            stop={{ ...departures.stop, index }}
+          />
+        </Column>
       </div>
     );
   });
@@ -108,7 +79,7 @@ const LineTableColumns = props => {
 };
 
 LineTableColumns.propTypes = {
-  departures: PropTypes.arrayOf(PropTypes.any).isRequired,
+  departuresByStop: PropTypes.arrayOf(PropTypes.any).isRequired,
   stopSequence: PropTypes.arrayOf(PropTypes.string).isRequired,
   days: PropTypes.string.isRequired,
   showDivider: PropTypes.bool.isRequired,

@@ -29,6 +29,7 @@ const lineQuery = gql`
         routes: routesForDateRange(routeDateBegin: $dateBegin, routeDateEnd: $dateEnd) {
           nodes {
             routeId
+            routeIdParsed
             direction
             dateBegin
             dateEnd
@@ -38,23 +39,38 @@ const lineQuery = gql`
             lineId
             routeSegments {
               nodes {
-                stopIndex
-                timingStopType
-                duration
-                line {
-                  nodes {
-                    trunkRoute
-                  }
-                }
                 stop: stopByStopId {
-                  stopId
-                  lat
-                  lon
-                  shortId
                   nameFi
                   nameSe
-                  platform
+                  stopId
                 }
+              }
+            }
+            timedStops: allTimedStops {
+              nodes {
+                stop: stopByStopId {
+                  nameFi
+                  nameSe
+                  stopId
+                }
+                dateBegin
+                dateEnd
+              }
+            }
+            timedStopsDepartures: timedStopsDepartures(
+              userDateBegin: $dateBegin
+              userDateEnd: $dateEnd
+            ) {
+              nodes {
+                stopId
+                routeId
+                direction
+                dayType
+                departureId
+                hours
+                minutes
+                isNextDay
+                timingStopType
               }
             }
           }
@@ -71,94 +87,41 @@ const lineQuery = gql`
   }
 `;
 
-const departureQuery = gql`
-  query getTimedStopDepartures($routeIdentifier: String!, $date: Date!) {
-    departures: getRouteDeparturesForTimedStops(routeIdentifier: $routeIdentifier, date: $date) {
-      nodes {
-        stopId
-        routeId
-        direction
-        departureId
-        dayType
-        hours
-        minutes
-        isNextDay
-        timingStopType
-      }
-    }
-  }
-`;
+const groupDeparturesForStops = route => {
+  const timedStops = route.timedStops.nodes;
 
-const filterTimedStopsForRoutes = line => {
-  const routes = line.routes.nodes;
-
-  const routesWithFilteredStops = routes.map(route => {
-    return {
-      ...route,
-      timedStops: filter(route.routeSegments.nodes, segment => {
-        return segment.stopIndex <= 1 || segment.timingStopType > 0;
-      }),
-    };
-  });
-
-  return routesWithFilteredStops;
+  return {
+    ...route,
+    departuresPerStop: timedStops.map(timedStop => {
+      return {
+        ...timedStop,
+        departures: filter(route.timedStopsDepartures.nodes, { stopId: timedStop.stop.stopId }),
+      };
+    }),
+  };
 };
 
 const lineQueryMapper = mapProps(props => {
   const line = props.data.lines.nodes[0];
-  const { dateBegin, dateEnd, showPrintBtn, lang } = props;
+  const { showPrintBtn, lang } = props;
 
-  console.log(props);
-
-  const routesWithFilteredStops = filterTimedStopsForRoutes(line);
+  const routesWithGroupedDepartures = line.routes.nodes.map(route => {
+    const groupedByStop = groupDeparturesForStops(route);
+    const groupedByStopAndDay = groupedByStop.departuresPerStop.map(stop => {
+      return { stop: stop.stop, departures: groupDeparturesByDay(stop.departures) };
+    });
+    return { ...route, departuresByStop: groupedByStopAndDay };
+  });
 
   return {
     line,
-    dateBegin,
-    dateEnd,
-    routesWithFilteredStops,
-    date: dateBegin,
-    routeIdentifier: line.lineId,
+    routes: routesWithGroupedDepartures,
     showPrintBtn,
     lang,
   };
 });
 
-const departuresMapper = mapProps(props => {
-  const departures = props.data.departures.nodes;
-
-  const routeDeparturesByStop = props.routesWithFilteredStops.map(route => {
-    const timedStopDepartures = route.timedStops.map(timedStop => {
-      // Iterate each timed stop for a given route and get all departures belonging to that stop and route direction
-      const stopDepartures = departures.filter(
-        departure =>
-          departure.stopId === timedStop.stop.stopId && departure.direction === route.direction,
-      );
-      return {
-        stop: timedStop.stop,
-        departures: groupDeparturesByDay(stopDepartures),
-        route,
-      };
-    });
-    return { ...route, departuresByStop: timedStopDepartures };
-  });
-
-  return {
-    line: props.line,
-    dateBegin: props.dateBegin,
-    dateEnd: props.dateEnd,
-    departures: routeDeparturesByStop,
-    showPrintBtn: props.showPrintBtn,
-    lang: props.lang,
-  };
-});
-
-const hoc = compose(
-  graphql(lineQuery),
-  apolloWrapper(lineQueryMapper),
-  graphql(departureQuery),
-  apolloWrapper(departuresMapper),
-);
+const hoc = compose(graphql(lineQuery), apolloWrapper(lineQueryMapper));
 
 const LineTimetableContainer = hoc(LineTimetable);
 

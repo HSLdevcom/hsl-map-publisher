@@ -7,11 +7,20 @@ import trunkIcon from 'icons/icon_trunk.svg';
 import lRailIcon from 'icons/icon_L_rail.svg';
 
 import zoneByShortId from 'data/zoneByShortId';
+import { weekdays } from 'moment/moment';
 
 // TODO: Get routes from api?
 const RAIL_ROUTE_ID_REGEXP = /^300[12]/;
 const SUBWAY_ROUTE_ID_REGEXP = /^31/;
 const U_LINE_REGEX = /^7/;
+
+const scheduleSegments = {
+  weekdays: 'mondays-fridays',
+  weekdaysExclFriday: 'mondays-thursdays',
+  fridays: 'fridays',
+  saturdays: 'saturdays',
+  sundays: 'sundays',
+};
 
 /**
  * Returns whether a route id is a so called number variant
@@ -312,4 +321,5 @@ export {
   getIcon,
   routeGeneralizer,
   filterRoute,
+  scheduleSegments,
 };

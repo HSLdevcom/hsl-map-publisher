@@ -37,10 +37,10 @@ const parseStopNames = stops => {
 };
 
 const StopList = props => {
-  const { stops, lang, lineId } = props;
+  const { stops, lang, routeIdParsed } = props;
   return (
     <div className={styles.stopList}>
-      <p className={styles.lineInfoText}>{getLineInfoText(lang, lineId)}</p>
+      <p className={styles.lineInfoText}>{getLineInfoText(lang, routeIdParsed)}</p>
       <p className={styles.stopListText}>{stops.join(' - ')}</p>
     </div>
   );
@@ -49,23 +49,23 @@ const StopList = props => {
 StopList.propTypes = {
   stops: PropTypes.array.isRequired,
   lang: PropTypes.string.isRequired,
-  lineId: PropTypes.string.isRequired,
+  routeIdParsed: PropTypes.string.isRequired,
 };
 
 const AllStopsList = props => {
-  const { stops, lineId } = props;
+  const { stops, routeIdParsed } = props;
   const parsedStopLists = parseStopNames(stops);
   return (
     <div className={styles.stopListsContainer}>
-      <StopList stops={parsedStopLists.namesFi} lang={TEXT_LANG.FI} lineId={lineId} />
-      <StopList stops={parsedStopLists.namesSe} lang={TEXT_LANG.SE} lineId={lineId} />
+      <StopList stops={parsedStopLists.namesFi} lang={TEXT_LANG.FI} routeIdParsed={routeIdParsed} />
+      <StopList stops={parsedStopLists.namesSe} lang={TEXT_LANG.SE} routeIdParsed={routeIdParsed} />
     </div>
   );
 };
 
 AllStopsList.propTypes = {
   stops: PropTypes.array.isRequired,
-  lineId: PropTypes.string.isRequired,
+  routeIdParsed: PropTypes.string.isRequired,
 };
 
 export default AllStopsList;
