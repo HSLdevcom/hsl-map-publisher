@@ -4,7 +4,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import mapProps from 'recompose/mapProps';
 import compose from 'recompose/compose';
-import { filter, find } from 'lodash';
+import { filter, isEmpty, uniqBy } from 'lodash';
 
 import apolloWrapper from 'util/apolloWrapper';
 
@@ -57,7 +57,7 @@ const lineQuery = gql`
                 dateEnd
               }
             }
-            timedStopsDepartures: timedStopsDepartures(
+            timedStopsDepartures: departuresForTimedStops(
               userDateBegin: $dateBegin
               userDateEnd: $dateEnd
             ) {
@@ -70,7 +70,10 @@ const lineQuery = gql`
                 hours
                 minutes
                 isNextDay
+                dateBegin
+                dateEnd
                 timingStopType
+                stopIndex
               }
             }
           }
@@ -87,35 +90,97 @@ const lineQuery = gql`
   }
 `;
 
-const groupDeparturesForStops = route => {
+const groupByValidityDateRange = departures => {
+  const dateRanges = uniqBy(departures, 'dateBegin').map(entry => {
+    return {
+      dateBegin: entry.dateBegin,
+      dateEnd: entry.dateEnd,
+    };
+  });
+  const groupedDepartures = dateRanges.map(dateRange => {
+    return {
+      ...dateRange,
+      departures: filter(departures, departure => {
+        return (
+          departure.dateBegin === dateRange.dateBegin && departure.dateEnd === dateRange.dateEnd
+        );
+      }),
+    };
+  });
+  return groupedDepartures;
+};
+
+const groupDepartureDateRangesForStops = (route, departuresByDateRanges) => {
   const timedStops = route.timedStops.nodes;
 
-  return {
-    ...route,
-    departuresPerStop: timedStops.map(timedStop => {
-      return {
-        ...timedStop,
-        departures: filter(route.timedStopsDepartures.nodes, { stopId: timedStop.stop.stopId }),
-      };
-    }),
-  };
+  const departuresByDateRangeAndStop = departuresByDateRanges.map(dateRange => {
+    return {
+      ...route,
+      dateBegin: dateRange.dateBegin,
+      dateEnd: dateRange.dateEnd,
+      departuresPerStop: timedStops.map(timedStop => {
+        return {
+          stop: timedStop.stop,
+          departures: filter(dateRange.departures, { stopId: timedStop.stop.stopId }),
+        };
+      }),
+    };
+  });
+  return departuresByDateRangeAndStop;
+};
+
+const groupDeparturesByWeekday = departuresByStop => {
+  return departuresByStop.map(stopWithDepartures => {
+    return {
+      stop: stopWithDepartures.stop,
+      departures: groupDeparturesByDay(stopWithDepartures.departures),
+    };
+  });
+};
+
+// Filters 'varikkolinja' routes from the timetable
+const removeExtraRoutes = routes => {
+  return filter(routes, route => {
+    return !route.routeId.includes(' ');
+  });
+};
+
+// Filters empty routes routes from the timetable
+const filterRoutes = routesWithGroupedDepartures => {
+  return filter(routesWithGroupedDepartures, route => {
+    return !isEmpty(route.departuresByDateRanges);
+  });
 };
 
 const lineQueryMapper = mapProps(props => {
   const line = props.data.lines.nodes[0];
   const { showPrintBtn, lang } = props;
 
-  const routesWithGroupedDepartures = line.routes.nodes.map(route => {
-    const groupedByStop = groupDeparturesForStops(route);
-    const groupedByStopAndDay = groupedByStop.departuresPerStop.map(stop => {
-      return { stop: stop.stop, departures: groupDeparturesByDay(stop.departures) };
-    });
-    return { ...route, departuresByStop: groupedByStopAndDay };
+  const filteredRoutes = removeExtraRoutes(line.routes.nodes);
+
+  const routesWithGroupedDepartures = filteredRoutes.map(route => {
+    const byValidityDateRange = groupByValidityDateRange(route.timedStopsDepartures.nodes);
+    const departuresByStopsAndDateRanges = groupDepartureDateRangesForStops(
+      route,
+      byValidityDateRange,
+    );
+    const dateRangesGroupedByStopAndDay = departuresByStopsAndDateRanges.map(
+      departuresByStopAndDateRange => {
+        return {
+          dateBegin: departuresByStopAndDateRange.dateBegin,
+          dateEnd: departuresByStopAndDateRange.dateEnd,
+          departuresByStop: groupDeparturesByWeekday(
+            departuresByStopAndDateRange.departuresPerStop,
+          ),
+        };
+      },
+    );
+    return { ...route, departuresByDateRanges: dateRangesGroupedByStopAndDay };
   });
 
   return {
     line,
-    routes: routesWithGroupedDepartures,
+    routes: filterRoutes(routesWithGroupedDepartures),
     showPrintBtn,
     lang,
   };

@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import styles from './lineTimetable.css';
 import LineTimetableHeader from './lineTimetableHeader';
 import LineTableColumns from './lineTableColumns';
 import AllStopsList from './allStopsList';
-import { filter, groupBy, flatten } from 'lodash';
+import { filter, groupBy, flatten, isEmpty } from 'lodash';
 import { scheduleSegments } from '../../util/domain';
 import { combineConsecutiveDays } from '../timetable/timetableContainer';
 
@@ -16,8 +16,8 @@ const formatDate = date => {
   return `${day}.${monthIndex}.${year}`;
 };
 
-const hasTimedStopRoutes = departuresByRoute => {
-  return filter(departuresByRoute, route => route.departuresByStop.length > 1).length > 0;
+const hasTimedStopRoutes = routes => {
+  return filter(routes, route => route.timedStops.nodes.length > 1).length > 0;
 };
 
 const RouteDepartures = props => {
@@ -161,6 +161,16 @@ RouteDepartures.propTypes = {
   showTimedStops: PropTypes.bool,
 };
 
+const dateRangeHasDepartures = routeDepartures => {
+  const hasDepartures = find(
+    Object.values(routeDepartures.departuresByStop[0].departures),
+    weekday => {
+      return !isEmpty(weekday);
+    },
+  );
+  return hasDepartures;
+};
+
 function LineTimetable(props) {
   const { routes } = props;
   const showTimedStops = hasTimedStopRoutes(routes);
@@ -169,35 +179,56 @@ function LineTimetable(props) {
     return (
       <div>
         {routes.map(routeWithDepartures => {
-          const {
-            nameFi,
-            nameSe,
-            routeIdParsed,
-            departuresByStop,
-            dateBegin,
-            dateEnd,
-          } = routeWithDepartures;
-          return (
-            routeWithDepartures.departuresByStop.length > 0 && (
-              <div>
-                <RouteDepartures
-                  routeIdParsed={routeIdParsed}
-                  nameFi={nameFi}
-                  nameSe={nameSe}
-                  showPrintBtn={props.showPrintBtn}
-                  lang={props.lang}
-                  departuresByStop={departuresByStop}
-                  dateBegin={dateBegin}
-                  dateEnd={dateEnd}
-                  showTimedStops={showTimedStops}
-                />
-                <AllStopsList
-                  stops={routeWithDepartures.routeSegments.nodes}
-                  routeIdParsed={routeIdParsed}
-                />
-              </div>
-            )
+          const routesByDateRanges = routeWithDepartures.departuresByDateRanges.map(
+            departuresForDateRange => {
+              const { nameFi, nameSe, routeIdParsed } = routeWithDepartures;
+              return {
+                nameFi,
+                nameSe,
+                routeIdParsed,
+                departuresByStop: departuresForDateRange.departuresByStop,
+                dateBegin: departuresForDateRange.dateBegin,
+                dateEnd: departuresForDateRange.dateEnd,
+              };
+            },
           );
+
+          const routeDeparturesForDateRanges = routesByDateRanges.map(routeForDateRange => {
+            const {
+              nameFi,
+              nameSe,
+              routeIdParsed,
+              departuresByStop,
+              dateBegin,
+              dateEnd,
+            } = routeForDateRange;
+
+            const hasDepartures = dateRangeHasDepartures(routeForDateRange);
+
+            return (
+              routeForDateRange.departuresByStop.length > 0 && (
+                <div>
+                  <RouteDepartures
+                    routeIdParsed={routeIdParsed}
+                    nameFi={nameFi}
+                    nameSe={nameSe}
+                    showPrintBtn={props.showPrintBtn}
+                    lang={props.lang}
+                    departuresByStop={departuresByStop}
+                    dateBegin={dateBegin}
+                    dateEnd={dateEnd}
+                    showTimedStops={showTimedStops}
+                  />
+                  <AllStopsList
+                    stops={routeWithDepartures.routeSegments.nodes}
+                    routeIdParsed={routeIdParsed}
+                  />
+                </div>
+              )
+            );
+          });
+
+          return routeDeparturesForDateRanges;
         })}
       </div>
     );
