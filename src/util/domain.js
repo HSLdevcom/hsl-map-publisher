@@ -20,6 +20,7 @@ const scheduleSegments = {
   fridays: 'fridays',
   saturdays: 'saturdays',
   sundays: 'sundays',
+  weekends: 'saturdays-sundays',
 };
 
 /**

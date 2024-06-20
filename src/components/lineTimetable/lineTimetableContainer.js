@@ -90,6 +90,8 @@ const lineQuery = gql`
   }
 `;
 
+const regularDayTypes = ['Ma', 'Ti', 'Ke', 'To', 'Pe', 'La', 'Su'];
+
 const groupByValidityDateRange = departures => {
   const dateRanges = uniqBy(departures, 'dateBegin').map(entry => {
     return {
@@ -102,7 +104,9 @@ const groupByValidityDateRange = departures => {
       ...dateRange,
       departures: filter(departures, departure => {
         return (
-          departure.dateBegin === dateRange.dateBegin && departure.dateEnd === dateRange.dateEnd
+          departure.dateBegin === dateRange.dateBegin &&
+          departure.dateEnd === dateRange.dateEnd &&
+          regularDayTypes.includes(departure.dayType[0])
         );
       }),
     };
@@ -145,11 +149,20 @@ const removeExtraRoutes = routes => {
   });
 };
 
-// Filters empty routes routes from the timetable
+// Filters empty routes from the timetable
 const filterRoutes = routesWithGroupedDepartures => {
   return filter(routesWithGroupedDepartures, route => {
     return !isEmpty(route.departuresByDateRanges);
   });
+};
+
+const getSpecialDepartures = departures => {
+  return uniqBy(
+    filter(departures, departure => {
+      return !regularDayTypes.includes(departure.dayType[0]);
+    }),
+    'dateBegin',
+  );
 };
 
 const lineQueryMapper = mapProps(props => {
@@ -160,6 +173,7 @@ const lineQueryMapper = mapProps(props => {
 
   const routesWithGroupedDepartures = filteredRoutes.map(route => {
     const byValidityDateRange = groupByValidityDateRange(route.timedStopsDepartures.nodes);
+    const specialDepartures = getSpecialDepartures(route.timedStopsDepartures.nodes);
     const departuresByStopsAndDateRanges = groupDepartureDateRangesForStops(
       route,
       byValidityDateRange,

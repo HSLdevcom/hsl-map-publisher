@@ -4,6 +4,7 @@ import { Column, Row, WrappingRow } from '../util';
 import LineTableHeader from './lineTableHeader';
 import styles from './lineTableColumns.css';
 import classNames from 'classnames';
+import { isArray, filter, isEmpty } from 'lodash';
 
 const LineTimetableRow = props => {
   const { hours, minutes } = props;
@@ -26,10 +27,9 @@ const DeparturesColumn = props => {
   const { departures, stop } = props;
 
   if (departures) {
-    const departureRows = departures.map(departure => (
-      <LineTimetableRow hours={departure.hours} minutes={departure.minutes} />
-    ));
-
+    const departureRows = departures.map(departure => {
+      return <LineTimetableRow hours={departure.hours} minutes={departure.minutes} />;
+    });
     return (
       <div>
         <LineTableHeader stop={stop} />
@@ -60,6 +60,24 @@ const LineTableColumns = props => {
   const { showDivider, departuresByStop } = props;
 
   const departureColums = departuresByStop.map((departures, index) => {
+    if (isArray(selectedDepartureDays)) {
+      const validSelectedDay = filter(selectedDepartureDays, departureDay => {
+        return !isEmpty(departures.combinedDays[departureDay]);
+      });
+      return (
+        <div>
+          <Column
+            className={classNames(styles.departureColumnContainer, {
+              [styles.wider]: showDivider,
+            })}>
+            <DeparturesColumn
+              departures={departures.combinedDays[validSelectedDay]}
+              stop={{ ...departures.stop, index }}
+            />
+          </Column>
+        </div>
+      );
+    }
     return (
       <div>
         <Column

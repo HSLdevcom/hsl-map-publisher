@@ -4,9 +4,28 @@ import styles from './lineTimetable.css';
 import LineTimetableHeader from './lineTimetableHeader';
 import LineTableColumns from './lineTableColumns';
 import AllStopsList from './allStopsList';
-import { filter, groupBy, flatten, isEmpty } from 'lodash';
+import { filter, isEmpty, uniqBy, flatten, forEach, groupBy, find } from 'lodash';
 import { scheduleSegments } from '../../util/domain';
 import { combineConsecutiveDays } from '../timetable/timetableContainer';
+
+const getScheduleWeekdaysText = dayType => {
+  switch (dayType) {
+    case scheduleSegments.weekdays:
+      return 'Maanantai-Perjantai / Måndag-Fredag';
+    case scheduleSegments.weekdaysExclFriday:
+      return 'Maanantai-Torstai / Måndag-Torsdag';
+    case scheduleSegments.fridays:
+      return 'Perjantai / Fredag';
+    case scheduleSegments.saturdays:
+      return 'Lauantai / Lördag';
+    case scheduleSegments.sundays:
+      return 'Sunnuntai / Söndag';
+    case scheduleSegments.weekends:
+      return 'Lauantai-Sunnuntai / Lördag-Söndag';
+    default:
+      return '';
+  }
+};
 
 const formatDate = date => {
   const day = date.getDate();
@@ -58,83 +77,30 @@ const RouteDepartures = props => {
     };
   });
 
-  const hasSeparateFridayDepartures =
-    scheduleSegments.fridays in mappedWeekdayDepartures[0].combinedDays;
+  const combinedDepartureTables = Object.keys(mappedWeekdayDepartures[0].combinedDays).map(key => {
+    return (
+      <div>
+        <LineTimetableHeader
+          routeIdParsed={routeIdParsed}
+          nameFi={nameFi}
+          nameSe={nameSe}
+          showPrintBtn={showPrintBtn}
+          lang={lang}
+        />
+        <span className={styles.timetableDays}>{getScheduleWeekdaysText(key)}</span>
+        <span className={styles.timetableDates}>
+          {formatDate(new Date(dateBegin))}-{formatDate(new Date(dateEnd))}
+        </span>
+        <LineTableColumns
+          showDivider={!showTimedStops}
+          departuresByStop={mappedWeekdayDepartures}
+          days={key}
+        />
+      </div>
+    );
+  });
 
-  return (
-    <div>
-      <LineTimetableHeader
-        routeIdParsed={routeIdParsed}
-        nameFi={nameFi}
-        nameSe={nameSe}
-        showPrintBtn={showPrintBtn}
-        lang={lang}
-      />
-      {hasSeparateFridayDepartures && (
-        <div>
-          <span className={styles.timetableDays}>Maanantai-Torstai</span>
-          <span className={styles.timetableDays}>Måndag-Torsdag</span>
-          <span className={styles.timetableDates}>
-            {formatDate(new Date(dateBegin))}-{formatDate(new Date(dateEnd))}
-          </span>
-          <LineTableColumns
-            showDivider={!showTimedStops}
-            departuresByStop={mappedWeekdayDepartures}
-            days={scheduleSegments.weekdaysExclFriday}
-          />
-
-          <div className={styles.pageBreak}>&nbsp;</div>
-          <LineTimetableHeader routeIdParsed={routeIdParsed} nameFi={nameFi} nameSe={nameSe} />
-          <span className={styles.timetableDays}>Perjantai/Fredag</span>
-          <span className={styles.timetableDates}>
-            {formatDate(new Date(dateBegin))}-{formatDate(new Date(dateEnd))}
-          </span>
-          <LineTableColumns
-            showDivider={!showTimedStops}
-            departuresByStop={mappedWeekdayDepartures}
-            days={scheduleSegments.fridays}
-          />
-        </div>
-      )}
-      {!hasSeparateFridayDepartures && (
-        <div>
-          <span className={styles.timetableDays}>Maanantai-Perjantai</span>
-          <span className={styles.timetableDays}>Måndag-Fredag</span>
-          <span className={styles.timetableDates}>
-            {formatDate(new Date(dateBegin))}-{formatDate(new Date(dateEnd))}
-          </span>
-          <LineTableColumns
-            showDivider={!showTimedStops}
-            departuresByStop={mappedWeekdayDepartures}
-            days={scheduleSegments.weekdays}
-          />
-        </div>
-      )}
-      <div className={styles.pageBreak}>&nbsp;</div>
-      <LineTimetableHeader routeIdParsed={routeIdParsed} nameFi={nameFi} nameSe={nameSe} />
-      <span className={styles.timetableDays}>Lauantai/Lördag</span>
-      <span className={styles.timetableDates}>
-        {formatDate(new Date(dateBegin))}-{formatDate(new Date(dateEnd))}
-      </span>
-      <LineTableColumns
-        showDivider={!showTimedStops}
-        departuresByStop={mappedWeekdayDepartures}
-        days={scheduleSegments.saturdays}
-      />
-      <div className={styles.pageBreak}>&nbsp;</div>
-      <LineTimetableHeader routeIdParsed={routeIdParsed} nameFi={nameFi} nameSe={nameSe} />
-      <span className={styles.timetableDays}>Sunnuntai/Söndag</span>
-      <span className={styles.timetableDates}>
-        {formatDate(new Date(dateBegin))}-{formatDate(new Date(dateEnd))}
-      </span>
-      <LineTableColumns
-        showDivider={!showTimedStops}
-        departuresByStop={mappedWeekdayDepartures}
-        days={scheduleSegments.sundays}
-      />
-      <div className={styles.pageBreak}>&nbsp;</div>
-    </div>
-  );
+  return <div>{combinedDepartureTables}</div>;
 };
 
 RouteDepartures.defaultProps = {
@@ -223,6 +189,8 @@ function LineTimetable(props) {
                     stops={routeWithDepartures.routeSegments.nodes}
                     routeIdParsed={routeIdParsed}
                   />
+                  <div className={styles.timetableDivider} />
+                  <div className={styles.pageBreak}>&nbsp;</div>
                 </div>
               )
             );
@@ -234,42 +202,73 @@ function LineTimetable(props) {
     );
   }
 
-  const groupedDepartures = groupBy(routes, 'routeId'); // Group by route ID
-  const combinedDeparturesForBothDirections = Object.values(groupedDepartures).map(route => {
-    const bothStopDepartures = route.map(direction => {
-      return direction.departuresByStop;
+  // The logic below is for timetables that do not have timed stops to display, only the starting stop for a route.
+  // These stops are displayed with both directions side by side in the timetable.
+  const groupedRoutes = groupBy(routes, 'routeId');
+
+  // Map the departures from both directions into unique date ranges, so that we can display both directions for a date range side by side
+  const routeGroupsMappedDepartures = Object.values(groupedRoutes).map(routeGroup => {
+    const { routeId, routeIdParsed, nameFi, nameSe, routeSegments } = routeGroup[0];
+
+    const allDepartureDateRanges = routeGroup.map(route => {
+      return route.departuresByDateRanges;
     });
-    // Combine both starting stops into the same route so they show up side by side in RouteDepartures
-    return { ...route[0], departuresByStop: flatten(bothStopDepartures) };
+
+    const uniqueDateRanges = flatten(uniqBy(allDepartureDateRanges, 'dateBegin'));
+
+    const mappedDeparturesBothDirections = uniqueDateRanges.map(dateRange => {
+      const { dateBegin, dateEnd } = dateRange;
+      const bothDirectionDepartures = [];
+
+      forEach(allDepartureDateRanges, departureDateRange => {
+        const departures = flatten(departureDateRange);
+        if (departures[0].dateBegin === dateBegin && departures[0].dateEnd === dateEnd) {
+          bothDirectionDepartures.push(departures[0].departuresByStop);
+        }
+      });
+      return {
+        dateBegin,
+        dateEnd,
+        departuresByStop: flatten(bothDirectionDepartures),
+      };
+    });
+
+    return {
+      routeId,
+      routeIdParsed,
+      nameFi,
+      nameSe,
+      routeSegments,
+      departuresByDateRanges: mappedDeparturesBothDirections,
+    };
   });
 
   return (
     <div>
-      {combinedDeparturesForBothDirections.map(routeWithDepartures => {
-        const {
-          nameFi,
-          nameSe,
-          routeIdParsed,
-          departuresByStop,
-          dateBegin,
-          dateEnd,
-        } = routeWithDepartures;
-        return (
-          <div>
-            <RouteDepartures
-              routeIdParsed={routeIdParsed}
-              nameFi={nameFi}
-              nameSe={nameSe}
-              showPrintBtn={props.showPrintBtn}
-              lang={props.lang}
-              departuresByStop={departuresByStop}
-              dateBegin={dateBegin}
-              dateEnd={dateEnd}
-              showTimedStops={showTimedStops}
-            />
-            <AllStopsList stops={routeWithDepartures.routeSegments.nodes} routeId={routeIdParsed} />
-          </div>
-        );
+      {routeGroupsMappedDepartures.map(routeWithDepartures => {
+        return routeWithDepartures.departuresByDateRanges.map(departuresFordateRange => {
+          const { nameFi, nameSe, routeIdParsed } = routeWithDepartures;
+          const { dateBegin, dateEnd, departuresByStop } = departuresFordateRange;
+          return (
+            <div>
+              <RouteDepartures
+                routeIdParsed={routeIdParsed}
+                nameFi={nameFi}
+                nameSe={nameSe}
+                showPrintBtn={props.showPrintBtn}
+                lang={props.lang}
+                departuresByStop={departuresByStop}
+                dateBegin={dateBegin}
+                dateEnd={dateEnd}
+                showTimedStops={showTimedStops}
+              />
+              <AllStopsList
+                stops={routeWithDepartures.routeSegments.nodes}
+                routeIdParsed={routeIdParsed}
+              />
+            </div>
+          );
+        });
       })}
     </div>
   );

@@ -158,6 +158,12 @@
   display: none;
 }
 
+.timetableDivider {
+  margin-top: 1rem;
+  width: 100%;
+  border-bottom: 2px dotted gray;
+}
+
 @media print {
   .noPrint,
   .noPrint * {
