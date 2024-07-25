@@ -156,15 +156,6 @@ const filterRoutes = routesWithGroupedDepartures => {
   });
 };
 
-const getSpecialDepartures = departures => {
-  return uniqBy(
-    filter(departures, departure => {
-      return !regularDayTypes.includes(departure.dayType[0]);
-    }),
-    'dateBegin',
-  );
-};
-
 const lineQueryMapper = mapProps(props => {
   const line = props.data.lines.nodes[0];
   const { showPrintBtn, lang } = props;
@@ -173,7 +164,6 @@ const lineQueryMapper = mapProps(props => {
 
   const routesWithGroupedDepartures = filteredRoutes.map(route => {
     const byValidityDateRange = groupByValidityDateRange(route.timedStopsDepartures.nodes);
-    const specialDepartures = getSpecialDepartures(route.timedStopsDepartures.nodes);
     const departuresByStopsAndDateRanges = groupDepartureDateRangesForStops(
       route,
       byValidityDateRange,

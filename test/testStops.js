@@ -7,7 +7,7 @@ const { mkdir } = require('fs/promises');
 const { finished } = require('node:stream/promises');
 const path = require('path');
 
-const stopIds = ['1020105', '1284188', '6301068', '1040411'];
+const stopIds = ['1020105', '1284188', '6301068', '1040411', '4930205', '4930209'];
 
 const testTerminalPosters = [
   {
@@ -24,22 +24,23 @@ const testTerminalPosters = [
 
 // Lines for testing the LineTimetable component
 const testLines = [
-  /* { lineId: '2015', dateBegin: '1999-02-02', dateEnd: '2050-12-31' },
-  { lineId: '1052', dateBegin: '2021-12-13', dateEnd: '2050-12-31' },
+  { lineId: '2015', dateBegin: '2024-05-01', dateEnd: '2024-06-30' },
+  { lineId: '1052', dateBegin: '2024-06-30', dateEnd: '2024-07-29' },
   { lineId: '1500', dateBegin: '2023-10-12', dateEnd: '2050-12-31' },
   { lineId: '1016', dateBegin: '2016-10-04', dateEnd: '2050-12-31' },
-  { lineId: '4570', dateBegin: '2022-08-15', dateEnd: '2050-12-31' }, */
-  { lineId: '6211U', dateBegin: '2024-05-05', dateEnd: '2050-06-16' },
+  { lineId: '4570', dateBegin: '2022-08-15', dateEnd: '2050-12-31' },
+  { lineId: '6211U', dateBegin: '2024-05-05', dateEnd: '2024-06-16' },
+  { lineId: '6211X', dateBegin: '2024-05-05', dateEnd: '2024-09-01' },
 ];
 
 const TEST_RESULTS_PATH = './test/results';
 
 const POSTER_COMPONENTS = {
-  // TIMETABLE: 'Timetable',
-  // STOP_POSTER: 'StopPoster',
-  // A3_STOP_POSTER: 'A3StopPoster',
+  TIMETABLE: 'Timetable',
+  STOP_POSTER: 'StopPoster',
+  A3_STOP_POSTER: 'A3StopPoster',
   LINE_TIMETABLE: 'LineTimetable',
-  // TERMINAL_POSTER: 'TerminalPoster',
+  TERMINAL_POSTER: 'TerminalPoster',
 };
 
 async function sleep(millis) {
@@ -55,11 +56,9 @@ function buildGenerationRequestBody(buildId, component, printAsA4) {
       const { lineId, routeDirection, dateBegin, dateEnd } = line;
       return {
         lineId,
-        routeDirection,
         dateBegin,
         dateEnd,
         printTimetablesAsA4: true,
-        date: new Date().toISOString().split('T')[0],
         selectedRuleTemplates: [],
         template: 'default', // Server throws error if template and selectedRuleTemplate aren't included in properties, however they aren't needed for rendering though
       };
@@ -89,8 +88,10 @@ function buildGenerationRequestBody(buildId, component, printAsA4) {
   } else {
     props = stopIds.map(stopId => {
       return {
+        dateBegin: '2024-06-17',
+        dateEnd: '2024-08-11',
         date: new Date().toISOString().split('T')[0],
-        isSummerTime: false,
+        isSummerTimetable: true,
         legend: true,
         mapZoneSymbols: true,
         mapZones: true,
