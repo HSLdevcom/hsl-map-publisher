@@ -1,6 +1,7 @@
 .stop {
   flex-grow: 1;
   height: 100px;
+  padding-right: 16px;
 }
 
 .stopName {

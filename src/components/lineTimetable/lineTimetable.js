@@ -8,6 +8,8 @@ import { filter, isEmpty, uniqBy, flatten, forEach, groupBy, find } from 'lodash
 import { scheduleSegments } from '../../util/domain';
 import { combineConsecutiveDays } from '../timetable/timetableContainer';
 
+const MAX_STOPS = 6; // Maximum amount of timed stops rendered on the timetable
+
 const getScheduleWeekdaysText = dayType => {
   switch (dayType) {
     case scheduleSegments.weekdays:
@@ -152,7 +154,7 @@ function LineTimetable(props) {
                 nameFi,
                 nameSe,
                 routeIdParsed,
-                departuresByStop: departuresForDateRange.departuresByStop,
+                departuresByStop: departuresForDateRange.departuresByStop.slice(0, MAX_STOPS),
                 dateBegin: departuresForDateRange.dateBegin,
                 dateEnd: departuresForDateRange.dateEnd,
               };
@@ -168,8 +170,6 @@ function LineTimetable(props) {
               dateBegin,
               dateEnd,
             } = routeForDateRange;
-
-            const hasDepartures = dateRangeHasDepartures(routeForDateRange);
 
             return (
               routeForDateRange.departuresByStop.length > 0 && (

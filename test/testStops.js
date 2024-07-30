@@ -3,7 +3,6 @@ const { TEST_PUBLISHER_SERVER_URL } = require('../constants');
 const fetch = require('node-fetch');
 const _ = require('lodash');
 const fs = require('fs');
-const { mkdir } = require('fs/promises');
 const { finished } = require('node:stream/promises');
 const path = require('path');
 
@@ -53,7 +52,7 @@ function buildGenerationRequestBody(buildId, component, printAsA4) {
 
   if (component === POSTER_COMPONENTS.LINE_TIMETABLE) {
     props = testLines.map(line => {
-      const { lineId, routeDirection, dateBegin, dateEnd } = line;
+      const { lineId, dateBegin, dateEnd } = line;
       return {
         lineId,
         dateBegin,
