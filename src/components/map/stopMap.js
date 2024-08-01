@@ -42,19 +42,19 @@ const INFO_MARGIN_LEFT = 44;
 
 const Attribution = () => <div className={styles.attribution}>&copy; OpenStreetMap</div>;
 
-const LocationSymbol = props => (
+const LocationSymbol = (props) => (
   <div style={{ width: props.size, height: props.size }}>
     <InlineSVG src={locationIcon} style={{ width: '100%' }} />
   </div>
 );
 
-const getSalesPointIcon = type => (
+const getSalesPointIcon = (type) => (
   <InlineSVG
     src={type.toLowerCase() === 'myyntipiste' ? ticketSalesPointIcon : ticketMachineIcon}
   />
 );
 
-const getZoneIcon = zone => {
+const getZoneIcon = (zone) => {
   switch (zone) {
     case 'A':
       return <InlineSVG src={aZone} style={{ width: '100%' }} />;
@@ -73,7 +73,7 @@ const getZoneIcon = zone => {
   }
 };
 
-const ZoneLabel = props => (
+const ZoneLabel = () => (
   <div className={styles.zoneHeading}>
     <span>
       <strong>Vyöhyke</strong> Zon/Zone
@@ -81,7 +81,7 @@ const ZoneLabel = props => (
   </div>
 );
 
-const ZoneSymbol = props => (
+const ZoneSymbol = (props) => (
   <Row>
     <div className={styles.zoneSymbol}>{getZoneIcon(props.zone)}</div>
     <ZoneLabel />
@@ -97,10 +97,10 @@ ZoneSymbol.propTypes = {
   zone: PropTypes.string.isRequired,
 };
 
-const getSymbolForEachZone = projectedSymbolsWithDistance => {
+const getSymbolForEachZone = (projectedSymbolsWithDistance) => {
   const zones = [];
   const uniqueSymbols = [];
-  projectedSymbolsWithDistance.forEach(symbol => {
+  projectedSymbolsWithDistance.forEach((symbol) => {
     if (!zones || !zones.includes(symbol.zone)) {
       zones.push(symbol.zone);
       uniqueSymbols.push(symbol);
@@ -110,8 +110,8 @@ const getSymbolForEachZone = projectedSymbolsWithDistance => {
 };
 
 const calculateSymbolDistancesFromStops = (stops, symbols) => {
-  const symbolsWithStopDistances = symbols.map(symbol => {
-    const stopDistances = stops.map(stop => {
+  const symbolsWithStopDistances = symbols.map((symbol) => {
+    const stopDistances = stops.map((stop) => {
       const xDif = Math.abs(symbol.sy - stop.x);
       const yDif = Math.abs(symbol.sx - stop.y);
       return yDif + xDif;
@@ -131,8 +131,8 @@ const calculateSymbolDistancesFromStops = (stops, symbols) => {
 
 const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
   const modes = [];
-  stops.forEach(stop => {
-    stop.routes.forEach(route => {
+  stops.forEach((stop) => {
+    stop.routes.forEach((route) => {
       const { mode } = route;
       if (mode && !modes.includes(mode)) {
         modes.push(mode);
@@ -143,7 +143,7 @@ const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
     });
   });
 
-  const legendContent = modes.map(mode => {
+  const legendContent = modes.map((mode) => {
     switch (mode) {
       case 'BUS':
         return (
@@ -254,7 +254,7 @@ const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
   };
 };
 
-const StopMap = props => {
+const StopMap = (props) => {
   const mapStyle = {
     width: props.mapOptions.width,
     height: props.mapOptions.height,
@@ -272,20 +272,20 @@ const StopMap = props => {
 
   // Filter out stops that are behind the mini map
   const stops = props.nearbyStops.filter(
-    stop => stop.x < miniMapStyle.left || stop.y < miniMapStyle.top,
+    (stop) => stop.x < miniMapStyle.left || stop.y < miniMapStyle.top,
   );
 
   // Filter out zone symbols that are behind the mini map
   // Added extra buffed width because zone symbols might be cut half by minimap
   const projectedSymbols = props.projectedSymbols.filter(
-    symbol =>
+    (symbol) =>
       symbol.sx < miniMapStyle.top - ZONE_SYMBOL_MAP_PADDING ||
       symbol.sy < miniMapStyle.left - ZONE_SYMBOL_MAP_PADDING_EXTRA,
   );
 
   // Avoid map edges so zone symbol and text is fully visible
   const projectedSymbolsInBbox = projectedSymbols.filter(
-    symbol =>
+    (symbol) =>
       symbol.sy > ZONE_SYMBOL_MAP_PADDING &&
       symbol.sx > ZONE_SYMBOL_MAP_PADDING &&
       symbol.sy < mapStyle.width - ZONE_SYMBOL_MAP_PADDING_EXTRA &&
@@ -338,7 +338,7 @@ const StopMap = props => {
           {stops.map((stop, index) => (
             <ItemFixed key={index} top={stop.y - STOP_RADIUS} left={stop.x - STOP_RADIUS}>
               <StopSymbol
-                platform={stop.stops.nodes[0].platform}
+                platform={stop.stops[0].platform}
                 routes={stop.routes}
                 size={STOP_RADIUS * 2}
               />
@@ -348,9 +348,10 @@ const StopMap = props => {
           {!isTerminal && (
             <ItemFixed
               top={props.currentStop.y - STOP_RADIUS}
-              left={props.currentStop.x - STOP_RADIUS}>
+              left={props.currentStop.x - STOP_RADIUS}
+            >
               <StopSymbol
-                platform={props.currentStop.stops.nodes[0].platform}
+                platform={props.currentStop.stops[0].platform}
                 routes={props.currentStop.routes}
                 size={STOP_RADIUS * 2}
               />
@@ -360,7 +361,8 @@ const StopMap = props => {
           {!isTerminal && (
             <ItemFixed
               top={props.currentStop.y - 2.2 * LOCATION_RADIUS}
-              left={props.currentStop.x - LOCATION_RADIUS}>
+              left={props.currentStop.x - LOCATION_RADIUS}
+            >
               <Row style={{ height: LOCATION_RADIUS * 2 }}>
                 <LocationSymbol size={LOCATION_RADIUS * 2} />
                 <div className={styles.title}>Olet tässä</div>
@@ -384,7 +386,8 @@ const StopMap = props => {
               x={stop.x}
               y={stop.y}
               distance={25}
-              angle={stop.calculatedHeading}>
+              angle={stop.calculatedHeading}
+            >
               <StopLabel {...stop} />
             </ItemPositioned>
           ))}
@@ -392,7 +395,8 @@ const StopMap = props => {
           {nearestSalePoint && (
             <ItemFixed
               top={nearestSalePoint.y - SALES_POINT_RADIUS}
-              left={nearestSalePoint.x - SALES_POINT_RADIUS}>
+              left={nearestSalePoint.x - SALES_POINT_RADIUS}
+            >
               <Row>
                 <div style={{ width: SALES_POINT_RADIUS * 2, height: SALES_POINT_RADIUS * 2 }}>
                   {salesPointIcon}
@@ -451,7 +455,8 @@ const StopMap = props => {
             top: miniMarkerOffsetTop,
             left: miniMarkerOffsetLeft,
             position: 'absolute',
-          }}>
+          }}
+        >
           <LocationSymbol size={LOCATION_RADIUS_MINI * 2} />
         </div>
       </div>

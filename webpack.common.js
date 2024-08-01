@@ -1,17 +1,14 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 
-const isDevelopment = process.env.NODE_ENV !== 'production';
-
 module.exports = {
-  entry: ['babel-polyfill', './src/index.js'],
   plugins: [
-    new CleanWebpackPlugin(['dist']),
     new HtmlWebpackPlugin({
       title: 'Stop poster',
     }),
+    new ESLintPlugin({ cache: true }),
     new Dotenv({ systemvars: true }),
   ],
   resolve: {
@@ -19,20 +16,12 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, 'dist'),
+    clean: true,
     filename: 'bundle.js',
     globalObject: 'this',
   },
   module: {
     rules: [
-      {
-        test: /\.js$/,
-        loader: 'eslint-loader',
-        enforce: 'pre',
-        exclude: /node_modules/,
-        options: {
-          cache: true,
-        },
-      },
       {
         test: /\.js$/,
         loader: 'babel-loader',
@@ -50,24 +39,17 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              modules: true,
+              modules: {
+                localIdentName: '[name]_[local]_[hash:base64:5]',
+              },
               importLoaders: 1,
-              localIdentName: '[name]_[local]_[hash:base64:5]',
             },
           },
         ],
       },
       {
         test: /\.svg$/,
-        loader: 'raw-loader',
-      },
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: /node_modules/,
-        options: {
-          plugins: [isDevelopment && require.resolve('react-refresh/babel')].filter(Boolean),
-        },
+        type: 'asset/source',
       },
     ],
   },

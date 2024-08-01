@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import { ApolloClient } from 'apollo-client';
-import { createHttpLink } from 'apollo-link-http';
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import { ApolloProvider } from 'react-apollo';
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import qs from 'qs';
 import get from 'lodash/get';
 
@@ -24,8 +21,17 @@ const components = {
 const graphqlUrl = process.env.JORE_GRAPHQL_URL || 'https://kartat.hsl.fi/jore/graphql';
 
 const client = new ApolloClient({
-  link: createHttpLink({ uri: graphqlUrl }),
-  cache: new InMemoryCache(),
+  uri: graphqlUrl,
+  cache: new InMemoryCache({
+    typePolicies: {
+      Stop: {
+        keyFields: ['nodeId'],
+      },
+      Terminal: {
+        keyFields: ['nodeId'],
+      },
+    },
+  }),
 });
 
 class App extends Component {
@@ -39,7 +45,7 @@ class App extends Component {
 
   componentDidMount() {
     if (this.root) {
-      renderQueue.onEmpty(error => {
+      renderQueue.onEmpty((error) => {
         if (error) {
           App.handleError(error);
           return;
@@ -73,7 +79,7 @@ class App extends Component {
     try {
       params = qs.parse(window.location.search, {
         ignoreQueryPrefix: true,
-        decoder: str => {
+        decoder: (str) => {
           // Make booleans booleans again
           // qs encodes booleans to strings, we need to make sure that they are real booleans.
           if (str === 'true') {
@@ -108,9 +114,10 @@ class App extends Component {
     return (
       <div
         style={rootStyle}
-        ref={ref => {
+        ref={(ref) => {
           this.root = ref;
-        }}>
+        }}
+      >
         <ApolloProvider client={client}>
           <ComponentToRender {...props} standalone template={template} />
         </ApolloProvider>

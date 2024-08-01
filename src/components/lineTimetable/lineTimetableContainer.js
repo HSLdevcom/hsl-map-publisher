@@ -1,7 +1,6 @@
-/* eslint-disable no-undef */
 import PropTypes from 'prop-types';
-import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
+import { graphql } from '@apollo/client/react/hoc';
 import mapProps from 'recompose/mapProps';
 import compose from 'recompose/compose';
 import { filter, find } from 'lodash';
@@ -50,6 +49,7 @@ const lineQuery = gql`
                 }
               }
               stop: stopByStopId {
+                nodeId
                 stopId
                 lat
                 lon
@@ -95,18 +95,18 @@ const departureQuery = gql`
   }
 `;
 
-const filterTimedStopsListFromLineQuery = props => {
-  const routeForSelectedDirection = find(props.data.line.routes.nodes, route => {
+const filterTimedStopsListFromLineQuery = (props) => {
+  const routeForSelectedDirection = find(props.data.line.routes.nodes, (route) => {
     return route.direction === props.routeDirection;
   });
   const stopList = routeForSelectedDirection.routeSegments.nodes;
-  const filteredStopsList = filter(stopList, stop => {
+  const filteredStopsList = filter(stopList, (stop) => {
     return stop.stopIndex <= 1 || stop.timingStopType > 0;
   });
   return { timedStops: filteredStopsList, allStops: stopList };
 };
 
-const lineQueryMapper = mapProps(props => {
+const lineQueryMapper = mapProps((props) => {
   const { dateBegin, dateEnd, routeDirection, showPrintBtn, lang } = props;
   const { line } = props.data;
   const { timedStops, allStops } = filterTimedStopsListFromLineQuery(props);
@@ -125,13 +125,13 @@ const lineQueryMapper = mapProps(props => {
   };
 });
 
-const departuresMapper = mapProps(props => {
+const departuresMapper = mapProps((props) => {
   console.log(props);
   const departures = props.data.departures.nodes;
 
-  const departuresByStop = props.timedStops.map(timedStop => {
+  const departuresByStop = props.timedStops.map((timedStop) => {
     const stopDepartures = departures.filter(
-      departure => departure.stopId === timedStop.stop.stopId,
+      (departure) => departure.stopId === timedStop.stop.stopId,
     );
     return {
       stop: timedStop.stop,
