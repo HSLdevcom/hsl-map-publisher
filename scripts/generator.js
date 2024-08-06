@@ -10,6 +10,7 @@ const { AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_KEY, PUBLISHER_RENDER_URL } = requi
 
 const CLIENT_URL = PUBLISHER_RENDER_URL;
 const RENDER_TIMEOUT = 10 * 60 * 1000;
+const PDF_TIMEOUT = 5 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
 const SCALE = 96 / 72;
 
@@ -91,6 +92,7 @@ async function renderComponent(options) {
       printBackground: true,
       format: 'A4',
       margin: 0,
+      timeout: PDF_TIMEOUT,
     };
   } else {
     printOptions = {

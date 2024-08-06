@@ -1,10 +1,12 @@
 .stop {
   flex-grow: 1;
+  height: 100px;
+  padding-right: 16px;
 }
 
 .stopName {
   font-size: 1.2em;
   margin: 0 0 0 2rem;
   font-family: GothamRounded-Medium;
-  word-break: break-all;
+  word-break: normal;
 }

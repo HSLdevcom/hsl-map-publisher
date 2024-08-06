@@ -9,14 +9,12 @@
 }
 
 .lineInfoText {
-  font-family: GothamRounded-Medium;
-  font-weight: bold;
+  font-family: GothamRounded-Book;
   font-size: 2rem;
 }
 
 .stopListText {
-  font-size: medium;
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Medium;
 }
 
 @media print {

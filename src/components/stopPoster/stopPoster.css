@@ -77,3 +77,11 @@
   width: calc(1984px + 30px);
   height: calc(2835px + 30px);
 }
+
+.smallTerminalPoster .left {
+  width: 570px;
+}
+
+.smallTerminalPoster .leftStretched {
+  width: 670px;
+}

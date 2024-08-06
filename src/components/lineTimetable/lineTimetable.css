@@ -144,18 +144,24 @@
 
 .timetableDays {
   margin: 0 1rem 1rem 2rem;
-  font-size: 1em;
+  font-size: 1.5em;
   font-family: GothamRounded-Book;
 }
 
 .timetableDates {
   margin: 0 1rem 1rem 4rem;
-  font-size: 1em;
+  font-size: 1.5em;
   font-family: GothamRounded-Book;
 }
 
 .pageBreak {
   display: none;
+}
+
+.timetableDivider {
+  margin-top: 1rem;
+  width: 100%;
+  border-bottom: 2px dotted gray;
 }
 
 @media print {
@@ -165,7 +171,7 @@
   }
   .pageBreak {
     display: block;
-    page-break-before: always;
+    page-break-after: always;
   }
 
   body {

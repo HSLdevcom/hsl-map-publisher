@@ -5,11 +5,11 @@ import styles from './lineTimetableHeader.css';
 import { PrintButton } from '../util';
 
 const LineTimetableHeader = props => {
-  const { showPrintBtn, lang, lineIdParsed, nameFi, nameSe } = props;
+  const { showPrintBtn, lang, routeIdParsed, nameFi, nameSe } = props;
   return (
     <div className={styles.header}>
       <div className={styles.lineId}>
-        <span className={styles.strong}>{lineIdParsed}</span>
+        <span className={styles.strong}>{routeIdParsed}</span>
       </div>
       <div className={styles.nameContainer}>
         <div className={styles.lineName}>
@@ -32,7 +32,7 @@ LineTimetableHeader.defaultProps = {
 };
 
 LineTimetableHeader.propTypes = {
-  lineIdParsed: PropTypes.string.isRequired,
+  routeIdParsed: PropTypes.string.isRequired,
   nameFi: PropTypes.string,
   nameSe: PropTypes.string,
   showPrintBtn: PropTypes.bool,
