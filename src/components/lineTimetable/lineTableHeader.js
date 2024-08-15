@@ -7,8 +7,8 @@ const LineTableHeader = props => {
   const { stop } = props;
   return (
     <div className={styles.stop}>
-      <p className={styles.stopName}>{stop.nameFi}</p>
-      <p className={styles.stopName}>{stop.nameSe}</p>
+      <p className={styles.stopNamePrimary}>{stop.nameFi}</p>
+      <p className={styles.stopNameSecondary}>{stop.nameSe}</p>
     </div>
   );
 };

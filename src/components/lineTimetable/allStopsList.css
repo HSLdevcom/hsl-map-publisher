@@ -1,6 +1,7 @@
 .stopListsContainer {
   margin-top: 2rem;
   max-width: 1171px;
+  page-break-inside: avoid;
 }
 
 .stopList {
@@ -15,10 +16,4 @@
 
 .stopListText {
   font-family: GothamRounded-Medium;
-}
-
-@media print {
-  .stopListsContainer {
-    page-break-inside: avoid;
-  }
 }

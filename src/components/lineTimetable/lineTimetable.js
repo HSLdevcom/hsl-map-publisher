@@ -173,7 +173,7 @@ function LineTimetable(props) {
 
             return (
               routeForDateRange.departuresByStop.length > 0 && (
-                <div>
+                <div className={styles.pageBreak}>
                   <RouteDepartures
                     routeIdParsed={routeIdParsed}
                     nameFi={nameFi}
@@ -190,7 +190,6 @@ function LineTimetable(props) {
                     routeIdParsed={routeIdParsed}
                   />
                   <div className={styles.timetableDivider} />
-                  <div className={styles.pageBreak}>&nbsp;</div>
                 </div>
               )
             );

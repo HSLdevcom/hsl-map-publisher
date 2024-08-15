@@ -4,10 +4,6 @@
   font-family: GothamRounded-Book;
 }
 
-.departureRowContainer > *:nth-child(odd) {
-  background-color: #e8e8e8;
-}
-
 .departureRow {
   font-size: 1.2rem;
   margin-left: 2rem;
@@ -29,8 +25,19 @@
   min-width: 400px !important;
 }
 
-.firstStopDivider {
-  border-right: 3px solid darkgray;
+.hour {
+  font-family: GothamXNarrow-Medium;
+}
+
+.minutes {
+  display: flex;
+  min-width: 2em;
+  padding: 0.25em 0 0 0.6em;
+  font-family: GothamXNarrow-Book;
+  font-size: 0.75em;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  margin-right: 0.25em;
 }
 
 @media print {

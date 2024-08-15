@@ -73,7 +73,7 @@ const isEqualDepartureHour = (a, b) => {
   return true;
 };
 
-const getDuplicateCutOff = (startIndex, rows) => {
+export const getDuplicateCutOff = (startIndex, rows) => {
   const startRow = rows[startIndex];
   let cutOffIndex = startIndex;
   for (let i = startIndex; i < rows.length; i++) {
@@ -86,7 +86,7 @@ const getDuplicateCutOff = (startIndex, rows) => {
   return cutOffIndex;
 };
 
-const filterDuplicateDepartureHours = departureRows => {
+export const filterDuplicateDepartureHours = departureRows => {
   return uniqBy(departureRows, 'departures');
 };
 
