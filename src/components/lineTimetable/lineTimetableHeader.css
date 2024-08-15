@@ -1,6 +1,5 @@
 .header {
   display: flex;
-  page-break-before: always;
   margin-bottom: 1rem;
   word-wrap: break-word;
 }
@@ -29,10 +28,4 @@
 .printBtnContainer {
   display: inline;
   margin-top: 1rem;
-}
-
-@media print {
-  .header {
-    page-break-before: always;
-  }
 }

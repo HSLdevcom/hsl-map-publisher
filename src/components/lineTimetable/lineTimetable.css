@@ -155,7 +155,7 @@
 }
 
 .pageBreak {
-  display: none;
+  page-break-inside: avoid;
 }
 
 .timetableDivider {
@@ -169,15 +169,8 @@
   .noPrint * {
     display: none !important;
   }
-  .pageBreak {
-    display: block;
-    page-break-after: always;
-  }
 
   body {
     overflow-y: visible;
-  }
-  div {
-    break-inside: avoid;
   }
 }
