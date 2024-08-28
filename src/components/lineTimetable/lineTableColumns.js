@@ -16,11 +16,15 @@ const LineTimetableRow = props => {
     <WrappingRow>
       <Row className={styles.departureRow}>
         <div className={styles.hour}>{hour}</div>
-        {sortedMinuteDepartures.map((departure, index) => (
-          <div className={styles.minutes} key={index}>
-            {departure.minutes.toString().padStart(2, '0')}
-          </div>
-        ))}
+        <div className={styles.minutesContainer}>
+          {sortedMinuteDepartures.map((departure, index) => (
+            <div className={styles.minutes} key={index}>
+              {departure.note === 'p'
+                ? `${departure.minutes.toString().padStart(2, '0')} pe`
+                : departure.minutes.toString().padStart(2, '0')}
+            </div>
+          ))}
+        </div>
       </Row>
     </WrappingRow>
   );

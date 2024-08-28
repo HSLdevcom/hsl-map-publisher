@@ -4,9 +4,9 @@ import styles from './lineTimetable.css';
 import LineTimetableHeader from './lineTimetableHeader';
 import LineTableColumns from './lineTableColumns';
 import AllStopsList from './allStopsList';
-import { filter, isEmpty, uniqBy, flatten, forEach, groupBy, find } from 'lodash';
+import { filter, isEmpty, uniqBy, flatten, forEach, groupBy, find, unionWith, omit } from 'lodash';
 import { scheduleSegments } from '../../util/domain';
-import { combineConsecutiveDays } from '../timetable/timetableContainer';
+import { addMissingFridayNote, combineConsecutiveDays } from '../timetable/timetableContainer';
 
 const MAX_STOPS = 6; // Maximum amount of timed stops rendered on the timetable
 
@@ -79,9 +79,38 @@ const RouteDepartures = props => {
     };
   });
 
-  const combinedDepartureTables = Object.keys(mappedWeekdayDepartures[0].combinedDays).map(key => {
+  const mergedWeekdaysDepartures = mappedWeekdayDepartures.map(mappedDeparturesForStop => {
+    if (
+      mappedDeparturesForStop.combinedDays[scheduleSegments.fridays] &&
+      mappedDeparturesForStop.combinedDays[scheduleSegments.weekdaysExclFriday]
+    ) {
+      // Merge friday departures onto Monday-Thursday departures and include a note so it can be displayed
+      const combinedWeekdayDepartures = unionWith(
+        mappedDeparturesForStop.combinedDays[scheduleSegments.weekdaysExclFriday],
+        mappedDeparturesForStop.combinedDays[scheduleSegments.fridays],
+        (weekday, friday) => {
+          return weekday.hours === friday.hours && weekday.minutes === friday.minutes;
+        },
+      );
+      const combinedWithNotes = combinedWeekdayDepartures.map(departure => {
+        return { ...departure, note: addMissingFridayNote(departure) };
+      });
+
+      const mergedDepartures = {
+        ...mappedDeparturesForStop,
+        combinedDays: {
+          [scheduleSegments.weekdays]: combinedWithNotes,
+          ...mappedDeparturesForStop.combinedDays,
+        },
+      };
+      return omit(mergedDepartures, ['combinedDays.mondays-thursdays', 'combinedDays.fridays']); // Remove redundant departure days, since we just combined them.
+    }
+    return { ...mappedDeparturesForStop };
+  });
+
+  const combinedDepartureTables = Object.keys(mergedWeekdaysDepartures[0].combinedDays).map(key => {
     return (
-      <div>
+      <div className={styles.timetableContainer}>
         <LineTimetableHeader
           routeIdParsed={routeIdParsed}
           nameFi={nameFi}
@@ -95,7 +124,7 @@ const RouteDepartures = props => {
         </span>
         <LineTableColumns
           showDivider={!showTimedStops}
-          departuresByStop={mappedWeekdayDepartures}
+          departuresByStop={mergedWeekdaysDepartures}
           days={key}
         />
       </div>

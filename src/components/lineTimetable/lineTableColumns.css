@@ -2,6 +2,7 @@
   max-width: 1171px;
   min-width: 120px;
   font-family: GothamRounded-Book;
+  margin: 0.5rem 0;
 }
 
 .departureRow {
@@ -27,6 +28,14 @@
 
 .hour {
   font-family: GothamXNarrow-Medium;
+  min-width: 3rem;
+  align-self: baseline;
+}
+
+.minutesContainer {
+  max-width: 400px;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .minutes {
