@@ -4,7 +4,19 @@ import styles from './lineTimetable.css';
 import LineTimetableHeader from './lineTimetableHeader';
 import LineTableColumns from './lineTableColumns';
 import AllStopsList from './allStopsList';
-import { filter, isEmpty, uniqBy, flatten, forEach, groupBy, find, unionWith, omit } from 'lodash';
+import {
+  filter,
+  isEmpty,
+  uniqBy,
+  flatten,
+  forEach,
+  groupBy,
+  find,
+  unionWith,
+  omit,
+  isEqual,
+  some,
+} from 'lodash';
 import { scheduleSegments } from '../../util/domain';
 import { addMissingFridayNote, combineConsecutiveDays } from '../timetable/timetableContainer';
 
@@ -54,7 +66,63 @@ const RouteDepartures = props => {
     showTimedStops,
   } = props;
 
-  const mappedWeekdayDepartures = departuresByStop.map(departuresForStop => {
+  // This fixes some errors in combined departures, such as ['saturdays-sundays'] for first 3 stops, and ['saturdays', 'sundays']
+  const fixPartialWeekendDepartures = departureRange => {
+    const firstStopDayKeys = Object.keys(departureRange[0].combinedDays);
+
+    const hasPartialDepartures = some(departureRange, stop => {
+      return !isEqual(Object.keys(stop.combinedDays), firstStopDayKeys);
+    });
+
+    if (hasPartialDepartures) {
+      // 'saturdays-sundays' combined departures
+      if (isEqual(firstStopDayKeys, [scheduleSegments.weekends])) {
+        const remappedStopDepartures = departureRange.map(stop => {
+          const stopKeys = Object.keys(stop.combinedDays);
+          // Has differing departure keys compared to first stop
+          if (!isEqual(stopKeys, firstStopDayKeys)) {
+            const stopDepartures = stop.combinedDays.saturdays
+              ? stop.combinedDays.saturdays
+              : stop.combinedDays.sundays;
+            return {
+              ...stop,
+              combinedDays: {
+                [scheduleSegments.weekends]: { ...stopDepartures },
+              },
+            };
+          }
+          return stop;
+        });
+        return remappedStopDepartures;
+      }
+      // 'saturdays' and 'sundays' departures separately
+      if (isEqual(firstStopDayKeys, [scheduleSegments.saturdays, scheduleSegments.sundays])) {
+        const remappedStopDepartures = departureRange.map(stop => {
+          const stopKeys = Object.keys(stop.combinedDays);
+          // Has differing departure keys compared to first stop
+          if (!isEqual(stopKeys, firstStopDayKeys)) {
+            return {
+              ...stop,
+              combinedDays: {
+                [scheduleSegments.saturdays]: filter(stop.combinedDays.weekends, departure => {
+                  return departure.dayType[0] === 'La';
+                }),
+                [scheduleSegments.sundays]: filter(stop.combinedDays.weekends, departure => {
+                  return departure.dayType[0] === 'Su';
+                }),
+              },
+            };
+          }
+          return stop;
+        });
+        return remappedStopDepartures;
+      }
+    }
+
+    return departureRange;
+  };
+
+  const mappedDepartures = departuresByStop.map(departuresForStop => {
     const {
       mondays,
       tuesdays,
@@ -65,7 +133,7 @@ const RouteDepartures = props => {
       sundays,
     } = departuresForStop.departures;
 
-    return {
+    const stopWithCombinedDepartures = {
       stop: departuresForStop.stop,
       combinedDays: combineConsecutiveDays({
         mondays,
@@ -77,9 +145,12 @@ const RouteDepartures = props => {
         sundays,
       }),
     };
+    return stopWithCombinedDepartures;
   });
 
-  const mergedWeekdaysDepartures = mappedWeekdayDepartures.map(mappedDeparturesForStop => {
+  const sanityCheckedDepartures = fixPartialWeekendDepartures(mappedDepartures);
+  console.log(sanityCheckedDepartures);
+  const mergedWeekdaysDepartures = sanityCheckedDepartures.map(mappedDeparturesForStop => {
     if (
       mappedDeparturesForStop.combinedDays[scheduleSegments.fridays] &&
       mappedDeparturesForStop.combinedDays[scheduleSegments.weekdaysExclFriday]
@@ -105,6 +176,7 @@ const RouteDepartures = props => {
       };
       return omit(mergedDepartures, ['combinedDays.mondays-thursdays', 'combinedDays.fridays']); // Remove redundant departure days, since we just combined them.
     }
+
     return { ...mappedDeparturesForStop };
   });
 
