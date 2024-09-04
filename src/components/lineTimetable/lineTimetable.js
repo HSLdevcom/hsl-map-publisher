@@ -93,7 +93,9 @@ const RouteDepartures = props => {
           }
           return stop;
         });
-        return remappedStopDepartures;
+        return Object.values(
+          omit(remappedStopDepartures, ['combinedDays.saturdays', 'combinedDays.sundays']), // Remove redundant departure arrays
+        );
       }
       // 'saturdays' and 'sundays' departures separately
       if (isEqual(firstStopDayKeys, [scheduleSegments.saturdays, scheduleSegments.sundays])) {
@@ -115,7 +117,7 @@ const RouteDepartures = props => {
           }
           return stop;
         });
-        return remappedStopDepartures;
+        return Object.values(omit(remappedStopDepartures, ['combinedDays.saturdays-sundays'])); // Remove redundant departure array
       }
     }
 
@@ -149,7 +151,6 @@ const RouteDepartures = props => {
   });
 
   const sanityCheckedDepartures = fixPartialWeekendDepartures(mappedDepartures);
-  console.log(sanityCheckedDepartures);
   const mergedWeekdaysDepartures = sanityCheckedDepartures.map(mappedDeparturesForStop => {
     if (
       mappedDeparturesForStop.combinedDays[scheduleSegments.fridays] &&
