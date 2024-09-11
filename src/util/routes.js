@@ -115,6 +115,8 @@ function routesToTree(routes, { stopZone, shortId }, height = 'auto', width = MA
   return root;
 }
 
-export {
-  routesToTree, // eslint-disable-line import/prefer-default-export
-};
+function shortenTrainParsedLineId(lineId) {
+  return lineId.replace(/^\d/, '');
+}
+
+export { routesToTree, shortenTrainParsedLineId };

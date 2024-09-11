@@ -19,6 +19,7 @@ import {
 } from 'lodash';
 import { scheduleSegments } from '../../util/domain';
 import { addMissingFridayNote, combineConsecutiveDays } from '../timetable/timetableContainer';
+import { shortenTrainParsedLineId } from '../../util/routes';
 
 const MAX_STOPS = 6; // Maximum amount of timed stops rendered on the timetable
 
@@ -241,14 +242,25 @@ const dateRangeHasDepartures = routeDepartures => {
   return hasDepartures;
 };
 
+const checkForTrainRoutes = routes => {
+  return routes.map(route => {
+    if (route.mode === 'RAIL') {
+      return { ...route, routeIdParsed: shortenTrainParsedLineId(route.routeIdParsed) };
+    }
+    return route;
+  });
+};
+
 function LineTimetable(props) {
   const { routes } = props;
   const showTimedStops = hasTimedStopRoutes(routes);
 
+  const checkedRoutes = checkForTrainRoutes(routes);
+
   if (showTimedStops) {
     return (
       <div>
-        {routes.map(routeWithDepartures => {
+        {checkedRoutes.map(routeWithDepartures => {
           const routesByDateRanges = routeWithDepartures.departuresByDateRanges.map(
             departuresForDateRange => {
               const { nameFi, nameSe, routeIdParsed } = routeWithDepartures;
@@ -305,7 +317,7 @@ function LineTimetable(props) {
 
   // The logic below is for timetables that do not have timed stops to display, only the starting stop for a route.
   // These stops are displayed with both directions side by side in the timetable.
-  const groupedRoutes = groupBy(routes, 'routeId');
+  const groupedRoutes = groupBy(checkedRoutes, 'routeId');
 
   // Map the departures from both directions into unique date ranges, so that we can display both directions for a date range side by side
   const routeGroupsMappedDepartures = Object.values(groupedRoutes).map(routeGroup => {
