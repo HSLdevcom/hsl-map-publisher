@@ -4,9 +4,22 @@ import styles from './lineTimetable.css';
 import LineTimetableHeader from './lineTimetableHeader';
 import LineTableColumns from './lineTableColumns';
 import AllStopsList from './allStopsList';
-import { filter, isEmpty, uniqBy, flatten, forEach, groupBy, find } from 'lodash';
+import {
+  filter,
+  isEmpty,
+  uniqBy,
+  flatten,
+  forEach,
+  groupBy,
+  find,
+  unionWith,
+  omit,
+  isEqual,
+  some,
+} from 'lodash';
 import { scheduleSegments } from '../../util/domain';
-import { combineConsecutiveDays } from '../timetable/timetableContainer';
+import { addMissingFridayNote, combineConsecutiveDays } from '../timetable/timetableContainer';
+import { shortenTrainParsedLineId } from '../../util/routes';
 
 const MAX_STOPS = 6; // Maximum amount of timed stops rendered on the timetable
 
@@ -54,7 +67,65 @@ const RouteDepartures = props => {
     showTimedStops,
   } = props;
 
-  const mappedWeekdayDepartures = departuresByStop.map(departuresForStop => {
+  // This fixes some errors in combined departures, such as ['saturdays-sundays'] for first 3 stops, and ['saturdays', 'sundays']
+  const fixPartialWeekendDepartures = departureRange => {
+    const firstStopDayKeys = Object.keys(departureRange[0].combinedDays);
+
+    const hasPartialDepartures = some(departureRange, stop => {
+      return !isEqual(Object.keys(stop.combinedDays), firstStopDayKeys);
+    });
+
+    if (hasPartialDepartures) {
+      // 'saturdays-sundays' combined departures
+      if (isEqual(firstStopDayKeys, [scheduleSegments.weekends])) {
+        const remappedStopDepartures = departureRange.map(stop => {
+          const stopKeys = Object.keys(stop.combinedDays);
+          // Has differing departure keys compared to first stop
+          if (!isEqual(stopKeys, firstStopDayKeys)) {
+            const stopDepartures = stop.combinedDays.saturdays
+              ? stop.combinedDays.saturdays
+              : stop.combinedDays.sundays;
+            return {
+              ...stop,
+              combinedDays: {
+                [scheduleSegments.weekends]: { ...stopDepartures },
+              },
+            };
+          }
+          return stop;
+        });
+        return Object.values(
+          omit(remappedStopDepartures, ['combinedDays.saturdays', 'combinedDays.sundays']), // Remove redundant departure arrays
+        );
+      }
+      // 'saturdays' and 'sundays' departures separately
+      if (isEqual(firstStopDayKeys, [scheduleSegments.saturdays, scheduleSegments.sundays])) {
+        const remappedStopDepartures = departureRange.map(stop => {
+          const stopKeys = Object.keys(stop.combinedDays);
+          // Has differing departure keys compared to first stop
+          if (!isEqual(stopKeys, firstStopDayKeys)) {
+            return {
+              ...stop,
+              combinedDays: {
+                [scheduleSegments.saturdays]: filter(stop.combinedDays.weekends, departure => {
+                  return departure.dayType[0] === 'La';
+                }),
+                [scheduleSegments.sundays]: filter(stop.combinedDays.weekends, departure => {
+                  return departure.dayType[0] === 'Su';
+                }),
+              },
+            };
+          }
+          return stop;
+        });
+        return Object.values(omit(remappedStopDepartures, ['combinedDays.saturdays-sundays'])); // Remove redundant departure array
+      }
+    }
+
+    return departureRange;
+  };
+
+  const mappedDepartures = departuresByStop.map(departuresForStop => {
     const {
       mondays,
       tuesdays,
@@ -65,7 +136,7 @@ const RouteDepartures = props => {
       sundays,
     } = departuresForStop.departures;
 
-    return {
+    const stopWithCombinedDepartures = {
       stop: departuresForStop.stop,
       combinedDays: combineConsecutiveDays({
         mondays,
@@ -77,11 +148,43 @@ const RouteDepartures = props => {
         sundays,
       }),
     };
+    return stopWithCombinedDepartures;
   });
 
-  const combinedDepartureTables = Object.keys(mappedWeekdayDepartures[0].combinedDays).map(key => {
+  const sanityCheckedDepartures = fixPartialWeekendDepartures(mappedDepartures);
+  const mergedWeekdaysDepartures = sanityCheckedDepartures.map(mappedDeparturesForStop => {
+    if (
+      mappedDeparturesForStop.combinedDays[scheduleSegments.fridays] &&
+      mappedDeparturesForStop.combinedDays[scheduleSegments.weekdaysExclFriday]
+    ) {
+      // Merge friday departures onto Monday-Thursday departures and include a note so it can be displayed
+      const combinedWeekdayDepartures = unionWith(
+        mappedDeparturesForStop.combinedDays[scheduleSegments.weekdaysExclFriday],
+        mappedDeparturesForStop.combinedDays[scheduleSegments.fridays],
+        (weekday, friday) => {
+          return weekday.hours === friday.hours && weekday.minutes === friday.minutes;
+        },
+      );
+      const combinedWithNotes = combinedWeekdayDepartures.map(departure => {
+        return { ...departure, note: addMissingFridayNote(departure) };
+      });
+
+      const mergedDepartures = {
+        ...mappedDeparturesForStop,
+        combinedDays: {
+          [scheduleSegments.weekdays]: combinedWithNotes,
+          ...mappedDeparturesForStop.combinedDays,
+        },
+      };
+      return omit(mergedDepartures, ['combinedDays.mondays-thursdays', 'combinedDays.fridays']); // Remove redundant departure days, since we just combined them.
+    }
+
+    return { ...mappedDeparturesForStop };
+  });
+
+  const combinedDepartureTables = Object.keys(mergedWeekdaysDepartures[0].combinedDays).map(key => {
     return (
-      <div>
+      <div className={styles.timetableContainer}>
         <LineTimetableHeader
           routeIdParsed={routeIdParsed}
           nameFi={nameFi}
@@ -95,7 +198,7 @@ const RouteDepartures = props => {
         </span>
         <LineTableColumns
           showDivider={!showTimedStops}
-          departuresByStop={mappedWeekdayDepartures}
+          departuresByStop={mergedWeekdaysDepartures}
           days={key}
         />
       </div>
@@ -139,14 +242,25 @@ const dateRangeHasDepartures = routeDepartures => {
   return hasDepartures;
 };
 
+const checkForTrainRoutes = routes => {
+  return routes.map(route => {
+    if (route.mode === 'RAIL') {
+      return { ...route, routeIdParsed: shortenTrainParsedLineId(route.routeIdParsed) };
+    }
+    return route;
+  });
+};
+
 function LineTimetable(props) {
   const { routes } = props;
   const showTimedStops = hasTimedStopRoutes(routes);
 
+  const checkedRoutes = checkForTrainRoutes(routes);
+
   if (showTimedStops) {
     return (
       <div>
-        {routes.map(routeWithDepartures => {
+        {checkedRoutes.map(routeWithDepartures => {
           const routesByDateRanges = routeWithDepartures.departuresByDateRanges.map(
             departuresForDateRange => {
               const { nameFi, nameSe, routeIdParsed } = routeWithDepartures;
@@ -173,7 +287,7 @@ function LineTimetable(props) {
 
             return (
               routeForDateRange.departuresByStop.length > 0 && (
-                <div>
+                <div className={styles.pageBreak}>
                   <RouteDepartures
                     routeIdParsed={routeIdParsed}
                     nameFi={nameFi}
@@ -190,7 +304,6 @@ function LineTimetable(props) {
                     routeIdParsed={routeIdParsed}
                   />
                   <div className={styles.timetableDivider} />
-                  <div className={styles.pageBreak}>&nbsp;</div>
                 </div>
               )
             );
@@ -204,7 +317,7 @@ function LineTimetable(props) {
 
   // The logic below is for timetables that do not have timed stops to display, only the starting stop for a route.
   // These stops are displayed with both directions side by side in the timetable.
-  const groupedRoutes = groupBy(routes, 'routeId');
+  const groupedRoutes = groupBy(checkedRoutes, 'routeId');
 
   // Map the departures from both directions into unique date ranges, so that we can display both directions for a date range side by side
   const routeGroupsMappedDepartures = Object.values(groupedRoutes).map(routeGroup => {

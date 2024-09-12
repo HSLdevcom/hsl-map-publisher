@@ -149,13 +149,13 @@
 }
 
 .timetableDates {
-  margin: 0 1rem 1rem 4rem;
+  margin: 0 1rem 1rem 2rem;
   font-size: 1.5em;
   font-family: GothamRounded-Book;
 }
 
 .pageBreak {
-  display: none;
+  page-break-inside: avoid;
 }
 
 .timetableDivider {
@@ -164,20 +164,17 @@
   border-bottom: 2px dotted gray;
 }
 
+.timetableContainer {
+  page-break-after: always;
+}
+
 @media print {
   .noPrint,
   .noPrint * {
     display: none !important;
   }
-  .pageBreak {
-    display: block;
-    page-break-after: always;
-  }
 
   body {
     overflow-y: visible;
-  }
-  div {
-    break-inside: avoid;
   }
 }

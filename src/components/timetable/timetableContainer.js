@@ -253,7 +253,7 @@ function getDuplicateRouteNote(duplicateRoutes, departure) {
   return duplicateRoutes.includes(departure.routeId) ? '*'.repeat(departure.direction) : null;
 }
 
-function addMissingFridayNote(departure) {
+export function addMissingFridayNote(departure) {
   return departure.dayType.length === 1 &&
     departure.dayType.includes('Pe') &&
     (!departure.note || !departure.note.includes('p'))

@@ -2,10 +2,7 @@
   max-width: 1171px;
   min-width: 120px;
   font-family: GothamRounded-Book;
-}
-
-.departureRowContainer > *:nth-child(odd) {
-  background-color: #e8e8e8;
+  margin: 0.5rem 0;
 }
 
 .departureRow {
@@ -29,8 +26,27 @@
   min-width: 400px !important;
 }
 
-.firstStopDivider {
-  border-right: 3px solid darkgray;
+.hour {
+  font-family: GothamXNarrow-Medium;
+  min-width: 3rem;
+  align-self: baseline;
+}
+
+.minutesContainer {
+  max-width: 400px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.minutes {
+  display: flex;
+  min-width: 2em;
+  padding: 0.25em 0 0 0.6em;
+  font-family: GothamXNarrow-Book;
+  font-size: 0.75em;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  margin-right: 0.25em;
 }
 
 @media print {
