@@ -21,7 +21,7 @@ import { scheduleSegments } from '../../util/domain';
 import { addMissingFridayNote, combineConsecutiveDays } from '../timetable/timetableContainer';
 import { shortenTrainParsedLineId } from '../../util/routes';
 
-const MAX_STOPS = 6; // Maximum amount of timed stops rendered on the timetable
+const MAX_STOPS = 4; // Maximum amount of timed stops rendered on the timetable
 
 const getScheduleWeekdaysText = dayType => {
   switch (dayType) {
@@ -182,6 +182,10 @@ const RouteDepartures = props => {
     return { ...mappedDeparturesForStop };
   });
 
+  const FridayNote = () => {
+    return <div className={styles.fridayNote}>pe = perjantaisin</div>;
+  };
+
   const combinedDepartureTables = Object.keys(mergedWeekdaysDepartures[0].combinedDays).map(key => {
     return (
       <div className={styles.timetableContainer}>
@@ -201,6 +205,7 @@ const RouteDepartures = props => {
           departuresByStop={mergedWeekdaysDepartures}
           days={key}
         />
+        {key === scheduleSegments.weekdays && <FridayNote />}
       </div>
     );
   });

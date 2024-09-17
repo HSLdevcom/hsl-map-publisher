@@ -94,6 +94,13 @@ async function renderComponent(options) {
       margin: 0,
       timeout: PDF_TIMEOUT,
     };
+  } else if (props.printAsA5) {
+    printOptions = {
+      printBackground: true,
+      format: 'A5',
+      margin: 0,
+      timeout: PDF_TIMEOUT,
+    };
   } else {
     printOptions = {
       printBackground: true,

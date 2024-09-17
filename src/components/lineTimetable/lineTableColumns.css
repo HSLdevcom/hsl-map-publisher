@@ -1,13 +1,13 @@
 .departureRowContainer {
-  max-width: 1171px;
+  max-width: 420px;
   min-width: 120px;
   font-family: GothamRounded-Book;
   margin: 0.5rem 0;
 }
 
 .departureRow {
-  font-size: 1.2rem;
-  margin-left: 2rem;
+  font-size: 1rem;
+  margin-left: 1.6rem;
   padding-top: 5px;
   padding-bottom: 5px;
 }
@@ -15,6 +15,8 @@
 .departureColumnContainer {
   flex-grow: 1;
   align-items: normal;
+  min-width: 100px;
+  max-width: 350px;
 }
 
 .tableContainer {
@@ -23,12 +25,14 @@
 }
 
 .wider {
-  min-width: 400px !important;
+  min-width: 200px !important;
 }
 
 .hour {
   font-family: GothamXNarrow-Medium;
-  min-width: 3rem;
+  font-size: 15px;
+  width: 1.5rem;
+  margin-right: 0.5em;
   align-self: baseline;
 }
 
@@ -40,13 +44,12 @@
 
 .minutes {
   display: flex;
-  min-width: 2em;
-  padding: 0.25em 0 0 0.6em;
+  min-width: 0.9em;
   font-family: GothamXNarrow-Book;
-  font-size: 0.75em;
-  letter-spacing: -0.025em;
+  font-size: 12px;
+  letter-spacing: -0.02em;
   line-height: 1;
-  margin-right: 0.25em;
+  margin-right: 0.2em;
 }
 
 @media print {

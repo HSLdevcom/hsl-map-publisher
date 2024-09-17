@@ -143,14 +143,15 @@
 }
 
 .timetableDays {
-  margin: 0 1rem 1rem 2rem;
-  font-size: 1.5em;
+  margin: 0 1rem 1rem 1.2rem;
+  font-size: 0.8em;
   font-family: GothamRounded-Book;
+  word-wrap: break-word;
 }
 
 .timetableDates {
   margin: 0 1rem 1rem 2rem;
-  font-size: 1.5em;
+  font-size: 0.8em;
   font-family: GothamRounded-Book;
 }
 
@@ -166,6 +167,12 @@
 
 .timetableContainer {
   page-break-after: always;
+}
+
+.fridayNote {
+  margin-left: 1.5rem;
+  font-family: GothamRounded-Book;
+  font-size: 12px;
 }
 
 @media print {

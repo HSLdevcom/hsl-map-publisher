@@ -20,7 +20,7 @@ const LineTimetableRow = props => {
           {sortedMinuteDepartures.map((departure, index) => (
             <div className={styles.minutes} key={index}>
               {departure.note === 'p'
-                ? `${departure.minutes.toString().padStart(2, '0')} pe`
+                ? `${departure.minutes.toString().padStart(2, '0')}pe`
                 : departure.minutes.toString().padStart(2, '0')}
             </div>
           ))}
