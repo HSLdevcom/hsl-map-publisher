@@ -1,3 +1,7 @@
+.headerContainer {
+  display: flex;
+}
+
 .stop {
   flex-grow: 1;
   height: 50px;
@@ -15,4 +19,9 @@
   font-size: 1rem;
   margin: 0 0 0 1.2rem;
   font-family: GothamXNarrow-Book;
+}
+
+.directionBracket {
+  font-family: GothamRounded-Medium;
+  font-size: 1rem;
 }

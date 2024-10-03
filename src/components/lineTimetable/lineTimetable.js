@@ -182,11 +182,8 @@ const RouteDepartures = props => {
     return { ...mappedDeparturesForStop };
   });
 
-  const FridayNote = () => {
-    return <div className={styles.fridayNote}>pe = perjantaisin</div>;
-  };
-
   const combinedDepartureTables = Object.keys(mergedWeekdaysDepartures[0].combinedDays).map(key => {
+    const showDivider = departuresByStop.length === 1 ? false : !showTimedStops;
     return (
       <div className={styles.timetableContainer}>
         <LineTimetableHeader
@@ -201,11 +198,10 @@ const RouteDepartures = props => {
           {formatDate(new Date(dateBegin))}-{formatDate(new Date(dateEnd))}
         </span>
         <LineTableColumns
-          showDivider={!showTimedStops}
+          showDivider={showDivider}
           departuresByStop={mergedWeekdaysDepartures}
           days={key}
         />
-        {key === scheduleSegments.weekdays && <FridayNote />}
       </div>
     );
   });
@@ -237,16 +233,6 @@ RouteDepartures.propTypes = {
   showTimedStops: PropTypes.bool,
 };
 
-const dateRangeHasDepartures = routeDepartures => {
-  const hasDepartures = find(
-    Object.values(routeDepartures.departuresByStop[0].departures),
-    weekday => {
-      return !isEmpty(weekday);
-    },
-  );
-  return hasDepartures;
-};
-
 const checkForTrainRoutes = routes => {
   return routes.map(route => {
     if (route.mode === 'RAIL') {
@@ -256,11 +242,26 @@ const checkForTrainRoutes = routes => {
   });
 };
 
+// Add note for friday departures because of merged timetables
+const addFridayNote = notes => {
+  return notes.splice(0, 0, { noteText: 'p) Vain perjantaisin' });
+};
+
 function LineTimetable(props) {
   const { routes } = props;
+  const notes = props.line.notes.nodes;
+  addFridayNote(notes);
   const showTimedStops = hasTimedStopRoutes(routes);
 
   const checkedRoutes = checkForTrainRoutes(routes);
+
+  const mappedNotes = notes.map(note => {
+    return (
+      <div key={note} className={styles.footnote}>
+        {note.noteText}
+      </div>
+    );
+  });
 
   if (showTimedStops) {
     return (
@@ -316,6 +317,12 @@ function LineTimetable(props) {
 
           return routeDeparturesForDateRanges;
         })}
+        {checkedRoutes.length >= 1 && <div className={styles.notesContainer}>{mappedNotes}</div>}
+        {checkedRoutes.length === 0 && (
+          <div className={styles.notesContainer}>
+            Linjaa ei löytynyt, tarkista tulosteen asetukset
+          </div>
+        )}
       </div>
     );
   }
@@ -367,6 +374,15 @@ function LineTimetable(props) {
         return routeWithDepartures.departuresByDateRanges.map(departuresFordateRange => {
           const { nameFi, nameSe, routeIdParsed } = routeWithDepartures;
           const { dateBegin, dateEnd, departuresByStop } = departuresFordateRange;
+
+          const hasDepartures = some(departuresByStop, stop =>
+            some(stop.departures, departureDay => departureDay.length > 0),
+          );
+
+          if (departuresByStop[0].stop.stopId === departuresByStop[1].stop.stopId) {
+            departuresByStop.pop(1);
+          }
+
           return (
             <div>
               <RouteDepartures
@@ -380,14 +396,23 @@ function LineTimetable(props) {
                 dateEnd={dateEnd}
                 showTimedStops={showTimedStops}
               />
-              <AllStopsList
-                stops={routeWithDepartures.routeSegments.nodes}
-                routeIdParsed={routeIdParsed}
-              />
+              {hasDepartures && (
+                <AllStopsList
+                  stops={routeWithDepartures.routeSegments.nodes}
+                  routeIdParsed={routeIdParsed}
+                />
+              )}
+              {hasDepartures && <div className={styles.timetableDivider} />}
             </div>
           );
         });
       })}
+      {checkedRoutes.length >= 1 && <div className={styles.notesContainer}>{mappedNotes}</div>}
+      {checkedRoutes.length === 0 && (
+        <div className={styles.notesContainer}>
+          Linjaa ei löytynyt, tarkista tulosteen asetukset
+        </div>
+      )}
     </div>
   );
 }

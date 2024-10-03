@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Column, Row, WrappingRow } from '../util';
 import LineTableHeader from './lineTableHeader';
 import styles from './lineTableColumns.css';
-import classNames from 'classnames';
+import classnames from 'classnames';
 import { isArray, filter, isEmpty, groupBy } from 'lodash';
 import { filterDuplicateDepartureHours, getDuplicateCutOff } from '../timetable/tableRows';
 
@@ -19,8 +19,8 @@ const LineTimetableRow = props => {
         <div className={styles.minutesContainer}>
           {sortedMinuteDepartures.map((departure, index) => (
             <div className={styles.minutes} key={index}>
-              {departure.note === 'p'
-                ? `${departure.minutes.toString().padStart(2, '0')}pe`
+              {departure.note !== null
+                ? `${departure.minutes.toString().padStart(2, '0')}${departure.note}`
                 : departure.minutes.toString().padStart(2, '0')}
             </div>
           ))}
@@ -87,8 +87,15 @@ const DeparturesColumn = props => {
     });
 
     return (
-      <div>
-        <LineTableHeader stop={stop} />
+      <div
+        className={classnames({
+          [styles.wider]: props.showBothDirections,
+          [styles.divider]: stop.index === 0 && props.showBothDirections,
+        })}>
+        <LineTableHeader
+          stop={stop}
+          isLastStop={props.showBothDirections ? true : props.isLastStop}
+        />
         <div className={styles.departureRowContainer}>{departureRows}</div>
       </div>
     );
@@ -104,6 +111,8 @@ const DeparturesColumn = props => {
 DeparturesColumn.propTypes = {
   departures: PropTypes.array.isRequired,
   stop: PropTypes.object.isRequired,
+  showBothDirections: PropTypes.bool.isRequired,
+  isLastStop: PropTypes.bool.isRequired,
 };
 
 const LineTableColumns = props => {
@@ -117,13 +126,12 @@ const LineTableColumns = props => {
       });
       return (
         <div>
-          <Column
-            className={classNames(styles.departureColumnContainer, {
-              [styles.wider]: showDivider,
-            })}>
+          <Column className={styles.departureColumnContainer}>
             <DeparturesColumn
               departures={departures.combinedDays[validSelectedDay]}
               stop={{ ...departures.stop, index }}
+              showBothDirections={showDivider}
+              isLastStop={index === departuresByStop.length - 1}
             />
           </Column>
         </div>
@@ -131,13 +139,12 @@ const LineTableColumns = props => {
     }
     return (
       <div>
-        <Column
-          className={classNames(styles.departureColumnContainer, {
-            [styles.wider]: showDivider,
-          })}>
+        <Column className={styles.departureColumnContainer}>
           <DeparturesColumn
             departures={departures.combinedDays[selectedDepartureDays]}
             stop={{ ...departures.stop, index }}
+            showBothDirections={showDivider}
+            isLastStop={index === departuresByStop.length - 1}
           />
         </Column>
       </div>
