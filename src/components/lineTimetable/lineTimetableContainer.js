@@ -4,7 +4,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import mapProps from 'recompose/mapProps';
 import compose from 'recompose/compose';
-import { filter, isEmpty, uniqBy } from 'lodash';
+import { filter, forEach, isEmpty, uniqBy, some } from 'lodash';
 
 import apolloWrapper from 'util/apolloWrapper';
 
@@ -74,6 +74,7 @@ const lineQuery = gql`
                 dateEnd
                 timingStopType
                 stopIndex
+                note
               }
             }
           }
@@ -89,6 +90,8 @@ const lineQuery = gql`
     }
   }
 `;
+
+const VARIKKOLINJA_REGEX = /\d{4}[\w]\d+/;
 
 const regularDayTypes = ['Ma', 'Ti', 'Ke', 'To', 'Pe', 'La', 'Su'];
 
@@ -142,11 +145,59 @@ const groupDeparturesByWeekday = departuresByStop => {
   });
 };
 
-// Filters 'varikkolinja' routes from the timetable
-const removeExtraRoutes = routes => {
-  return filter(routes, route => {
+const hasSameTimedStops = (variantRoute, regularRoute) => {
+  const regularTimedStops = regularRoute.timedStops.nodes;
+  const variantTimedStops = variantRoute.timedStops.nodes;
+
+  if (regularTimedStops.length !== variantTimedStops.length) {
+    return false;
+  }
+
+  let hasSameStops = true;
+  for (let i = 0; i < regularTimedStops.length; i++) {
+    const regularRouteStop = regularTimedStops[i];
+    const variantRouteStop = variantTimedStops[i];
+
+    if (regularRouteStop.stop.stopId !== variantRouteStop.stop.stopId) {
+      hasSameStops = false;
+    }
+  }
+  return hasSameStops;
+};
+
+// Merge variant routes from the timetable if they have the same timed stops.
+const mergeExtraRoutes = routes => {
+  // Filter 'varikkolinja' routes from the list
+  const filteredRoutes = filter(routes, route => {
+    if (route.mode === 'TRAM') {
+      return route.routeId.match(VARIKKOLINJA_REGEX) === null;
+    }
+    return true;
+  });
+
+  const regularRoutes = filter(filteredRoutes, route => {
     return !route.routeId.includes(' ');
   });
+
+  const variantRoutes = filter(filteredRoutes, route => {
+    return route.routeId.includes(' ');
+  });
+
+  forEach(variantRoutes, variantRoute => {
+    forEach(regularRoutes, regularRoute => {
+      if (
+        regularRoute.routeIdParsed === variantRoute.routeIdParsed &&
+        regularRoute.mode === variantRoute.mode &&
+        regularRoute.direction === variantRoute.direction
+      ) {
+        if (hasSameTimedStops(variantRoute, regularRoute)) {
+          // Found a matching "regular" route where we can merge variant departures
+          regularRoute.timedStopsDepartures.nodes.push(...variantRoute.timedStopsDepartures.nodes);
+        }
+      }
+    });
+  });
+  return regularRoutes;
 };
 
 // Filters empty routes from the timetable
@@ -160,9 +211,9 @@ const lineQueryMapper = mapProps(props => {
   const line = props.data.lines.nodes[0];
   const { showPrintBtn, lang } = props;
 
-  const filteredRoutes = removeExtraRoutes(line.routes.nodes);
+  const mergedRoutes = mergeExtraRoutes(line.routes.nodes);
 
-  const routesWithGroupedDepartures = filteredRoutes.map(route => {
+  const routesWithGroupedDepartures = mergedRoutes.map(route => {
     const byValidityDateRange = groupByValidityDateRange(route.timedStopsDepartures.nodes);
     const departuresByStopsAndDateRanges = groupDepartureDateRangesForStops(
       route,

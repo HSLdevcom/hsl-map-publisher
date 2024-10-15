@@ -46,7 +46,7 @@ const getZoneLetterStyle = zone => ({
       : 'translate(-50%, -50%)', // No px adjustments for zone A and the "else" case.
 });
 
-const getNotes = (notes, symbols) => {
+export const getNotes = (notes, symbols) => {
   const parsedNotes = [];
   symbols.forEach(symbol => {
     notes.forEach(note => {
