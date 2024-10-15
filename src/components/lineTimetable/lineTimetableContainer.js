@@ -187,7 +187,8 @@ const mergeExtraRoutes = routes => {
     forEach(regularRoutes, regularRoute => {
       if (
         regularRoute.routeIdParsed === variantRoute.routeIdParsed &&
-        regularRoute.mode === variantRoute.mode
+        regularRoute.mode === variantRoute.mode &&
+        regularRoute.direction === variantRoute.direction
       ) {
         if (hasSameTimedStops(variantRoute, regularRoute)) {
           // Found a matching "regular" route where we can merge variant departures

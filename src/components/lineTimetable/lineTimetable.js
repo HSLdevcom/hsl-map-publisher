@@ -379,23 +379,28 @@ function LineTimetable(props) {
             some(stop.departures, departureDay => departureDay.length > 0),
           );
 
-          if (departuresByStop[0].stop.stopId === departuresByStop[1].stop.stopId) {
+          if (
+            hasDepartures &&
+            departuresByStop[0].stop.stopId === departuresByStop[1].stop.stopId
+          ) {
             departuresByStop.pop(1);
           }
 
           return (
             <div>
-              <RouteDepartures
-                routeIdParsed={routeIdParsed}
-                nameFi={nameFi}
-                nameSe={nameSe}
-                showPrintBtn={props.showPrintBtn}
-                lang={props.lang}
-                departuresByStop={departuresByStop}
-                dateBegin={dateBegin}
-                dateEnd={dateEnd}
-                showTimedStops={showTimedStops}
-              />
+              {hasDepartures && (
+                <RouteDepartures
+                  routeIdParsed={routeIdParsed}
+                  nameFi={nameFi}
+                  nameSe={nameSe}
+                  showPrintBtn={props.showPrintBtn}
+                  lang={props.lang}
+                  departuresByStop={departuresByStop}
+                  dateBegin={dateBegin}
+                  dateEnd={dateEnd}
+                  showTimedStops={showTimedStops}
+                />
+              )}
               {hasDepartures && (
                 <AllStopsList
                   stops={routeWithDepartures.routeSegments.nodes}
