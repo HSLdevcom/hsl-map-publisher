@@ -108,6 +108,14 @@
   border: 2px solid #0098a1;
 }
 
+.primaryLegendText {
+  font-family: GothamRounded-Medium;
+}
+
+.italics {
+  font-style: italic;
+}
+
 .overlays {
   position: absolute;
   top: 0;
