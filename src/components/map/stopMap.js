@@ -150,7 +150,11 @@ const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
           <div key={mode} className={styles.legendRow}>
             <div className={classNames(styles.legendLine, styles.bus)} />
             <div className={classNames(styles.legendIcon, styles.bus)} />
-            <div className={styles.legendText}>Bussi / Buss / Bus</div>
+            <div className={styles.legendText}>
+              <span className={styles.primaryLegendText}>Bussi</span> / <span>Buss</span>
+              {' / '}
+              <span className={styles.italics}>Bus</span>
+            </div>
           </div>
         );
       case 'TRAM':
@@ -158,7 +162,11 @@ const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
           <div key={mode} className={styles.legendRow}>
             <div className={classNames(styles.legendLine, styles.tram)} />
             <div className={classNames(styles.legendIcon, styles.tram)} />
-            <div className={styles.legendText}>Raitiovaunu / Spårvagn / Tram</div>
+            <div className={styles.legendText}>
+              <span className={styles.primaryLegendText}>Raitiovaunu</span> / <span>Spårvagn</span>
+              {' / '}
+              <span className={styles.italics}>Tram</span>
+            </div>
           </div>
         );
       case 'SUBWAY':
@@ -166,7 +174,9 @@ const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
           <div key={mode} className={styles.legendRow}>
             <div className={classNames(styles.legendLine, styles.subway)} />
             <div className={classNames(styles.legendIcon, styles.subway)} />
-            <div className={styles.legendText}>Metro</div>
+            <div className={styles.legendText}>
+              <span className={styles.primaryLegendText}>Metro</span>
+            </div>
           </div>
         );
       case 'RAIL':
@@ -174,7 +184,11 @@ const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
           <div key={mode} className={styles.legendRow}>
             <div className={classNames(styles.legendLine, styles.rail)} />
             <div className={classNames(styles.legendIcon, styles.rail)} />
-            <div className={styles.legendText}>Juna / Rail</div>
+            <div className={styles.legendText}>
+              <span className={styles.primaryLegendText}>Juna</span> / <span>Tåg</span>
+              {' / '}
+              <span className={styles.italics}>Rail</span>
+            </div>
           </div>
         );
       case 'TRUNK':
@@ -182,7 +196,11 @@ const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
           <div key={mode} className={styles.legendRow}>
             <div className={classNames(styles.legendLine, styles.trunk)} />
             <div className={classNames(styles.legendIcon, styles.trunk)} />
-            <div className={styles.legendText}>Runkolinja / Trunk route</div>
+            <div className={styles.legendText}>
+              <span className={styles.primaryLegendText}>Runkolinja</span> / <span>Stomlinjen</span>
+              {' / '}
+              <span className={styles.italics}>Trunk route</span>
+            </div>
           </div>
         );
       case 'L_RAIL':
@@ -190,7 +208,13 @@ const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
           <div key={mode} className={styles.legendRow}>
             <div className={classNames(styles.legendLine, styles.l_rail)} />
             <div className={classNames(styles.legendIcon, styles.l_rail)} />
-            <div className={styles.legendText}>Pikaratikka / Snabbspårvagn / Light rail</div>
+            <div className={styles.legendText}>
+              <span className={styles.primaryLegendText}>Pikaratikka</span>
+              {' / '}
+              <span>Snabbspårvagn</span>
+              {' / '}
+              <span className={styles.italics}>Light rail</span>
+            </div>
           </div>
         );
       default:
@@ -214,7 +238,11 @@ const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
         <div key={subwayEntrance.type} className={styles.legendRow}>
           <InlineSVG style={svgStyles} src={subwayStationIcon} />
           <div className={styles.legendText}>
-            Metron sisäänkäynti / Metrons ingång / Metro entrance
+            <span className={styles.primaryLegendText}>Metron sisäänkäynti</span>
+            {' / '}
+            <span>Metrons ingång</span>
+            {' / '}
+            <span className={styles.italics}>Metro entrance</span>
           </div>
         </div>,
       );
@@ -230,7 +258,11 @@ const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
         <div key="Myyntipiste" className={styles.legendRow}>
           <InlineSVG style={svgStyles} src={ticketSalesPointIcon} />
           <div className={styles.legendText}>
-            Lipunmyyntipiste / Biljettförsäljning / Ticket sales
+            <span className={styles.primaryLegendText}>Lipunmyyntipiste</span>
+            {' / '}
+            <span>Biljettförsäljning</span>
+            {' / '}
+            <span className={styles.italics}>Ticket sales</span>
           </div>
         </div>,
       );
@@ -240,7 +272,13 @@ const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
       legendContent.push(
         <div key="Monilippuautomaatti" className={styles.legendRow}>
           <InlineSVG style={svgStyles} src={ticketMachineIcon} />
-          <div className={styles.legendText}>Lippuautomaatti / Ticket sales machine</div>
+          <div className={styles.legendText}>
+            <span className={styles.primaryLegendText}>Lippuautomaatti</span>
+            {' / '}
+            <span>Biljettautomat</span>
+            {' / '}
+            <span className={styles.italics}>Ticket sales machine</span>
+          </div>
         </div>,
       );
     }
