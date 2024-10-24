@@ -6,21 +6,29 @@ import styles from './tableHeader.css';
 
 const TableHeader = props => {
   const header = props.printAsA3 ? (
-    <span>
-      {' '}
-      &nbsp;&nbsp;
-      {props.subtitleSw}
-      &nbsp;&nbsp;
-      {props.subtitleEn}
-    </span>
+    <div className={styles.inline}>
+      <span>
+        {' '}
+        &nbsp;&nbsp;
+        {props.subtitleSw}
+      </span>
+      <span className={styles.italics}>
+        &nbsp;&nbsp;
+        {props.subtitleEn}
+      </span>
+    </div>
   ) : (
-    <span>
-      {' '}
-      &nbsp;&nbsp;
-      {props.subtitleSw}
-      &nbsp;&nbsp;
-      {props.subtitleEn}
-    </span>
+    <div className={styles.inline}>
+      <span>
+        {' '}
+        &nbsp;&nbsp;
+        {props.subtitleSw}
+      </span>
+      <span className={styles.italics}>
+        &nbsp;&nbsp;
+        {props.subtitleEn}
+      </span>
+    </div>
   );
   return (
     <div
