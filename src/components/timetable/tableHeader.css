@@ -39,3 +39,11 @@
 .a3Title {
   font-size: 0.8em;
 }
+
+.italics {
+  font-style: italic;
+}
+
+.inline {
+  display: inline;
+}

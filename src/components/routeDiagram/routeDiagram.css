@@ -77,3 +77,7 @@
   font-family: GothamRounded-Book;
   font-size: 0.75em;
 }
+
+.italics {
+  font-style: italic;
+}
