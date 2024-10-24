@@ -18,6 +18,7 @@
   align-items: normal;
   min-width: 100px;
   max-width: 350px;
+  page-break-inside: avoid;
 }
 
 .tableContainer {

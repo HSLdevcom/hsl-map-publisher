@@ -1,5 +1,6 @@
 .headerContainer {
   display: flex;
+  page-break-inside: avoid;
 }
 
 .stop {

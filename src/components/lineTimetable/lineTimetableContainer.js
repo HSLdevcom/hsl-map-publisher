@@ -249,6 +249,7 @@ LineTimetableContainer.defaultProps = {
   date: null,
   showPrintBtn: false,
   lang: 'fi',
+  printPageNumbers: true,
 };
 
 LineTimetableContainer.propTypes = {
@@ -258,6 +259,7 @@ LineTimetableContainer.propTypes = {
   date: PropTypes.string,
   showPrintBtn: PropTypes.bool,
   lang: PropTypes.string,
+  printPageNumbers: PropTypes.bool,
 };
 
 export default LineTimetableContainer;
