@@ -14,6 +14,8 @@ const a3TableHeader = props => (
         {' '}
         &nbsp;&nbsp;
         {props.subtitleSw}
+      </span>
+      <span className={styles.italics}>
         &nbsp;&nbsp;
         {props.subtitleEn}
       </span>
