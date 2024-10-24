@@ -19,7 +19,7 @@ const RouteDiagram = props => (
       className={classNames(styles.componentName, { [styles.componentNameA3]: props.printAsA3 })}>
       <div className={!props.printAsA3 ? styles.title : styles.titleA3}>Linjojen reitit</div>
       <div className={!props.printAsA3 ? styles.subtitle : styles.subtitleA3}>
-        Linjernas rutter / Routes
+        Linjernas rutter / <span className={styles.italics}>Routes</span>
       </div>
     </div>
     <div className={styles.start}>
