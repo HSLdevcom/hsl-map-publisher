@@ -24,7 +24,7 @@ import { shortenTrainParsedLineId } from '../../util/routes';
 const MAX_STOPS = 4; // Maximum amount of timed stops rendered on the timetable
 
 const A5_PAGE_HEIGHT = 960;
-const PAGE_NUMBER_HEIGHT = 46;
+const PAGE_NUMBER_HEIGHT = 21;
 
 const getScheduleWeekdaysText = dayType => {
   switch (dayType) {
@@ -303,7 +303,7 @@ class LineTimetable extends Component {
             pageNumberPositions.map((height, index) => {
               const pageNumber = index + 1;
               return (
-                <span className={styles.address} style={{ top: `${height}px` }}>
+                <span className={styles.pageNumber} style={{ top: `${height}px` }}>
                   {pageNumber}
                 </span>
               );
@@ -415,6 +415,15 @@ class LineTimetable extends Component {
         ref={ref => {
           this.content = ref;
         }}>
+        {pageNumberPositions.length > 0 &&
+          pageNumberPositions.map((height, index) => {
+            const pageNumber = index + 1;
+            return (
+              <span className={styles.pageNumber} style={{ top: `${height}px` }}>
+                {pageNumber}
+              </span>
+            );
+          })}
         {routeGroupsMappedDepartures.map(routeWithDepartures => {
           return routeWithDepartures.departuresByDateRanges.map(departuresFordateRange => {
             const { nameFi, nameSe, routeIdParsed } = routeWithDepartures;
@@ -434,17 +443,19 @@ class LineTimetable extends Component {
             return (
               <div>
                 {hasDepartures && (
-                  <RouteDepartures
-                    routeIdParsed={routeIdParsed}
-                    nameFi={nameFi}
-                    nameSe={nameSe}
-                    showPrintBtn={this.props.showPrintBtn}
-                    lang={this.props.lang}
-                    departuresByStop={departuresByStop}
-                    dateBegin={dateBegin}
-                    dateEnd={dateEnd}
-                    showTimedStops={showTimedStops}
-                  />
+                  <div className={styles.pageBreak}>
+                    <RouteDepartures
+                      routeIdParsed={routeIdParsed}
+                      nameFi={nameFi}
+                      nameSe={nameSe}
+                      showPrintBtn={this.props.showPrintBtn}
+                      lang={this.props.lang}
+                      departuresByStop={departuresByStop}
+                      dateBegin={dateBegin}
+                      dateEnd={dateEnd}
+                      showTimedStops={showTimedStops}
+                    />
+                  </div>
                 )}
                 {hasDepartures && (
                   <AllStopsList
