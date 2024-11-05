@@ -3,6 +3,8 @@
   min-width: 120px;
   font-family: GothamRounded-Book;
   margin: 0.5rem 0;
+  page-break-inside: avoid;
+  page-break-after: always;
 }
 
 .departureRow {
@@ -59,10 +61,4 @@
 
 .departureRowContainer > *:nth-child(even) {
   background-color: #eaeaea;
-}
-
-@media print {
-  .departureRow {
-    page-break-inside: avoid;
-  }
 }

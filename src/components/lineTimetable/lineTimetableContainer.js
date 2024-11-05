@@ -4,7 +4,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import mapProps from 'recompose/mapProps';
 import compose from 'recompose/compose';
-import { filter, forEach, isEmpty, uniqBy, some } from 'lodash';
+import { filter, forEach, isEmpty, uniqBy, some, uniqWith } from 'lodash';
 
 import apolloWrapper from 'util/apolloWrapper';
 
@@ -207,6 +207,19 @@ const filterRoutes = routesWithGroupedDepartures => {
   });
 };
 
+const filterNotes = (notes, dateBegin) => {
+  const timetableDateBegin = new Date(dateBegin);
+  const filteredNotes = notes.filter(note => {
+    if (note.dateEnd === null) {
+      return true;
+    }
+    const noteDateEnd = new Date(note.dateEnd);
+    return noteDateEnd > timetableDateBegin;
+  });
+  const duplicatesRemoved = uniqWith(filteredNotes, (a, b) => a.noteText === b.noteText);
+  return duplicatesRemoved;
+};
+
 const lineQueryMapper = mapProps(props => {
   const line = props.data.lines.nodes[0];
   const { showPrintBtn, lang } = props;
@@ -233,8 +246,10 @@ const lineQueryMapper = mapProps(props => {
     return { ...route, departuresByDateRanges: dateRangesGroupedByStopAndDay };
   });
 
+  const filteredNotes = filterNotes(line.notes.nodes, props.dateBegin);
+
   return {
-    line,
+    line: { ...line, notes: filteredNotes },
     routes: filterRoutes(routesWithGroupedDepartures),
     showPrintBtn,
     lang,
@@ -246,7 +261,6 @@ const hoc = compose(graphql(lineQuery), apolloWrapper(lineQueryMapper));
 const LineTimetableContainer = hoc(LineTimetable);
 
 LineTimetableContainer.defaultProps = {
-  date: null,
   showPrintBtn: false,
   lang: 'fi',
   printPageNumbers: true,
@@ -256,7 +270,6 @@ LineTimetableContainer.propTypes = {
   lineId: PropTypes.string.isRequired,
   dateBegin: PropTypes.string.isRequired,
   dateEnd: PropTypes.string.isRequired,
-  date: PropTypes.string,
   showPrintBtn: PropTypes.bool,
   lang: PropTypes.string,
   printPageNumbers: PropTypes.bool,

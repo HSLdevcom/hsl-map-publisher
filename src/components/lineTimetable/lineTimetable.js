@@ -6,16 +6,15 @@ import LineTableColumns from './lineTableColumns';
 import AllStopsList from './allStopsList';
 import {
   filter,
-  isEmpty,
   uniqBy,
   flatten,
   forEach,
   groupBy,
-  find,
   unionWith,
   omit,
   isEqual,
   some,
+  uniq,
 } from 'lodash';
 import { scheduleSegments } from '../../util/domain';
 import { addMissingFridayNote, combineConsecutiveDays } from '../timetable/timetableContainer';
@@ -247,9 +246,27 @@ const checkForTrainRoutes = routes => {
 
 // Add note for friday departures because of merged timetables
 const addFridayNote = notes => {
-  return notes.splice(0, 0, { noteText: 'p) Vain perjantaisin' });
+  const mutableArr = notes.splice(0);
+  return mutableArr.splice(0, 0, { noteText: 'p) Vain perjantaisin' });
 };
 
+const hasFridayDepartures = routes => {
+  let hasFriDepartures = false;
+  forEach(routes, route => {
+    const departures = [...route.timedStopsDepartures.nodes];
+    const fridayDepartures = departures.filter(departure => departure.dayType.includes('Pe'));
+    hasFriDepartures = hasFriDepartures ? true : fridayDepartures.length > 0;
+  });
+  return hasFriDepartures;
+};
+
+const usesFridayDepartureNote = routes => {
+  let usesFridayDepartureNotation = true;
+  forEach(routes, route => {
+    usesFridayDepartureNotation = !usesFridayDepartureNotation ? false : route.mode !== 'TRAM';
+  });
+  return usesFridayDepartureNotation;
+};
 class LineTimetable extends Component {
   constructor(props) {
     super(props);
@@ -267,10 +284,13 @@ class LineTimetable extends Component {
 
   render() {
     const { routes } = this.props;
-    const notes = this.props.line.notes.nodes;
-    addFridayNote(notes);
-    const showTimedStops = hasTimedStopRoutes(routes);
+    let { notes } = this.props.line;
+    if (hasFridayDepartures(routes) && usesFridayDepartureNote(routes)) {
+      const addedFridayNotes = addFridayNote(this.props.line.notes);
+      notes = uniq(addedFridayNotes);
+    }
 
+    const showTimedStops = hasTimedStopRoutes(routes);
     const checkedRoutes = checkForTrainRoutes(routes);
 
     const mappedNotes = notes.map(note => {

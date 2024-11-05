@@ -26,3 +26,9 @@
   font-family: GothamRounded-Medium;
   font-size: 1rem;
 }
+
+@media print {
+  .headerContainer {
+    page-break-inside: avoid;
+  }
+}
