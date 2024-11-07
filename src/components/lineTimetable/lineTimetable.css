@@ -1,15 +1,6 @@
-.root {
-  position: relative;
-  width: 100%;
-  padding: var(--border-radius);
-  padding-top: calc(var(--border-radius) - 15px);
-  border-radius: var(--border-radius);
-  color: var(--hsl-blue);
-  background: var(--light-background);
-  --timetable-accent-color: white;
-  font-size: 16px;
-  margin-bottom: 10px;
-  font-family: GothamRounded-Medium;
+.container {
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 .root.a3 {
@@ -147,7 +138,7 @@
 }
 
 .pageBreak {
-  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 .timetableDivider {
@@ -157,7 +148,7 @@
 }
 
 .timetableContainer {
-  page-break-after: always;
+  break-after: always;
 }
 
 .fridayNote {
@@ -168,7 +159,7 @@
 
 .notesContainer {
   margin: 0.5rem 0 1rem 0.5rem;
-  page-break-after: always;
+  break-after: always;
 }
 
 .pageNumber {
@@ -184,9 +175,5 @@
   .noPrint,
   .noPrint * {
     display: none !important;
-  }
-
-  body {
-    overflow-y: visible;
   }
 }

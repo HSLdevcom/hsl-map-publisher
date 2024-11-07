@@ -3,8 +3,8 @@
   min-width: 120px;
   font-family: GothamRounded-Book;
   margin: 0.5rem 0;
-  page-break-inside: avoid;
-  page-break-after: always;
+  break-inside: avoid;
+  break-after: always;
 }
 
 .departureRow {
@@ -20,7 +20,7 @@
   align-items: normal;
   min-width: 100px;
   max-width: 350px;
-  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 .tableContainer {

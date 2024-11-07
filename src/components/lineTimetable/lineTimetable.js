@@ -316,6 +316,7 @@ class LineTimetable extends Component {
     if (showTimedStops) {
       return (
         <div
+          className={styles.container}
           ref={ref => {
             this.content = ref;
           }}>

@@ -2,8 +2,6 @@
   display: flex;
   margin-bottom: 1rem;
   word-wrap: break-word;
-  page-break-before: always;
-  page-break-inside: avoid;
 }
 
 .lineId {

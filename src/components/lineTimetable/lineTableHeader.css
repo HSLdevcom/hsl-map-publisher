@@ -1,6 +1,16 @@
-.headerContainer {
-  display: flex;
+div {
+  break-inside: avoid;
   page-break-inside: avoid;
+}
+
+.headerContainer {
+  display: block;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.flexHeader {
+  display: flex;
 }
 
 .stop {
@@ -29,6 +39,7 @@
 
 @media print {
   .headerContainer {
+    break-inside: avoid;
     page-break-inside: avoid;
   }
 }

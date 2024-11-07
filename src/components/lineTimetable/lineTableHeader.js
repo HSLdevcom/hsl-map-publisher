@@ -7,11 +7,13 @@ const LineTableHeader = props => {
   const { stop, isLastStop } = props;
   return (
     <div className={styles.headerContainer}>
-      <div className={styles.stop}>
-        <p className={styles.stopNamePrimary}>{stop.nameFi}</p>
-        <p className={styles.stopNameSecondary}>{stop.nameSe}</p>
+      <div className={styles.flexHeader}>
+        <div className={styles.stop}>
+          <p className={styles.stopNamePrimary}>{stop.nameFi}</p>
+          <p className={styles.stopNameSecondary}>{stop.nameSe}</p>
+        </div>
+        {!isLastStop && <div className={styles.directionBracket}>&gt;</div>}
       </div>
-      {!isLastStop && <div className={styles.directionBracket}>&gt;</div>}
     </div>
   );
 };
