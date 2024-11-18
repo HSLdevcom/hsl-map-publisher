@@ -296,16 +296,19 @@ function routeGeneralizer(routes) {
 function filterRoute(props) {
   const { filter } = props;
   const { routeId } = props;
+  const routeIdParsed = trimRouteId(routeId);
   if (!filter) {
     return true;
   }
-  for (let i = 0; i < filter.length; i++) {
-    const char = filter[i];
-    if (char !== '*' && char === routeId[i]) {
-      return false;
+
+  const filteredRoutes = filter.split(',').map(routeIdToFilter => routeIdToFilter.trim());
+  let routeMatchesFilter = false;
+  filteredRoutes.forEach(filterRouteId => {
+    if (routeId.includes(filterRouteId) && filterRouteId === routeIdParsed) {
+      routeMatchesFilter = true;
     }
-  }
-  return true;
+  });
+  return !routeMatchesFilter;
 }
 
 export {
