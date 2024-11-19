@@ -1,7 +1,6 @@
 .stopListsContainer {
   margin-top: 1rem;
   max-width: 95%;
-  break-inside: avoid;
 }
 
 .stopList {

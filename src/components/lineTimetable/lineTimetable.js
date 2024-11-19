@@ -15,6 +15,7 @@ import {
   isEqual,
   some,
   uniq,
+  sortBy,
 } from 'lodash';
 import { scheduleSegments } from '../../util/domain';
 import { addMissingFridayNote, combineConsecutiveDays } from '../timetable/timetableContainer';
@@ -278,7 +279,7 @@ class LineTimetable extends Component {
   componentDidMount() {
     const { renderPageNumbers } = this.state;
     if (this.props.printPageNumbers && !renderPageNumbers) {
-      this.setState({ renderPageNumbers: true });
+      this.setState({ renderPageNumbers: false });
     }
   }
 
@@ -306,86 +307,98 @@ class LineTimetable extends Component {
     if (this.state.renderPageNumbers && this.content) {
       const { scrollHeight } = this.content;
       const pages = Math.ceil(scrollHeight / A5_PAGE_HEIGHT);
-      let j = 0;
+      let index = 0;
+      let inverseIndex = pages + 1;
       for (let i = 1; i < pages + 1; i++) {
-        pageNumberPositions.push(i * A5_PAGE_HEIGHT + j * PAGE_NUMBER_HEIGHT);
-        j++;
+        pageNumberPositions.push({
+          top: i * A5_PAGE_HEIGHT + index * PAGE_NUMBER_HEIGHT,
+          bottom: inverseIndex * A5_PAGE_HEIGHT - index * PAGE_NUMBER_HEIGHT,
+        });
+        index++;
+        inverseIndex--;
       }
     }
 
     if (showTimedStops) {
       return (
-        <div
-          className={styles.container}
-          ref={ref => {
-            this.content = ref;
-          }}>
-          {pageNumberPositions.length > 0 &&
-            pageNumberPositions.map((height, index) => {
-              const pageNumber = index + 1;
-              return (
-                <span className={styles.pageNumber} style={{ top: `${height}px` }}>
-                  {pageNumber}
-                </span>
+        <div className={styles.parentContainer}>
+          <div
+            ref={ref => {
+              this.content = ref;
+            }}>
+            {checkedRoutes.map(routeWithDepartures => {
+              const routesByDateRanges = routeWithDepartures.departuresByDateRanges.map(
+                departuresForDateRange => {
+                  const { nameFi, nameSe, routeIdParsed } = routeWithDepartures;
+                  return {
+                    nameFi,
+                    nameSe,
+                    routeIdParsed,
+                    departuresByStop: departuresForDateRange.departuresByStop.slice(0, MAX_STOPS),
+                    dateBegin: departuresForDateRange.dateBegin,
+                    dateEnd: departuresForDateRange.dateEnd,
+                  };
+                },
               );
-            })}
-          {checkedRoutes.map(routeWithDepartures => {
-            const routesByDateRanges = routeWithDepartures.departuresByDateRanges.map(
-              departuresForDateRange => {
-                const { nameFi, nameSe, routeIdParsed } = routeWithDepartures;
-                return {
+
+              const sortedRoutes = sortBy(routesByDateRanges, ['dateBegin']);
+
+              const routeDeparturesForDateRanges = sortedRoutes.map(routeForDateRange => {
+                const {
                   nameFi,
                   nameSe,
                   routeIdParsed,
-                  departuresByStop: departuresForDateRange.departuresByStop.slice(0, MAX_STOPS),
-                  dateBegin: departuresForDateRange.dateBegin,
-                  dateEnd: departuresForDateRange.dateEnd,
-                };
-              },
-            );
+                  departuresByStop,
+                  dateBegin,
+                  dateEnd,
+                } = routeForDateRange;
 
-            const routeDeparturesForDateRanges = routesByDateRanges.map(routeForDateRange => {
-              const {
-                nameFi,
-                nameSe,
-                routeIdParsed,
-                departuresByStop,
-                dateBegin,
-                dateEnd,
-              } = routeForDateRange;
+                return (
+                  routeForDateRange.departuresByStop.length > 0 && (
+                    <div className={styles.timetableContainer}>
+                      <RouteDepartures
+                        routeIdParsed={routeIdParsed}
+                        nameFi={nameFi}
+                        nameSe={nameSe}
+                        showPrintBtn={this.props.showPrintBtn}
+                        lang={this.props.lang}
+                        departuresByStop={departuresByStop}
+                        dateBegin={dateBegin}
+                        dateEnd={dateEnd}
+                        showTimedStops={showTimedStops}
+                      />
+                      <AllStopsList
+                        stops={routeWithDepartures.routeSegments.nodes}
+                        routeIdParsed={routeIdParsed}
+                      />
+                      <div className={styles.timetableDivider} />
+                    </div>
+                  )
+                );
+              });
 
-              return (
-                routeForDateRange.departuresByStop.length > 0 && (
-                  <div className={styles.pageBreak}>
-                    <RouteDepartures
-                      routeIdParsed={routeIdParsed}
-                      nameFi={nameFi}
-                      nameSe={nameSe}
-                      showPrintBtn={this.props.showPrintBtn}
-                      lang={this.props.lang}
-                      departuresByStop={departuresByStop}
-                      dateBegin={dateBegin}
-                      dateEnd={dateEnd}
-                      showTimedStops={showTimedStops}
-                    />
-                    <AllStopsList
-                      stops={routeWithDepartures.routeSegments.nodes}
-                      routeIdParsed={routeIdParsed}
-                    />
-                    <div className={styles.timetableDivider} />
-                  </div>
-                )
-              );
-            });
-
-            return routeDeparturesForDateRanges;
-          })}
-          {checkedRoutes.length >= 1 && <div className={styles.notesContainer}>{mappedNotes}</div>}
-          {checkedRoutes.length === 0 && (
-            <div className={styles.notesContainer}>
-              Linjaa ei löytynyt, tarkista tulosteen asetukset
-            </div>
-          )}
+              return routeDeparturesForDateRanges;
+            })}
+            {checkedRoutes.length >= 1 && (
+              <div className={styles.notesContainer}>{mappedNotes}</div>
+            )}
+            {checkedRoutes.length === 0 && (
+              <div className={styles.notesContainer}>
+                Linjaa ei löytynyt, tarkista tulosteen asetukset
+              </div>
+            )}
+            {pageNumberPositions.length > 0 &&
+              pageNumberPositions.map((position, index) => {
+                const pageNumber = index + 1;
+                return (
+                  <span
+                    className={styles.pageNumber}
+                    style={{ top: `${position.top}px`, bottom: `${position.bottom}px` }}>
+                    {pageNumber}
+                  </span>
+                );
+              })}
+          </div>
         </div>
       );
     }
@@ -403,8 +416,9 @@ class LineTimetable extends Component {
       });
 
       const uniqueDateRanges = flatten(uniqBy(allDepartureDateRanges, 'dateBegin'));
+      const sortedUniqueDateRanges = sortBy(uniqueDateRanges, ['dateBegin']);
 
-      const mappedDeparturesBothDirections = uniqueDateRanges.map(dateRange => {
+      const mappedDeparturesBothDirections = sortedUniqueDateRanges.map(dateRange => {
         const { dateBegin, dateEnd } = dateRange;
         const bothDirectionDepartures = [];
 
@@ -437,10 +451,12 @@ class LineTimetable extends Component {
           this.content = ref;
         }}>
         {pageNumberPositions.length > 0 &&
-          pageNumberPositions.map((height, index) => {
+          pageNumberPositions.map((position, index) => {
             const pageNumber = index + 1;
             return (
-              <span className={styles.pageNumber} style={{ top: `${height}px` }}>
+              <span
+                className={styles.pageNumber}
+                style={{ top: `${position.top}px`, bottom: `${position.bottom}px` }}>
                 {pageNumber}
               </span>
             );
@@ -464,7 +480,7 @@ class LineTimetable extends Component {
             return (
               <div>
                 {hasDepartures && (
-                  <div className={styles.pageBreak}>
+                  <div>
                     <RouteDepartures
                       routeIdParsed={routeIdParsed}
                       nameFi={nameFi}
@@ -476,6 +492,7 @@ class LineTimetable extends Component {
                       dateEnd={dateEnd}
                       showTimedStops={showTimedStops}
                     />
+                    <div className={styles.pageBreak} />
                   </div>
                 )}
                 {hasDepartures && (

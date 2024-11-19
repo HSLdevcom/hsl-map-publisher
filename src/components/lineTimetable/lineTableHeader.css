@@ -1,12 +1,7 @@
-div {
-  break-inside: avoid;
-  page-break-inside: avoid;
-}
-
 .headerContainer {
   display: block;
-  break-inside: avoid;
   page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 .flexHeader {
@@ -35,11 +30,4 @@ div {
 .directionBracket {
   font-family: GothamRounded-Medium;
   font-size: 1rem;
-}
-
-@media print {
-  .headerContainer {
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
 }
