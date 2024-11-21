@@ -11,6 +11,12 @@
   font-family: GothamRounded-Book;
 }
 
+.footnote {
+  padding: 0.125em 0.625em;
+  font-family: GothamXNarrow-Book;
+  font-size: 0.813em;
+}
+
 .pageBreak {
   break-inside: auto;
 }
