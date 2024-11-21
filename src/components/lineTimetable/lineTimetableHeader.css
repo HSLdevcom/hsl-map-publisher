@@ -2,6 +2,9 @@
   display: flex;
   margin-bottom: 1rem;
   word-wrap: break-word;
+  break-inside: avoid;
+  break-after: avoid;
+  break-before: auto;
 }
 
 .lineId {

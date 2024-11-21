@@ -13,20 +13,22 @@ const LineTimetableRow = props => {
     return a.minutes - b.minutes;
   });
   return (
-    <WrappingRow>
-      <Row className={styles.departureRow}>
-        <div className={styles.hour}>{hour}</div>
-        <div className={styles.minutesContainer}>
-          {sortedMinuteDepartures.map((departure, index) => (
-            <div className={styles.minutes} key={index}>
-              {departure.note !== null
-                ? `${departure.minutes.toString().padStart(2, '0')}${departure.note}`
-                : departure.minutes.toString().padStart(2, '0')}
-            </div>
-          ))}
-        </div>
-      </Row>
-    </WrappingRow>
+    <div className={styles.breakContainer}>
+      <WrappingRow>
+        <Row className={styles.departureRow}>
+          <div className={styles.hour}>{hour}</div>
+          <div className={styles.minutesContainer}>
+            {sortedMinuteDepartures.map((departure, index) => (
+              <div className={styles.minutes} key={index}>
+                {departure.note !== null
+                  ? `${departure.minutes.toString().padStart(2, '0')}${departure.note}`
+                  : departure.minutes.toString().padStart(2, '0')}
+              </div>
+            ))}
+          </div>
+        </Row>
+      </WrappingRow>
+    </div>
   );
 };
 

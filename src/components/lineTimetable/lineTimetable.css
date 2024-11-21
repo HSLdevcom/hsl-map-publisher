@@ -108,8 +108,7 @@
 }
 
 .pageBreak {
-  break-before: avoid;
-  break-inside: always;
+  break-inside: auto;
 }
 
 .timetableDivider {
@@ -118,13 +117,7 @@
   border-bottom: 2px dotted gray;
 }
 
-.parentContainer {
-  display: block;
-}
-
 .timetableContainer {
-  page-break-inside: avoid;
-  page-break-after: always;
   display: block;
 }
 
@@ -153,10 +146,6 @@
   .noPrint,
   .noPrint * {
     display: none !important;
-  }
-
-  .pageBreak {
-    break-inside: always;
   }
 
   .timetableContainer,

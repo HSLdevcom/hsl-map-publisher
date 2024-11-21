@@ -188,7 +188,7 @@ const RouteDepartures = props => {
   const combinedDepartureTables = Object.keys(mergedWeekdaysDepartures[0].combinedDays).map(key => {
     const showDivider = departuresByStop.length === 1 ? false : !showTimedStops;
     return (
-      <div className={styles.timetableContainer}>
+      <div>
         <LineTimetableHeader
           routeIdParsed={routeIdParsed}
           nameFi={nameFi}
@@ -205,6 +205,7 @@ const RouteDepartures = props => {
           departuresByStop={mergedWeekdaysDepartures}
           days={key}
         />
+        <div className={styles.pageBreak} />
       </div>
     );
   });
@@ -321,7 +322,7 @@ class LineTimetable extends Component {
 
     if (showTimedStops) {
       return (
-        <div className={styles.parentContainer}>
+        <div>
           <div
             ref={ref => {
               this.content = ref;
@@ -355,7 +356,7 @@ class LineTimetable extends Component {
 
                 return (
                   routeForDateRange.departuresByStop.length > 0 && (
-                    <div className={styles.timetableContainer}>
+                    <div>
                       <RouteDepartures
                         routeIdParsed={routeIdParsed}
                         nameFi={nameFi}
