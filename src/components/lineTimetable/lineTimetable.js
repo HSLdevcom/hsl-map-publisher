@@ -463,9 +463,9 @@ class LineTimetable extends Component {
             );
           })}
         {routeGroupsMappedDepartures.map(routeWithDepartures => {
-          return routeWithDepartures.departuresByDateRanges.map(departuresFordateRange => {
+          return routeWithDepartures.departuresByDateRanges.map(departuresForDateRange => {
             const { nameFi, nameSe, routeIdParsed } = routeWithDepartures;
-            const { dateBegin, dateEnd, departuresByStop } = departuresFordateRange;
+            const { dateBegin, dateEnd, departuresByStop } = departuresForDateRange;
 
             const hasDepartures = some(departuresByStop, stop =>
               some(stop.departures, departureDay => departureDay.length > 0),

@@ -4,7 +4,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import mapProps from 'recompose/mapProps';
 import compose from 'recompose/compose';
-import { filter, forEach, isEmpty, uniqBy, some, uniqWith } from 'lodash';
+import { filter, forEach, isEmpty, uniqBy, uniqWith } from 'lodash';
 
 import apolloWrapper from 'util/apolloWrapper';
 
