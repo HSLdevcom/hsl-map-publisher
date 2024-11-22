@@ -5,16 +5,21 @@
   margin: 0.5rem 0;
 }
 
+.breakContainer {
+  display: block;
+  break-inside: avoid;
+}
+
 .departureRow {
   font-size: 1rem;
   margin-left: 1.6rem;
   padding-top: 5px;
   padding-bottom: 5px;
   height: 35px;
+  break-inside: avoid;
 }
 
 .departureColumnContainer {
-  flex-grow: 1;
   align-items: normal;
   min-width: 100px;
   max-width: 350px;
@@ -34,12 +39,14 @@
   font-size: 15px;
   width: 1.5rem;
   margin-right: 0.5em;
+  break-inside: avoid;
 }
 
 .minutesContainer {
   max-width: 400px;
   display: flex;
   flex-wrap: wrap;
+  break-inside: avoid;
 }
 
 .minutes {
@@ -58,10 +65,4 @@
 
 .departureRowContainer > *:nth-child(even) {
   background-color: #eaeaea;
-}
-
-@media print {
-  .departureRow {
-    page-break-inside: avoid;
-  }
 }

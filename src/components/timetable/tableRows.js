@@ -73,6 +73,21 @@ const isEqualDepartureHour = (a, b) => {
   return true;
 };
 
+const isCutOffValid = (rows, startIndex, cutOffIndex) => {
+  let isValid = true;
+
+  const startingHour = Number(rows[startIndex].hour);
+  const cutOffHour = Number(rows[cutOffIndex].hour);
+
+  for (let i = startingHour; i < cutOffHour; i++) {
+    const hourDepartures = rows.filter(row => Number(row.hour) === i);
+    if (hourDepartures.length === 0) {
+      isValid = false;
+    }
+  }
+  return isValid;
+};
+
 export const getDuplicateCutOff = (startIndex, rows) => {
   const startRow = rows[startIndex];
   let cutOffIndex = startIndex;
@@ -83,7 +98,18 @@ export const getDuplicateCutOff = (startIndex, rows) => {
     }
     cutOffIndex = i;
   }
-  return cutOffIndex;
+  if (isCutOffValid(rows, startIndex, cutOffIndex)) {
+    return cutOffIndex;
+  }
+
+  let newCutOffIndex = cutOffIndex;
+
+  // Roll back the cutoff hour until the result is a valid cutoff
+  while (!isCutOffValid(rows, startIndex, newCutOffIndex)) {
+    newCutOffIndex--;
+  }
+
+  return newCutOffIndex;
 };
 
 export const filterDuplicateDepartureHours = departureRows => {

@@ -1,4 +1,10 @@
 .headerContainer {
+  display: block;
+  break-inside: avoid;
+  break-before: avoid-page;
+}
+
+.flexHeader {
   display: flex;
 }
 
@@ -6,13 +12,14 @@
   flex-grow: 1;
   height: 50px;
   padding-right: 16px;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .stopNamePrimary {
   font-size: 1rem;
   margin: 0 0 0 1.2rem;
   font-family: GothamRounded-Medium;
+  break-inside: avoid;
 }
 
 .stopNameSecondary {

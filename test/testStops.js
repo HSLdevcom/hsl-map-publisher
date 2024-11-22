@@ -6,8 +6,10 @@ const fs = require('fs');
 const { finished } = require('node:stream/promises');
 const path = require('path');
 
-const stopIds = ['1020105', '1284188', '6301068', '1040411', '4930205', '4930209'];
+// Stop poster tests
+const stopIds = ['1020105', '1284188', '6301068', '1040411', '4930205', '4930209', '2311220'];
 
+// Terminal poster tests
 const testTerminalPosters = [
   {
     terminalId: '1000004',
@@ -21,15 +23,12 @@ const testTerminalPosters = [
   },
 ];
 
-// Lines for testing the LineTimetable component
+// LineTimetable tests
 const testLines = [
-  { lineId: '2015', dateBegin: '2024-05-01', dateEnd: '2024-06-30' },
-  { lineId: '1052', dateBegin: '2024-06-30', dateEnd: '2024-07-29' },
-  { lineId: '1500', dateBegin: '2023-10-12', dateEnd: '2050-12-31' },
-  { lineId: '1016', dateBegin: '2016-10-04', dateEnd: '2050-12-31' },
-  { lineId: '4570', dateBegin: '2022-08-15', dateEnd: '2050-12-31' },
-  { lineId: '6211U', dateBegin: '2024-05-05', dateEnd: '2024-06-16' },
-  { lineId: '6211X', dateBegin: '2024-05-05', dateEnd: '2024-09-01' },
+  { lineId: '2015', dateBegin: '2024-12-01', dateEnd: '2024-12-10' },
+  { lineId: '1007', dateBegin: '2024-12-01', dateEnd: '2024-12-30' },
+  { lineId: '1052', dateBegin: '2024-12-01', dateEnd: '2024-12-30' },
+  { lineId: '2510', dateBegin: '2024-12-01', dateEnd: '2024-12-30' },
 ];
 
 const TEST_RESULTS_PATH = './test/results';
@@ -57,7 +56,7 @@ function buildGenerationRequestBody(buildId, component, printAsA4) {
         lineId,
         dateBegin,
         dateEnd,
-        printTimetablesAsA4: true,
+        printAsA5: true,
         selectedRuleTemplates: [],
         template: 'default', // Server throws error if template and selectedRuleTemplate aren't included in properties, however they aren't needed for rendering though
       };
@@ -87,8 +86,6 @@ function buildGenerationRequestBody(buildId, component, printAsA4) {
   } else {
     props = stopIds.map(stopId => {
       return {
-        dateBegin: '2024-06-17',
-        dateEnd: '2024-08-11',
         date: new Date().toISOString().split('T')[0],
         isSummerTimetable: true,
         legend: true,

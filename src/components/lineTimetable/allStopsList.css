@@ -1,8 +1,7 @@
 .stopListsContainer {
-  margin-top: 1rem;
+  padding-top: 1.2rem;
   max-width: 95%;
-  page-break-inside: avoid;
-  page-break-after: always;
+  break-inside: avoid;
 }
 
 .stopList {

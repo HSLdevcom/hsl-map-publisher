@@ -2,8 +2,8 @@
   display: flex;
   margin-bottom: 1rem;
   word-wrap: break-word;
-  page-break-before: always;
-  page-break-inside: avoid;
+  break-inside: avoid;
+  break-after: avoid;
 }
 
 .lineId {
@@ -13,7 +13,6 @@
 }
 
 .nameContainer {
-  display: block;
   padding-top: 2rem;
 }
 

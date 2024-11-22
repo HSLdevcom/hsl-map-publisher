@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styles from './lineTimetable.css';
 import LineTimetableHeader from './lineTimetableHeader';
@@ -6,22 +6,25 @@ import LineTableColumns from './lineTableColumns';
 import AllStopsList from './allStopsList';
 import {
   filter,
-  isEmpty,
   uniqBy,
   flatten,
   forEach,
   groupBy,
-  find,
   unionWith,
   omit,
   isEqual,
   some,
+  uniq,
+  sortBy,
 } from 'lodash';
 import { scheduleSegments } from '../../util/domain';
 import { addMissingFridayNote, combineConsecutiveDays } from '../timetable/timetableContainer';
 import { shortenTrainParsedLineId } from '../../util/routes';
 
 const MAX_STOPS = 4; // Maximum amount of timed stops rendered on the timetable
+
+const A5_PAGE_HEIGHT = 960;
+const PAGE_NUMBER_HEIGHT = 21;
 
 const getScheduleWeekdaysText = dayType => {
   switch (dayType) {
@@ -185,7 +188,7 @@ const RouteDepartures = props => {
   const combinedDepartureTables = Object.keys(mergedWeekdaysDepartures[0].combinedDays).map(key => {
     const showDivider = departuresByStop.length === 1 ? false : !showTimedStops;
     return (
-      <div className={styles.timetableContainer}>
+      <div>
         <LineTimetableHeader
           routeIdParsed={routeIdParsed}
           nameFi={nameFi}
@@ -202,6 +205,7 @@ const RouteDepartures = props => {
           departuresByStop={mergedWeekdaysDepartures}
           days={key}
         />
+        <div className={styles.pageBreak} />
       </div>
     );
   });
@@ -244,78 +248,264 @@ const checkForTrainRoutes = routes => {
 
 // Add note for friday departures because of merged timetables
 const addFridayNote = notes => {
-  return notes.splice(0, 0, { noteText: 'p) Vain perjantaisin' });
+  const mutableArr = notes.splice(0);
+  return mutableArr.splice(0, 0, { noteText: 'p) Vain perjantaisin' });
 };
 
-function LineTimetable(props) {
-  const { routes } = props;
-  const notes = props.line.notes.nodes;
-  addFridayNote(notes);
-  const showTimedStops = hasTimedStopRoutes(routes);
-
-  const checkedRoutes = checkForTrainRoutes(routes);
-
-  const mappedNotes = notes.map(note => {
-    return (
-      <div key={note} className={styles.footnote}>
-        {note.noteText}
-      </div>
-    );
+const hasFridayDepartures = routes => {
+  let hasFriDepartures = false;
+  forEach(routes, route => {
+    const departures = [...route.timedStopsDepartures.nodes];
+    const fridayDepartures = departures.filter(departure => departure.dayType.includes('Pe'));
+    hasFriDepartures = hasFriDepartures ? true : fridayDepartures.length > 0;
   });
+  return hasFriDepartures;
+};
 
-  if (showTimedStops) {
+const usesFridayDepartureNote = routes => {
+  let usesFridayDepartureNotation = true;
+  forEach(routes, route => {
+    usesFridayDepartureNotation = !usesFridayDepartureNotation ? false : route.mode !== 'TRAM';
+  });
+  return usesFridayDepartureNotation;
+};
+class LineTimetable extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      renderPageNumbers: false,
+    };
+  }
+
+  componentDidMount() {
+    const { renderPageNumbers } = this.state;
+    if (this.props.printPageNumbers && !renderPageNumbers) {
+      this.setState({ renderPageNumbers: false });
+    }
+  }
+
+  render() {
+    const { routes } = this.props;
+    let { notes } = this.props.line;
+    if (hasFridayDepartures(routes) && usesFridayDepartureNote(routes)) {
+      const addedFridayNotes = addFridayNote(this.props.line.notes);
+      notes = uniq(addedFridayNotes);
+    }
+
+    const showTimedStops = hasTimedStopRoutes(routes);
+    const checkedRoutes = checkForTrainRoutes(routes);
+
+    const mappedNotes = notes.map(note => {
+      return (
+        <div key={note} className={styles.footnote}>
+          {note.noteText}
+        </div>
+      );
+    });
+
+    const pageNumberPositions = [];
+
+    if (this.state.renderPageNumbers && this.content) {
+      const { scrollHeight } = this.content;
+      const pages = Math.ceil(scrollHeight / A5_PAGE_HEIGHT);
+      let index = 0;
+      let inverseIndex = pages + 1;
+      for (let i = 1; i < pages + 1; i++) {
+        pageNumberPositions.push({
+          top: i * A5_PAGE_HEIGHT + index * PAGE_NUMBER_HEIGHT,
+          bottom: inverseIndex * A5_PAGE_HEIGHT - index * PAGE_NUMBER_HEIGHT,
+        });
+        index++;
+        inverseIndex--;
+      }
+    }
+
+    if (showTimedStops) {
+      return (
+        <div>
+          <div
+            ref={ref => {
+              this.content = ref;
+            }}>
+            {checkedRoutes.map(routeWithDepartures => {
+              const routesByDateRanges = routeWithDepartures.departuresByDateRanges.map(
+                departuresForDateRange => {
+                  const { nameFi, nameSe, routeIdParsed } = routeWithDepartures;
+                  return {
+                    nameFi,
+                    nameSe,
+                    routeIdParsed,
+                    departuresByStop: departuresForDateRange.departuresByStop.slice(0, MAX_STOPS),
+                    dateBegin: departuresForDateRange.dateBegin,
+                    dateEnd: departuresForDateRange.dateEnd,
+                  };
+                },
+              );
+
+              const sortedRoutes = sortBy(routesByDateRanges, ['dateBegin']);
+
+              const routeDeparturesForDateRanges = sortedRoutes.map(routeForDateRange => {
+                const {
+                  nameFi,
+                  nameSe,
+                  routeIdParsed,
+                  departuresByStop,
+                  dateBegin,
+                  dateEnd,
+                } = routeForDateRange;
+
+                return (
+                  routeForDateRange.departuresByStop.length > 0 && (
+                    <div>
+                      <RouteDepartures
+                        routeIdParsed={routeIdParsed}
+                        nameFi={nameFi}
+                        nameSe={nameSe}
+                        showPrintBtn={this.props.showPrintBtn}
+                        lang={this.props.lang}
+                        departuresByStop={departuresByStop}
+                        dateBegin={dateBegin}
+                        dateEnd={dateEnd}
+                        showTimedStops={showTimedStops}
+                      />
+                      <AllStopsList
+                        stops={routeWithDepartures.routeSegments.nodes}
+                        routeIdParsed={routeIdParsed}
+                      />
+                      <div className={styles.timetableDivider} />
+                    </div>
+                  )
+                );
+              });
+
+              return routeDeparturesForDateRanges;
+            })}
+            {checkedRoutes.length >= 1 && (
+              <div className={styles.notesContainer}>{mappedNotes}</div>
+            )}
+            {checkedRoutes.length === 0 && (
+              <div className={styles.notesContainer}>
+                Linjaa ei löytynyt, tarkista tulosteen asetukset
+              </div>
+            )}
+            {pageNumberPositions.length > 0 &&
+              pageNumberPositions.map((position, index) => {
+                const pageNumber = index + 1;
+                return (
+                  <span
+                    className={styles.pageNumber}
+                    style={{ top: `${position.top}px`, bottom: `${position.bottom}px` }}>
+                    {pageNumber}
+                  </span>
+                );
+              })}
+          </div>
+        </div>
+      );
+    }
+
+    // The logic below is for timetables that do not have timed stops to display, only the starting stop for a route.
+    // These stops are displayed with both directions side by side in the timetable.
+    const groupedRoutes = groupBy(checkedRoutes, 'routeId');
+
+    // Map the departures from both directions into unique date ranges, so that we can display both directions for a date range side by side
+    const routeGroupsMappedDepartures = Object.values(groupedRoutes).map(routeGroup => {
+      const { routeId, routeIdParsed, nameFi, nameSe, routeSegments } = routeGroup[0];
+
+      const allDepartureDateRanges = routeGroup.map(route => {
+        return route.departuresByDateRanges;
+      });
+
+      const uniqueDateRanges = flatten(uniqBy(allDepartureDateRanges, 'dateBegin'));
+      const sortedUniqueDateRanges = sortBy(uniqueDateRanges, ['dateBegin']);
+
+      const mappedDeparturesBothDirections = sortedUniqueDateRanges.map(dateRange => {
+        const { dateBegin, dateEnd } = dateRange;
+        const bothDirectionDepartures = [];
+
+        forEach(allDepartureDateRanges, departureDateRange => {
+          const departures = flatten(departureDateRange);
+          if (departures[0].dateBegin === dateBegin && departures[0].dateEnd === dateEnd) {
+            bothDirectionDepartures.push(departures[0].departuresByStop);
+          }
+        });
+        return {
+          dateBegin,
+          dateEnd,
+          departuresByStop: flatten(bothDirectionDepartures),
+        };
+      });
+
+      return {
+        routeId,
+        routeIdParsed,
+        nameFi,
+        nameSe,
+        routeSegments,
+        departuresByDateRanges: mappedDeparturesBothDirections,
+      };
+    });
+
     return (
-      <div>
-        {checkedRoutes.map(routeWithDepartures => {
-          const routesByDateRanges = routeWithDepartures.departuresByDateRanges.map(
-            departuresForDateRange => {
-              const { nameFi, nameSe, routeIdParsed } = routeWithDepartures;
-              return {
-                nameFi,
-                nameSe,
-                routeIdParsed,
-                departuresByStop: departuresForDateRange.departuresByStop.slice(0, MAX_STOPS),
-                dateBegin: departuresForDateRange.dateBegin,
-                dateEnd: departuresForDateRange.dateEnd,
-              };
-            },
-          );
+      <div
+        ref={ref => {
+          this.content = ref;
+        }}>
+        {pageNumberPositions.length > 0 &&
+          pageNumberPositions.map((position, index) => {
+            const pageNumber = index + 1;
+            return (
+              <span
+                className={styles.pageNumber}
+                style={{ top: `${position.top}px`, bottom: `${position.bottom}px` }}>
+                {pageNumber}
+              </span>
+            );
+          })}
+        {routeGroupsMappedDepartures.map(routeWithDepartures => {
+          return routeWithDepartures.departuresByDateRanges.map(departuresForDateRange => {
+            const { nameFi, nameSe, routeIdParsed } = routeWithDepartures;
+            const { dateBegin, dateEnd, departuresByStop } = departuresForDateRange;
 
-          const routeDeparturesForDateRanges = routesByDateRanges.map(routeForDateRange => {
-            const {
-              nameFi,
-              nameSe,
-              routeIdParsed,
-              departuresByStop,
-              dateBegin,
-              dateEnd,
-            } = routeForDateRange;
+            const hasDepartures = some(departuresByStop, stop =>
+              some(stop.departures, departureDay => departureDay.length > 0),
+            );
+
+            if (
+              hasDepartures &&
+              departuresByStop[0].stop.stopId === departuresByStop[1].stop.stopId
+            ) {
+              departuresByStop.pop(1);
+            }
 
             return (
-              routeForDateRange.departuresByStop.length > 0 && (
-                <div className={styles.pageBreak}>
-                  <RouteDepartures
-                    routeIdParsed={routeIdParsed}
-                    nameFi={nameFi}
-                    nameSe={nameSe}
-                    showPrintBtn={props.showPrintBtn}
-                    lang={props.lang}
-                    departuresByStop={departuresByStop}
-                    dateBegin={dateBegin}
-                    dateEnd={dateEnd}
-                    showTimedStops={showTimedStops}
-                  />
+              <div>
+                {hasDepartures && (
+                  <div>
+                    <RouteDepartures
+                      routeIdParsed={routeIdParsed}
+                      nameFi={nameFi}
+                      nameSe={nameSe}
+                      showPrintBtn={this.props.showPrintBtn}
+                      lang={this.props.lang}
+                      departuresByStop={departuresByStop}
+                      dateBegin={dateBegin}
+                      dateEnd={dateEnd}
+                      showTimedStops={showTimedStops}
+                    />
+                    <div className={styles.pageBreak} />
+                  </div>
+                )}
+                {hasDepartures && (
                   <AllStopsList
                     stops={routeWithDepartures.routeSegments.nodes}
                     routeIdParsed={routeIdParsed}
                   />
-                  <div className={styles.timetableDivider} />
-                </div>
-              )
+                )}
+                {hasDepartures && <div className={styles.timetableDivider} />}
+              </div>
             );
           });
-
-          return routeDeparturesForDateRanges;
         })}
         {checkedRoutes.length >= 1 && <div className={styles.notesContainer}>{mappedNotes}</div>}
         {checkedRoutes.length === 0 && (
@@ -326,106 +516,13 @@ function LineTimetable(props) {
       </div>
     );
   }
-
-  // The logic below is for timetables that do not have timed stops to display, only the starting stop for a route.
-  // These stops are displayed with both directions side by side in the timetable.
-  const groupedRoutes = groupBy(checkedRoutes, 'routeId');
-
-  // Map the departures from both directions into unique date ranges, so that we can display both directions for a date range side by side
-  const routeGroupsMappedDepartures = Object.values(groupedRoutes).map(routeGroup => {
-    const { routeId, routeIdParsed, nameFi, nameSe, routeSegments } = routeGroup[0];
-
-    const allDepartureDateRanges = routeGroup.map(route => {
-      return route.departuresByDateRanges;
-    });
-
-    const uniqueDateRanges = flatten(uniqBy(allDepartureDateRanges, 'dateBegin'));
-
-    const mappedDeparturesBothDirections = uniqueDateRanges.map(dateRange => {
-      const { dateBegin, dateEnd } = dateRange;
-      const bothDirectionDepartures = [];
-
-      forEach(allDepartureDateRanges, departureDateRange => {
-        const departures = flatten(departureDateRange);
-        if (departures[0].dateBegin === dateBegin && departures[0].dateEnd === dateEnd) {
-          bothDirectionDepartures.push(departures[0].departuresByStop);
-        }
-      });
-      return {
-        dateBegin,
-        dateEnd,
-        departuresByStop: flatten(bothDirectionDepartures),
-      };
-    });
-
-    return {
-      routeId,
-      routeIdParsed,
-      nameFi,
-      nameSe,
-      routeSegments,
-      departuresByDateRanges: mappedDeparturesBothDirections,
-    };
-  });
-
-  return (
-    <div>
-      {routeGroupsMappedDepartures.map(routeWithDepartures => {
-        return routeWithDepartures.departuresByDateRanges.map(departuresFordateRange => {
-          const { nameFi, nameSe, routeIdParsed } = routeWithDepartures;
-          const { dateBegin, dateEnd, departuresByStop } = departuresFordateRange;
-
-          const hasDepartures = some(departuresByStop, stop =>
-            some(stop.departures, departureDay => departureDay.length > 0),
-          );
-
-          if (
-            hasDepartures &&
-            departuresByStop[0].stop.stopId === departuresByStop[1].stop.stopId
-          ) {
-            departuresByStop.pop(1);
-          }
-
-          return (
-            <div>
-              {hasDepartures && (
-                <RouteDepartures
-                  routeIdParsed={routeIdParsed}
-                  nameFi={nameFi}
-                  nameSe={nameSe}
-                  showPrintBtn={props.showPrintBtn}
-                  lang={props.lang}
-                  departuresByStop={departuresByStop}
-                  dateBegin={dateBegin}
-                  dateEnd={dateEnd}
-                  showTimedStops={showTimedStops}
-                />
-              )}
-              {hasDepartures && (
-                <AllStopsList
-                  stops={routeWithDepartures.routeSegments.nodes}
-                  routeIdParsed={routeIdParsed}
-                />
-              )}
-              {hasDepartures && <div className={styles.timetableDivider} />}
-            </div>
-          );
-        });
-      })}
-      {checkedRoutes.length >= 1 && <div className={styles.notesContainer}>{mappedNotes}</div>}
-      {checkedRoutes.length === 0 && (
-        <div className={styles.notesContainer}>
-          Linjaa ei löytynyt, tarkista tulosteen asetukset
-        </div>
-      )}
-    </div>
-  );
 }
 
 LineTimetable.defaultProps = {
   routes: {},
   showPrintBtn: false,
   lang: 'fi',
+  printPageNumbers: true,
 };
 
 LineTimetable.propTypes = {
@@ -433,6 +530,7 @@ LineTimetable.propTypes = {
   routes: PropTypes.object,
   showPrintBtn: PropTypes.bool,
   lang: PropTypes.string,
+  printPageNumbers: PropTypes.bool,
 };
 
 export default LineTimetable;

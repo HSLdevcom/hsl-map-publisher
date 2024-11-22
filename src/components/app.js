@@ -105,6 +105,10 @@ class App extends Component {
       rootStyle = { display: 'inline-block' };
     }
 
+    if (ComponentToRender === components.LineTimetable) {
+      rootStyle = { display: 'block' };
+    }
+
     return (
       <div
         style={rootStyle}
