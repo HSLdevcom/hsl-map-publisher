@@ -4,6 +4,7 @@ import styles from './lineTimetable.css';
 import LineTimetableHeader from './lineTimetableHeader';
 import LineTableColumns from './lineTableColumns';
 import AllStopsList from './allStopsList';
+import { PrintButton } from '../util';
 import {
   filter,
   uniqBy,
@@ -59,7 +60,6 @@ const hasTimedStopRoutes = routes => {
 
 const RouteDepartures = props => {
   const {
-    showPrintBtn,
     lang,
     departuresByStop,
     routeIdParsed,
@@ -193,7 +193,6 @@ const RouteDepartures = props => {
           routeIdParsed={routeIdParsed}
           nameFi={nameFi}
           nameSe={nameSe}
-          showPrintBtn={showPrintBtn}
           lang={lang}
         />
         <span className={styles.timetableDays}>{getScheduleWeekdaysText(key)}</span>
@@ -217,7 +216,6 @@ RouteDepartures.defaultProps = {
   routeIdParsed: '',
   nameFi: '',
   nameSe: '',
-  showPrintBtn: '',
   lang: '',
   departuresByStop: {},
   dateBegin: '',
@@ -229,7 +227,6 @@ RouteDepartures.propTypes = {
   routeIdParsed: PropTypes.string,
   nameFi: PropTypes.string,
   nameSe: PropTypes.string,
-  showPrintBtn: PropTypes.string,
   lang: PropTypes.string,
   departuresByStop: PropTypes.object,
   dateBegin: PropTypes.string,
@@ -357,11 +354,13 @@ class LineTimetable extends Component {
                 return (
                   routeForDateRange.departuresByStop.length > 0 && (
                     <div>
+                      <div className={styles.printBtnContainer}>
+                        {this.props.showPrintButton && <PrintButton lang={this.props.lang} />}
+                      </div>
                       <RouteDepartures
                         routeIdParsed={routeIdParsed}
                         nameFi={nameFi}
                         nameSe={nameSe}
-                        showPrintBtn={this.props.showPrintBtn}
                         lang={this.props.lang}
                         departuresByStop={departuresByStop}
                         dateBegin={dateBegin}
@@ -482,11 +481,13 @@ class LineTimetable extends Component {
               <div>
                 {hasDepartures && (
                   <div>
+                    <div className={styles.printBtnContainer}>
+                      {this.props.showPrintButton && <PrintButton lang={this.props.lang} />}
+                    </div>
                     <RouteDepartures
                       routeIdParsed={routeIdParsed}
                       nameFi={nameFi}
                       nameSe={nameSe}
-                      showPrintBtn={this.props.showPrintBtn}
                       lang={this.props.lang}
                       departuresByStop={departuresByStop}
                       dateBegin={dateBegin}
@@ -520,7 +521,7 @@ class LineTimetable extends Component {
 
 LineTimetable.defaultProps = {
   routes: {},
-  showPrintBtn: false,
+  showPrintButton: false,
   lang: 'fi',
   printPageNumbers: true,
 };
@@ -528,7 +529,7 @@ LineTimetable.defaultProps = {
 LineTimetable.propTypes = {
   line: PropTypes.object.isRequired,
   routes: PropTypes.object,
-  showPrintBtn: PropTypes.bool,
+  showPrintButton: PropTypes.bool,
   lang: PropTypes.string,
   printPageNumbers: PropTypes.bool,
 };
