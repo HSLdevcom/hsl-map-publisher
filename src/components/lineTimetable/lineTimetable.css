@@ -52,6 +52,12 @@
   height: fit-content;
 }
 
+.printBtnContainer {
+  position: absolute;
+  left: 680px;
+  top: 20px;
+}
+
 @media print {
   .noPrint,
   .noPrint * {

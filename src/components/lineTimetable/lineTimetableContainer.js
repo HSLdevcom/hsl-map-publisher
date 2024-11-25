@@ -222,7 +222,7 @@ const filterNotes = (notes, dateBegin) => {
 
 const lineQueryMapper = mapProps(props => {
   const line = props.data.lines.nodes[0];
-  const { showPrintBtn, lang } = props;
+  const { showPrintButton, lang } = props;
 
   const mergedRoutes = mergeExtraRoutes(line.routes.nodes);
 
@@ -251,7 +251,7 @@ const lineQueryMapper = mapProps(props => {
   return {
     line: { ...line, notes: filteredNotes },
     routes: filterRoutes(routesWithGroupedDepartures),
-    showPrintBtn,
+    showPrintButton,
     lang,
   };
 });
@@ -261,7 +261,7 @@ const hoc = compose(graphql(lineQuery), apolloWrapper(lineQueryMapper));
 const LineTimetableContainer = hoc(LineTimetable);
 
 LineTimetableContainer.defaultProps = {
-  showPrintBtn: false,
+  showPrintButton: false,
   lang: 'fi',
   printPageNumbers: true,
 };
@@ -270,7 +270,7 @@ LineTimetableContainer.propTypes = {
   lineId: PropTypes.string.isRequired,
   dateBegin: PropTypes.string.isRequired,
   dateEnd: PropTypes.string.isRequired,
-  showPrintBtn: PropTypes.bool,
+  showPrintButton: PropTypes.bool,
   lang: PropTypes.string,
   printPageNumbers: PropTypes.bool,
 };
