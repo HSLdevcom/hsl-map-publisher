@@ -2,6 +2,7 @@
   display: block;
   break-inside: avoid;
   break-before: avoid-page;
+  margin-bottom: 1.3rem;
 }
 
 .flexHeader {
@@ -17,15 +18,17 @@
 
 .stopNamePrimary {
   font-size: 1rem;
-  margin: 0 0 0 1.2rem;
+  margin: 0 0 0.2rem 1.2rem;
   font-family: GothamRounded-Medium;
+  letter-spacing: normal;
   break-inside: avoid;
 }
 
 .stopNameSecondary {
   font-size: 1rem;
   margin: 0 0 0 1.2rem;
-  font-family: GothamXNarrow-Book;
+  font-family: GothamRounded-Book;
+  letter-spacing: normal;
 }
 
 .directionBracket {
