@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { hot } from 'react-hot-loader';
 import { get, cloneDeep } from 'lodash';
 import { JustifiedColumn, Spacer } from 'components/util';
 import renderQueue from 'util/renderQueue';
 import { colorsByMode } from 'util/domain';
 import Measure from 'react-measure';
+import classNames from 'classnames';
 
 import CropMarks from 'components/cropMarks';
 import RouteDiagram from 'components/routeDiagram/routeDiagramContainer';
@@ -334,6 +334,7 @@ class TerminalPoster extends Component {
       minimapZones,
       legend,
       stops,
+      isSmallTerminalPoster,
     } = this.props;
 
     if (!hasRoutesProp) {
@@ -383,7 +384,11 @@ class TerminalPoster extends Component {
 
     return (
       <CropMarks>
-        <div className={styles.root} style={isTrunkStop ? trunkStopStyle : null}>
+        <div
+          className={classNames(styles.root, {
+            [styles.smallTerminalPoster]: isSmallTerminalPoster,
+          })}
+          style={isTrunkStop ? trunkStopStyle : null}>
           <JustifiedColumn>
             <Header stopId={terminalId} />
             <div
@@ -517,6 +522,7 @@ TerminalPoster.propTypes = {
   routeFilter: PropTypes.string,
   legend: PropTypes.bool,
   stops: PropTypes.array.isRequired,
+  isSmallTerminalPoster: PropTypes.bool,
 };
 
 TerminalPoster.defaultProps = {
@@ -530,6 +536,7 @@ TerminalPoster.defaultProps = {
   minimapZones: false,
   routeFilter: '',
   legend: false,
+  isSmallTerminalPoster: false,
 };
 
-export default hot(module)(TerminalPoster);
+export default TerminalPoster;

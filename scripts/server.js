@@ -49,6 +49,7 @@ const PORT = 4000;
 
 const RENDER_URL_COMPONENTS = {
   TIMETABLE: 'Timetable',
+  LINE_TIMETABLE: 'LineTimetable',
 };
 
 const bullRedisConnection = new Redis(REDIS_CONNECTION_STRING, {
@@ -62,8 +63,11 @@ const cancelSignalRedis = new Redis(REDIS_CONNECTION_STRING);
 async function generatePoster(buildId, component, props, index) {
   const { stopId, date, template, selectedRuleTemplates } = props;
 
-  // RuleTemplates are not available for TerminalPoster
-  const data = component !== 'TerminalPoster' ? await getStopInfo({ stopId, date }) : null;
+  // RuleTemplates are not available for TerminalPoster and LineTimetable
+  const data =
+    component !== 'TerminalPoster' && component !== 'LineTimetable'
+      ? await getStopInfo({ stopId, date })
+      : null;
 
   // Checks if any rule template will match the stop, and returns *the first one*.
   // If no match, returns the default template.
@@ -102,6 +106,8 @@ async function generatePoster(buildId, component, props, index) {
   return { id };
 }
 
+const isRunningOnLocalEnv = () => process.env.BUILD_ENV === 'local';
+
 const errorHandler = async (ctx, next) => {
   try {
     await next();
@@ -118,6 +124,12 @@ const authMiddleware = async (ctx, next) => {
   // Helper function to allow specific requests without authentication
   const allowAuthException = ctx2 => {
     const envHostUrl = new URL(process.env.REACT_APP_PUBLISHER_SERVER_URL);
+
+    // Allow API testing in local environment without authentication
+    if (isRunningOnLocalEnv()) {
+      return true;
+    }
+
     // Allow session related requests
     if (['/login', '/logout', '/session'].includes(ctx2.path)) {
       return true;
@@ -153,6 +165,7 @@ const authMiddleware = async (ctx, next) => {
 };
 
 const allowedToGenerate = user => {
+  if (isRunningOnLocalEnv()) return true;
   if (!user || !user.email) return false;
   const domain = user.email.split('@')[1];
   const parsedAllowedDomains = DOMAINS_ALLOWED_TO_GENERATE.split(',');
@@ -401,9 +414,17 @@ async function main() {
   });
 
   unAuthorizedRouter.post('/generateRenderUrl', koaBody(), async ctx => {
-    const { props } = ctx.request.body;
+    const { props, component } = ctx.request.body;
     const { template } = props;
-    const component = RENDER_URL_COMPONENTS.TIMETABLE; // Restrict unauthorized API generation only for quick timetable generations
+    if (
+      component !== RENDER_URL_COMPONENTS.TIMETABLE &&
+      component !== RENDER_URL_COMPONENTS.LINE_TIMETABLE
+    ) {
+      // Return error if wrong components is requested, restrict render API only to less resource intensive timetables.
+      ctx.body = 'Requested component missing or invalid';
+      ctx.status = 400;
+      return;
+    }
     const renderUrl = generateRenderUrl(component, template, props);
 
     if (props.redirect) {

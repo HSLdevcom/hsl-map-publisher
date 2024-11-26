@@ -27,8 +27,12 @@ const Destinations = props => {
             </Row>
           ))}
           <Column style={{ flexBasis: '100%' }}>
-            <div className={styles.title}>{destinations[0].titleFi}</div>
-            <div className={styles.subtitle}>{destinations[0].titleSe}</div>
+            <div className={styles.title} style={{ color: getColor(destinations[0]) }}>
+              {destinations[0].titleFi}
+            </div>
+            <div className={styles.subtitle} style={{ color: getColor(destinations[0]) }}>
+              {destinations[0].titleSe}
+            </div>
           </Column>
         </WrappingRow>
       ))}

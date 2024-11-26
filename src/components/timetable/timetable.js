@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Spacer, PlatformSymbol, getWeekdayName } from 'components/util';
+import { Spacer, PlatformSymbol, getWeekdayName, PrintButton } from 'components/util';
 import classNames from 'classnames';
 
 import TableHeader from './tableHeader';
@@ -46,7 +46,7 @@ const getZoneLetterStyle = zone => ({
       : 'translate(-50%, -50%)', // No px adjustments for zone A and the "else" case.
 });
 
-const getNotes = (notes, symbols) => {
+export const getNotes = (notes, symbols) => {
   const parsedNotes = [];
   symbols.forEach(symbol => {
     notes.forEach(note => {
@@ -56,22 +56,6 @@ const getNotes = (notes, symbols) => {
     });
   });
   return parsedNotes;
-};
-
-const PrintButton = lang => {
-  const PRINT_TEXT = {
-    fi: 'TULOSTA AIKATAULU',
-    sv: 'SKRIV UT TIDTABEL',
-    en: 'PRINT SCHEDULE',
-  };
-
-  return (
-    <div className={styles.noPrint}>
-      <button className={styles.printBtn} type="button" onClick={window.print}>
-        {PRINT_TEXT[lang.lang]}
-      </button>
-    </div>
-  );
 };
 
 class Timetable extends Component {
@@ -201,7 +185,7 @@ class Timetable extends Component {
               ? `${getWeekdayName(dayNames[0], 'en')} - ${getWeekdayName(dayNames[1], 'en')}`
               : `${getWeekdayName(dayNames[0], 'en')}`;
           return (
-            <div>
+            <div key={`tableheader_container_${fiTitle}`}>
               <TableHeader
                 title={fiTitle}
                 subtitleSw={svTitle}

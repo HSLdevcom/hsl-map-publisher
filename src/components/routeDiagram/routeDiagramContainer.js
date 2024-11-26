@@ -24,6 +24,12 @@ const routeDiagramQuery = gql`
                 routeId
                 hasRegularDayDepartures(date: $date)
                 pickupDropoffType
+                line {
+                  nodes {
+                    lineId
+                    trunkRoute
+                  }
+                }
                 route {
                   nodes {
                     mode
@@ -48,6 +54,12 @@ const routeDiagramQuery = gql`
                           route {
                             nodes {
                               mode
+                            }
+                          }
+                          line {
+                            nodes {
+                              lineId
+                              trunkRoute
                             }
                           }
                         }
@@ -100,6 +112,7 @@ const propsMapper = mapProps(props => {
         .map(routeSegment => ({
           ...routeSegment.route.nodes[0],
           routeId: trimRouteId(routeSegment.routeId),
+          trunkRoute: routeSegment.line.nodes[0].trunkRoute === '1',
           // List all stops (including drop-off only) for each route
           stops: sortBy(routeSegment.nextStops.nodes, node => node.stopIndex).map(nodeToStop),
         })),
