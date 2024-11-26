@@ -1,7 +1,6 @@
 .departureRowContainer {
   max-width: 420px;
   min-width: 120px;
-  font-family: GothamRounded-Book;
   margin: 0.5rem 0;
 }
 
@@ -27,7 +26,7 @@
 
 .tableContainer {
   display: flex;
-  margin-top: 1rem;
+  margin-top: 1.3rem;
 }
 
 .wider {
