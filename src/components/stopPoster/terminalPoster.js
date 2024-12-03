@@ -357,7 +357,7 @@ class TerminalPoster extends Component {
     const tramImage = get(src, 'slots[0].image.svg', '');
     let useDiagram = this.state.hasDiagram;
 
-    if (isTramStop && tramImage) useDiagram = false;
+    if (tramImage) useDiagram = false;
 
     const TerminalPosterTimetable = props => (
       <React.Fragment>
@@ -472,7 +472,7 @@ class TerminalPoster extends Component {
                         />
                       )}
 
-                      <Spacer height={10} />
+                      {useDiagram && <Spacer height={10} />}
                       {useDiagram && (
                         <RouteDiagram
                           height={this.state.diagramOptions.diagramStopCount}
@@ -482,7 +482,7 @@ class TerminalPoster extends Component {
                           maxColumns={hasLeftColumn ? 6 : 8}
                         />
                       )}
-                      {isTramStop && tramImage && <TramDiagram svg={tramImage} />}
+                      {!useDiagram && tramImage && <TramDiagram svg={tramImage} />}
                     </div>
                   )}
                 </Measure>
