@@ -65,12 +65,14 @@ function routesToTree(routes, { stopZone, shortId }, height = 'auto', width = MA
         type: 'stop',
         zone: stop.stopZone,
         routeSegments: stop.routeSegments.nodes.map(segment => {
+
           let trunkRoute;
           try {
             trunkRoute = segment.line.nodes[0].trunkRoute === '1';
           } catch (e) {
             trunkRoute = false;
           }
+
           return {
             ...segment,
             trunkRoute,
