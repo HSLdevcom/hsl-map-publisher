@@ -449,7 +449,7 @@ class TerminalPoster extends Component {
                 <Measure client>
                   {({ measureRef, contentRect }) => (
                     <div className={styles.right} ref={measureRef}>
-                      {!useDiagram && <Spacer height={10} />}
+                      <Spacer height={10} />
                       {/* The key will make sure the map updates its size if the layout changes */}
                       {shouldRenderMap && (
                         <CustomMap
@@ -472,7 +472,7 @@ class TerminalPoster extends Component {
                         />
                       )}
 
-                      {useDiagram && <Spacer height={10} />}
+                      <Spacer height={10} />
                       {useDiagram && (
                         <RouteDiagram
                           height={this.state.diagramOptions.diagramStopCount}
