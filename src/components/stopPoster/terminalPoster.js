@@ -494,6 +494,7 @@ class TerminalPoster extends Component {
               template={template ? get(template, 'areas', []).find(t => t.key === 'footer') : {}}
               shortId={shortId}
               isTrunkStop={isTrunkStop}
+              isSmallTerminalPoster={isSmallTerminalPoster}
             />
             <Metadata date={date} />
           </JustifiedColumn>

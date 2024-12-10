@@ -67,7 +67,24 @@ const slotWidth = 392;
 const slotHeight = 358;
 
 const getFirstSlotPosition = slotsAmount => {
-  return slotsAmount === 3 ? 453 : 25;
+  let firstSlotMargin;
+
+  switch (slotsAmount) {
+    case 3:
+      firstSlotMargin = 453;
+      break;
+    case 4:
+      firstSlotMargin = 120;
+      break;
+    case 5:
+      firstSlotMargin = 25;
+      break;
+    default:
+      firstSlotMargin = 25;
+      break;
+  }
+
+  return firstSlotMargin;
 };
 
 function createTemplateSlots(areaSlots) {
@@ -119,7 +136,13 @@ const Footer = props => {
     feedback: getFeedbackUrl(props.shortId),
   };
 
-  const slots = createTemplateSlots(get(props, 'template.slots', []));
+  const templateSlots = get(props, 'template.slots', []);
+
+  if (templateSlots.length === 5 && props.isSmallTerminalPoster) {
+    templateSlots.splice(4, 1); // Remove the fifth SVG slot to fit the smaller terminal poster footer
+  }
+
+  const slots = createTemplateSlots(templateSlots);
 
   return (
     <div className={styles.footerWrapper}>
@@ -188,10 +211,12 @@ Footer.propTypes = {
   shortId: PropTypes.string.isRequired,
   isTrunkStop: PropTypes.bool.isRequired,
   onError: PropTypes.func.isRequired,
+  isSmallTerminalPoster: PropTypes.bool,
 };
 
 Footer.defaultProps = {
   template: null,
+  isSmallTerminalPoster: false,
 };
 
 export default Footer;
