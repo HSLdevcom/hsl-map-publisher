@@ -65,7 +65,27 @@ function getDynamicAreas(svg, widthModifier, heightModifier) {
 const slotMargin = 25;
 const slotWidth = 392;
 const slotHeight = 358;
-const firstSlotLeft = 453;
+
+const getFirstSlotPosition = slotsAmount => {
+  let firstSlotMargin;
+
+  switch (slotsAmount) {
+    case 3:
+      firstSlotMargin = 453;
+      break;
+    case 4:
+      firstSlotMargin = 120;
+      break;
+    case 5:
+      firstSlotMargin = 25;
+      break;
+    default:
+      firstSlotMargin = 25;
+      break;
+  }
+
+  return firstSlotMargin;
+};
 
 function createTemplateSlots(areaSlots) {
   return areaSlots.reduce((slots, { image, size }, idx) => {
@@ -76,9 +96,11 @@ function createTemplateSlots(areaSlots) {
       return slots;
     }
 
+    const firstSlotLeftPosition = getFirstSlotPosition(areaSlots.length);
+
     const marginToWidth = size > 1 ? (size - 1) * slotMargin : 0;
     const width = slotWidth * size + marginToWidth;
-    const left = firstSlotLeft + slotWidth * idx + slotMargin * idx;
+    const left = firstSlotLeftPosition + slotWidth * idx + slotMargin * idx;
     const $svg = cheerio.load(svg);
 
     const svgViewBox = $svg('svg')
@@ -114,16 +136,26 @@ const Footer = props => {
     feedback: getFeedbackUrl(props.shortId),
   };
 
-  const slots = createTemplateSlots(get(props, 'template.slots', []));
+  const templateSlots = get(props, 'template.slots', []);
+
+  if (templateSlots.length === 5 && props.isSmallTerminalPoster) {
+    templateSlots.splice(4, 1); // Remove the fifth SVG slot to fit the smaller terminal poster footer
+  }
+
+  const slots = createTemplateSlots(templateSlots);
 
   return (
     <div className={styles.footerWrapper}>
       <InlineSVG className={styles.dottedLine} src={dottedLine} />
-      <InlineSVG className={classnames(styles.footerPiece, styles.hslLogo)} src={hslLogo} />
-      <InlineSVG
-        className={classnames(styles.footerPiece, styles.customerService)}
-        src={customerService}
-      />
+      {slots.length === 3 && (
+        <div>
+          <InlineSVG className={classnames(styles.footerPiece, styles.hslLogo)} src={hslLogo} />
+          <InlineSVG
+            className={classnames(styles.footerPiece, styles.customerService)}
+            src={customerService}
+          />
+        </div>
+      )}
       {slots.map((slot, slotIdx) => {
         const svg = get(slot, 'svg', '');
 
@@ -179,10 +211,12 @@ Footer.propTypes = {
   shortId: PropTypes.string.isRequired,
   isTrunkStop: PropTypes.bool.isRequired,
   onError: PropTypes.func.isRequired,
+  isSmallTerminalPoster: PropTypes.bool,
 };
 
 Footer.defaultProps = {
   template: null,
+  isSmallTerminalPoster: false,
 };
 
 export default Footer;
