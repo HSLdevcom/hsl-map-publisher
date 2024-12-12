@@ -80,7 +80,7 @@ const getFirstSlotPosition = slotsAmount => {
       firstSlotMargin = 25;
       break;
     default:
-      firstSlotMargin = 25;
+      firstSlotMargin = 480;
       break;
   }
 
@@ -138,6 +138,10 @@ const Footer = props => {
 
   const templateSlots = get(props, 'template.slots', []);
 
+  if (templateSlots.length === 3 && props.isSmallTerminalPoster) {
+    templateSlots.splice(2, 1); // Compatibility with 3 slot templates for the smaller terminal poster
+  }
+
   if (templateSlots.length === 5 && props.isSmallTerminalPoster) {
     templateSlots.splice(4, 1); // Remove the fifth SVG slot to fit the smaller terminal poster footer
   }
@@ -147,7 +151,7 @@ const Footer = props => {
   return (
     <div className={styles.footerWrapper}>
       <InlineSVG className={styles.dottedLine} src={dottedLine} />
-      {slots.length === 3 && (
+      {slots.length <= 3 && (
         <div>
           <InlineSVG className={classnames(styles.footerPiece, styles.hslLogo)} src={hslLogo} />
           <InlineSVG
