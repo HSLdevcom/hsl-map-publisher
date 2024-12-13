@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 
 import Destinations from './destinations';
 import Stop from './stop';
@@ -66,7 +67,11 @@ class Path extends Component {
       <div className={styles.root}>
         <div className={styles.header} />
         {this.props.items.map((item, index) => (
-          <div key={index}>
+          <div
+            key={index}
+            className={classNames({
+              [styles.compact]: this.isLastStop && this.props.useCompactLayout,
+            })}>
             {item.type === 'stop' && (
               <Stop
                 {...item}
@@ -86,7 +91,7 @@ class Path extends Component {
             <div className={styles.footer} style={{ width: this.getWidth(this.props.children) }} />
             <div className={styles.children}>
               {this.props.children.map((branch, index) => (
-                <Path key={index} {...branch} />
+                <Path key={index} {...branch} useCompactLayout={this.props.useCompactLayout} />
               ))}
             </div>
           </div>
@@ -98,6 +103,7 @@ class Path extends Component {
 
 Path.defaultProps = {
   children: null,
+  useCompactLayout: false,
 };
 
 Path.propTypes = {
@@ -107,6 +113,7 @@ Path.propTypes = {
       destinations: PropTypes.arrayOf(PropTypes.object),
     }),
   ).isRequired,
+  useCompactLayout: PropTypes.bool,
 };
 
 // eslint-disable-next-line

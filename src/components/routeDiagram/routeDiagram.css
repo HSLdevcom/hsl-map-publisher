@@ -6,6 +6,7 @@
   padding: 42px 3px 42px 42px;
   background: white;
   border-radius: var(--border-radius);
+  overflow: hidden;
 
   --left-width: 10px;
   --right-width: 200px;
@@ -14,6 +15,10 @@
   --line-width: 2px;
   --line-radius: 10px;
   --line-border: var(--line-width) solid var(--line-color);
+}
+
+.narrow {
+  max-width: 1840px;
 }
 
 .a3 {

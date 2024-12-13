@@ -3,6 +3,10 @@
   color: var(--line-color);
 }
 
+.compact {
+  max-width: 300px;
+}
+
 .header {
   width: var(--left-width);
   border-right: var(--line-border);
