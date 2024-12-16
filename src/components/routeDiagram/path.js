@@ -14,6 +14,9 @@ const PATH_WIDTH = 225;
 const PATH_WIDTH_WIDER = 251;
 const LINE_RADIUS = 10;
 
+const COMPACT_PATH_WIDTH = PATH_WIDTH * 0.88;
+const COMPACT_PATH_WIDTH_WIDER = PATH_WIDTH_WIDER * 0.88;
+
 class Path extends Component {
   hasTerminalId = branch => {
     let foundTerminalId = false;
@@ -26,22 +29,26 @@ class Path extends Component {
   };
 
   getWidth = (nodes, isRoot = true) => {
+    const { useCompactLayout } = this.props;
     let width = 0;
     nodes.forEach((node, index) => {
       if (!node.children || (isRoot && index === nodes.length - 1)) {
         if (this.hasTerminalId(node)) {
-          width += PATH_WIDTH_WIDER;
+          width += useCompactLayout ? COMPACT_PATH_WIDTH_WIDER : PATH_WIDTH_WIDER;
         } else {
-          width += PATH_WIDTH;
+          width += useCompactLayout ? COMPACT_PATH_WIDTH : PATH_WIDTH;
         }
       } else {
         width += this.getWidth(node.children, false);
       }
     });
 
+    const rootWidePath = useCompactLayout ? COMPACT_PATH_WIDTH_WIDER : PATH_WIDTH_WIDER;
+    const rootPath = useCompactLayout ? COMPACT_PATH_WIDTH : PATH_WIDTH;
+
     return isRoot
       ? width -
-          (this.hasTerminalId(nodes[nodes.length - 1]) ? PATH_WIDTH_WIDER : PATH_WIDTH) -
+          (this.hasTerminalId(nodes[nodes.length - 1]) ? rootWidePath : rootPath) -
           LINE_RADIUS
       : width;
   };
@@ -79,6 +86,7 @@ class Path extends Component {
                 isLast={this.isLastStop(item)}
                 destinationRouteIds={destinationRouteIds}
                 hasTerminalId={hasTerminalId}
+                useCompactLayout={this.props.useCompactLayout}
               />
             )}
             {item.type === 'gap' && <Gap />}

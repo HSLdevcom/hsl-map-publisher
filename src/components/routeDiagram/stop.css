@@ -5,6 +5,10 @@
   white-space: nowrap;
 }
 
+.compact {
+  margin-left: 1.5px;
+}
+
 .left {
   width: var(--left-width);
 }
