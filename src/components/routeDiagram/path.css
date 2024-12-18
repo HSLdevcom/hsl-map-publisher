@@ -3,8 +3,8 @@
   color: var(--line-color);
 }
 
-.compact {
-  max-width: 220px;
+.children > .compact:last-child {
+  margin-left: -50px;
 }
 
 .header {

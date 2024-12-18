@@ -15,7 +15,7 @@ const RouteDiagram = props => {
     <div
       className={
         !printAsA3
-          ? classNames(styles.root, { [styles.narrow]: useCompactLayout })
+          ? styles.root
           : classNames(styles.root, styles.a3, {
               [styles.useWide]: useWide,
             })

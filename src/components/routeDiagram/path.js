@@ -14,9 +14,6 @@ const PATH_WIDTH = 225;
 const PATH_WIDTH_WIDER = 251;
 const LINE_RADIUS = 10;
 
-const COMPACT_PATH_WIDTH = PATH_WIDTH * 0.88;
-const COMPACT_PATH_WIDTH_WIDER = PATH_WIDTH_WIDER * 0.88;
-
 class Path extends Component {
   hasTerminalId = branch => {
     let foundTerminalId = false;
@@ -29,28 +26,52 @@ class Path extends Component {
   };
 
   getWidth = (nodes, isRoot = true) => {
-    const { useCompactLayout } = this.props;
     let width = 0;
     nodes.forEach((node, index) => {
       if (!node.children || (isRoot && index === nodes.length - 1)) {
         if (this.hasTerminalId(node)) {
-          width += useCompactLayout ? COMPACT_PATH_WIDTH_WIDER : PATH_WIDTH_WIDER;
+          width += PATH_WIDTH_WIDER;
         } else {
-          width += useCompactLayout ? COMPACT_PATH_WIDTH : PATH_WIDTH;
+          width += PATH_WIDTH;
         }
       } else {
         width += this.getWidth(node.children, false);
       }
     });
 
-    const rootWidePath = useCompactLayout ? COMPACT_PATH_WIDTH_WIDER : PATH_WIDTH_WIDER;
-    const rootPath = useCompactLayout ? COMPACT_PATH_WIDTH : PATH_WIDTH;
-
     return isRoot
       ? width -
-          (this.hasTerminalId(nodes[nodes.length - 1]) ? rootWidePath : rootPath) -
+          (this.hasTerminalId(nodes[nodes.length - 1]) ? PATH_WIDTH_WIDER : PATH_WIDTH) -
           LINE_RADIUS
       : width;
+  };
+
+  calculateCompactWidth = (originalWidth, children) => {
+    const widthRemainder = originalWidth % children.length;
+    const needsExtraTrimming = widthRemainder <= 1 && children.length >= 2;
+
+    let trimLength;
+    switch (widthRemainder) {
+      case 0:
+        if (originalWidth < 500) {
+          trimLength = 100;
+          break;
+        }
+        trimLength = originalWidth > 1300 ? 45 : 105;
+        break;
+      case 1:
+        if (originalWidth > 1300) {
+          trimLength = 146;
+          break;
+        }
+        trimLength = originalWidth > 500 ? 150 : 50;
+        break;
+      default:
+        trimLength = 100;
+        break;
+    }
+
+    return needsExtraTrimming ? this.getWidth(children) - trimLength : this.getWidth(children) - 50;
   };
 
   getDestinationRouteIds = items => {
@@ -71,14 +92,10 @@ class Path extends Component {
     const destinationRouteIds = this.getDestinationRouteIds(this.props.items);
     const hasTerminalId = this.hasTerminalId(this.props);
     return (
-      <div className={styles.root}>
+      <div className={classNames(styles.root, { [styles.compact]: this.props.useCompactLayout })}>
         <div className={styles.header} />
         {this.props.items.map((item, index) => (
-          <div
-            key={index}
-            className={classNames({
-              [styles.compact]: this.isLastStop && this.props.useCompactLayout,
-            })}>
+          <div key={index}>
             {item.type === 'stop' && (
               <Stop
                 {...item}
@@ -96,7 +113,17 @@ class Path extends Component {
         ))}
         {this.props.children && (
           <div>
-            <div className={styles.footer} style={{ width: this.getWidth(this.props.children) }} />
+            <div
+              className={styles.footer}
+              style={{
+                width: this.props.useCompactLayout
+                  ? this.calculateCompactWidth(
+                      this.getWidth(this.props.children),
+                      this.props.children,
+                    )
+                  : this.getWidth(this.props.children),
+              }}
+            />
             <div className={styles.children}>
               {this.props.children.map((branch, index) => (
                 <Path key={index} {...branch} useCompactLayout={this.props.useCompactLayout} />
