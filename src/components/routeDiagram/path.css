@@ -3,6 +3,10 @@
   color: var(--line-color);
 }
 
+.children > .compact:last-child {
+  margin-left: -50px;
+}
+
 .header {
   width: var(--left-width);
   border-right: var(--line-border);

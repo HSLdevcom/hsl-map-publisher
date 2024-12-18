@@ -8,41 +8,48 @@ import markerIcon from 'icons/marker.svg';
 import Path from './path';
 import styles from './routeDiagram.css';
 
-const RouteDiagram = props => (
-  <div
-    className={
-      !props.printAsA3
-        ? styles.root
-        : classNames(styles.root, styles.a3, props.useWide ? styles.useWide : '')
-    }>
+const RouteDiagram = props => {
+  const { printAsA3, useWide, useCompactLayout, tree } = props;
+  tree.useCompactLayout = useCompactLayout;
+  return (
     <div
-      className={classNames(styles.componentName, { [styles.componentNameA3]: props.printAsA3 })}>
-      <div className={!props.printAsA3 ? styles.title : styles.titleA3}>Linjojen reitit</div>
-      <div className={!props.printAsA3 ? styles.subtitle : styles.subtitleA3}>
-        Linjernas rutter / <span className={styles.italics}>Routes</span>
+      className={
+        !printAsA3
+          ? styles.root
+          : classNames(styles.root, styles.a3, {
+              [styles.useWide]: useWide,
+            })
+      }>
+      <div className={classNames(styles.componentName, { [styles.componentNameA3]: printAsA3 })}>
+        <div className={!printAsA3 ? styles.title : styles.titleA3}>Linjojen reitit</div>
+        <div className={!printAsA3 ? styles.subtitle : styles.subtitleA3}>
+          Linjernas rutter / <span className={styles.italics}>Routes</span>
+        </div>
       </div>
-    </div>
-    <div className={styles.start}>
-      <InlineSVG src={markerIcon} className={styles.icon} />
-      <div className={classNames(styles.title, { [styles.titleA3]: props.printAsA3 })}>
-        Olet tässä&nbsp;&nbsp;
-        <span className={styles.subtitle}>Du är här&nbsp;&nbsp;</span>
-        <span className={styles.subtitle}>You are here</span>
+      <div className={styles.start}>
+        <InlineSVG src={markerIcon} className={styles.icon} />
+        <div className={classNames(styles.title, { [styles.titleA3]: printAsA3 })}>
+          Olet tässä&nbsp;&nbsp;
+          <span className={styles.subtitle}>Du är här&nbsp;&nbsp;</span>
+          <span className={styles.subtitle}>You are here</span>
+        </div>
       </div>
+      <Path {...tree} />
     </div>
-    <Path {...props.tree} />
-  </div>
-);
+  );
+};
 
 RouteDiagram.defaultProps = {
   printAsA3: false,
   useWide: false,
+  useCompactLayout: false,
 };
 
 RouteDiagram.propTypes = {
   tree: PropTypes.shape(Path.propTypes).isRequired,
   printAsA3: PropTypes.bool,
   useWide: PropTypes.bool,
+  useCompactLayout: PropTypes.bool,
 };
 
 export default RouteDiagram;

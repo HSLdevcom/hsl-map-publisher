@@ -480,6 +480,7 @@ class TerminalPoster extends Component {
                           date={date}
                           routeFilter={this.props.routeFilter}
                           maxColumns={hasLeftColumn ? 6 : 8}
+                          useCompactLayout={isSmallTerminalPoster}
                         />
                       )}
                       {!useDiagram && tramImage && <TramDiagram svg={tramImage} />}

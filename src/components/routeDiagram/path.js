@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 
 import Destinations from './destinations';
 import Stop from './stop';
@@ -45,6 +46,34 @@ class Path extends Component {
       : width;
   };
 
+  calculateCompactWidth = (originalWidth, children) => {
+    const widthRemainder = originalWidth % children.length;
+    const needsExtraTrimming = widthRemainder <= 1 && children.length >= 2;
+
+    let trimLength;
+    switch (widthRemainder) {
+      case 0:
+        if (originalWidth < 500) {
+          trimLength = 100;
+          break;
+        }
+        trimLength = originalWidth > 1300 ? 45 : 105;
+        break;
+      case 1:
+        if (originalWidth > 1300) {
+          trimLength = 146;
+          break;
+        }
+        trimLength = originalWidth > 500 ? 150 : 50;
+        break;
+      default:
+        trimLength = 100;
+        break;
+    }
+
+    return needsExtraTrimming ? this.getWidth(children) - trimLength : this.getWidth(children) - 50;
+  };
+
   getDestinationRouteIds = items => {
     const destinationRouteIds = [];
     items.forEach(item => {
@@ -63,7 +92,7 @@ class Path extends Component {
     const destinationRouteIds = this.getDestinationRouteIds(this.props.items);
     const hasTerminalId = this.hasTerminalId(this.props);
     return (
-      <div className={styles.root}>
+      <div className={classNames(styles.root, { [styles.compact]: this.props.useCompactLayout })}>
         <div className={styles.header} />
         {this.props.items.map((item, index) => (
           <div key={index}>
@@ -74,6 +103,7 @@ class Path extends Component {
                 isLast={this.isLastStop(item)}
                 destinationRouteIds={destinationRouteIds}
                 hasTerminalId={hasTerminalId}
+                useCompactLayout={this.props.useCompactLayout}
               />
             )}
             {item.type === 'gap' && <Gap />}
@@ -83,10 +113,20 @@ class Path extends Component {
         ))}
         {this.props.children && (
           <div>
-            <div className={styles.footer} style={{ width: this.getWidth(this.props.children) }} />
+            <div
+              className={styles.footer}
+              style={{
+                width: this.props.useCompactLayout
+                  ? this.calculateCompactWidth(
+                      this.getWidth(this.props.children),
+                      this.props.children,
+                    )
+                  : this.getWidth(this.props.children),
+              }}
+            />
             <div className={styles.children}>
               {this.props.children.map((branch, index) => (
-                <Path key={index} {...branch} />
+                <Path key={index} {...branch} useCompactLayout={this.props.useCompactLayout} />
               ))}
             </div>
           </div>
@@ -98,6 +138,7 @@ class Path extends Component {
 
 Path.defaultProps = {
   children: null,
+  useCompactLayout: false,
 };
 
 Path.propTypes = {
@@ -107,6 +148,7 @@ Path.propTypes = {
       destinations: PropTypes.arrayOf(PropTypes.object),
     }),
   ).isRequired,
+  useCompactLayout: PropTypes.bool,
 };
 
 // eslint-disable-next-line
