@@ -107,14 +107,12 @@ class Stop extends Component {
             ))}
           </div>
           {showTerminalAreaRoutesContainer && (
-            <div>
+            <div
+              className={classNames({
+                [styles.compactRoutes]: this.props.useCompactLayout,
+              })}>
               <div className={styles.terminalAreaRoutesTitle}>Linjat / Linjerna / Lines</div>
-              <div
-                className={classNames(styles.terminalAreaRoutesContainer, {
-                  [styles.compactRoutes]: this.props.useCompactLayout,
-                })}>
-                {terminalAreaRouteDivs}
-              </div>
+              <div className={styles.terminalAreaRoutesContainer}>{terminalAreaRouteDivs}</div>
             </div>
           )}
         </div>
