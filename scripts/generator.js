@@ -87,7 +87,7 @@ async function renderComponent(options) {
   await page.emulateMediaType('screen');
 
   let printOptions = {};
-  if (props.printTimetablesAsA4) {
+  if (props.printTimetablesAsA4 || component === 'CoverPage') {
     printOptions = {
       printBackground: true,
       format: 'A4',

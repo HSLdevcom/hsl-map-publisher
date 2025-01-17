@@ -47,3 +47,19 @@
 .inline {
   display: inline;
 }
+
+.compactTitle {
+  font-size: 0.8em;
+}
+
+.compactSubtitle {
+  font-size: 0.5em;
+}
+
+.compactRoot {
+  margin: 0.5em 0;
+}
+
+.compactPadding {
+  padding-top: 0.15em;
+}
