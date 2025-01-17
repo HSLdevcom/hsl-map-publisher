@@ -39,19 +39,12 @@ const StopRow = props => {
     stopType,
   } = props.stop;
 
-  const posterDates =
-    dateBegin && dateEnd
-      ? ` Voimassaoloaika: ${dateBegin} - ${dateEnd}`
-      : `Voimassaoloaikaa ei erikseen määritetty`;
-
   return (
     <div className={styles.stopRow}>
       <span>{`${shortId} ${nameFi}, ${addressFi}, ${shelterText(stopType)},`}</span>
       <span>{` Ajojärjestys: ${distributionOrder}, ${
         ` Alue: ${distributionArea},` !== null ? distributionArea : ','
-      } 
-       Julistepaikat: ${posterCount},`}</span>
-      <span>{` ${posterDates}`}</span>
+      } Julistepaikat: ${posterCount}`}</span>
     </div>
   );
 };
@@ -72,8 +65,7 @@ const CoverPage = props => {
       <div className={styles.title}>{title}</div>
       <br />
       <div>{`Aikatauluja ${mappedStops.length}kpl, Generointipäivä: ${props.date}`}</div>
-      <br />
-      <ul>{mappedStops}</ul>
+      <ul className={styles.rowContainer}>{mappedStops}</ul>
     </div>
   );
 };

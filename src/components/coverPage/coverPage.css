@@ -2,7 +2,6 @@
   height: 1110px;
   width: 100%;
   text-align: center;
-  text-justify: auto;
   font-family: GothamRounded-Medium;
 }
 
@@ -13,15 +12,13 @@
 }
 
 .title {
-  padding-top: 6rem;
-  font-size: 4rem;
+  padding-top: 3rem;
+  font-size: 2rem;
 }
 
 .stopRow {
+  font-family: GothamRounded-Book;
   text-align: left;
-  font-size: 1rem;
-  border-bottom: 2px dashed var(--hsl-blue);
-  padding: 1rem 0;
-  word-wrap: break-word;
-  max-width: 92%;
+  font-size: 0.8rem;
+  padding: 3px 0;
 }
