@@ -31,8 +31,6 @@ const StopRow = props => {
     shortId,
     nameFi,
     addressFi,
-    dateBegin,
-    dateEnd,
     distributionArea,
     distributionOrder,
     posterCount,
@@ -42,8 +40,8 @@ const StopRow = props => {
   return (
     <div className={styles.stopRow}>
       <span>{`${shortId} ${nameFi}, ${addressFi}, ${shelterText(stopType)},`}</span>
-      <span>{` Ajojärjestys: ${distributionOrder}, ${
-        ` Alue: ${distributionArea},` !== null ? distributionArea : ','
+      <span>{` Ajojärjestys: ${distributionOrder !== null ? distributionOrder : '-'}, ${
+        distributionArea !== null ? `${distributionArea},` : ''
       } Julistepaikat: ${posterCount}`}</span>
     </div>
   );

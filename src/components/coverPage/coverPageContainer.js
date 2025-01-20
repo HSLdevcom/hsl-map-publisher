@@ -29,19 +29,7 @@ const coverPageQuery = gql`
 `;
 
 const propsMapper = mapProps(props => {
-  const queriedStops = props.data.getStopsByIds.nodes;
-
-  const stops = queriedStops.map(queriedStop => {
-    const { dateBegin, dateEnd } = props.stopsWithDates.find(
-      arrItem => arrItem.stopId === queriedStop.stopId,
-    );
-    return {
-      ...queriedStop,
-      dateBegin,
-      dateEnd,
-    };
-  });
-
+  const stops = props.data.getStopsByIds.nodes;
   return {
     title: props.title,
     stops,
