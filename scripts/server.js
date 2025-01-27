@@ -181,23 +181,15 @@ const createBuildCoverPage = async (buildId, buildTitle, posters) => {
   const filteredPosters = posters.filter(poster => poster.component === 'Timetable');
 
   const stopIds = [...filteredPosters.map(poster => poster.props.stopId)];
-
-  const stopsWithDates = [
-    ...filteredPosters.map(poster => {
-      return {
-        stopId: poster.props.stopId,
-        dateBegin: poster.props.dateBegin,
-        dateEnd: poster.props.dateEnd,
-      };
-    }),
-  ];
+  const { date, dateBegin, dateEnd } = filteredPosters[0].props;
 
   const component = 'CoverPage';
   const props = {
     title: buildTitle,
     stopIds,
-    stopsWithDates,
-    date: new Date().toISOString().split('T')[0],
+    date,
+    dateBegin,
+    dateEnd,
     selectedRuleTemplates: [],
   };
 
@@ -437,7 +429,6 @@ async function main() {
         const coverPage = orderedPosters.filter(poster => poster.order === -2);
         const remainingPages = orderedPosters.filter(poster => poster.order !== -2);
         orderedPosters = [...coverPage, ...orderBy(remainingPages, 'order', 'asc')];
-        console.log(orderedPosters);
       }
 
       filename = await fileHandler.concatenate(

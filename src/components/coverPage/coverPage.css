@@ -1,7 +1,6 @@
 .coverPageContainer {
   height: 1110px;
   width: 100%;
-  text-align: center;
   font-family: GothamRounded-Medium;
 }
 
@@ -11,14 +10,23 @@
   --timetable-accent-color: #eaeaea;
 }
 
-.title {
+.date {
   padding-top: 3rem;
   font-size: 2rem;
+  margin-left: 2rem;
+}
+
+.margin {
+  margin: 10px 2rem;
 }
 
 .stopRow {
   font-family: GothamRounded-Book;
-  text-align: left;
   font-size: 0.8rem;
   padding: 3px 0;
+}
+
+.rowContainer {
+  margin-top: 1rem;
+  margin-left: 2rem;
 }

@@ -52,7 +52,7 @@ StopRow.propTypes = {
 };
 
 const CoverPage = props => {
-  const { title, stops } = props;
+  const { title, date, stops, dateBegin, dateEnd } = props;
 
   const mappedStops = stops.map(stop => {
     return <StopRow stop={stop} />;
@@ -60,10 +60,11 @@ const CoverPage = props => {
 
   return (
     <div className={styles.coverPageContainer}>
-      <div className={styles.title}>{title}</div>
-      <br />
-      <div>{`Aikatauluja ${mappedStops.length}kpl, Generointipäivä: ${props.date}`}</div>
-      <ul className={styles.rowContainer}>{mappedStops}</ul>
+      <div className={styles.date}>{date}</div>
+      <div
+        className={styles.margin}>{`Aikatauluja ${mappedStops.length}kpl, Tuloste: ${title}`}</div>
+      <div className={styles.margin}>{`Voimassaolokausi ${dateBegin} - ${dateEnd}`}</div>
+      <div className={styles.rowContainer}>{mappedStops}</div>
     </div>
   );
 };
@@ -72,12 +73,16 @@ CoverPage.defaultProps = {
   title: '',
   stops: [],
   date: '',
+  dateBegin: '',
+  dateEnd: '',
 };
 
 CoverPage.propTypes = {
   title: PropTypes.string,
   stops: PropTypes.arrayOf(PropTypes.object),
   date: PropTypes.string,
+  dateBegin: PropTypes.string,
+  dateEnd: PropTypes.string,
 };
 
 export default CoverPage;

@@ -34,6 +34,8 @@ const propsMapper = mapProps(props => {
     title: props.title,
     stops,
     date: props.date,
+    dateBegin: props.dateBegin,
+    dateEnd: props.dateEnd,
   };
 });
 
@@ -43,14 +45,17 @@ const CoverPageContainer = hoc(CoverPage);
 CoverPageContainer.defaultProps = {
   title: '',
   greyscale: false,
-  date: '',
+  dateBegin: '',
+  dateEnd: '',
 };
 
 CoverPageContainer.propTypes = {
   title: PropTypes.string,
   buildId: PropTypes.string.isRequired,
   stopIds: PropTypes.arrayOf(PropTypes.string).isRequired,
-  date: PropTypes.string,
+  date: PropTypes.string.isRequired,
+  dateBegin: PropTypes.string,
+  dateEnd: PropTypes.string,
   greyscale: PropTypes.bool,
 };
 
