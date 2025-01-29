@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 
 import { iconsByMode, trimRouteId, routeGeneralizer, getColor } from 'util/domain';
 import { Column, InlineSVG } from 'components/util';
@@ -71,7 +72,9 @@ class Stop extends Component {
         ref={divElement => {
           this.divElement = divElement;
         }}
-        className={styles.root}>
+        className={classNames(styles.root, {
+          [styles.compact]: this.props.useCompactLayout,
+        })}>
         <div className={styles.left} />
         <div className={styles.separator}>
           <div
@@ -104,7 +107,10 @@ class Stop extends Component {
             ))}
           </div>
           {showTerminalAreaRoutesContainer && (
-            <div>
+            <div
+              className={classNames({
+                [styles.compactRoutes]: this.props.useCompactLayout,
+              })}>
               <div className={styles.terminalAreaRoutesTitle}>Linjat / Linjerna / Lines</div>
               <div className={styles.terminalAreaRoutesContainer}>{terminalAreaRouteDivs}</div>
             </div>
@@ -119,6 +125,7 @@ Stop.defaultProps = {
   nameSe: null,
   destinationRouteIds: [],
   terminalId: null,
+  useCompactLayout: false,
 };
 
 Stop.propTypes = {
@@ -131,6 +138,7 @@ Stop.propTypes = {
   destinationRouteIds: PropTypes.array,
   transferModes: PropTypes.arrayOf(PropTypes.oneOf(['BUS', 'TRAM', 'FERRY', 'RAIL', 'SUBWAY']))
     .isRequired,
+  useCompactLayout: PropTypes.bool,
 };
 
 export default Stop;
