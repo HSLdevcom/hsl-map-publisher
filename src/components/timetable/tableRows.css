@@ -42,3 +42,7 @@
   padding-left: 0.938em;
   font-family: GothamXNarrow-Medium;
 }
+
+.compactRow {
+  font-size: 10px;
+}

@@ -11,6 +11,7 @@ import Timetable from 'components/timetable/timetableContainer';
 import A3StopPoster from 'components/a3stopPoster/a3StopPosterContainer';
 import TerminalPoster from 'components/stopPoster/terminalPosterContainer';
 import LineTimetable from 'components/lineTimetable/lineTimetableContainer';
+import CoverPage from 'components/coverPage/coverPageContainer';
 import renderQueue from 'util/renderQueue';
 
 const components = {
@@ -19,6 +20,7 @@ const components = {
   A3StopPoster,
   TerminalPoster,
   LineTimetable,
+  CoverPage,
 };
 
 const graphqlUrl = process.env.JORE_GRAPHQL_URL || 'https://kartat.hsl.fi/jore/graphql';

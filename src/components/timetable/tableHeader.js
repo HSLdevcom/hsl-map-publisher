@@ -35,27 +35,38 @@ const TableHeader = props => {
       className={classNames(styles.root, {
         [styles.largerPaddingTop]: props.printingAsA4,
         [styles.noPaddingTop]: props.printAsA3,
+        [styles.compactPadding]: props.useCompactLayout,
+        [styles.compactRoot]: props.useCompactLayout,
       })}>
-      <div className={styles.title}>
+      <div className={classNames(styles.title, { [styles.compactTitle]: props.useCompactLayout })}>
         <span className={styles.strong}>{props.title}</span>
         {header}
       </div>
 
-      <div className={styles.subtitle}>
+      <div
+        className={classNames(styles.subtitle, {
+          [styles.compactSubtitle]: props.useCompactLayout,
+        })}>
         <div className={styles.strong}>Tunti</div>
         <div>
           <span className={styles.strong}>min</span> / linja Ajat ovat arvioituja
         </div>
       </div>
 
-      <div className={styles.subtitle}>
+      <div
+        className={classNames(styles.subtitle, {
+          [styles.compactSubtitle]: props.useCompactLayout,
+        })}>
         <div className={styles.strong}>Timme</div>
         <div>
           <span className={styles.strong}>min</span> / linje Tiderna är beräknade
         </div>
       </div>
 
-      <div className={styles.subtitle}>
+      <div
+        className={classNames(styles.subtitle, {
+          [styles.compactSubtitle]: props.useCompactLayout,
+        })}>
         <div className={styles.strong}>Hour</div>
         <div>
           <span className={styles.strong}>min</span> / route The times are estimates
@@ -68,6 +79,7 @@ const TableHeader = props => {
 TableHeader.defaultProps = {
   printingAsA4: false,
   printAsA3: false,
+  useCompactLayout: false,
 };
 
 TableHeader.propTypes = {
@@ -76,6 +88,7 @@ TableHeader.propTypes = {
   subtitleEn: PropTypes.string.isRequired,
   printingAsA4: PropTypes.bool,
   printAsA3: PropTypes.bool,
+  useCompactLayout: PropTypes.bool,
 };
 
 export default TableHeader;

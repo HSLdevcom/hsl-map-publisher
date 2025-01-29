@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import CoverPage from '../coverPage/coverPage';
 import PropTypes from 'prop-types';
 import { Spacer, PlatformSymbol, getWeekdayName, PrintButton } from 'components/util';
 import classNames from 'classnames';
@@ -106,6 +107,15 @@ class Timetable extends Component {
         ref={ref => {
           this.content = ref;
         }}>
+        {this.props.showCoverPage && (
+          <CoverPage
+            stopShortId={this.props.stopShortId.replace(/\s+/g, '')}
+            stopName={this.props.stopNameFi}
+            dateBegin={this.props.dateBegin}
+            dateEnd={this.props.dateEnd}
+            greyscale={this.props.greyscale}
+          />
+        )}
         {addressInfoPositions.map(height => (
           <span className={styles.address} style={{ top: `${height}px` }}>
             {addressInfo}
@@ -130,7 +140,10 @@ class Timetable extends Component {
             </div>
           )}
           {this.props.showValidityPeriod && (
-            <div className={styles.validity}>
+            <div
+              className={classNames(styles.validity, {
+                [styles.coverPageMargin]: this.props.showCoverPage,
+              })}>
               <div className={styles.shortId}>
                 {this.props.stopShortId && `${this.props.stopShortId.replace(/\s+/g, '')}`}
               </div>
@@ -191,6 +204,7 @@ class Timetable extends Component {
                 subtitleSw={svTitle}
                 subtitleEn={enTitle}
                 printingAsA4={this.props.printableAsA4}
+                useCompactLayout={this.props.useCompactLayout}
               />
               <TableRows departures={this.props.combinedDays[combinedDay]} />
             </div>
@@ -225,6 +239,8 @@ Timetable.defaultProps = {
   showAddressInfo: true,
   showPrintButton: false,
   lang: 'fi',
+  showCoverPage: false,
+  useCompactLayout: false,
 };
 
 Timetable.propTypes = {
@@ -256,6 +272,8 @@ Timetable.propTypes = {
   showPrintButton: PropTypes.bool,
   combinedDays: PropTypes.object.isRequired,
   lang: PropTypes.string,
+  showCoverPage: PropTypes.bool,
+  useCompactLayout: PropTypes.bool,
 };
 
 export default Timetable;
