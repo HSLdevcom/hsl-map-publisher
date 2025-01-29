@@ -7,7 +7,7 @@ const { finished } = require('node:stream/promises');
 const path = require('path');
 
 // Stop poster tests
-const stopIds = ['1020105', '1284188', '6301068', '1040411', '4930205', '4930209', '2311220'];
+const stopIds = ['2311220', '1250108', '1040144'];
 
 // Terminal poster tests
 const testTerminalPosters = [
@@ -26,20 +26,23 @@ const testTerminalPosters = [
 // LineTimetable tests
 const testLines = [
   { lineId: '2015', dateBegin: '2024-12-01', dateEnd: '2024-12-10' },
-  { lineId: '1007', dateBegin: '2024-12-01', dateEnd: '2024-12-30' },
-  { lineId: '1052', dateBegin: '2024-12-01', dateEnd: '2024-12-30' },
-  { lineId: '2510', dateBegin: '2024-12-01', dateEnd: '2024-12-30' },
+  { lineId: '1007', dateBegin: '2024-12-01', dateEnd: '2024-12-10' },
+  { lineId: '1005', dateBegin: '2024-12-01', dateEnd: '2024-12-10' },
+  { lineId: '1052', dateBegin: '2024-12-01', dateEnd: '2024-12-10' },
+  { lineId: '2510', dateBegin: '2024-12-01', dateEnd: '2024-12-10' },
 ];
 
 const TEST_RESULTS_PATH = './test/results';
 
 const POSTER_COMPONENTS = {
   TIMETABLE: 'Timetable',
-  STOP_POSTER: 'StopPoster',
-  A3_STOP_POSTER: 'A3StopPoster',
-  LINE_TIMETABLE: 'LineTimetable',
-  TERMINAL_POSTER: 'TerminalPoster',
+  // STOP_POSTER: 'StopPoster',
+  // A3_STOP_POSTER: 'A3StopPoster',
+  // LINE_TIMETABLE: 'LineTimetable',
+  // TERMINAL_POSTER: 'TerminalPoster',
 };
+
+const PRINT_COVER_PAGE = true;
 
 async function sleep(millis) {
   return new Promise(resolve => setTimeout(resolve, millis));
@@ -95,7 +98,7 @@ function buildGenerationRequestBody(buildId, component, printAsA4) {
         minimapZones: true,
         printTimetablesAsA4: printAsA4,
         printTimetablesAsGreyscale: false,
-        routeFilter: '',
+        routeFilter: '2, 9, 9N',
         salesPoint: true,
         selectedRuleTemplates: [],
         stopId,
@@ -202,6 +205,26 @@ async function downloadPosters(buildId) {
   }
 }
 
+async function downloadPostersWithCoverPage(buildId) {
+  if (fs.existsSync(TEST_RESULTS_PATH)) {
+    console.log('Cleaning up old results from', TEST_RESULTS_PATH);
+    await fs.rmSync(TEST_RESULTS_PATH, { recursive: true, force: false });
+  }
+  await fs.mkdirSync(TEST_RESULTS_PATH);
+
+  console.log('Downloading poster PDF with cover page..');
+  try {
+    const pdfRequest = await fetch(
+      `${TEST_PUBLISHER_SERVER_URL}/downloadBuild/${buildId}?printCoverPage=true`,
+    );
+    const pdfDestination = path.resolve(TEST_RESULTS_PATH, `${buildId}.pdf`);
+    const stream = fs.createWriteStream(pdfDestination, { flags: 'wx' });
+    await finished(pdfRequest.body.pipe(stream));
+  } catch (e) {
+    console.log("Couldn't download PDF:", e);
+  }
+}
+
 async function generateTestPDFs() {
   const buildListName = `LOCAL_TEST_RENDERS`;
 
@@ -225,7 +248,12 @@ async function generateTestPDFs() {
   await sleep(3000);
 
   await pollForCompletedPosters(id);
-  await downloadPosters(id);
+
+  if (PRINT_COVER_PAGE && POSTER_COMPONENTS.TIMETABLE) {
+    await downloadPostersWithCoverPage(id);
+  } else {
+    await downloadPosters(id);
+  }
 }
 
 // Call the function to execute the HTTP POST calls
