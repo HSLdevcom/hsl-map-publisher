@@ -35,14 +35,12 @@ services:
         condition: service_started
       redis:
         condition: service_started
-    env_file:
-      - .env.local
   
   publisher-render:
     image: hsl-map-publisher
     pull_policy: never # use the same build as publisher-server
     ports:
-      - 5000:5000
+      - 5001:5000
     environment:
       - SERVICE=start:production
     volumes:
