@@ -40,7 +40,7 @@ services:
     image: hsl-map-publisher
     pull_policy: never # use the same build as publisher-server
     ports:
-      - 5001:5000
+      - 5000:5000
     environment:
       - SERVICE=start:production
     volumes:
