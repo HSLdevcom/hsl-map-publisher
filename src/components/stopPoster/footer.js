@@ -151,7 +151,7 @@ const Footer = props => {
   return (
     <div className={styles.footerWrapper}>
       <InlineSVG className={styles.dottedLine} src={dottedLine} />
-      {slots.length <= 3 && (
+      {slots.length <= 3 && getFirstSlotPosition(templateSlots.length) > 25 && (
         <div>
           <InlineSVG className={classnames(styles.footerPiece, styles.hslLogo)} src={hslLogo} />
           <InlineSVG
