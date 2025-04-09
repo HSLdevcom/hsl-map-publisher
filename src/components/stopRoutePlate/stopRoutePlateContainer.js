@@ -5,7 +5,7 @@ import withProps from 'recompose/withProps';
 
 import apolloWrapper from 'util/apolloWrapper';
 import StopRoutePlate from './stopRoutePlate';
-import { xor, uniqWith, forEach, isEqual, xorWith } from 'lodash';
+import { forEach, isEqual, xorWith, find } from 'lodash';
 
 const stopRoutePlateQuery = gql`
   query stopRoutePlateQuery($stopIds: [String!], $dateBegin: Date!, $dateEnd: Date!) {
@@ -74,26 +74,30 @@ const stopRoutePlateQuery = gql`
     }
   }
 `;
-const strCompareWithoutWhitespace = (a, b) => {
+
+const compareWithoutWhitespace = (a, b) => {
   const whitespaceRemovedA = a.replace(/\s+/g, '');
   const whitespaceRemovedB = b.replace(/\s+/g, '');
   return whitespaceRemovedA === whitespaceRemovedB;
 };
 
-const compareRoutes = (routeA, routeB) => {
+const compareSimilarRoutes = (routeA, routeB) => {
+  // Filters out negligible changes to route information like adding extra whitespace
   let isSameRoute = true;
-  console.log(routeA);
-  console.log(routeB);
   if (routeA.routeId !== routeB.routeId) isSameRoute = false;
   if (routeA.line?.nodes[0].destinationFi !== routeB.line?.nodes[0].destinationFi) {
-    const isSameWithoutWhitespace = strCompareWithoutWhitespace(
+    const isSameWithoutWhitespace = compareWithoutWhitespace(
       routeA.line?.[0].destinationFi,
       routeB.line?.[0].destinationFi,
     );
     if (!isSameWithoutWhitespace) isSameRoute = false;
   }
-  if (routeA.viaFi !== routeB.viaFi) isSameRoute = false;
-  if (routeA.viaSe !== routeB.viaSe) isSameRoute = false;
+  if (routeA.viaFi !== routeB.viaFi) {
+    if (!compareWithoutWhitespace(routeA.viaFi, routeB.viaFi)) isSameRoute = false;
+  }
+  if (routeA.viaSe !== routeB.viaSe) {
+    if (!compareWithoutWhitespace(routeA.viaFi, routeB.viaFi)) isSameRoute = false;
+  }
 
   return isSameRoute;
 };
@@ -109,8 +113,50 @@ const checkStopRoutesForChanges = stop => {
     return [];
   }
 
-  const routeDifferences = xorWith(dateBeginRoutes, dateEndRoutes, isEqual);
-  return routeDifferences;
+  const allRouteDifferences = xorWith(dateBeginRoutes, dateEndRoutes, isEqual);
+
+  const mappedRouteDifferences = allRouteDifferences.map(routeDiff => {
+    let isRemoved = null;
+    let isAdded = null;
+    let isNegligibleChange = false;
+
+    const existsOnBeginningDateRoutes = find(dateBeginRoutes, dateBeginRoute => {
+      return isEqual(dateBeginRoute, routeDiff);
+    });
+    const existsOnEndingDateRoutes = find(dateEndRoutes, dateEndRoute => {
+      return isEqual(dateEndRoute, routeDiff);
+    });
+
+    const dateBeginShallowSearchResult = find(dateBeginRoutes, dateBeginRoute => {
+      return dateBeginRoute.routeId === routeDiff.routeId;
+    });
+
+    const dateEndShallowSearchResult = find(dateEndRoutes, dateEndRoute => {
+      return dateEndRoute.routeId === routeDiff.routeId;
+    });
+
+    if (dateBeginShallowSearchResult && dateEndShallowSearchResult) {
+      // Same routeId exists on both days, so change must be inside the route properties.
+      isNegligibleChange = !compareSimilarRoutes(
+        dateBeginShallowSearchResult,
+        dateEndShallowSearchResult,
+      );
+    }
+
+    isRemoved = existsOnBeginningDateRoutes && existsOnEndingDateRoutes === undefined;
+    isAdded = existsOnEndingDateRoutes && existsOnBeginningDateRoutes === undefined;
+
+    return {
+      ...routeDiff,
+      isAdded,
+      isRemoved,
+      isNegligibleChange,
+    };
+  });
+
+  console.log(mappedRouteDifferences);
+
+  return allRouteDifferences;
 };
 
 const propsMapper = withProps(props => {
