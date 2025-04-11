@@ -116,6 +116,7 @@
     "raw-loader": "^0.5.1",
     "react": "18.2.0",
     "react-apollo": "^2.0.1",
+    "react-csv": "^2.2.2",
     "react-dom": "18.2.0",
     "react-measure": "^2.5.2",
     "recompose": "^0.30.0",

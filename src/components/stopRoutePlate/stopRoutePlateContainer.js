@@ -5,7 +5,8 @@ import withProps from 'recompose/withProps';
 
 import apolloWrapper from 'util/apolloWrapper';
 import StopRoutePlate from './stopRoutePlate';
-import { forEach, isEqual, xorWith, find } from 'lodash';
+import { forEach, isEqual, xorWith, find, differenceWith } from 'lodash';
+import { getFormattedRouteList } from 'util/domain';
 
 const stopRoutePlateQuery = gql`
   query stopRoutePlateQuery($stopIds: [String!], $dateBegin: Date!, $dateEnd: Date!) {
@@ -35,10 +36,14 @@ const stopRoutePlateQuery = gql`
             viaFi
             viaSe
             hasRegularDayDepartures
+            dateBegin
+            dateEnd
             line {
               nodes {
                 nameFi
                 nameSe
+                dateBegin
+                dateEnd
                 destinationFi
                 destinationSe
                 lineId
@@ -57,10 +62,14 @@ const stopRoutePlateQuery = gql`
             viaFi
             viaSe
             hasRegularDayDepartures
+            dateBegin
+            dateEnd
             line {
               nodes {
                 nameFi
                 nameSe
+                dateBegin
+                dateEnd
                 destinationFi
                 destinationSe
                 lineId
@@ -102,16 +111,9 @@ const compareSimilarRoutes = (routeA, routeB) => {
   return isSameRoute;
 };
 
-const checkStopRoutesForChanges = stop => {
+const checkStopRouteChanges = stop => {
   const dateBeginRoutes = stop.routePlateDateBegin.nodes;
   const dateEndRoutes = stop.routePlateDateEnd.nodes;
-
-  if (dateBeginRoutes.length === 0 || dateEndRoutes.length === 0) {
-    console.log(
-      `Cannot compare route differences on stop ${stop.nameFi} due to zero routes on one of the dates`,
-    );
-    return [];
-  }
 
   const allRouteDifferences = xorWith(dateBeginRoutes, dateEndRoutes, isEqual);
 
@@ -137,7 +139,7 @@ const checkStopRoutesForChanges = stop => {
 
     if (dateBeginShallowSearchResult && dateEndShallowSearchResult) {
       // Same routeId exists on both days, so change must be inside the route properties.
-      isNegligibleChange = !compareSimilarRoutes(
+      isNegligibleChange = compareSimilarRoutes(
         dateBeginShallowSearchResult,
         dateEndShallowSearchResult,
       );
@@ -154,22 +156,45 @@ const checkStopRoutesForChanges = stop => {
     };
   });
 
-  console.log(mappedRouteDifferences);
+  const addedRoutes = mappedRouteDifferences.filter(diff => diff.isAdded);
+  const removedRoutes = mappedRouteDifferences.filter(diff => diff.isRemoved);
+  const unchangedRoutes = differenceWith(dateBeginRoutes, dateEndRoutes);
 
-  return allRouteDifferences;
+  const formattedAddedRoutes = getFormattedRouteList(addedRoutes);
+  const formattedRemovedRoutes = getFormattedRouteList(removedRoutes);
+  const formattedUnchangedRoutes = getFormattedRouteList(unchangedRoutes);
+  const formattedEndDateRoutes = getFormattedRouteList(dateEndRoutes);
+
+  return {
+    addedRoutes,
+    removedRoutes,
+    unchangedRoutes,
+    formatted: {
+      added: formattedAddedRoutes,
+      removed: formattedRemovedRoutes,
+      unchanged: formattedUnchangedRoutes,
+      endResult: formattedEndDateRoutes,
+    },
+  };
 };
+
+const getMapsLink = (lat, lon) => `https://www.google.com/maps/place/${lat},${lon}`;
 
 const propsMapper = withProps(props => {
   const stops = props.data.stops.nodes;
   const routeDiffs = [];
   forEach(stops, stop => {
-    const differences = checkStopRoutesForChanges(stop);
-    if (differences.length > 0) {
-      routeDiffs.push({ stop, routeChanges: differences });
-    }
+    const differences = checkStopRouteChanges(stop);
+    routeDiffs.push({
+      stop: {
+        ...stop,
+        latLon: `${stop.lat}, ${stop.lon}`,
+        linkToLocation: getMapsLink(stop.lat, stop.lon),
+      },
+      routeChanges: differences,
+    });
   });
   return {
-    stops,
     routeDiffs,
   };
 });

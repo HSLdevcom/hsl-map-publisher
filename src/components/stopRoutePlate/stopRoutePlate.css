@@ -1,0 +1,18 @@
+body {
+  font-family: GothamRounded-Medium;
+}
+
+th {
+  width: 200px;
+  text-align: justify;
+  background-color: white;
+  padding: 10px;
+}
+
+table {
+  border-spacing: 0px;
+}
+
+.rowContainer > *:nth-child(odd) {
+  background-color: #eaeaea;
+}

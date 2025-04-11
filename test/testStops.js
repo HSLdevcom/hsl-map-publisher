@@ -10,13 +10,7 @@ const path = require('path');
 const PRINT_COVER_PAGE = false;
 
 // Stop poster tests
-const stopIds = [
-  /* '2311220', '1250108', '1040144' */
-  '1361108',
-  '4970238',
-];
-
-const stopRoutePlateTestStops = ['1361108', '4970238'];
+const stopIds = ['2311220', '1250108', '1040144', '1361108', '4970238'];
 
 const testDateRange = {
   dateBegin: '2025-02-24',
@@ -102,12 +96,13 @@ function buildGenerationRequestBody(buildId, component, printAsA4) {
   } else if (component === POSTER_COMPONENTS.STOP_ROUTE_PLATE) {
     props = [
       {
-        stopIds: stopRoutePlateTestStops,
+        stopIds,
         dateBegin: testDateRange.dateBegin,
         dateEnd: testDateRange.dateEnd,
         routeFilter: '',
         template: 'default',
         selectedRuleTemplates: [],
+        downloadTable: false,
       },
     ];
   } else {
