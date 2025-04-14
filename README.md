@@ -126,14 +126,24 @@ Remember to also include `DIGITRANSIT_APIKEY` !
 
 Build the local version of `hsl-map-publisher`:
 
-``` 
-docker compose build
+```bash
+docker compose --env-file .env.local build
 ```
 
 Setup the development environment:
 
-```
+```bash
 docker compose up
+```
+
+Or in a single command:
+```bash
+docker compose --env-file .env.local up --build
+```
+
+You can also omit the `--env-file` flag, then the `DIGITRANSIT_APIKEY` parameter is read from the default `.env` file (everything else is passed from `.env.local` file per the `Dockerfile` build arguments):
+```bash
+docker compose up --build
 ```
 
 Shutdown the environmnet:
