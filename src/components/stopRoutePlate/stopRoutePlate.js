@@ -1,11 +1,22 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import StopRoutePlateRow from './stopRoutePlateRow';
-import { CSVDownload } from 'react-csv';
+import { CSVLink } from 'react-csv';
 
 import styles from './stopRoutePlate.css';
 
+const CSVDownload = props => {
+  const btnRef = useRef(null);
+  useEffect(() => btnRef.current?.click(), [btnRef]);
+  return (
+    <CSVLink {...props}>
+      <span ref={btnRef} />
+    </CSVLink>
+  );
+};
+
 const StopRoutePlate = props => {
+  console.log(props);
   const { routeDiffs, downloadTable } = props;
 
   const csvHeaders = [
@@ -41,7 +52,13 @@ const StopRoutePlate = props => {
           </table>
         </div>
       )}
-      {downloadTable && <CSVDownload data={routeDiffs} headers={csvHeaders} />}
+      {downloadTable && (
+        <CSVDownload
+          filename={props.csvFileName ? props.csvFileName : 'unnamed'}
+          data={routeDiffs}
+          headers={csvHeaders}
+        />
+      )}
     </div>
   );
 };
@@ -53,6 +70,7 @@ StopRoutePlate.defaultProps = {
 StopRoutePlate.propTypes = {
   routeDiffs: PropTypes.object.isRequired,
   downloadTable: PropTypes.bool,
+  csvFileName: PropTypes.string.isRequired,
 };
 
 export default StopRoutePlate;

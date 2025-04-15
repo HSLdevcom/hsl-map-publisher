@@ -14,7 +14,7 @@ const fileHandler = require('./fileHandler');
 const authEndpoints = require('./auth/authEndpoints');
 const { matchStopDataToRules } = require('./util/rules');
 
-const { generateRenderUrl } = require('./generator');
+const { generateRenderUrl, csvPath } = require('./generator');
 
 const {
   DOMAINS_ALLOWED_TO_GENERATE,
@@ -72,8 +72,6 @@ async function generatePoster(buildId, component, props, index) {
     component !== 'StopRoutePlate'
       ? await getStopInfo({ stopId, date })
       : null;
-
-  console.log(props);
 
   // Checks if any rule template will match the stop, and returns *the first one*.
   // If no match, returns the default template.
@@ -368,23 +366,30 @@ async function main() {
     const { component } = await getPoster({ id });
     let filename;
 
-    const downloadedPosterIds = await downloadPostersFromCloud([id]);
+    const downloadedPosterIds = await downloadPostersFromCloud([id], true);
     if (downloadedPosterIds.length < 1) {
       ctx.throw(404, 'Poster ids not found.');
     }
-    try {
-      filename = await fileHandler.concatenate(downloadedPosterIds, `${component}-${id}`);
-      await fileHandler.removeFiles(downloadedPosterIds);
-    } catch (err) {
-      ctx.throw(500, err.message || 'PDF concatenation failed.');
+
+    if (component === 'StopRoutePlate') {
+      filename = csvPath(id);
+      ctx.type = 'text/csv';
+      ctx.set('Content-Disposition', `attachment; filename="Kilvitysohje-${id}.csv"`);
+      ctx.body = fs.createReadStream(filename);
+    } else {
+      try {
+        filename = await fileHandler.concatenate(downloadedPosterIds, `${component}-${id}`);
+        await fileHandler.removeFiles(downloadedPosterIds);
+      } catch (err) {
+        ctx.throw(500, err.message || 'PDF concatenation failed.');
+      }
+
+      console.log('PDF concatenation succeeded.');
+
+      ctx.type = 'application/pdf';
+      ctx.set('Content-Disposition', `attachment; filename="${component}-${id}.pdf"`);
+      ctx.body = fs.createReadStream(filename);
     }
-
-    console.log('PDF concatenation succeeded.');
-
-    ctx.type = 'application/pdf';
-    ctx.set('Content-Disposition', `attachment; filename="${component}-${id}.pdf"`);
-    ctx.body = fs.createReadStream(filename);
-
     await fs.remove(filename);
   });
 

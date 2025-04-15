@@ -17,6 +17,7 @@ const {
 
 const pdfOutputDir = path.join(__dirname, '..', 'output');
 const pdfPath = id => path.join(pdfOutputDir, `${id}.pdf`);
+const csvPath = id => path.join(pdfOutputDir, `${id}.csv`);
 
 async function uploadStream(containerURL, filePath, aborter) {
   const fp = path.resolve(filePath);
@@ -101,7 +102,7 @@ async function streamToString(readableStream) {
   });
 }
 
-async function downloadPostersFromCloud(posterIds) {
+async function downloadPostersFromCloud(posterIds, downloadCSVFile) {
   const account = AZURE_STORAGE_ACCOUNT;
   const accountKey = AZURE_STORAGE_KEY;
   const containerName = AZURE_UPLOAD_CONTAINER;
@@ -117,6 +118,27 @@ async function downloadPostersFromCloud(posterIds) {
 
   posterIds.forEach(id => {
     const createPromise = async () => {
+      if (downloadCSVFile) {
+        if (await fs.pathExists(csvPath(id))) {
+          console.log(`Poster "${id}" already exists locally. Skipping download.`);
+          downloadedPosterIds.push(id);
+          return;
+        }
+
+        try {
+          const blockBlobURL = BlockBlobURL.fromContainerURL(containerURL, `${id}.pdf`);
+          const downloadResponse = await blockBlobURL.download(aborter, 0);
+          const content = await streamToString(downloadResponse.readableStreamBody);
+          await fs.outputFile(csvPath(id), content);
+          downloadedPosterIds.push(id);
+          return;
+        } catch (err) {
+          console.log(err);
+          console.log(`Something went wrong downloading blob ${id}.`);
+          return;
+        }
+      }
+
       const pdfFilePath = pdfPath(id);
 
       if (await fs.pathExists(pdfFilePath)) {

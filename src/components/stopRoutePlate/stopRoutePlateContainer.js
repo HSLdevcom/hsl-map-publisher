@@ -196,6 +196,7 @@ const propsMapper = withProps(props => {
   });
   return {
     routeDiffs,
+    csvFileName: props.csvFileName,
   };
 });
 
