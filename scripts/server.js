@@ -366,7 +366,13 @@ async function main() {
     const { component } = await getPoster({ id });
     let filename;
 
-    const downloadedPosterIds = await downloadPostersFromCloud([id], true);
+    let downloadedPosterIds;
+
+    if (component === 'StopRoutePlate') {
+      downloadedPosterIds = await downloadPostersFromCloud([], [id]);
+    } else {
+      downloadedPosterIds = await downloadPostersFromCloud([id]);
+    }
     if (downloadedPosterIds.length < 1) {
       ctx.throw(404, 'Poster ids not found.');
     }
@@ -411,8 +417,9 @@ async function main() {
     let orderedPosters = build.posters.sort((a, b) => (a.order > b.order ? 1 : -1));
     const slicedPosters = orderedPosters.slice(first, last);
     const posterIds = slicedPosters
-      .filter(poster => poster.status === 'READY')
+      .filter(poster => poster.status === 'READY' && poster.component !== 'StopRoutePlate') // Filter spreadsheets out, they are downloaded separately
       .map(poster => poster.id);
+
     const downloadedPosterIds = await downloadPostersFromCloud(posterIds);
 
     if (downloadedPosterIds.length < 1) {
@@ -420,7 +427,7 @@ async function main() {
     }
 
     try {
-      // Get the order of the downloaded posters and sort the posters before concatenation.
+      // Get the order of the downloaded PDF posters and sort the posters before PDF concatenation.
       orderedPosters = orderBy(
         downloadedPosterIds.map(downloadedId => ({
           id: downloadedId,
@@ -450,15 +457,14 @@ async function main() {
       if (printCoverPage) {
         removeCoverPages(orderedPosters);
       }
+
+      ctx.type = 'application/pdf';
+      ctx.set('Content-Disposition', `attachment; filename="${parsedTitle}-${id}.pdf"`);
+      ctx.body = fs.createReadStream(filename);
+      await fs.remove(filename);
     } catch (err) {
       ctx.throw(500, err.message || 'PDF concatenation failed.');
     }
-
-    ctx.type = 'application/pdf';
-    ctx.set('Content-Disposition', `attachment; filename="${parsedTitle}-${id}.pdf"`);
-    ctx.body = fs.createReadStream(filename);
-
-    await fs.remove(filename);
   });
 
   router.post('/login', async ctx => {
