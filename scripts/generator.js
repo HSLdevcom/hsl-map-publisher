@@ -11,7 +11,6 @@ const { AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_KEY, PUBLISHER_RENDER_URL } = requi
 
 const CLIENT_URL = PUBLISHER_RENDER_URL;
 const RENDER_TIMEOUT = 10 * 60 * 1000;
-const CSV_TIMEOUT = 10 * 1000;
 const PDF_TIMEOUT = 5 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
 const SCALE = 96 / 72;
@@ -58,17 +57,9 @@ async function sleep(millis) {
 async function waitFile(filePath) {
   let fileFinishedDownloading = false;
 
-  const checkResult = err => {
-    if (err) {
-      fileFinishedDownloading = true;
-    } else {
-      fileFinishedDownloading = true;
-    }
-  };
-
-  for (fileFinishedDownloading; fileFinishedDownloading !== true; ) {
+  for (fileFinishedDownloading; !fileFinishedDownloading; ) {
     await sleep(1000);
-    fs.access(filePath, fs.constants.F_OK, checkResult);
+    fileFinishedDownloading = fs.existsSync(filePath);
   }
 
   return true;
@@ -113,11 +104,15 @@ async function renderComponent(options) {
 
     const csvFilePath = csvPath(id);
 
-    await page.goto(pageUrl);
-    await waitFile(csvFilePath);
-    const posterUploaded = await uploadPosterToCloud(csvFilePath);
-    await page.close();
-    return posterUploaded;
+    try {
+      await page.goto(pageUrl);
+      await waitFile(csvFilePath);
+      const posterUploaded = await uploadPosterToCloud(csvFilePath);
+      await page.close();
+      return posterUploaded;
+    } catch (err) {
+      throw new Error('StopRoutePlate CSV rendering failed');
+    }
   }
 
   await page.goto(pageUrl, {
@@ -201,7 +196,6 @@ async function generate(options) {
     } catch (error) {
       onError(error);
     }
-    /* eslint-enable no-await-in-loop */
   }
 
   return { success: false };

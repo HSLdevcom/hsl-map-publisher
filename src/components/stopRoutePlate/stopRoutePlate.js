@@ -16,7 +16,6 @@ const CSVDownload = props => {
 };
 
 const StopRoutePlate = props => {
-  console.log(props);
   const { routeDiffs, downloadTable } = props;
 
   const csvHeaders = [

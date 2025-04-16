@@ -85,9 +85,13 @@ const stopRoutePlateQuery = gql`
 `;
 
 const compareWithoutWhitespace = (a, b) => {
-  const whitespaceRemovedA = a.replace(/\s+/g, '');
-  const whitespaceRemovedB = b.replace(/\s+/g, '');
-  return whitespaceRemovedA === whitespaceRemovedB;
+  try {
+    const whitespaceRemovedA = a.replace(/\s+/g, '');
+    const whitespaceRemovedB = b.replace(/\s+/g, '');
+    return whitespaceRemovedA === whitespaceRemovedB;
+  } catch {
+    return false;
+  }
 };
 
 const compareSimilarRoutes = (routeA, routeB) => {
