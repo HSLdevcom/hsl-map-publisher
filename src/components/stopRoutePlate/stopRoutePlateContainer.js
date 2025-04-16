@@ -6,7 +6,7 @@ import withProps from 'recompose/withProps';
 import apolloWrapper from 'util/apolloWrapper';
 import StopRoutePlate from './stopRoutePlate';
 import { forEach, isEqual, xorWith, find, differenceWith } from 'lodash';
-import { getFormattedRouteList } from 'util/domain';
+import { getFormattedRouteList, filterRoute } from 'util/domain';
 
 const stopRoutePlateQuery = gql`
   query stopRoutePlateQuery($stopIds: [String!], $dateBegin: Date!, $dateEnd: Date!) {
@@ -112,8 +112,8 @@ const compareSimilarRoutes = (routeA, routeB) => {
 };
 
 const checkStopRouteChanges = stop => {
-  const dateBeginRoutes = stop.routePlateDateBegin.nodes;
-  const dateEndRoutes = stop.routePlateDateEnd.nodes;
+  const dateBeginRoutes = stop.routePlateDateBegin;
+  const dateEndRoutes = stop.routePlateDateEnd;
 
   const allRouteDifferences = xorWith(dateBeginRoutes, dateEndRoutes, isEqual);
 
@@ -182,8 +182,21 @@ const getMapsLink = (lat, lon) => `https://www.google.com/maps/place/${lat},${lo
 
 const propsMapper = withProps(props => {
   const stops = props.data.stops.nodes;
+
+  const filteredStops = stops.map(stop => {
+    return {
+      ...stop,
+      routePlateDateBegin: stop.routePlateDateBegin.nodes.filter(routeSegment => {
+        return filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter });
+      }),
+      routePlateDateEnd: stop.routePlateDateEnd.nodes.filter(routeSegment => {
+        return filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter });
+      }),
+    };
+  });
+
   const routeDiffs = [];
-  forEach(stops, stop => {
+  forEach(filteredStops, stop => {
     const differences = checkStopRouteChanges(stop);
     routeDiffs.push({
       stop: {
