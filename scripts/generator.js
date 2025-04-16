@@ -43,7 +43,10 @@ function generateRenderUrl(component, template, props, id) {
     generationProps.csvFileName = id;
   }
 
-  const encodedProps = qs.stringify({ component, props: generationProps, template });
+  const encodedProps = qs.stringify(
+    { component, props: generationProps, template },
+    { arrayFormat: 'brackets' },
+  );
   const pageUrl = `${PUBLISHER_RENDER_URL}/?${encodedProps}`;
   return pageUrl;
 }
@@ -65,7 +68,6 @@ async function waitFile(filePath) {
 
   for (fileFinishedDownloading; fileFinishedDownloading !== true; ) {
     await sleep(1000);
-    console.log(filePath);
     fs.access(filePath, fs.constants.F_OK, checkResult);
   }
 
