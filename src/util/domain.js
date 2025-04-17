@@ -311,6 +311,23 @@ function filterRoute(props) {
   return !routeMatchesFilter;
 }
 
+function formatRouteString(route) {
+  const lineProps = route.line?.nodes[0];
+  let routeString = `${trimRouteId(route.routeId)} ${lineProps.nameFi}`;
+  if (route.viaFi) {
+    routeString += ` (kautta ${route.viaFi})`;
+  }
+  return routeString;
+}
+
+function getFormattedRouteList(routes) {
+  const routeStringArray = routes.map(routeChange => {
+    return formatRouteString(routeChange);
+  });
+
+  return routeStringArray;
+}
+
 export {
   isNumberVariant,
   isRailRoute,
@@ -326,4 +343,6 @@ export {
   routeGeneralizer,
   filterRoute,
   scheduleSegments,
+  getFormattedRouteList,
+  formatRouteString,
 };

@@ -14,14 +14,17 @@ const {
   AZURE_STORAGE_KEY,
   AZURE_UPLOAD_CONTAINER,
 } = require('../constants');
+const { forEach } = require('lodash');
 
 const pdfOutputDir = path.join(__dirname, '..', 'output');
 const pdfPath = id => path.join(pdfOutputDir, `${id}.pdf`);
+const csvPath = id => path.join(pdfOutputDir, `${id}.csv`);
 
 async function uploadStream(containerURL, filePath, aborter) {
   const fp = path.resolve(filePath);
 
   const fileName = path.basename(fp).replace('.md', '-stream.md');
+
   const blockBlobURL = BlockBlobURL.fromContainerURL(containerURL, fileName);
 
   const stream = fs.createReadStream(fp);
@@ -59,7 +62,7 @@ async function uploadPosterToCloud(filePath) {
     return false;
   }
 
-  console.log(`Uploading Pdf ${filePath} to Azure.`);
+  console.log(`Uploading poster ${filePath} to Azure.`);
 
   const credentials = new SharedKeyCredential(account, accountKey);
   const pipeline = StorageURL.newPipeline(credentials);
@@ -71,16 +74,16 @@ async function uploadPosterToCloud(filePath) {
   try {
     await uploadStream(containerURL, filePath, aborter);
   } catch (err) {
-    console.log('Pdf upload unsuccessful.');
+    console.log('File upload unsuccessful.');
     console.error(err);
     return false;
   }
-  console.log('Pdf upload successful.');
+  console.log('File upload successful.');
 
   try {
     await fs.remove(filePath);
   } catch (err) {
-    console.log(`Pdf ${filePath} removal unsuccessful.`);
+    console.log(`File ${filePath} removal unsuccessful.`);
     console.error(err);
   }
 
@@ -101,7 +104,7 @@ async function streamToString(readableStream) {
   });
 }
 
-async function downloadPostersFromCloud(posterIds) {
+async function downloadPostersFromCloud(posterIds, spreadSheetIds) {
   const account = AZURE_STORAGE_ACCOUNT;
   const accountKey = AZURE_STORAGE_KEY;
   const containerName = AZURE_UPLOAD_CONTAINER;
@@ -138,6 +141,30 @@ async function downloadPostersFromCloud(posterIds) {
     posterPromises.push(createPromise());
   });
 
+  if (spreadSheetIds) {
+    forEach(spreadSheetIds, id => {
+      const createCsvPromise = async () => {
+        if (await fs.pathExists(csvPath(id))) {
+          console.log(`Poster "${id}" already exists locally. Skipping download.`);
+          downloadedPosterIds.push(id);
+          return;
+        }
+
+        try {
+          const blockBlobURL = BlockBlobURL.fromContainerURL(containerURL, `${id}.csv`);
+          const downloadResponse = await blockBlobURL.download(aborter, 0);
+          const content = await streamToString(downloadResponse.readableStreamBody);
+          await fs.outputFile(csvPath(id), content);
+          downloadedPosterIds.push(id);
+          return;
+        } catch (err) {
+          console.log(err);
+          console.log(`Something went wrong downloading blob ${id}.csv`);
+        }
+      };
+      posterPromises.push(createCsvPromise());
+    });
+  }
   await Promise.all(posterPromises);
   console.log(`Posters downloaded: ${downloadedPosterIds.length}.`);
 

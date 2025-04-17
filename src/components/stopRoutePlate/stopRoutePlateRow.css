@@ -1,0 +1,11 @@
+td {
+  width: 200px;
+  font-family: GothamRounded-Book;
+  text-align: justify;
+  vertical-align: baseline;
+  padding: 10px;
+}
+
+p {
+  margin-right: 20px;
+}
