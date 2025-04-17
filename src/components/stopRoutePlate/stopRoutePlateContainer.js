@@ -6,7 +6,7 @@ import withProps from 'recompose/withProps';
 import apolloWrapper from 'util/apolloWrapper';
 import StopRoutePlate from './stopRoutePlate';
 import { forEach, isEqual, xorWith, find, differenceWith } from 'lodash';
-import { getFormattedRouteList, filterRoute } from 'util/domain';
+import { getFormattedRouteList, filterRoute, isNumberVariant } from 'util/domain';
 
 const stopRoutePlateQuery = gql`
   query stopRoutePlateQuery($stopIds: [String!], $dateBegin: Date!, $dateEnd: Date!) {
@@ -105,6 +105,13 @@ const compareSimilarRoutes = (routeA, routeB) => {
     );
     if (!isSameWithoutWhitespace) isSameRoute = false;
   }
+  if (routeA.line?.nodes[0].nameFi !== routeB.line?.nodes[0].nameFi) {
+    const isSameWithoutWhitespace = compareWithoutWhitespace(
+      routeA.line?.[0].nameFi,
+      routeB.line?.[0].nameFi,
+    );
+    if (!isSameWithoutWhitespace) isSameRoute = false;
+  }
   if (routeA.viaFi !== routeB.viaFi) {
     if (!compareWithoutWhitespace(routeA.viaFi, routeB.viaFi)) isSameRoute = false;
   }
@@ -125,6 +132,7 @@ const checkStopRouteChanges = stop => {
     let isRemoved = null;
     let isAdded = null;
     let isNegligibleChange = false;
+    let changeDate = null;
 
     const existsOnBeginningDateRoutes = find(dateBeginRoutes, dateBeginRoute => {
       return isEqual(dateBeginRoute, routeDiff);
@@ -152,13 +160,33 @@ const checkStopRouteChanges = stop => {
     isRemoved = existsOnBeginningDateRoutes && existsOnEndingDateRoutes === undefined;
     isAdded = existsOnEndingDateRoutes && existsOnBeginningDateRoutes === undefined;
 
+    if (isRemoved) {
+      changeDate = existsOnBeginningDateRoutes.dateEnd;
+    }
+
+    if (isAdded) {
+      changeDate = existsOnEndingDateRoutes.dateBegin;
+    }
+
     return {
       ...routeDiff,
       isAdded,
       isRemoved,
       isNegligibleChange,
+      changeDate,
     };
   });
+
+  const getFormattedChangeDateForStop = (addedRoutes, removedRoutes) => {
+    try {
+      const sortedChangeDates = [...addedRoutes, ...removedRoutes].sort((a, b) => {
+        return Date.parse(a.changeDate) > Date.parse(b.changeDate);
+      });
+      return `${sortedChangeDates[0].changeDate}`;
+    } catch {
+      return '';
+    }
+  };
 
   const addedRoutes = mappedRouteDifferences.filter(diff => diff.isAdded);
   const removedRoutes = mappedRouteDifferences.filter(diff => diff.isRemoved);
@@ -168,6 +196,7 @@ const checkStopRouteChanges = stop => {
   const formattedRemovedRoutes = getFormattedRouteList(removedRoutes);
   const formattedUnchangedRoutes = getFormattedRouteList(unchangedRoutes);
   const formattedEndDateRoutes = getFormattedRouteList(dateEndRoutes);
+  const formattedEarliestChangeDate = getFormattedChangeDateForStop(addedRoutes, removedRoutes);
 
   return {
     addedRoutes,
@@ -178,6 +207,7 @@ const checkStopRouteChanges = stop => {
       removed: formattedRemovedRoutes,
       unchanged: formattedUnchangedRoutes,
       endResult: formattedEndDateRoutes,
+      earliestChangeDate: formattedEarliestChangeDate,
     },
   };
 };
@@ -190,12 +220,16 @@ const propsMapper = withProps(props => {
   const filteredStops = stops.map(stop => {
     return {
       ...stop,
-      routePlateDateBegin: stop.routePlateDateBegin.nodes.filter(routeSegment => {
-        return filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter });
-      }),
-      routePlateDateEnd: stop.routePlateDateEnd.nodes.filter(routeSegment => {
-        return filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter });
-      }),
+      routePlateDateBegin: stop.routePlateDateBegin.nodes
+        .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
+        .filter(routeSegment => {
+          return filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter });
+        }),
+      routePlateDateEnd: stop.routePlateDateEnd.nodes
+        .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
+        .filter(routeSegment => {
+          return filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter });
+        }),
     };
   });
 

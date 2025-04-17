@@ -321,9 +321,11 @@ function formatRouteString(route) {
 }
 
 function getFormattedRouteList(routes) {
-  return routes.map(routeChange => {
+  const routeStringArray = routes.map(routeChange => {
     return formatRouteString(routeChange);
   });
+
+  return routeStringArray;
 }
 
 export {
