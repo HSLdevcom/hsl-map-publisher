@@ -315,7 +315,7 @@ function formatRouteString(route) {
   const lineProps = route.line?.nodes[0];
   let routeString = `${trimRouteId(route.routeId)} ${lineProps.nameFi}`;
   if (route.viaFi) {
-    routeString += `(kautta ${route.viaFi})`;
+    routeString += ` (kautta ${route.viaFi})`;
   }
   return routeString;
 }
