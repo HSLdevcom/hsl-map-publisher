@@ -195,10 +195,7 @@ const checkStopRouteChanges = stop => {
     .filter(diff => !diff.isNegligibleChange)
     .filter(diff => diff.isRemoved);
 
-  const negligibleChangeRoutes = mappedRouteDifferences.filter(diff => diff.isNegligibleChange);
-  const unchangedRoutes = differenceWith(dateBeginRoutes, dateEndRoutes).concat(
-    negligibleChangeRoutes,
-  );
+  const unchangedRoutes = differenceWith(dateBeginRoutes, dateEndRoutes);
 
   const formattedAddedRoutes = getFormattedRouteList(addedRoutes);
   const formattedRemovedRoutes = getFormattedRouteList(removedRoutes);
