@@ -5,8 +5,14 @@ import withProps from 'recompose/withProps';
 
 import apolloWrapper from 'util/apolloWrapper';
 import StopRoutePlate from './stopRoutePlate';
-import { forEach, isEqual, xorWith, find, differenceWith } from 'lodash';
-import { getFormattedRouteList, filterRoute, isNumberVariant } from 'util/domain';
+import { forEach, isEqual, xorWith, find, differenceWith, uniq, findIndex } from 'lodash';
+import {
+  getFormattedRouteList,
+  formatRouteString,
+  filterRoute,
+  isNumberVariant,
+  getShelterText,
+} from 'util/domain';
 
 const stopRoutePlateQuery = gql`
   query stopRoutePlateQuery($stopIds: [String!], $dateBegin: Date!, $dateEnd: Date!) {
@@ -14,6 +20,7 @@ const stopRoutePlateQuery = gql`
       nodes {
         stopId
         nameFi
+        nameSe
         addressFi
         shortId
         posterCount
@@ -31,13 +38,18 @@ const stopRoutePlateQuery = gql`
           nodes {
             routeId
             pickupDropoffType
-            destinationFi
-            destinationSe
             viaFi
             viaSe
             hasRegularDayDepartures
             dateBegin
             dateEnd
+            route {
+              nodes {
+                destinationFi
+                destinationSe
+                mode
+              }
+            }
             line {
               nodes {
                 nameFi
@@ -57,13 +69,18 @@ const stopRoutePlateQuery = gql`
           nodes {
             routeId
             pickupDropoffType
-            destinationFi
-            destinationSe
             viaFi
             viaSe
             hasRegularDayDepartures
             dateBegin
             dateEnd
+            route {
+              nodes {
+                destinationFi
+                destinationSe
+                mode
+              }
+            }
             line {
               nodes {
                 nameFi
@@ -98,17 +115,17 @@ const compareSimilarRoutes = (routeA, routeB) => {
   // Filters out negligible changes to route information like adding extra whitespace
   let isSameRoute = true;
   if (routeA.routeId !== routeB.routeId) isSameRoute = false;
-  if (routeA.line?.nodes[0].destinationFi !== routeB.line?.nodes[0].destinationFi) {
+  if (routeA.route?.nodes[0].destinationFi !== routeB.route?.nodes[0].destinationFi) {
     const isSameWithoutWhitespace = compareWithoutWhitespace(
-      routeA.line?.[0].destinationFi,
-      routeB.line?.[0].destinationFi,
+      routeA.route?.nodes[0].destinationFi,
+      routeB.route?.nodes[0].destinationFi,
     );
     if (!isSameWithoutWhitespace) isSameRoute = false;
   }
-  if (routeA.line?.nodes[0].nameFi !== routeB.line?.nodes[0].nameFi) {
+  if (routeA.route?.nodes[0].destinationSe !== routeB.route?.nodes[0].destinationSe) {
     const isSameWithoutWhitespace = compareWithoutWhitespace(
-      routeA.line?.[0].nameFi,
-      routeB.line?.[0].nameFi,
+      routeA.route?.nodes[0].destinationSe,
+      routeB.route?.nodes[0].destinationSe,
     );
     if (!isSameWithoutWhitespace) isSameRoute = false;
   }
@@ -116,7 +133,7 @@ const compareSimilarRoutes = (routeA, routeB) => {
     if (!compareWithoutWhitespace(routeA.viaFi, routeB.viaFi)) isSameRoute = false;
   }
   if (routeA.viaSe !== routeB.viaSe) {
-    if (!compareWithoutWhitespace(routeA.viaFi, routeB.viaFi)) isSameRoute = false;
+    if (!compareWithoutWhitespace(routeA.viaSe, routeB.viaSe)) isSameRoute = false;
   }
 
   return isSameRoute;
@@ -219,12 +236,25 @@ const checkStopRouteChanges = stop => {
 
 const getMapsLink = (lat, lon) => `https://www.google.com/maps/place/${lat},${lon}`;
 
+const deepCompareRoutePlates = (a, b) => {
+  const aRoute = a.route?.nodes[0];
+  const bRoute = b.route?.nodes[0];
+  return (
+    a.routeId === b.routeId &&
+    a.viaFi === b.viaFi &&
+    a.viaSe === b.viaSe &&
+    aRoute.destinationFi === bRoute.destinationFi &&
+    aRoute.destinationSe === bRoute.destinationSe
+  );
+};
+
 const propsMapper = withProps(props => {
   const stops = props.data.stops.nodes;
 
   const filteredStops = stops.map(stop => {
     return {
       ...stop,
+      stopType: getShelterText(stop.stopType),
       routePlateDateBegin: stop.routePlateDateBegin.nodes
         .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
         .filter(routeSegment => {
@@ -250,9 +280,57 @@ const propsMapper = withProps(props => {
       routeChanges: differences,
     });
   });
+
+  const allPlates = [];
+
+  forEach(routeDiffs, diff => {
+    const { routeChanges } = diff;
+    if (routeChanges.addedRoutes.length > 0) {
+      allPlates.push(...routeChanges.addedRoutes);
+    }
+    if (routeChanges.removedRoutes.length > 0) {
+      allPlates.push(...routeChanges.removedRoutes);
+    }
+  });
+
+  const groupedRoutePlates = [];
+
+  forEach(allPlates, plate => {
+    const plateAlreadyExists = findIndex(groupedRoutePlates, uniquePlate => {
+      return deepCompareRoutePlates(plate, uniquePlate);
+    });
+    if (plateAlreadyExists === -1) {
+      if (plate.isAdded && !plate.isNegligibleChange)
+        groupedRoutePlates.push({ ...plate, totalAmount: -1, removed: 0, added: 1 });
+      if (plate.isRemoved && !plate.isNegligibleChange)
+        groupedRoutePlates.push({ ...plate, totalAmount: 1, removed: 1, added: 0 });
+    } else {
+      if (groupedRoutePlates[plateAlreadyExists]?.isAdded) {
+        groupedRoutePlates[plateAlreadyExists].totalAmount--;
+        groupedRoutePlates[plateAlreadyExists].added++;
+      }
+      if (groupedRoutePlates[plateAlreadyExists]?.isRemoved) {
+        groupedRoutePlates[plateAlreadyExists].totalAmount++;
+        groupedRoutePlates[plateAlreadyExists].removed++;
+      }
+    }
+  });
+
+  const routePlateSummary = groupedRoutePlates.map(plate => {
+    return {
+      comparisonDateRange: `${props.dateBegin} - ${props.dateEnd}`,
+      plateText: formatRouteString(plate),
+      amountRemoved: plate.removed,
+      amountAdded: plate.added,
+      totalAmount: plate.totalAmount,
+      amountNeeded: plate.totalAmount > 0 ? 0 : plate.removed + plate.added,
+    };
+  });
+
   return {
     routeDiffs,
     csvFileName: props.csvFileName,
+    routePlateSummary,
   };
 });
 

@@ -34,12 +34,23 @@ const formatSummaryInfo = (dateBegin, dateEnd, routeDiffs) => {
 };
 
 const StopRoutePlate = props => {
-  const { routeDiffs, downloadTable, dateBegin, dateEnd } = props;
+  const {
+    routeDiffs,
+    downloadTable,
+    downloadSummary,
+    dateBegin,
+    dateEnd,
+    routePlateSummary,
+  } = props;
 
   const csvHeaders = [
     { label: 'Sisältö', key: 'summary' },
-    { label: 'Pysäkin nimi', key: 'stop.nameFi' },
+    { label: 'Nimi FI', key: 'stop.nameFi' },
+    { label: 'Nimi SE', key: 'stop.nameSe' },
+    { label: 'Pysäkkityyppi', key: 'stop.stopType' },
+    { label: 'Vyöhyke', key: 'stop.stopZone' },
     { label: 'Tunnus', key: 'stop.shortId' },
+    { label: 'Laiturinumero', key: 'stop.platform' },
     { label: 'Sijainti', key: 'stop.linkToLocation' },
     { label: 'Koordinaatit', key: 'stop.latLon' },
     { label: 'Muutospäivämäärä (aikaisin)', key: 'routeChanges.formatted.earliestChangeDate' },
@@ -49,13 +60,21 @@ const StopRoutePlate = props => {
     { label: 'Lopputulos', key: 'routeChanges.formatted.endResult' },
   ];
 
+  const summaryCsvHeaders = [
+    { label: 'Vertailuväli', key: 'comparisonDateRange' },
+    { label: 'Kilpi', key: 'plateText' },
+    { label: 'Poistettavat', key: 'amountRemoved' },
+    { label: 'Lisättävät', key: 'amountAdded' },
+    { label: 'Tilattavat', key: 'amountNeeded' },
+  ];
+
   const generationSummary = {
     summary: formatSummaryInfo(dateBegin, dateEnd, routeDiffs),
   };
 
   return (
     <div>
-      {!downloadTable && (
+      {!downloadTable && !downloadSummary && (
         <div>
           <table className={styles.rowContainer}>
             <tr>
@@ -82,17 +101,27 @@ const StopRoutePlate = props => {
           headers={csvHeaders}
         />
       )}
+      {downloadSummary && (
+        <CSVDownload
+          filename={props.csvFileName ? `summary-${props.csvFileName}` : 'summary-unnamed'}
+          data={routePlateSummary}
+          headers={summaryCsvHeaders}
+        />
+      )}
     </div>
   );
 };
 
 StopRoutePlate.defaultProps = {
   downloadTable: false,
+  downloadSummary: false,
 };
 
 StopRoutePlate.propTypes = {
   routeDiffs: PropTypes.object.isRequired,
+  routePlateSummary: PropTypes.object.isRequired,
   downloadTable: PropTypes.bool,
+  downloadSummary: PropTypes.bool,
   csvFileName: PropTypes.string.isRequired,
   dateBegin: PropTypes.string.isRequired,
   dateEnd: PropTypes.string.isRequired,

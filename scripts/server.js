@@ -334,6 +334,11 @@ async function main() {
       );
       if (!orderNumber) orderNumber = i + build.posters.length;
       posters.push(generatePoster(buildId, component, currentProps, orderNumber));
+      if (component === 'StopRoutePlate' && currentProps.downloadTable) {
+        // Add the summary spreadsheet to generation queue as well
+        const summaryProps = { ...currentProps, downloadTable: false, downloadSummary: true };
+        posters.push(generatePoster(buildId, component, summaryProps, orderNumber++));
+      }
     }
 
     try {
@@ -363,13 +368,15 @@ async function main() {
 
   router.get('/downloadPoster/:id', async ctx => {
     const { id } = ctx.params;
-    const { component } = await getPoster({ id });
+    const { component, props } = await getPoster({ id });
     let filename;
 
     let downloadedPosterIds;
 
     if (component === 'StopRoutePlate') {
-      downloadedPosterIds = await downloadPostersFromCloud([], [id]);
+      downloadedPosterIds = props.downloadSummary
+        ? await downloadPostersFromCloud([], [`summary-${id}`])
+        : await downloadPostersFromCloud([], [id]);
     } else {
       downloadedPosterIds = await downloadPostersFromCloud([id]);
     }
@@ -377,10 +384,15 @@ async function main() {
       ctx.throw(404, 'Poster ids not found.');
     }
 
-    if (component === 'StopRoutePlate') {
+    if (component === 'StopRoutePlate' && props.downloadTable) {
       filename = csvPath(id);
       ctx.type = 'text/csv';
       ctx.set('Content-Disposition', `attachment; filename="Kilvitysohje-${id}.csv"`);
+      ctx.body = fs.createReadStream(filename);
+    } else if (component === 'StopRoutePlate' && props.downloadSummary) {
+      filename = csvPath(`Summary-${id}`);
+      ctx.type = 'text/csv';
+      ctx.set('Content-Disposition', `attachment; filename="Yhteenveto-${id}.csv"`);
       ctx.body = fs.createReadStream(filename);
     } else {
       try {

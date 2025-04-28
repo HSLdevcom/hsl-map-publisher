@@ -95,14 +95,14 @@ async function renderComponent(options) {
 
   console.log(`Opening ${pageUrl} in Puppeteer.`);
 
-  if (component === 'StopRoutePlate' && props.downloadTable) {
-    // Allow the downloading of CSV file since the component just sends it to the client
+  if (component === 'StopRoutePlate' && (props.downloadTable || props.downloadSummary)) {
+    // Allow the downloading of CSV file since the component just sends it to the client instead of actually rendering
     await page._client.send('Page.setDownloadBehavior', {
       behavior: 'allow',
       downloadPath: fileOutputDir,
     });
 
-    const csvFilePath = csvPath(id);
+    const csvFilePath = props.downloadSummary ? csvPath(`summary-${id}`) : csvPath(id);
 
     try {
       await page.goto(pageUrl);
