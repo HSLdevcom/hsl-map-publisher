@@ -1,4 +1,4 @@
-const { get, last, clone } = require('lodash');
+const { get, clone } = require('lodash');
 const AuthService = require('./authService');
 const validator = require('validator');
 
