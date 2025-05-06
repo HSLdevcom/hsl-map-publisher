@@ -1,5 +1,6 @@
-const { get, last, clone } = require('lodash');
+const { get, clone } = require('lodash');
 const AuthService = require('./authService');
+const validator = require('validator');
 
 const { DOMAINS_ALLOWED_TO_LOGIN, PUBLISHER_TEST_GROUP } = require('../../constants');
 
@@ -7,12 +8,19 @@ const allowedDomains = DOMAINS_ALLOWED_TO_LOGIN.split(',');
 
 const hasAllowedDomain = async userInfo => {
   const groups = get(userInfo, 'groups');
-  const domain = last(userInfo.email.toLowerCase().split('@')) || '';
+
+  const emailValidationOptions = {
+    host_whitelist: allowedDomains,
+  };
+
   if (groups.includes(PUBLISHER_TEST_GROUP)) {
     return true;
   }
 
-  if (!allowedDomains.includes(domain) && !groups.includes(PUBLISHER_TEST_GROUP)) {
+  if (
+    !validator.isEmail(userInfo.email, emailValidationOptions) &&
+    !groups.includes(PUBLISHER_TEST_GROUP)
+  ) {
     console.log(`User does not have allowed domain. Logging out.`);
     return false;
   }
