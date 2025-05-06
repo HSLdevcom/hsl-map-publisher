@@ -31,13 +31,7 @@ const TableHeader = props => {
     </div>
   );
   return (
-    <div
-      className={classNames(styles.root, {
-        [styles.largerPaddingTop]: props.printingAsA4,
-        [styles.noPaddingTop]: props.printAsA3,
-        [styles.compactPadding]: props.useCompactLayout,
-        [styles.compactRoot]: props.useCompactLayout,
-      })}>
+    <div className={styles.root}>
       <div className={classNames(styles.title, { [styles.compactTitle]: props.useCompactLayout })}>
         <span className={styles.strong}>{props.title}</span>
         {header}

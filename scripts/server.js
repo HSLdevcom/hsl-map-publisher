@@ -9,6 +9,7 @@ const fs = require('fs-extra');
 const { Queue } = require('bullmq');
 const Redis = require('ioredis');
 const { koaBody } = require('koa-body');
+const validator = require('validator');
 
 const fileHandler = require('./fileHandler');
 const authEndpoints = require('./auth/authEndpoints');
@@ -171,13 +172,20 @@ const authMiddleware = async (ctx, next) => {
 const allowedToGenerate = user => {
   if (isRunningOnLocalEnv()) return true;
   if (!user || !user.email) return false;
-  const domain = user.email.split('@')[1];
+
   const parsedAllowedDomains = DOMAINS_ALLOWED_TO_GENERATE.split(',');
+
   if (user.groups && user.groups.includes(PUBLISHER_TEST_GROUP)) {
     return true;
   }
 
-  return parsedAllowedDomains.includes(domain);
+  const emailCheckOpts = {
+    host_whitelist: parsedAllowedDomains,
+  };
+
+  const isAllowedToGenerate = validator.isEmail(user.email, emailCheckOpts);
+
+  return isAllowedToGenerate;
 };
 
 const createBuildCoverPage = async (buildId, buildTitle, posters) => {
