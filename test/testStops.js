@@ -35,8 +35,8 @@ const testLines = [
 const TEST_RESULTS_PATH = './test/results';
 
 const POSTER_COMPONENTS = {
-  TIMETABLE: 'Timetable',
-  // STOP_POSTER: 'StopPoster',
+  // TIMETABLE: 'Timetable',
+  STOP_POSTER: 'StopPoster',
   // A3_STOP_POSTER: 'A3StopPoster',
   // LINE_TIMETABLE: 'LineTimetable',
   // TERMINAL_POSTER: 'TerminalPoster',
@@ -90,6 +90,8 @@ function buildGenerationRequestBody(buildId, component, printAsA4) {
     props = stopIds.map(stopId => {
       return {
         date: new Date().toISOString().split('T')[0],
+        dateBegin: null,
+        dateEnd: null,
         isSummerTimetable: true,
         legend: true,
         mapZoneSymbols: true,
@@ -98,7 +100,7 @@ function buildGenerationRequestBody(buildId, component, printAsA4) {
         minimapZones: true,
         printTimetablesAsA4: printAsA4,
         printTimetablesAsGreyscale: false,
-        routeFilter: '2, 9, 9N',
+        routeFilter: '',
         salesPoint: true,
         selectedRuleTemplates: [],
         stopId,
