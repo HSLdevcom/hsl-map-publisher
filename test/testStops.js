@@ -6,8 +6,16 @@ const fs = require('fs');
 const { finished } = require('node:stream/promises');
 const path = require('path');
 
+// This prints out the timetable cover page
+const PRINT_COVER_PAGE = false;
+
 // Stop poster tests
-const stopIds = ['2311220', '1250108', '1040144'];
+const stopIds = [/* '2311220', '1250108', '1040144', */ '1361108' /* , '4970238' */];
+
+const testDateRange = {
+  dateBegin: '2025-02-24',
+  dateEnd: '2025-06-30',
+};
 
 // Terminal poster tests
 const testTerminalPosters = [
@@ -36,13 +44,12 @@ const TEST_RESULTS_PATH = './test/results';
 
 const POSTER_COMPONENTS = {
   // TIMETABLE: 'Timetable',
-  STOP_POSTER: 'StopPoster',
+  // STOP_POSTER: 'StopPoster',
   // A3_STOP_POSTER: 'A3StopPoster',
   // LINE_TIMETABLE: 'LineTimetable',
   // TERMINAL_POSTER: 'TerminalPoster',
+  STOP_ROUTE_PLATE: 'StopRoutePlate',
 };
-
-const PRINT_COVER_PAGE = true;
 
 async function sleep(millis) {
   return new Promise(resolve => setTimeout(resolve, millis));
@@ -86,6 +93,18 @@ function buildGenerationRequestBody(buildId, component, printAsA4) {
         template: 'default',
       };
     });
+  } else if (component === POSTER_COMPONENTS.STOP_ROUTE_PLATE) {
+    props = [
+      {
+        stopIds,
+        dateBegin: testDateRange.dateBegin,
+        dateEnd: testDateRange.dateEnd,
+        routeFilter: '',
+        template: 'default',
+        selectedRuleTemplates: [],
+        downloadTable: false,
+      },
+    ];
   } else {
     props = stopIds.map(stopId => {
       return {

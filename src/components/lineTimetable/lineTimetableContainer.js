@@ -10,6 +10,7 @@ import apolloWrapper from 'util/apolloWrapper';
 
 import LineTimetable from './lineTimetable';
 import { groupDeparturesByDay } from '../timetable/timetableContainer';
+import { isNumberVariant } from '../../util/domain';
 
 const lineQuery = gql`
   query lineQuery($lineId: String!, $dateBegin: Date!, $dateEnd: Date!) {
@@ -91,8 +92,6 @@ const lineQuery = gql`
   }
 `;
 
-const VARIKKOLINJA_REGEX = /\d{4}[\w]\d+/;
-
 const regularDayTypes = ['Ma', 'Ti', 'Ke', 'To', 'Pe', 'La', 'Su'];
 
 const groupByValidityDateRange = departures => {
@@ -170,7 +169,7 @@ const mergeExtraRoutes = routes => {
   // Filter 'varikkolinja' routes from the list
   const filteredRoutes = filter(routes, route => {
     if (route.mode === 'TRAM') {
-      return route.routeId.match(VARIKKOLINJA_REGEX) === null;
+      return !isNumberVariant(route.routeId);
     }
     return true;
   });

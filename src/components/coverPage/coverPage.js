@@ -2,29 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import styles from './coverPage.css';
-import classNames from 'classnames';
-
-function shelterText(stopType) {
-  switch (stopType) {
-    case '01':
-    case '08':
-      return 'Lasikatos';
-    case '02':
-      return 'Teräskatos';
-    case '03':
-      return 'Terminaali';
-    case '04':
-      return 'Tolppa';
-    case '05':
-      return 'Urbankatos';
-    case '06':
-      return 'Betonikatos';
-    case '07':
-      return 'Puukatos';
-    default:
-      return 'Varustelutieto puuttuu';
-  }
-}
+import { getShelterText } from '../../util/domain';
 
 const StopRow = props => {
   const {
@@ -39,7 +17,7 @@ const StopRow = props => {
 
   return (
     <div className={styles.stopRow}>
-      <span>{`${shortId} ${nameFi}, ${addressFi}, ${shelterText(stopType)},`}</span>
+      <span>{`${shortId} ${nameFi}, ${addressFi}, ${getShelterText(stopType)},`}</span>
       <span>{` Ajojärjestys: ${distributionOrder !== null ? distributionOrder : '-'}, ${
         distributionArea !== null ? `${distributionArea},` : ''
       } Julistepaikat: ${posterCount}`}</span>

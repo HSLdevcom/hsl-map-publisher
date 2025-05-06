@@ -15,7 +15,7 @@ const fileHandler = require('./fileHandler');
 const authEndpoints = require('./auth/authEndpoints');
 const { matchStopDataToRules } = require('./util/rules');
 
-const { generateRenderUrl } = require('./generator');
+const { generateRenderUrl, csvPath } = require('./generator');
 
 const {
   DOMAINS_ALLOWED_TO_GENERATE,
@@ -65,9 +65,12 @@ const cancelSignalRedis = new Redis(REDIS_CONNECTION_STRING);
 async function generatePoster(buildId, component, props, index) {
   const { stopId, date, template, selectedRuleTemplates } = props;
 
-  // RuleTemplates are not available for TerminalPoster, LineTimetable and CoverPage
+  // RuleTemplates are not available for TerminalPoster, LineTimetable, CoverPage nor StopRoutePlate
   const data =
-    component !== 'TerminalPoster' && component !== 'LineTimetable' && component !== 'CoverPage'
+    component !== 'TerminalPoster' &&
+    component !== 'LineTimetable' &&
+    component !== 'CoverPage' &&
+    component !== 'StopRoutePlate'
       ? await getStopInfo({ stopId, date })
       : null;
 
@@ -339,6 +342,11 @@ async function main() {
       );
       if (!orderNumber) orderNumber = i + build.posters.length;
       posters.push(generatePoster(buildId, component, currentProps, orderNumber));
+      if (component === 'StopRoutePlate' && currentProps.downloadTable) {
+        // Add the summary spreadsheet to generation queue as well
+        const summaryProps = { ...currentProps, downloadTable: false, downloadSummary: true };
+        posters.push(generatePoster(buildId, component, summaryProps, orderNumber++));
+      }
     }
 
     try {
@@ -368,26 +376,46 @@ async function main() {
 
   router.get('/downloadPoster/:id', async ctx => {
     const { id } = ctx.params;
-    const { component } = await getPoster({ id });
+    const { component, props } = await getPoster({ id });
     let filename;
 
-    const downloadedPosterIds = await downloadPostersFromCloud([id]);
+    let downloadedPosterIds;
+
+    if (component === 'StopRoutePlate') {
+      downloadedPosterIds = props.downloadSummary
+        ? await downloadPostersFromCloud([], [`summary-${id}`])
+        : await downloadPostersFromCloud([], [id]);
+    } else {
+      downloadedPosterIds = await downloadPostersFromCloud([id]);
+    }
     if (downloadedPosterIds.length < 1) {
       ctx.throw(404, 'Poster ids not found.');
     }
-    try {
-      filename = await fileHandler.concatenate(downloadedPosterIds, `${component}-${id}`);
-      await fileHandler.removeFiles(downloadedPosterIds);
-    } catch (err) {
-      ctx.throw(500, err.message || 'PDF concatenation failed.');
+
+    if (component === 'StopRoutePlate' && props.downloadTable) {
+      filename = csvPath(id);
+      ctx.type = 'text/csv';
+      ctx.set('Content-Disposition', `attachment; filename="Kilvitysohje-${id}.csv"`);
+      ctx.body = fs.createReadStream(filename);
+    } else if (component === 'StopRoutePlate' && props.downloadSummary) {
+      filename = csvPath(`Summary-${id}`);
+      ctx.type = 'text/csv';
+      ctx.set('Content-Disposition', `attachment; filename="Yhteenveto-${id}.csv"`);
+      ctx.body = fs.createReadStream(filename);
+    } else {
+      try {
+        filename = await fileHandler.concatenate(downloadedPosterIds, `${component}-${id}`);
+        await fileHandler.removeFiles(downloadedPosterIds);
+      } catch (err) {
+        ctx.throw(500, err.message || 'PDF concatenation failed.');
+      }
+
+      console.log('PDF concatenation succeeded.');
+
+      ctx.type = 'application/pdf';
+      ctx.set('Content-Disposition', `attachment; filename="${component}-${id}.pdf"`);
+      ctx.body = fs.createReadStream(filename);
     }
-
-    console.log('PDF concatenation succeeded.');
-
-    ctx.type = 'application/pdf';
-    ctx.set('Content-Disposition', `attachment; filename="${component}-${id}.pdf"`);
-    ctx.body = fs.createReadStream(filename);
-
     await fs.remove(filename);
   });
 
@@ -409,8 +437,9 @@ async function main() {
     let orderedPosters = build.posters.sort((a, b) => (a.order > b.order ? 1 : -1));
     const slicedPosters = orderedPosters.slice(first, last);
     const posterIds = slicedPosters
-      .filter(poster => poster.status === 'READY')
+      .filter(poster => poster.status === 'READY' && poster.component !== 'StopRoutePlate') // Filter spreadsheets out, they are downloaded separately
       .map(poster => poster.id);
+
     const downloadedPosterIds = await downloadPostersFromCloud(posterIds);
 
     if (downloadedPosterIds.length < 1) {
@@ -418,7 +447,7 @@ async function main() {
     }
 
     try {
-      // Get the order of the downloaded posters and sort the posters before concatenation.
+      // Get the order of the downloaded PDF posters and sort the posters before PDF concatenation.
       orderedPosters = orderBy(
         downloadedPosterIds.map(downloadedId => ({
           id: downloadedId,
@@ -448,15 +477,14 @@ async function main() {
       if (printCoverPage) {
         removeCoverPages(orderedPosters);
       }
+
+      ctx.type = 'application/pdf';
+      ctx.set('Content-Disposition', `attachment; filename="${parsedTitle}-${id}.pdf"`);
+      ctx.body = fs.createReadStream(filename);
+      await fs.remove(filename);
     } catch (err) {
       ctx.throw(500, err.message || 'PDF concatenation failed.');
     }
-
-    ctx.type = 'application/pdf';
-    ctx.set('Content-Disposition', `attachment; filename="${parsedTitle}-${id}.pdf"`);
-    ctx.body = fs.createReadStream(filename);
-
-    await fs.remove(filename);
   });
 
   router.post('/login', async ctx => {
