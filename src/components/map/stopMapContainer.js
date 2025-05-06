@@ -295,26 +295,31 @@ const mapInterestsMapper = mapProps(props => {
   };
 });
 
-const getSalePoints = () =>
-  fetch(process.env.SALES_POINT_DATA_URL, { method: 'GET' })
+const getSalePoints = () => {
+  return fetch(process.env.SALES_POINT_DATA_URL, { method: 'GET' })
     .then(response => response.json())
-    .then(data =>
-      data.features
-        .filter(sp => SALE_POINT_TYPES.includes(sp.properties.Tyyppi))
-        .map(sp => {
-          const { properties } = sp;
-          const { coordinates } = sp.geometry;
-          const [lon, lat] = coordinates;
-          return {
-            id: properties.ID,
-            type: properties.Tyyppi,
-            title: properties.Nimi,
-            address: properties.Osoite,
-            lat,
-            lon,
-          };
-        }),
-    );
+    .then(data => {
+      try {
+        return data.features
+          .filter(sp => SALE_POINT_TYPES.includes(sp.properties.Tyyppi))
+          .map(sp => {
+            const { properties } = sp;
+            const { coordinates } = sp.geometry;
+            const [lon, lat] = coordinates;
+            return {
+              id: properties.ID,
+              type: properties.Tyyppi,
+              title: properties.Nimi,
+              address: properties.Osoite,
+              lat,
+              lon,
+            };
+          });
+      } catch (e) {
+        throw new Error('Error accessing sales point data', e);
+      }
+    });
+};
 
 const fetchOSMObjects = async props => {
   let results;
@@ -341,7 +346,7 @@ const osmPointsMapper = mapProps(props => {
 
 const salePointsMapper = mapProps(props => {
   // If sales points are not configured, do not fetch them but return empty array
-  const salePoints = props.showSalesPoint || props.legend ? getSalePoints() : Promise.resolve([]);
+  const salePoints = props.showSalesPoint ? getSalePoints() : Promise.resolve([]);
   return {
     ...props,
     salePoints,
