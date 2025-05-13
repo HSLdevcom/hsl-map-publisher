@@ -5,6 +5,7 @@ import { Row, WrappingRow } from 'components/util';
 import sortBy from 'lodash/sortBy';
 import { trimRouteId } from 'util/domain';
 import { uniqBy } from 'lodash';
+import classNames from 'classnames';
 
 import styles from './tableRows.css';
 
@@ -30,7 +31,7 @@ Departure.propTypes = {
 };
 
 const TableRow = props => (
-  <Row>
+  <Row className={classNames({ [styles.compactRow]: props.useCompactLayout })}>
     <div className={styles.hours}>{props.hours}</div>
     <WrappingRow>
       {sortBy(props.departures, a => a.minutes).map((departure, index) => (
@@ -40,9 +41,14 @@ const TableRow = props => (
   </Row>
 );
 
+TableRow.defaultProps = {
+  useCompactLayout: false,
+};
+
 TableRow.propTypes = {
   hours: PropTypes.string.isRequired,
   departures: PropTypes.arrayOf(PropTypes.shape(Departure.propTypes)).isRequired,
+  useCompactLayout: PropTypes.bool,
 };
 
 const isEqualDepartureHour = (a, b) => {
@@ -155,6 +161,7 @@ const TableRows = props => {
   }
 
   const filteredDepartures = filterDuplicateDepartureHours(rowsByHour);
+  const useCompactLayout = true;
 
   return (
     <div className={styles.root}>
@@ -163,6 +170,7 @@ const TableRows = props => {
           key={`${departuresHour.hour}${departuresHour.departures}`}
           hours={departuresHour.hour}
           departures={departuresHour.departures}
+          useCompactLayout={useCompactLayout}
         />
       ))}
     </div>

@@ -357,7 +357,7 @@ class TerminalPoster extends Component {
     const tramImage = get(src, 'slots[0].image.svg', '');
     let useDiagram = this.state.hasDiagram;
 
-    if (isTramStop && tramImage) useDiagram = false;
+    if (tramImage) useDiagram = false;
 
     const TerminalPosterTimetable = props => (
       <React.Fragment>
@@ -449,7 +449,7 @@ class TerminalPoster extends Component {
                 <Measure client>
                   {({ measureRef, contentRect }) => (
                     <div className={styles.right} ref={measureRef}>
-                      {!useDiagram && <Spacer height={10} />}
+                      <Spacer height={10} />
                       {/* The key will make sure the map updates its size if the layout changes */}
                       {shouldRenderMap && (
                         <CustomMap
@@ -480,9 +480,10 @@ class TerminalPoster extends Component {
                           date={date}
                           routeFilter={this.props.routeFilter}
                           maxColumns={hasLeftColumn ? 6 : 8}
+                          useCompactLayout={isSmallTerminalPoster}
                         />
                       )}
-                      {isTramStop && tramImage && <TramDiagram svg={tramImage} />}
+                      {!useDiagram && tramImage && <TramDiagram svg={tramImage} />}
                     </div>
                   )}
                 </Measure>
@@ -494,6 +495,7 @@ class TerminalPoster extends Component {
               template={template ? get(template, 'areas', []).find(t => t.key === 'footer') : {}}
               shortId={shortId}
               isTrunkStop={isTrunkStop}
+              isSmallTerminalPoster={isSmallTerminalPoster}
             />
             <Metadata date={date} />
           </JustifiedColumn>

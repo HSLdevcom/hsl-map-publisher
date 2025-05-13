@@ -7,7 +7,7 @@
   color: var(--hsl-blue);
   background: var(--light-background);
   --timetable-accent-color: white;
-  font-size: 16px;
+  font-size: 15px;
   margin-bottom: 10px;
 }
 
@@ -159,6 +159,10 @@
   cursor: pointer;
   color: var(--hsl-blue);
   border: 1px solid var(--hsl-blue);
+}
+
+.coverPageMargin {
+  top: 1160px;
 }
 
 @media print {

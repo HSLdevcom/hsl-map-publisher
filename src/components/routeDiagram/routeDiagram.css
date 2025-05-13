@@ -46,6 +46,14 @@
   font-family: GothamRounded-Book;
 }
 
+.componentNameA3 > .titleA3 {
+  font-family: GothamRounded-Medium;
+}
+
+.componentNameA3 > .subtitleA3 {
+  font-family: GothamRounded-Book;
+}
+
 .start {
   display: flex;
   align-items: center;

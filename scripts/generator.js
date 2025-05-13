@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 const fs = require('fs-extra');
 const path = require('path');
 const puppeteer = require('puppeteer');
@@ -17,9 +18,10 @@ const SCALE = 96 / 72;
 let browser = null;
 const cwd = process.cwd();
 
-const pdfOutputDir = path.join(cwd, 'output');
+const fileOutputDir = path.join(cwd, 'output');
 
-const pdfPath = id => path.join(pdfOutputDir, `${id}.pdf`);
+const pdfPath = id => path.join(fileOutputDir, `${id}.pdf`);
+const csvPath = id => path.join(fileOutputDir, `${id}.csv`);
 
 async function initialize() {
   browser = await puppeteer.launch({
@@ -30,17 +32,41 @@ async function initialize() {
   });
 }
 
-function generateRenderUrl(component, template, props) {
+function generateRenderUrl(component, template, props, id) {
   const generationProps = props.date
     ? props
     : Object.assign(props, { date: moment(Date()).format('YYYY-MM-DD') }); // Add current date by default if request props do not contain it
-  const encodedProps = qs.stringify({ component, props: generationProps, template });
+
+  if (id && component === 'StopRoutePlate') {
+    // This is needed to pass the component the same ID as the poster generation, so the filename can be assigned as that.
+    generationProps.csvFileName = id;
+  }
+
+  const encodedProps = qs.stringify(
+    { component, props: generationProps, template },
+    { arrayFormat: 'brackets' },
+  );
   const pageUrl = `${PUBLISHER_RENDER_URL}/?${encodedProps}`;
   return pageUrl;
 }
 
+async function sleep(millis) {
+  return new Promise(resolve => setTimeout(resolve, millis));
+}
+
+async function waitFile(filePath) {
+  let fileFinishedDownloading = false;
+
+  for (fileFinishedDownloading; !fileFinishedDownloading; ) {
+    await sleep(1000);
+    fileFinishedDownloading = fs.existsSync(filePath);
+  }
+
+  return true;
+}
+
 /**
- * Renders component to PDF file
+ * Renders component to PDF or CSV file
  * @returns {Promise}
  */
 async function renderComponent(options) {
@@ -65,9 +91,29 @@ async function renderComponent(options) {
     }
   });
 
-  const pageUrl = generateRenderUrl(component, template, props);
+  const pageUrl = generateRenderUrl(component, template, props, id);
 
   console.log(`Opening ${pageUrl} in Puppeteer.`);
+
+  if (component === 'StopRoutePlate' && (props.downloadTable || props.downloadSummary)) {
+    // Allow the downloading of CSV file since the component just sends it to the client instead of actually rendering
+    await page._client.send('Page.setDownloadBehavior', {
+      behavior: 'allow',
+      downloadPath: fileOutputDir,
+    });
+
+    const csvFilePath = props.downloadSummary ? csvPath(`summary-${id}`) : csvPath(id);
+
+    try {
+      await page.goto(pageUrl);
+      await waitFile(csvFilePath);
+      const posterUploaded = await uploadPosterToCloud(csvFilePath);
+      await page.close();
+      return posterUploaded;
+    } catch (err) {
+      throw new Error('StopRoutePlate CSV rendering failed');
+    }
+  }
 
   await page.goto(pageUrl, {
     timeout: RENDER_TIMEOUT,
@@ -87,7 +133,7 @@ async function renderComponent(options) {
   await page.emulateMediaType('screen');
 
   let printOptions = {};
-  if (props.printTimetablesAsA4) {
+  if (props.printTimetablesAsA4 || component === 'CoverPage') {
     printOptions = {
       printBackground: true,
       format: 'A4',
@@ -150,7 +196,6 @@ async function generate(options) {
     } catch (error) {
       onError(error);
     }
-    /* eslint-enable no-await-in-loop */
   }
 
   return { success: false };
@@ -159,4 +204,5 @@ async function generate(options) {
 module.exports = {
   generate,
   generateRenderUrl,
+  csvPath,
 };

@@ -361,7 +361,6 @@ const StopMap = props => {
             municipal_borders: { enabled: true },
             routes: { enabled: true },
             subway_entrance: { enabled: true },
-            ticket_sales: { enabled: true },
             citybikes: { enabled: props.showCitybikes },
             ticket_zones: { enabled: mapStyle.mapZones },
             text_fisv: { enabled: true },

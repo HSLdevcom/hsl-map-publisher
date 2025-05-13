@@ -311,6 +311,51 @@ function filterRoute(props) {
   return !routeMatchesFilter;
 }
 
+function formatRouteString(route) {
+  const routeProps = route.route?.nodes[0];
+  let routeString;
+  if (route.viaFi || route.viaSe) {
+    routeString = `${trimRouteId(route.routeId)} ${routeProps.destinationFi} kautta ${
+      route.viaFi
+    } / ${routeProps.destinationSe} via ${route.viaSe}`;
+  } else {
+    routeString = `${trimRouteId(route.routeId)} ${routeProps.destinationFi} / ${
+      routeProps.destinationSe
+    }`;
+  }
+  return routeString;
+}
+
+function getFormattedRouteList(routes) {
+  const routeStringArray = routes.map(routeChange => {
+    return formatRouteString(routeChange);
+  });
+
+  return routeStringArray;
+}
+
+function getShelterText(stopType) {
+  switch (stopType) {
+    case '01':
+    case '08':
+      return 'Lasikatos';
+    case '02':
+      return 'Teräskatos';
+    case '03':
+      return 'Terminaali';
+    case '04':
+      return 'Tolppa';
+    case '05':
+      return 'Urbankatos';
+    case '06':
+      return 'Betonikatos';
+    case '07':
+      return 'Puukatos';
+    default:
+      return 'Varustelutieto puuttuu';
+  }
+}
+
 export {
   isNumberVariant,
   isRailRoute,
@@ -326,4 +371,7 @@ export {
   routeGeneralizer,
   filterRoute,
   scheduleSegments,
+  getFormattedRouteList,
+  formatRouteString,
+  getShelterText,
 };

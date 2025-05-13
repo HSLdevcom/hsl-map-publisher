@@ -65,6 +65,14 @@ module.exports = function createEmptyTemplate(label, id) {
             image: null,
             size: 1,
           },
+          {
+            image: null,
+            size: 1,
+          },
+          {
+            image: null,
+            size: 1,
+          },
         ],
       },
     ]),

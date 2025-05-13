@@ -433,6 +433,8 @@ const propsMapper = mapProps(props => {
     showAddressInfo: props.showAddressInfo,
     showPrintButton: props.showPrintButton,
     lang: props.lang,
+    showCoverPage: props.showCoverPage,
+    useCompactLayout: props.useCompactLayout,
   };
 });
 
@@ -455,6 +457,8 @@ TimetableContainer.defaultProps = {
   showAddressInfo: true,
   showPrintButton: false,
   lang: 'fi',
+  showCoverPage: false,
+  useCompactLayout: false,
 };
 
 TimetableContainer.propTypes = {
@@ -476,6 +480,8 @@ TimetableContainer.propTypes = {
   showPrintButton: PropTypes.bool,
   combinedDays: PropTypes.object,
   lang: PropTypes.string,
+  showCoverPage: PropTypes.bool,
+  useCompactLayout: PropTypes.bool,
 };
 
 export default TimetableContainer;

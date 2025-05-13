@@ -1,33 +1,24 @@
 .root {
-  margin: 0.938em 0;
+  margin-top: 0.4em;
+  margin-bottom: 0.938em;
   font-family: GothamRounded-Book;
   color: var(--timetable-text-color);
   break-after: avoid;
 }
 
-.root.largerPaddingTop {
-  padding-top: 0.25em;
-}
-
-.root.noPaddingTop {
-  margin: 0;
-}
-
 .strong {
   font-family: GothamXNarrow-Medium;
-  font-size: 1.115em;
 }
 
 .title {
   padding: 0.313em 0.45em;
-  font-size: 1.125em;
   font-family: GothamXNarrow-Book;
 }
 
 .subtitle {
   display: flex;
   padding: 0 0.625em 0 0.65em;
-  font-size: 0.75em;
+  font-size: 12px;
   line-height: 1.2;
   letter-spacing: -0.025em;
 }
@@ -46,4 +37,20 @@
 
 .inline {
   display: inline;
+}
+
+.compactTitle {
+  font-size: 0.8em;
+}
+
+.compactSubtitle {
+  font-size: 0.5em;
+}
+
+.compactRoot {
+  margin: 0.5em 0;
+}
+
+.compactPadding {
+  padding-top: 0.15em;
 }
