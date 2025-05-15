@@ -398,7 +398,7 @@ async function main() {
       ctx.set('Content-Disposition', `attachment; filename="Kilvitysohje-${id}.csv"`);
       ctx.body = fs.createReadStream(filename);
     } else if (component === 'StopRoutePlate' && props.downloadSummary) {
-      filename = csvPath(`Summary-${id}`);
+      filename = csvPath(`summary-${id}`);
       ctx.type = 'text/csv';
       ctx.set('Content-Disposition', `attachment; filename="Yhteenveto-${id}.csv"`);
       ctx.body = fs.createReadStream(filename);
