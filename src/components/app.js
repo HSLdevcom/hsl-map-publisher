@@ -12,7 +12,7 @@ import A3StopPoster from 'components/a3stopPoster/a3StopPosterContainer';
 import TerminalPoster from 'components/stopPoster/terminalPosterContainer';
 import LineTimetable from 'components/lineTimetable/lineTimetableContainer';
 import CoverPage from 'components/coverPage/coverPageContainer';
-import StopRoutePlate from './stopRoutePlate/stopRoutePlateContainer';
+import * as StopRoutePlate from './stopRoutePlate/stopRoutePlateContainer';
 import renderQueue from 'util/renderQueue';
 
 const components = {
@@ -111,6 +111,14 @@ class App extends Component {
 
     if (ComponentToRender === components.LineTimetable) {
       rootStyle = { display: 'block' };
+    }
+
+    if (ComponentToRender === components.StopRoutePlate) {
+      if (props.useLineQuery) {
+        ComponentToRender = StopRoutePlate.LineQueryStopRoutePlateContainer;
+      } else {
+        ComponentToRender = StopRoutePlate.StopRoutePlateContainer;
+      }
     }
 
     return (

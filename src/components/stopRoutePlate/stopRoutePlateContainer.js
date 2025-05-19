@@ -5,13 +5,14 @@ import withProps from 'recompose/withProps';
 
 import apolloWrapper from 'util/apolloWrapper';
 import StopRoutePlate from './stopRoutePlate';
-import { forEach, isEqual, xorWith, find, differenceWith, uniq, findIndex } from 'lodash';
+import { forEach, isEqual, xorWith, find, differenceWith, findIndex, uniqBy } from 'lodash';
 import {
   getFormattedRouteList,
   formatRouteString,
   filterRoute,
   isNumberVariant,
   getShelterText,
+  trimRouteId,
 } from 'util/domain';
 
 const stopRoutePlateQuery = gql`
@@ -50,19 +51,6 @@ const stopRoutePlateQuery = gql`
                 mode
               }
             }
-            line {
-              nodes {
-                nameFi
-                nameSe
-                dateBegin
-                dateEnd
-                destinationFi
-                destinationSe
-                lineId
-                lineIdParsed
-                trunkRoute
-              }
-            }
           }
         }
         routePlateDateEnd: routeSegmentsForDate(date: $dateEnd) {
@@ -81,17 +69,99 @@ const stopRoutePlateQuery = gql`
                 mode
               }
             }
-            line {
+          }
+        }
+      }
+    }
+  }
+`;
+
+// This is for the line query (linjahaku) version of the stopRoutePlate query
+const lineQueryStopRoutePlateQuery = gql`
+  query stopRoutePlateLineQuery($lineId: String!, $dateBegin: Date!, $dateEnd: Date!) {
+    lines: getLinesWithIdAndUserDateRange(
+      id: $lineId
+      lineDateBegin: $dateBegin
+      lineDateEnd: $dateEnd
+    ) {
+      nodes {
+        lineId
+        lineIdParsed
+        destinationFi
+        destinationSe
+        dateBegin
+        dateEnd
+        trunkRoute
+        routes: routesForDateRange(routeDateBegin: $dateBegin, routeDateEnd: $dateEnd) {
+          nodes {
+            routeId
+            direction
+            dateBegin
+            dateEnd
+            mode
+            routeSegments {
               nodes {
-                nameFi
-                nameSe
-                dateBegin
-                dateEnd
+                pickupDropoffType
                 destinationFi
                 destinationSe
-                lineId
-                lineIdParsed
-                trunkRoute
+                viaFi
+                viaSe
+                dateImported
+                hasRegularDayDepartures
+                stopByStopId {
+                  stopId
+                  nameFi
+                  nameSe
+                  addressFi
+                  shortId
+                  posterCount
+                  stopType
+                  stopZone
+                  lat
+                  lon
+                  distributionArea
+                  distributionOrder
+                  stopTariff
+                  modes {
+                    nodes
+                  }
+                  routePlateDateBegin: routeSegmentsForDate(date: $dateBegin) {
+                    nodes {
+                      routeId
+                      pickupDropoffType
+                      viaFi
+                      viaSe
+                      hasRegularDayDepartures
+                      dateBegin
+                      dateEnd
+                      route {
+                        nodes {
+                          destinationFi
+                          destinationSe
+                          mode
+                        }
+                      }
+                    }
+                  }
+                  routePlateDateEnd: routeSegmentsForDate(date: $dateEnd) {
+                    nodes {
+                      routeId
+                      pickupDropoffType
+                      viaFi
+                      viaSe
+                      hasRegularDayDepartures
+                      dateBegin
+                      dateEnd
+                      route {
+                        nodes {
+                          destinationFi
+                          destinationSe
+                          mode
+                        }
+                      }
+                    }
+                  }
+                }
               }
             }
           }
@@ -334,7 +404,107 @@ const propsMapper = withProps(props => {
   };
 });
 
-const hoc = compose(graphql(stopRoutePlateQuery), apolloWrapper(propsMapper));
-const StopRoutePlateContainer = hoc(StopRoutePlate);
+const lineQueryPropsMapper = withProps(props => {
+  const allRoutes = props.data.lines?.nodes[0].routes?.nodes;
 
-export default StopRoutePlateContainer;
+  const stops = allRoutes.flatMap(route => {
+    return route.routeSegments.nodes.map(routeSegment => {
+      return { ...routeSegment.stopByStopId, queriedRouteIdParsed: trimRouteId(route.routeId) };
+    });
+  });
+
+  const uniqueStops = uniqBy(stops, 'stopId');
+
+  const filteredStops = uniqueStops.map(stop => {
+    return {
+      ...stop,
+      stopType: getShelterText(stop.stopType),
+      routePlateDateBegin: stop.routePlateDateBegin.nodes
+        .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
+        .filter(routeSegment => {
+          return filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter });
+        }),
+      routePlateDateEnd: stop.routePlateDateEnd.nodes
+        .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
+        .filter(routeSegment => {
+          return filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter });
+        }),
+    };
+  });
+
+  const routeDiffs = [];
+  forEach(filteredStops, stop => {
+    const differences = checkStopRouteChanges(stop);
+    routeDiffs.push({
+      stop: {
+        ...stop,
+        latLon: `${stop.lat}, ${stop.lon}`,
+        linkToLocation: getMapsLink(stop.lat, stop.lon),
+      },
+      routeChanges: differences,
+    });
+  });
+
+  const allPlates = [];
+
+  forEach(routeDiffs, diff => {
+    const { routeChanges } = diff;
+    if (routeChanges.addedRoutes.length > 0) {
+      allPlates.push(...routeChanges.addedRoutes);
+    }
+    if (routeChanges.removedRoutes.length > 0) {
+      allPlates.push(...routeChanges.removedRoutes);
+    }
+  });
+
+  const groupedRoutePlates = [];
+
+  forEach(allPlates, plate => {
+    const plateAlreadyExists = findIndex(groupedRoutePlates, uniquePlate => {
+      return deepCompareRoutePlates(plate, uniquePlate);
+    });
+    if (plateAlreadyExists === -1) {
+      if (plate.isAdded && !plate.isNegligibleChange)
+        groupedRoutePlates.push({ ...plate, totalAmount: -1, removed: 0, added: 1 });
+      if (plate.isRemoved && !plate.isNegligibleChange)
+        groupedRoutePlates.push({ ...plate, totalAmount: 1, removed: 1, added: 0 });
+    } else {
+      if (groupedRoutePlates[plateAlreadyExists]?.isAdded) {
+        groupedRoutePlates[plateAlreadyExists].totalAmount--;
+        groupedRoutePlates[plateAlreadyExists].added++;
+      }
+      if (groupedRoutePlates[plateAlreadyExists]?.isRemoved) {
+        groupedRoutePlates[plateAlreadyExists].totalAmount++;
+        groupedRoutePlates[plateAlreadyExists].removed++;
+      }
+    }
+  });
+
+  const routePlateSummary = groupedRoutePlates.map(plate => {
+    return {
+      comparisonDateRange: `${props.dateBegin} - ${props.dateEnd}`,
+      plateText: formatRouteString(plate),
+      amountRemoved: plate.removed,
+      amountAdded: plate.added,
+      totalAmount: plate.totalAmount,
+      amountNeeded: plate.totalAmount > 0 ? 0 : plate.removed + plate.added,
+    };
+  });
+
+  return {
+    routeDiffs,
+    csvFileName: props.csvFileName,
+    routePlateSummary,
+    usesLineQuery: true,
+  };
+});
+
+const hoc = compose(graphql(stopRoutePlateQuery), apolloWrapper(propsMapper));
+const lineQueryHoc = compose(
+  graphql(lineQueryStopRoutePlateQuery),
+  apolloWrapper(lineQueryPropsMapper),
+);
+const StopRoutePlateContainer = hoc(StopRoutePlate);
+const LineQueryStopRoutePlateContainer = lineQueryHoc(StopRoutePlate);
+
+export { StopRoutePlateContainer, LineQueryStopRoutePlateContainer };
