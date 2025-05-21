@@ -60,6 +60,24 @@ const StopRoutePlate = props => {
     { label: 'Lopputulos', key: 'routeChanges.formatted.endResult' },
   ];
 
+  const lineQueryCsvHeaders = [
+    { label: 'Sisältö', key: 'summary' },
+    { label: 'Linja', key: 'stop.queriedRouteIdParsed' },
+    { label: 'Nimi FI', key: 'stop.nameFi' },
+    { label: 'Nimi SE', key: 'stop.nameSe' },
+    { label: 'Pysäkkityyppi', key: 'stop.stopType' },
+    { label: 'Vyöhyke', key: 'stop.stopZone' },
+    { label: 'Tunnus', key: 'stop.shortId' },
+    { label: 'Laiturinumero', key: 'stop.platform' },
+    { label: 'Sijainti', key: 'stop.linkToLocation' },
+    { label: 'Koordinaatit', key: 'stop.latLon' },
+    { label: 'Muutospäivämäärä (aikaisin)', key: 'routeChanges.formatted.earliestChangeDate' },
+    { label: 'Muuttumattomat', key: 'routeChanges.formatted.unchanged' },
+    { label: 'Uudet', key: 'routeChanges.formatted.added' },
+    { label: 'Poistettavat', key: 'routeChanges.formatted.removed' },
+    { label: 'Lopputulos', key: 'routeChanges.formatted.endResult' },
+  ];
+
   const summaryCsvHeaders = [
     { label: 'Vertailuväli', key: 'comparisonDateRange' },
     { label: 'Kilpi', key: 'plateText' },
@@ -98,7 +116,7 @@ const StopRoutePlate = props => {
         <CSVDownload
           filename={props.csvFileName ? props.csvFileName : 'unnamed'}
           data={[generationSummary, ...routeDiffs]}
-          headers={csvHeaders}
+          headers={props.usesLineQuery ? lineQueryCsvHeaders : csvHeaders}
         />
       )}
       {downloadSummary && (
@@ -115,6 +133,7 @@ const StopRoutePlate = props => {
 StopRoutePlate.defaultProps = {
   downloadTable: false,
   downloadSummary: false,
+  usesLineQuery: false,
 };
 
 StopRoutePlate.propTypes = {
@@ -125,6 +144,7 @@ StopRoutePlate.propTypes = {
   csvFileName: PropTypes.string.isRequired,
   dateBegin: PropTypes.string.isRequired,
   dateEnd: PropTypes.string.isRequired,
+  usesLineQuery: PropTypes.bool,
 };
 
 export default StopRoutePlate;
