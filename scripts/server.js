@@ -165,7 +165,7 @@ const authMiddleware = async (ctx, next) => {
 };
 
 const allowedToGenerate = user => {
-  // if (isRunningOnLocalEnv()) return true;
+  if (isRunningOnLocalEnv()) return true;
   if (!user || !user.email) return false;
 
   if (user.groups && user.groups.includes(GROUP_GENERATE)) {
