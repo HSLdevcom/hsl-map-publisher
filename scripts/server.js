@@ -9,7 +9,6 @@ const fs = require('fs-extra');
 const { Queue } = require('bullmq');
 const Redis = require('ioredis');
 const { koaBody } = require('koa-body');
-const validator = require('validator');
 
 const fileHandler = require('./fileHandler');
 const authEndpoints = require('./auth/authEndpoints');
@@ -17,11 +16,7 @@ const { matchStopDataToRules } = require('./util/rules');
 
 const { generateRenderUrl, csvPath } = require('./generator');
 
-const {
-  DOMAINS_ALLOWED_TO_GENERATE,
-  PUBLISHER_TEST_GROUP,
-  REDIS_CONNECTION_STRING,
-} = require('../constants');
+const { GROUP_GENERATE, GROUP_READONLY, REDIS_CONNECTION_STRING } = require('../constants');
 
 const {
   migrate,
@@ -170,22 +165,14 @@ const authMiddleware = async (ctx, next) => {
 };
 
 const allowedToGenerate = user => {
-  if (isRunningOnLocalEnv()) return true;
+  // if (isRunningOnLocalEnv()) return true;
   if (!user || !user.email) return false;
 
-  const parsedAllowedDomains = DOMAINS_ALLOWED_TO_GENERATE.split(',');
-
-  if (user.groups && user.groups.includes(PUBLISHER_TEST_GROUP)) {
+  if (user.groups && user.groups.includes(GROUP_GENERATE)) {
     return true;
   }
 
-  const emailCheckOpts = {
-    host_whitelist: parsedAllowedDomains,
-  };
-
-  const isAllowedToGenerate = validator.isEmail(user.email, emailCheckOpts);
-
-  return isAllowedToGenerate;
+  return false;
 };
 
 const createBuildCoverPage = async (buildId, buildTitle, posters) => {
@@ -489,9 +476,15 @@ async function main() {
 
   router.post('/login', async ctx => {
     const authResponse = await authEndpoints.authorize(ctx.request, ctx.response, ctx.session);
-    ctx.session = authResponse.modifiedSession;
-    ctx.body = authResponse.body;
-    ctx.response.status = authResponse.status;
+
+    if (authResponse.body.isOk) {
+      ctx.session = authResponse.modifiedSession;
+      ctx.body = authResponse.body;
+      ctx.response.status = authResponse.status;
+    } else {
+      ctx.body = authResponse.body.message;
+      ctx.response.status = authResponse.status;
+    }
   });
 
   router.get('/logout', async ctx => {
