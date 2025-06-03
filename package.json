@@ -39,7 +39,7 @@
     "url": "git+https://github.com/HSLdevcom/hsl-map-publisher.git"
   },
   "author": "",
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "bugs": {
     "url": "https://github.com/HSLdevcom/hsl-map-publisher/issues"
   },
