@@ -59,6 +59,10 @@
   align-items: center;
 }
 
+.compactRoutes {
+  max-width: 60px;
+}
+
 .terminalAreaRoutesTitle {
   font-size: 0.5em;
   white-space: initial;

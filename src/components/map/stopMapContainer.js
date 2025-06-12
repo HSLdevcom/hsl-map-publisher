@@ -325,9 +325,7 @@ const fetchOSMObjects = async props => {
   let results;
   try {
     const osmData = await fetch(
-      `https://nominatim.openstreetmap.org/search.php?q=subway_entrance&
-      viewbox=${props.maxInterestLon}%2C${props.maxInterestLat}%2C${props.minInterestLon}%2C${props.minInterestLat}
-      &bounded=1&format=json&namedetails=1`,
+      `https://nominatim.openstreetmap.org/search.php?q=subway_entrance&viewbox=${props.maxInterestLon}%2C${props.maxInterestLat}%2C${props.minInterestLon}%2C${props.minInterestLat}&bounded=1&format=json&namedetails=1`,
     );
     results = await osmData.json();
   } catch (e) {
