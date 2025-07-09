@@ -48,7 +48,7 @@ class App extends Component {
     this.params = null;
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     if (this.root) {
       renderQueue.onEmpty(error => {
         if (error) {
@@ -73,16 +73,15 @@ class App extends Component {
       const posterId = get(params, 'id', null);
 
       if (renderComponent === components.StopRoutePlate && posterId) {
-        fetch(`${process.env.REACT_APP_PUBLISHER_SERVER_URL}/posters/${posterId}`)
-          .then(response => {
-            if (!response.ok) {
-              throw new Error(`Failed to fetch props for id ${posterId}`);
-            }
-            return response.json();
-          })
-          .then(data => {
-            this.setState({ fetchedProps: { ...data.props, csvFileName: posterId } });
-          });
+        const stopPosterPropsReq = await window.fetch(
+          `${process.env.REACT_APP_PUBLISHER_SERVER_URL}/posters/${posterId}`,
+        );
+        if (!stopPosterPropsReq.ok) {
+          throw new Error(`Failed to fetch props for id ${posterId}`);
+        }
+
+        const requestedProps = await stopPosterPropsReq.json();
+        this.setState({ fetchedProps: { ...requestedProps.props, csvFileName: posterId } });
       }
     } catch (error) {
       App.handleError(new Error('Failed to parse url fragment'));
