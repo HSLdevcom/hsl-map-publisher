@@ -126,6 +126,7 @@ const propsMapper = mapProps(props => {
     tree: routesToTree(routes, stopDetails, props.height, treeMaxWidth),
     printAsA3: props.printAsA3,
     useWide: props.useWide,
+    useCompactLayout: props.useCompactLayout,
   };
 });
 
@@ -133,9 +134,14 @@ const hoc = compose(graphql(routeDiagramQuery), apolloWrapper(propsMapper));
 
 const RouteDiagramContainer = hoc(RouteDiagram);
 
+RouteDiagramContainer.defaultProps = {
+  useCompactLayout: false,
+};
+
 RouteDiagramContainer.propTypes = {
   stopIds: PropTypes.array.isRequired,
   date: PropTypes.string.isRequired,
+  useCompactLayout: PropTypes.bool,
 };
 
 export default RouteDiagramContainer;

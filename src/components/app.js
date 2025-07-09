@@ -11,6 +11,8 @@ import Timetable from 'components/timetable/timetableContainer';
 import A3StopPoster from 'components/a3stopPoster/a3StopPosterContainer';
 import TerminalPoster from 'components/stopPoster/terminalPosterContainer';
 import LineTimetable from 'components/lineTimetable/lineTimetableContainer';
+import CoverPage from 'components/coverPage/coverPageContainer';
+import * as StopRoutePlate from './stopRoutePlate/stopRoutePlateContainer';
 import renderQueue from 'util/renderQueue';
 
 const components = {
@@ -19,6 +21,8 @@ const components = {
   A3StopPoster,
   TerminalPoster,
   LineTimetable,
+  CoverPage,
+  StopRoutePlate,
 };
 
 const graphqlUrl = process.env.JORE_GRAPHQL_URL || 'https://kartat.hsl.fi/jore/graphql';
@@ -107,6 +111,14 @@ class App extends Component {
 
     if (ComponentToRender === components.LineTimetable) {
       rootStyle = { display: 'block' };
+    }
+
+    if (ComponentToRender === components.StopRoutePlate) {
+      if (props.useLineQuery) {
+        ComponentToRender = StopRoutePlate.LineQueryStopRoutePlateContainer;
+      } else {
+        ComponentToRender = StopRoutePlate.StopRoutePlateContainer;
+      }
     }
 
     return (
