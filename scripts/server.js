@@ -139,12 +139,11 @@ const authMiddleware = async (ctx, next) => {
     if (['/login', '/logout', '/session'].includes(ctx2.path)) {
       return true;
     }
-    // Allow GET /templates/..., so that puppeteer can get the template.
-    if (
-      ctx2.path.startsWith('/templates/') &&
-      ctx.method === 'GET' &&
-      ctx.host === envHostUrl.host
-    ) {
+    // Allow GET /templates/..., so that puppeteer can get the template or StopRoutePlate props.
+    const startsWithAllowedPaths =
+      ctx2.path.startsWith('/templates/') || ctx2.path.startsWith('/posters/');
+
+    if (startsWithAllowedPaths && ctx.method === 'GET' && ctx.host === envHostUrl.host) {
       return true;
     }
     return false;
