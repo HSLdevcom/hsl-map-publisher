@@ -121,6 +121,17 @@ const errorHandler = async (ctx, next) => {
   }
 };
 
+const allowedToGenerate = user => {
+  if (isRunningOnLocalEnv()) return true;
+  if (!user || !user.email) return false;
+
+  if (user.groups && user.groups.includes(GROUP_GENERATE)) {
+    return true;
+  }
+
+  return false;
+};
+
 const authMiddleware = async (ctx, next) => {
   // Helper function to allow specific requests without authentication
   const allowAuthException = ctx2 => {
@@ -159,20 +170,16 @@ const authMiddleware = async (ctx, next) => {
       // Not authenticated, throw 401
       ctx.throw(401);
     } else {
+      // If the request is CRUD, check if the user has privileges to perform the action
+      if (ctx.method !== 'GET' && ctx.method !== 'HEAD') {
+        const user = authResponse.body;
+        if (!allowedToGenerate(user)) {
+          ctx.throw(403, 'User does not have privileges to perform this action.');
+        }
+      }
       await next();
     }
   }
-};
-
-const allowedToGenerate = user => {
-  if (isRunningOnLocalEnv()) return true;
-  if (!user || !user.email) return false;
-
-  if (user.groups && user.groups.includes(GROUP_GENERATE)) {
-    return true;
-  }
-
-  return false;
 };
 
 const createBuildCoverPage = async (buildId, buildTitle, posters) => {
