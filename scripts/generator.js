@@ -9,7 +9,6 @@ const moment = require('moment');
 
 const { AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_KEY, PUBLISHER_RENDER_URL } = require('../constants');
 
-const CLIENT_URL = PUBLISHER_RENDER_URL;
 const RENDER_TIMEOUT = 10 * 60 * 1000;
 const PDF_TIMEOUT = 5 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
@@ -40,10 +39,11 @@ function generateRenderUrl(component, template, props, id) {
   if (id && component === 'StopRoutePlate') {
     // This is needed to pass the component the same ID as the poster generation, so the filename can be assigned as that.
     generationProps.csvFileName = id;
+    delete generationProps.stopIds; // Remove stopIds from props, since they are fetched from the server due to possibly very large size.
   }
 
   const encodedProps = qs.stringify(
-    { component, props: generationProps, template },
+    { component, props: generationProps, template, id },
     { arrayFormat: 'brackets' },
   );
   const pageUrl = `${PUBLISHER_RENDER_URL}/?${encodedProps}`;
