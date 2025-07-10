@@ -122,7 +122,7 @@ const errorHandler = async (ctx, next) => {
 };
 
 const allowedToGenerate = user => {
-  // if (isRunningOnLocalEnv()) return true;
+  if (isRunningOnLocalEnv()) return true;
   if (!user || !user.email) return false;
 
   if (user.groups && user.groups.includes(GROUP_GENERATE)) {
@@ -138,9 +138,9 @@ const authMiddleware = async (ctx, next) => {
     const envHostUrl = new URL(process.env.REACT_APP_PUBLISHER_SERVER_URL);
 
     // Allow API testing in local environment without authentication
-    /* if (isRunningOnLocalEnv()) {
+    if (isRunningOnLocalEnv()) {
       return true;
-    } */
+    }
 
     // Allow session related requests
     if (['/login', '/logout', '/session'].includes(ctx2.path)) {
