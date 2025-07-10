@@ -10,6 +10,7 @@ const { Queue } = require('bullmq');
 const Redis = require('ioredis');
 const { koaBody } = require('koa-body');
 const validator = require('validator');
+const moment = require('moment');
 
 const fileHandler = require('./fileHandler');
 const authEndpoints = require('./auth/authEndpoints');
@@ -513,18 +514,39 @@ async function main() {
     ctx.status = 200;
   });
 
+  const isAllowedComponent = component => {
+    return (
+      component === RENDER_URL_COMPONENTS.TIMETABLE ||
+      component === RENDER_URL_COMPONENTS.LINE_TIMETABLE
+    );
+  };
+
   unAuthorizedRouter.post('/generateRenderUrl', koaBody(), async ctx => {
-    const { props, component } = ctx.request.body;
+    let { props } = ctx.request.body;
+    const { component } = ctx.request.body;
     const { template } = props;
-    if (
-      component !== RENDER_URL_COMPONENTS.TIMETABLE &&
-      component !== RENDER_URL_COMPONENTS.LINE_TIMETABLE
-    ) {
+    if (!isAllowedComponent(component)) {
       // Return error if wrong components is requested, restrict render API only to less resource intensive timetables.
       ctx.body = 'Requested component missing or invalid';
       ctx.status = 400;
       return;
     }
+
+    if (component === RENDER_URL_COMPONENTS.LINE_TIMETABLE) {
+      if (!props.dateBegin && !props.dateEnd) {
+        // Add default date range if not provided, which is a week from today
+        props = {
+          ...props,
+          dateBegin: moment(Date())
+            .startOf('isoWeek')
+            .format('YYYY-MM-DD'),
+          dateEnd: moment(Date())
+            .endOf('isoWeek')
+            .format('YYYY-MM-DD'),
+        };
+      }
+    }
+
     const renderUrl = generateRenderUrl(component, template, props);
 
     if (props.redirect) {
