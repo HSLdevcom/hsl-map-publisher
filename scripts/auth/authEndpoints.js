@@ -1,31 +1,19 @@
 const { get, clone } = require('lodash');
 const AuthService = require('./authService');
-const validator = require('validator');
 
-const { DOMAINS_ALLOWED_TO_LOGIN, PUBLISHER_TEST_GROUP } = require('../../constants');
+const { GROUP_GENERATE, GROUP_READONLY } = require('../../constants');
 
-const allowedDomains = DOMAINS_ALLOWED_TO_LOGIN.split(',');
+const hasAllowedGroup = async userInfo => {
+  const groups = get(userInfo, 'groups', {});
 
-const hasAllowedDomain = async userInfo => {
-  const groups = get(userInfo, 'groups');
-
-  const emailValidationOptions = {
-    host_whitelist: allowedDomains,
-  };
-
-  if (groups.includes(PUBLISHER_TEST_GROUP)) {
-    return true;
-  }
-
-  if (
-    !validator.isEmail(userInfo.email, emailValidationOptions) &&
-    !groups.includes(PUBLISHER_TEST_GROUP)
-  ) {
-    console.log(`User does not have allowed domain. Logging out.`);
+  if (!groups || !Array.isArray(groups)) {
+    console.log('User does not have valid groups assigned');
     return false;
   }
-
-  return true;
+  if (groups.includes(GROUP_GENERATE) || groups.includes(GROUP_READONLY)) {
+    return true;
+  }
+  return false;
 };
 
 const authorize = async (req, res, session) => {
@@ -68,13 +56,13 @@ const authorize = async (req, res, session) => {
   if (session && tokenResponse.access_token) {
     modifiedSession.accessToken = tokenResponse.access_token;
     const userInfo = await AuthService.requestUserInfo(modifiedSession.accessToken);
-    const isAllowed = await hasAllowedDomain(userInfo);
+    const isAllowed = await hasAllowedGroup(userInfo);
     if (!isAllowed) {
       return {
         status: 401,
         body: {
           isOk: false,
-          message: 'No allowed group.',
+          message: 'User does not have valid groups assigned.',
         },
       };
     }
@@ -105,7 +93,7 @@ const authorize = async (req, res, session) => {
 
 const checkExistingSession = async (req, res, session) => {
   if (session && session.accessToken) {
-    const isAllowed = await hasAllowedDomain(session);
+    const isAllowed = await hasAllowedGroup(session);
     if (!isAllowed) {
       await AuthService.logoutFromIdentityProvider(session.accessToken);
       return {
