@@ -1,6 +1,6 @@
-FROM node:18-buster-slim
+FROM node:18-bullseye-slim
 
-RUN apt-get update \
+RUN apt-get -y update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -yq wget curl gnupg fontconfig fonts-liberation ca-certificates --no-install-recommends \
     # This installs the necessary libs to make the bundled version of Chromium that Puppeteer installs work
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
