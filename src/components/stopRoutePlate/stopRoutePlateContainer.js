@@ -39,8 +39,8 @@ const stopRoutePlateQuery = gql`
           nodes {
             routeId
             pickupDropoffType
-            viaFi
-            viaSe
+            plateViaFi
+            plateViaSe
             hasRegularDayDepartures
             dateBegin
             dateEnd
@@ -57,8 +57,8 @@ const stopRoutePlateQuery = gql`
           nodes {
             routeId
             pickupDropoffType
-            viaFi
-            viaSe
+            plateViaFi
+            plateViaSe
             hasRegularDayDepartures
             dateBegin
             dateEnd
@@ -104,8 +104,8 @@ const lineQueryStopRoutePlateQuery = gql`
                 pickupDropoffType
                 destinationFi
                 destinationSe
-                viaFi
-                viaSe
+                plateViaFi
+                plateViaSe
                 dateImported
                 hasRegularDayDepartures
                 stopByStopId {
@@ -129,8 +129,8 @@ const lineQueryStopRoutePlateQuery = gql`
                     nodes {
                       routeId
                       pickupDropoffType
-                      viaFi
-                      viaSe
+                      plateViaFi
+                      plateViaSe
                       hasRegularDayDepartures
                       dateBegin
                       dateEnd
@@ -147,8 +147,8 @@ const lineQueryStopRoutePlateQuery = gql`
                     nodes {
                       routeId
                       pickupDropoffType
-                      viaFi
-                      viaSe
+                      plateViaFi
+                      plateViaSe
                       hasRegularDayDepartures
                       dateBegin
                       dateEnd
@@ -199,11 +199,11 @@ const compareSimilarRoutes = (routeA, routeB) => {
     );
     if (!isSameWithoutWhitespace) isSameRoute = false;
   }
-  if (routeA.viaFi !== routeB.viaFi) {
-    if (!compareWithoutWhitespace(routeA.viaFi, routeB.viaFi)) isSameRoute = false;
+  if (routeA.plateViaFi !== routeB.plateViaFi) {
+    if (!compareWithoutWhitespace(routeA.plateViaFi, routeB.plateViaFi)) isSameRoute = false;
   }
-  if (routeA.viaSe !== routeB.viaSe) {
-    if (!compareWithoutWhitespace(routeA.viaSe, routeB.viaSe)) isSameRoute = false;
+  if (routeA.plateViaSe !== routeB.plateViaSe) {
+    if (!compareWithoutWhitespace(routeA.plateViaSe, routeB.plateViaSe)) isSameRoute = false;
   }
 
   return isSameRoute;
@@ -311,8 +311,8 @@ const deepCompareRoutePlates = (a, b) => {
   const bRoute = b.route?.nodes[0];
   return (
     a.routeId === b.routeId &&
-    a.viaFi === b.viaFi &&
-    a.viaSe === b.viaSe &&
+    a.plateViaFi === b.plateViaFi &&
+    a.plateViaSe === b.plateViaSe &&
     aRoute.destinationFi === bRoute.destinationFi &&
     aRoute.destinationSe === bRoute.destinationSe
   );
