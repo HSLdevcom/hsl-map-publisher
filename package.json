@@ -105,7 +105,7 @@
     "koa-session": "^5.10.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
-    "node-fetch": "^1.7.3",
+    "node-fetch": "^3.3.2",
     "p-map": "^1.2.0",
     "pdf-merger-js": "^3.4.0",
     "pg": "^8.7.3",
