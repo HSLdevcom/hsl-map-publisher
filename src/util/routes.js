@@ -55,18 +55,36 @@ function truncate(node) {
  * @param {Array} routes
  * @returns {Object}
  */
-function routesToTree(routes, { stopZone, shortId }, height = 'auto') {
+function routesToTree(routes, { stopZone, shortId }, height = 'auto', width = MAX_WIDTH) {
   const currentZone = stopZone;
 
   const itemLists = routes.map(route =>
     route.stops.map((stop, index, stops) => {
-      const item = { ...stop, type: 'stop', zone: stop.stopZone };
+      const item = {
+        ...stop,
+        type: 'stop',
+        zone: stop.stopZone,
+        routeSegments: stop.routeSegments.nodes.map(segment => {
+          let trunkRoute;
+          try {
+            trunkRoute = segment.line.nodes[0].trunkRoute === '1';
+          } catch (e) {
+            trunkRoute = false;
+          }
+
+          return {
+            ...segment,
+            trunkRoute,
+          };
+        }),
+      };
       if (index === stops.length - 1) {
         item.destinations = [
           {
             routeId: route.routeId,
             titleFi: route.destinationFi,
             titleSe: route.destinationSe,
+            trunkRoute: route.trunkRoute,
           },
         ];
       }
@@ -94,7 +112,7 @@ function routesToTree(routes, { stopZone, shortId }, height = 'auto') {
 
   generalizeTree(root, {
     height,
-    width: MAX_WIDTH,
+    width: width || MAX_WIDTH,
     prune,
     truncate,
   });
@@ -103,6 +121,8 @@ function routesToTree(routes, { stopZone, shortId }, height = 'auto') {
   return root;
 }
 
-export {
-  routesToTree, // eslint-disable-line import/prefer-default-export
-};
+function shortenTrainParsedLineId(lineId) {
+  return lineId.replace(/^\d/, '');
+}
+
+export { routesToTree, shortenTrainParsedLineId };

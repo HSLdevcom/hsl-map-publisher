@@ -1,30 +1,26 @@
+/* eslint-disable no-await-in-loop */
 const fs = require('fs-extra');
 const path = require('path');
 const puppeteer = require('puppeteer');
 const qs = require('qs');
-const { promisify } = require('util');
-const { spawn } = require('child_process');
 const log = require('./util/log');
-const get = require('lodash/get');
 const { uploadPosterToCloud } = require('./cloudService');
+const moment = require('moment');
 
-const { AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_KEY } = require('../constants');
+const { AZURE_STORAGE_ACCOUNT, AZURE_STORAGE_KEY, PUBLISHER_RENDER_URL } = require('../constants');
 
-const CLIENT_URL = 'http://localhost:5000';
 const RENDER_TIMEOUT = 10 * 60 * 1000;
+const PDF_TIMEOUT = 5 * 60 * 1000;
 const MAX_RENDER_ATTEMPTS = 3;
 const SCALE = 96 / 72;
 
 let browser = null;
-let previous = Promise.resolve();
 const cwd = process.cwd();
 
-const pdfOutputDir = path.join(cwd, 'output');
-const concatOutputDir = path.join(pdfOutputDir, 'concatenated');
+const fileOutputDir = path.join(cwd, 'output');
 
-fs.ensureDirSync(concatOutputDir);
-
-const pdfPath = id => path.join(pdfOutputDir, `${id}.pdf`);
+const pdfPath = id => path.join(fileOutputDir, `${id}.pdf`);
+const csvPath = id => path.join(fileOutputDir, `${id}.csv`);
 
 async function initialize() {
   browser = await puppeteer.launch({
@@ -35,8 +31,42 @@ async function initialize() {
   });
 }
 
+function generateRenderUrl(component, template, props, id) {
+  const generationProps = props.date
+    ? props
+    : Object.assign(props, { date: moment(Date()).format('YYYY-MM-DD') }); // Add current date by default if request props do not contain it
+
+  if (id && component === 'StopRoutePlate') {
+    // This is needed to pass the component the same ID as the poster generation, so the filename can be assigned as that.
+    generationProps.csvFileName = id;
+    delete generationProps.stopIds; // Remove stopIds from props, since they are fetched from the server due to possibly very large size.
+  }
+
+  const encodedProps = qs.stringify(
+    { component, props: generationProps, template, id },
+    { arrayFormat: 'brackets' },
+  );
+  const pageUrl = `${PUBLISHER_RENDER_URL}/?${encodedProps}`;
+  return pageUrl;
+}
+
+async function sleep(millis) {
+  return new Promise(resolve => setTimeout(resolve, millis));
+}
+
+async function waitFile(filePath) {
+  let fileFinishedDownloading = false;
+
+  for (fileFinishedDownloading; !fileFinishedDownloading; ) {
+    await sleep(1000);
+    fileFinishedDownloading = fs.existsSync(filePath);
+  }
+
+  return true;
+}
+
 /**
- * Renders component to PDF file
+ * Renders component to PDF or CSV file
  * @returns {Promise}
  */
 async function renderComponent(options) {
@@ -52,16 +82,38 @@ async function renderComponent(options) {
     onError(error);
   });
 
-  page.on('console', ({ type, text }) => {
-    if (['error', 'warning', 'log'].includes(type)) {
-      onInfo(`Console(${type}): ${text}`);
+  page.on('console', message => {
+    const { url, lineNumber, columnNumber } = message.location();
+    if (['error', 'warning', 'log'].includes(message.type())) {
+      onInfo(
+        `Console(${message.type()}) on (${url}:${lineNumber}:${columnNumber}):\n${message.text()}`,
+      );
     }
   });
 
-  const encodedProps = qs.stringify({ component, props, template });
-  const pageUrl = `${CLIENT_URL}/?${encodedProps}`;
+  const pageUrl = generateRenderUrl(component, template, props, id);
 
   console.log(`Opening ${pageUrl} in Puppeteer.`);
+
+  if (component === 'StopRoutePlate' && (props.downloadTable || props.downloadSummary)) {
+    // Allow the downloading of CSV file since the component just sends it to the client instead of actually rendering
+    await page._client.send('Page.setDownloadBehavior', {
+      behavior: 'allow',
+      downloadPath: fileOutputDir,
+    });
+
+    const csvFilePath = props.downloadSummary ? csvPath(`summary-${id}`) : csvPath(id);
+
+    try {
+      await page.goto(pageUrl);
+      await waitFile(csvFilePath);
+      const posterUploaded = await uploadPosterToCloud(csvFilePath);
+      await page.close();
+      return posterUploaded;
+    } catch (err) {
+      throw new Error('StopRoutePlate CSV rendering failed');
+    }
+  }
 
   await page.goto(pageUrl, {
     timeout: RENDER_TIMEOUT,
@@ -78,14 +130,22 @@ async function renderComponent(options) {
     throw new Error(error);
   }
 
-  await page.emulateMedia('screen');
+  await page.emulateMediaType('screen');
 
   let printOptions = {};
-  if (props.printTimetablesAsA4) {
+  if (props.printTimetablesAsA4 || component === 'CoverPage') {
     printOptions = {
       printBackground: true,
       format: 'A4',
       margin: 0,
+      timeout: PDF_TIMEOUT,
+    };
+  } else if (props.printAsA5) {
+    printOptions = {
+      printBackground: true,
+      format: 'A5',
+      margin: 0,
+      timeout: PDF_TIMEOUT,
     };
   } else {
     printOptions = {
@@ -107,7 +167,7 @@ async function renderComponent(options) {
   return posterUploaded;
 }
 
-async function renderComponentRetry(options) {
+async function generate(options) {
   const { onInfo, onError } = options;
 
   for (let i = 0; i < MAX_RENDER_ATTEMPTS; i++) {
@@ -136,92 +196,13 @@ async function renderComponentRetry(options) {
     } catch (error) {
       onError(error);
     }
-    /* eslint-enable no-await-in-loop */
   }
 
   return { success: false };
 }
 
-/**
- * Adds component to render queue
- * @param {Object} options
- * @param {string} options.id - Unique id
- * @param {string} options.component - React component to render
- * @param {Object} options.props - Props to pass to component
- * @param {function} options.onInfo - Callback (string)
- * @param {function} options.onError - Callback (Error)
- * @returns {Promise} - Always resolves with { success }
- */
-function generate(options) {
-  previous = previous.then(() => renderComponentRetry(options));
-  return previous;
-}
-
-/**
- * Concatenates posters to a multi-page PDF
- * @param {string[]} ids - Ids to concatate
- * @returns {Readable} - PDF stream
- * @param ids
- * @param title
- */
-async function concatenate(ids, title) {
-  const concatFolderExists = await fs.pathExists(concatOutputDir);
-  if (!concatFolderExists) {
-    fs.ensureDirSync(concatOutputDir);
-  }
-
-  const filenames = ids.map(id => pdfPath(id));
-  const parsedTitle = title.replace('/', '');
-  const filepath = path.join(concatOutputDir, `${parsedTitle}.pdf`);
-  const fileExists = await fs.pathExists(filepath);
-
-  if (!fileExists) {
-    return new Promise((resolve, reject) => {
-      const pdftk = spawn('pdftk', [...filenames, 'cat', 'output', filepath]);
-
-      pdftk.on('error', err => {
-        reject(err);
-      });
-
-      pdftk.on('close', code => {
-        if (code === 0) {
-          resolve(filepath);
-        } else {
-          reject(new Error(`PDFTK closed with code ${code}`));
-        }
-      });
-    });
-  }
-
-  return filepath;
-}
-
-async function removeFiles(ids) {
-  if (!AZURE_STORAGE_ACCOUNT || !AZURE_STORAGE_KEY) {
-    console.log('Azure credentials not set. Not removing files.');
-    return;
-  }
-  const filenames = ids.map(id => pdfPath(id));
-  const removePromises = [];
-
-  filenames.forEach(filename => {
-    const createPromise = async () => {
-      try {
-        await fs.remove(filename);
-      } catch (err) {
-        console.log(`Pdf ${filename} removal unsuccessful.`);
-        console.error(err);
-      }
-    };
-
-    removePromises.push(createPromise());
-  });
-
-  await Promise.all(removePromises);
-}
-
 module.exports = {
   generate,
-  concatenate,
-  removeFiles,
+  generateRenderUrl,
+  csvPath,
 };

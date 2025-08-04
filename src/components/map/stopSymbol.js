@@ -1,39 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { isTrunkRoute, colorsByMode } from 'util/domain';
+import { colorsByMode } from 'util/domain';
+
+import styles from './stopLabel.css';
 
 const strokeWidth = 5;
 
 const StopSymbol = props => {
   const modes = [...new Set(props.routes.map(({ mode }) => mode))];
   const colors = [];
-
-  if (props.routes.some(({ routeId }) => isTrunkRoute(routeId))) {
+  if (props.routes.some(route => route.trunkRoute)) {
     colors.push(colorsByMode.TRUNK);
   }
-  if (modes.includes('TRAM')) {
-    colors.push(colorsByMode.TRAM);
-  }
-  if (modes.includes('RAIL')) {
-    colors.push(colorsByMode.RAIL);
-  }
-  if (modes.includes('SUBWAY')) {
-    colors.push(colorsByMode.SUBWAY);
-  }
-  if (modes.includes('FERRY')) {
-    colors.push(colorsByMode.FERRY);
-  }
-  if (modes.includes('BUS') && props.routes.some(({ routeId }) => !isTrunkRoute(routeId))) {
-    colors.push(colorsByMode.BUS);
-  }
+  modes.forEach(mode => {
+    colors.push(colorsByMode[mode]);
+  });
+
+  const maxRadius = props.size / 2 - (strokeWidth / 2) * (4 - colors.length);
 
   const outlines = colors.map((color, index) => {
-    const maxRadius = props.size / 2 - (strokeWidth / 2) * (4 - colors.length);
     const radius = maxRadius - index * (strokeWidth + 1);
     return { color, radius };
   });
-
   return (
     <svg width={props.size} height={props.size} style={{ display: 'block' }}>
       <circle cx={props.size / 2} cy={props.size / 2} r={outlines[0].radius} fill="#fff" />
@@ -48,12 +37,28 @@ const StopSymbol = props => {
           fill="none"
         />
       ))}
+      <text
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fontWeight="bold"
+        className={styles.route}
+        x={props.size / 2}
+        y={props.size / 2 + 1}
+        fill={colors.pop()}
+        fontSize="10.5">
+        {props.platform}
+      </text>
     </svg>
   );
 };
 
+StopSymbol.defaultProps = {
+  platform: null,
+};
+
 StopSymbol.propTypes = {
   size: PropTypes.number.isRequired,
+  platform: PropTypes.string,
   routes: PropTypes.arrayOf(
     PropTypes.shape({
       routeId: PropTypes.string.isRequired,

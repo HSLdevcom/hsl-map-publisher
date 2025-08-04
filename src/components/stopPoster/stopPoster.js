@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { hot } from 'react-hot-loader';
 import { get, cloneDeep } from 'lodash';
 import { JustifiedColumn, Spacer } from 'components/util';
 import renderQueue from 'util/renderQueue';
@@ -27,7 +26,12 @@ const ROUTE_DIAGRAM_MIN_HEIGHT = 10;
 
 const trunkStopStyle = {
   '--background': colorsByMode.TRUNK,
-  '--light-background': '#FFE0D1',
+  '--light-background': colorsByMode.LIGHT_TRUNK,
+};
+
+const lighRailStyle = {
+  '--background': colorsByMode.L_RAIL,
+  '--light-background': colorsByMode.LIGHT_L_RAIL,
 };
 
 const defaultDiagramOptions = {
@@ -58,9 +62,6 @@ class StopPoster extends Component {
       adsPhase: false,
       diagramOptions: defaultDiagramOptions,
     };
-  }
-
-  componentWillMount() {
     renderQueue.add(this);
   }
 
@@ -72,7 +73,9 @@ class StopPoster extends Component {
       try {
         // This url will probably always be the same. If you find yourself
         // changing it, please make an .env setup while you're at it.
-        templateReq = await window.fetch(`http://localhost:4000/templates/${this.props.template}`);
+        templateReq = await window.fetch(
+          `${process.env.REACT_APP_PUBLISHER_SERVER_URL}/templates/${this.props.template}`,
+        );
         templateBody = await templateReq.json();
       } catch (err) {
         this.onError(err);
@@ -193,6 +196,11 @@ class StopPoster extends Component {
         // TODO: This is kind of dirty fix. Binarysearch to get acceptable
         // height for routetree.
         const { diagramOptions } = this.state;
+
+        if (diagramOptions.heightValues.length === 0) {
+          this.setState({ hasDiagram: false });
+          return;
+        }
         diagramOptions.binarySearching = true;
         diagramOptions.middleHeightValue =
           diagramOptions.heightValues[Math.floor(diagramOptions.heightValues.length / 2)];
@@ -308,6 +316,8 @@ class StopPoster extends Component {
       shortId,
       stopId,
       isTrunkStop,
+      isTramStop,
+      isLightRail,
       hasRoutes: hasRoutesProp,
       date,
       isSummerTimetable,
@@ -315,10 +325,11 @@ class StopPoster extends Component {
       dateEnd,
       mapZoneSymbols,
       mapZones,
+      salesPoint,
       minimapZoneSymbols,
       minimapZones,
+      legend,
     } = this.props;
-
     if (!hasRoutesProp) {
       return null;
     }
@@ -334,11 +345,11 @@ class StopPoster extends Component {
       hasColumnTimetable,
     } = this.state;
 
-    const { isTramStop } = this.props;
     const src = get(template, 'areas', []).find(t => t.key === 'tram');
     const tramImage = get(src, 'slots[0].image.svg', '');
-    let useDiagram = hasDiagram || (hasDiagram && isTramStop && !tramImage);
-    if (isTramStop && tramImage) useDiagram = false;
+    // Use diagram, if it's available, except on tram and lightrail stops with tramimage
+    const useTramDiagram = (isTramStop || isLightRail) && tramImage;
+    const useDiagram = hasDiagram && !useTramDiagram;
 
     const StopPosterTimetable = props => (
       <div className={styles.timetable}>
@@ -352,13 +363,21 @@ class StopPoster extends Component {
           showNotes={!props.hideDetails}
           showComponentName={!props.hideDetails}
           segments={props.segments}
+          routeFilter={props.routeFilter}
         />
       </div>
     );
 
+    let alternativeStyle = null;
+    if (isTrunkStop) {
+      alternativeStyle = trunkStopStyle;
+    }
+    if (isLightRail) {
+      alternativeStyle = lighRailStyle;
+    }
     return (
       <CropMarks>
-        <div className={styles.root} style={isTrunkStop ? trunkStopStyle : null}>
+        <div className={styles.root} style={alternativeStyle}>
           <JustifiedColumn>
             <Header stopId={stopId} />
             <div
@@ -367,14 +386,25 @@ class StopPoster extends Component {
                 this.content = ref;
               }}>
               <Spacer width="100%" height={50} />
-              {hasRoutes && hasRoutesOnTop && <Routes stopId={stopId} date={date} />}
+              {hasRoutes && hasRoutesOnTop && (
+                <Routes stopId={stopId} date={date} routeFilter={this.props.routeFilter} />
+              )}
               {hasRoutes && hasRoutesOnTop && <Spacer height={10} />}
               <div className={styles.columns}>
                 <div className={hasStretchedLeftColumn ? styles.leftStretched : styles.left}>
-                  {hasRoutes && !hasRoutesOnTop && <Routes stopId={stopId} date={date} />}
+                  {hasRoutes && !hasRoutesOnTop && (
+                    <Routes stopId={stopId} date={date} routeFilter={this.props.routeFilter} />
+                  )}
                   {hasRoutes && !hasRoutesOnTop && <Spacer height={10} />}
-                  {hasColumnTimetable && <StopPosterTimetable />}
-                  {!hasColumnTimetable && <StopPosterTimetable segments={['weekdays']} />}
+                  {hasColumnTimetable && (
+                    <StopPosterTimetable routeFilter={this.props.routeFilter} />
+                  )}
+                  {!hasColumnTimetable && (
+                    <StopPosterTimetable
+                      segments={['weekdays']}
+                      routeFilter={this.props.routeFilter}
+                    />
+                  )}
                   {/* The key will make sure the ad container updates its size if the layout changes */}
                   <AdContainer
                     key={`poster_ads_${hasRoutes}${hasRoutesOnTop}${hasStretchedLeftColumn}${useDiagram}`}
@@ -395,9 +425,17 @@ class StopPoster extends Component {
                     <div className={styles.right} ref={measureRef}>
                       {!hasColumnTimetable && (
                         <div className={styles.timetables}>
-                          <StopPosterTimetable segments={['saturdays']} hideDetails />
+                          <StopPosterTimetable
+                            segments={['saturdays']}
+                            hideDetails
+                            routeFilter={this.props.routeFilter}
+                          />
                           <Spacer width={10} />
-                          <StopPosterTimetable segments={['sundays']} hideDetails />
+                          <StopPosterTimetable
+                            segments={['sundays']}
+                            hideDetails
+                            routeFilter={this.props.routeFilter}
+                          />
                         </div>
                       )}
                       {!useDiagram && <Spacer height={10} />}
@@ -416,8 +454,10 @@ class StopPoster extends Component {
                           }
                           mapZoneSymbols={mapZoneSymbols}
                           mapZones={mapZones}
+                          showSalesPoint={salesPoint}
                           minimapZoneSymbols={minimapZoneSymbols}
                           minimapZones={minimapZones}
+                          legend={legend}
                         />
                       )}
 
@@ -425,11 +465,12 @@ class StopPoster extends Component {
                       {useDiagram && (
                         <RouteDiagram
                           height={this.state.diagramOptions.diagramStopCount}
-                          stopId={stopId}
+                          stopIds={[stopId]}
                           date={date}
+                          routeFilter={this.props.routeFilter}
                         />
                       )}
-                      {isTramStop && tramImage && <TramDiagram svg={tramImage} />}
+                      {useTramDiagram && <TramDiagram svg={tramImage} />}
                     </div>
                   )}
                 </Measure>
@@ -458,13 +499,17 @@ StopPoster.propTypes = {
   dateEnd: PropTypes.string,
   hasRoutes: PropTypes.bool.isRequired,
   isTrunkStop: PropTypes.bool.isRequired,
+  isLightRail: PropTypes.bool.isRequired,
   isTramStop: PropTypes.bool.isRequired,
   shortId: PropTypes.string.isRequired,
   template: PropTypes.any.isRequired,
   mapZoneSymbols: PropTypes.bool,
   mapZones: PropTypes.bool,
+  salesPoint: PropTypes.bool,
   minimapZoneSymbols: PropTypes.bool,
   minimapZones: PropTypes.bool,
+  routeFilter: PropTypes.string,
+  legend: PropTypes.bool,
 };
 
 StopPoster.defaultProps = {
@@ -473,8 +518,11 @@ StopPoster.defaultProps = {
   dateEnd: null,
   mapZoneSymbols: false,
   mapZones: false,
+  salesPoint: false,
   minimapZoneSymbols: false,
   minimapZones: false,
+  routeFilter: '',
+  legend: false,
 };
 
-export default hot(module)(StopPoster);
+export default StopPoster;

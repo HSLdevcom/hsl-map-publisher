@@ -126,6 +126,100 @@ InlineSVG.propTypes = {
   src: PropTypes.string.isRequired,
 };
 
+const PrintButton = lang => {
+  const PRINT_TEXT = {
+    fi: 'TULOSTA AIKATAULU',
+    sv: 'SKRIV UT TIDTABEL',
+    en: 'PRINT SCHEDULE',
+  };
+
+  return (
+    <div className={styles.noPrint}>
+      <button className={styles.printBtn} type="button" onClick={window.print}>
+        {PRINT_TEXT[lang.lang]}
+      </button>
+    </div>
+  );
+};
+
+PrintButton.propTypes = {
+  lang: PropTypes.string.isRequired,
+};
+
+const PlatformSymbol = ({ platform, size, color }) => (
+  <svg className={styles.PScontainer} width={size} height={size}>
+    <circle
+      className={styles.PScircle}
+      style={{ stroke: color }}
+      cx={size / 2}
+      cy={size / 2}
+      r={size / 2 - 2}
+    />
+    <text
+      className={styles.PStext}
+      style={{ fill: color }}
+      x={size / 2}
+      y={size / 2}
+      fontSize={size / 2}>
+      {platform}
+    </text>
+  </svg>
+);
+
+const translations = {
+  fi: {
+    mondays: 'Maanantai',
+    tuesdays: 'Tiistai',
+    wednesdays: 'Keskiviikko',
+    thursdays: 'Torstai',
+    fridays: 'Perjantai',
+    saturdays: 'Lauantai',
+    sundays: 'Sunnuntai',
+  },
+  sv: {
+    mondays: 'Måndag',
+    tuesdays: 'Tisdag',
+    wednesdays: 'Onsdag',
+    thursdays: 'Torsdag',
+    fridays: 'Fredag',
+    saturdays: 'Lördag',
+    sundays: 'Söndag',
+  },
+  en: {
+    mondays: 'Monday',
+    tuesdays: 'Tuesday',
+    wednesdays: 'Wednesday',
+    thursdays: 'Thursday',
+    fridays: 'Friday',
+    saturdays: 'Saturday',
+    sundays: 'Sunday',
+  },
+};
+
+const getWeekdayName = (dayName, lang = 'en') => {
+  let selectedLanguage = lang;
+  if (!translations[selectedLanguage]) {
+    console.warn(`Language ${lang} not supported. Falling back to English.`);
+    selectedLanguage = 'en';
+  }
+  if (!translations[selectedLanguage][dayName]) {
+    console.warn(`Day name ${dayName} not supported.`);
+    return null;
+  }
+  return translations[selectedLanguage][dayName];
+};
+
+PlatformSymbol.propTypes = {
+  platform: PropTypes.string.isRequired,
+  size: PropTypes.number,
+  color: PropTypes.string,
+};
+
+PlatformSymbol.defaultProps = {
+  size: 40,
+  color: undefined, // The default is the bus color (comes from css)
+};
+
 export {
   Row,
   JustifiedRow,
@@ -136,4 +230,7 @@ export {
   Spacer,
   FlexSpacer,
   InlineSVG,
+  PlatformSymbol,
+  getWeekdayName,
+  PrintButton,
 };

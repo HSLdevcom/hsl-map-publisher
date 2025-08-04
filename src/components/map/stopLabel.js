@@ -18,19 +18,22 @@ const mapRoutesByDestination = routes => {
     const key = `${route.destinationFi}${route.viaFi}`;
     if (!routeSet[key]) {
       const newRoute = route;
-      newRoute.routeIds = [route.routeId];
+      newRoute.routeIds = [{ routeId: route.routeId, trunkRoute: route.trunkRoute }];
       routeSet[key] = newRoute;
     } else {
       const newRouteIds = routeSet[key].routeIds;
-      newRouteIds.push(route.routeId);
+      newRouteIds.push({ routeId: route.routeId, trunkRoute: route.trunkRoute });
       routeSet[key].routeIds = newRouteIds;
     }
   });
   return Object.values(routeSet);
 };
 
-const routeIdsComponent = (routeId, mode, isNewLine, content) => (
-  <span className={styles.route} key={routeId} style={{ color: getColor({ routeId, mode }) }}>
+const routeIdsComponent = (routeId, mode, isNewLine, content, trunkRoute) => (
+  <span
+    className={styles.route}
+    key={routeId}
+    style={{ color: getColor({ routeId, mode, trunkRoute }) }}>
     {isNewLine && <br />}
     {content}
   </span>
@@ -39,7 +42,7 @@ const routeIdsComponent = (routeId, mode, isNewLine, content) => (
 const routeIdComponentWidth = routes => {
   let chars = 0;
   routes.forEach(route => {
-    const routeId = route.routeIds[0];
+    const { routeId } = route.routeIds[0];
     if (route.routeIds.length < 2 && routeId.length > chars) {
       chars = routeId.length;
     }
@@ -58,7 +61,7 @@ const RouteList = props => {
           const content = `${route.routeId}${index < routes.length - 1 ? ', ' : ''}`;
           const isNewLine = rowLength + content.length > MAX_LABEL_CHARS;
           rowLength = isNewLine ? content.length : rowLength + content.length;
-          return routeIdsComponent(route.routeId, route.mode, isNewLine, content);
+          return routeIdsComponent(route.routeId, route.mode, isNewLine, content, route.trunkRoute);
         })}
       </div>
     );
@@ -75,11 +78,11 @@ const RouteList = props => {
             <div
               key={index}
               style={route.routeIds.length > 1 ? { width: 'auto' } : { width: `${width}px` }}>
-              {route.routeIds.map((routeId, i) => {
+              {route.routeIds.map(({ routeId, trunkRoute }, i) => {
                 const content = `${routeId}${i < route.routeIds.length - 1 ? ', ' : ''}`;
                 const isNewLine = rowLength + content.length > MAX_ROUTEID_CHARS;
                 rowLength = isNewLine ? content.length : rowLength + content.length;
-                return routeIdsComponent(routeId, route.mode, isNewLine, content);
+                return routeIdsComponent(routeId, route.mode, isNewLine, content, trunkRoute);
               })}
             </div>
             <Spacer width={6} />

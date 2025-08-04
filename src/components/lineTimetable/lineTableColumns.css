@@ -1,0 +1,67 @@
+.departureRowContainer {
+  max-width: 420px;
+  min-width: 120px;
+  margin: 0.5rem 0;
+}
+
+.breakContainer {
+  display: block;
+  break-inside: avoid;
+}
+
+.departureRow {
+  font-size: 1rem;
+  margin-left: 1.6rem;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  height: 35px;
+  break-inside: avoid;
+}
+
+.departureColumnContainer {
+  align-items: normal;
+  min-width: 100px;
+  max-width: 350px;
+}
+
+.tableContainer {
+  display: flex;
+  margin-top: 1.3rem;
+}
+
+.wider {
+  min-width: 270px;
+}
+
+.hour {
+  font-family: GothamXNarrow-Medium;
+  font-size: 15px;
+  width: 1.5rem;
+  margin-right: 0.5em;
+  break-inside: avoid;
+}
+
+.minutesContainer {
+  max-width: 400px;
+  display: flex;
+  flex-wrap: wrap;
+  break-inside: avoid;
+}
+
+.minutes {
+  display: flex;
+  min-width: 0.9em;
+  font-family: GothamXNarrow-Book;
+  font-size: 12px;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-right: 0.2em;
+}
+
+.divider {
+  border-right: 2px solid #3333338a;
+}
+
+.departureRowContainer > *:nth-child(even) {
+  background-color: #eaeaea;
+}

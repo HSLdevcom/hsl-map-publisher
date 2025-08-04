@@ -14,14 +14,8 @@ const hocFactory = propName => WrappedComponent =>
       }
     }
 
-    componentWillReceiveProps(nextProps) {
-      if (nextProps[propName] && nextProps[propName] !== this.props[propName]) {
-        this.setState({ loading: true });
-        this.handlePromise(nextProps[propName]);
-      }
-    }
-
     componentWillUnmount() {
+      renderQueue.remove(this.promise);
       this.promise = null;
     }
 

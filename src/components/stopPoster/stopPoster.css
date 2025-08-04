@@ -34,12 +34,12 @@
 
 .left {
   composes: column;
-  width: 689px;
+  width: 639px;
 }
 
 .leftStretched {
   composes: column;
-  width: 820px;
+  width: 780px;
 }
 
 .right {
@@ -68,4 +68,20 @@
 
 .timetables > .timetable {
   flex: 1 0 0;
+}
+
+/*
+ Poster 700 x 1000mm / 1984px x 2835px @ 72 ppi
+*/
+.smallTerminalPoster {
+  width: calc(1984px + 30px);
+  height: calc(2835px + 30px);
+}
+
+.smallTerminalPoster .left {
+  width: 570px;
+}
+
+.smallTerminalPoster .leftStretched {
+  width: 670px;
 }

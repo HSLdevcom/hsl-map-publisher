@@ -1,0 +1,71 @@
+.timetableDays {
+  margin: 0 1rem 1rem 1.2rem;
+  font-size: 0.8em;
+  font-family: GothamRounded-Book;
+  word-wrap: break-word;
+}
+
+.timetableDates {
+  margin: 0 1rem 1rem 2rem;
+  font-size: 0.8em;
+  font-family: GothamRounded-Book;
+}
+
+.footnote {
+  padding: 0.125em 0.625em;
+  font-family: GothamRounded-Book;
+  font-size: 0.813em;
+}
+
+.pageBreak {
+  break-inside: auto;
+}
+
+.timetableDivider {
+  margin-top: 1rem;
+  width: 100%;
+  border-bottom: 2px dotted gray;
+}
+
+.timetableContainer {
+  display: block;
+}
+
+.fridayNote {
+  margin-left: 1.5rem;
+  font-family: GothamRounded-Book;
+  font-size: 12px;
+}
+
+.notesContainer {
+  margin: 0.5rem 0 1rem 0.5rem;
+}
+
+.pageNumber {
+  font-family: GothamRounded-Medium;
+  font-size: 16px;
+  color: black;
+  position: absolute;
+  left: 680px;
+  right: 30px;
+  width: fit-content;
+  height: fit-content;
+}
+
+.printBtnContainer {
+  position: absolute;
+  left: 680px;
+  top: 20px;
+}
+
+@media print {
+  .noPrint,
+  .noPrint * {
+    display: none !important;
+  }
+
+  .timetableContainer,
+  .timetableContainer * {
+    break-inside: avoid;
+  }
+}
