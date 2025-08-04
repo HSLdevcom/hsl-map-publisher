@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 
-import { iconsByMode, trimRouteId, routeGeneralizer } from 'util/domain';
+import { iconsByMode, trimRouteId, routeGeneralizer, getColor } from 'util/domain';
 import { Column, InlineSVG } from 'components/util';
 import styles from './stop.css';
 
@@ -21,15 +22,21 @@ class Stop extends Component {
 
   getTerminalAreaRoutes = props => {
     const routes = [];
-    props.routeSegments.nodes.forEach(segment => {
-      const routeId = trimRouteId(segment.routeId);
-      if (!props.destinationRouteIds.includes(routeId) && segment.hasRegularDayDepartures) {
-        if (!routes.includes(routeId)) {
-          routes.push(routeId);
+    const trunkRoutes = [];
+    props.routeSegments
+      .filter(segment => ['BUS', 'TRAM'].includes(segment.route.nodes[0].mode)) // Assume only one mode for a route
+      .forEach(segment => {
+        const routeId = trimRouteId(segment.routeId);
+        if (!props.destinationRouteIds.includes(routeId) && segment.hasRegularDayDepartures) {
+          if (!routes.includes(routeId)) {
+            routes.push(routeId);
+            if (segment.trunkRoute) {
+              trunkRoutes.push(routeId);
+            }
+          }
         }
-      }
-    });
-    return routeGeneralizer(routes);
+      });
+    return { routes: routeGeneralizer(routes), trunkRoutes };
   };
 
   render() {
@@ -37,17 +44,25 @@ class Stop extends Component {
     if (metroRegexp.test(this.props.nameFi)) modes.add('SUBWAY');
     this.props.transferModes.forEach(mode => modes.add(mode));
 
-    const terminalAreaRoutes = this.getTerminalAreaRoutes(this.props);
+    const terminalAreaRouteList = this.getTerminalAreaRoutes(this.props);
+    const terminalAreaRoutes = terminalAreaRouteList.routes.map((route, index) => {
+      return {
+        text: route.text,
+        trunkRoute: terminalAreaRouteList.trunkRoutes.includes(route.text),
+      };
+    });
     if (terminalAreaRoutes.length - 1 >= MAX_TERMINAL_ROUTE_DIVS) {
       terminalAreaRoutes.length = MAX_TERMINAL_ROUTE_DIVS;
       terminalAreaRoutes.push({ text: '...' });
     }
 
-    const terminalAreaRouteDivs = terminalAreaRoutes.map((item, index) => (
-      <span key={index} className={styles.routeContainer}>
-        {item.text}
-      </span>
-    ));
+    const terminalAreaRouteDivs = terminalAreaRoutes.map((item, index) => {
+      return (
+        <span key={index} className={styles.routeContainer} style={{ color: getColor(item) }}>
+          {item.text}
+        </span>
+      );
+    });
 
     const showTerminalAreaRoutesContainer =
       terminalAreaRouteDivs.length > 0 && this.props.terminalId;
@@ -57,7 +72,9 @@ class Stop extends Component {
         ref={divElement => {
           this.divElement = divElement;
         }}
-        className={styles.root}>
+        className={classNames(styles.root, {
+          [styles.compact]: this.props.useCompactLayout,
+        })}>
         <div className={styles.left} />
         <div className={styles.separator}>
           <div
@@ -90,7 +107,10 @@ class Stop extends Component {
             ))}
           </div>
           {showTerminalAreaRoutesContainer && (
-            <div>
+            <div
+              className={classNames({
+                [styles.compactRoutes]: this.props.useCompactLayout,
+              })}>
               <div className={styles.terminalAreaRoutesTitle}>Linjat / Linjerna / Lines</div>
               <div className={styles.terminalAreaRoutesContainer}>{terminalAreaRouteDivs}</div>
             </div>
@@ -105,6 +125,7 @@ Stop.defaultProps = {
   nameSe: null,
   destinationRouteIds: [],
   terminalId: null,
+  useCompactLayout: false,
 };
 
 Stop.propTypes = {
@@ -117,6 +138,7 @@ Stop.propTypes = {
   destinationRouteIds: PropTypes.array,
   transferModes: PropTypes.arrayOf(PropTypes.oneOf(['BUS', 'TRAM', 'FERRY', 'RAIL', 'SUBWAY']))
     .isRequired,
+  useCompactLayout: PropTypes.bool,
 };
 
 export default Stop;

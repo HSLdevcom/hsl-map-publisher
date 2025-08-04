@@ -1,0 +1,42 @@
+/*
+ Poster 810mm x 1210mm / 31.89in x 47.64in / 2296px x 3430px @ 72 ppi
+ 72 DPI: 842 x 1,191 pixels
+ Bleed 5mm / 15 px @ 72 ppi
+*/
+
+.root {
+  width: 1191px;
+  height: 842px;
+  padding: 1px;
+  color: white;
+  background: var(--background);
+  box-sizing: border-box;
+}
+
+.content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-flow: column;
+  overflow: hidden;
+}
+
+.columns {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+}
+
+.timetables {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+}
+
+.timetablesContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  /* padding-top: 10px; */
+}

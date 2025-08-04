@@ -1,0 +1,27 @@
+.header {
+  display: flex;
+  margin-bottom: 1rem;
+  word-wrap: break-word;
+  break-inside: avoid;
+  break-after: avoid;
+}
+
+.lineId {
+  font-size: 2rem;
+  margin: 2rem 2rem 0 2rem;
+  font-family: GothamRounded-Medium;
+}
+
+.nameContainer {
+  padding-top: 2rem;
+}
+
+.lineName {
+  font-size: 20px;
+  font-family: GothamRounded-Medium;
+}
+
+.lineNameSecondary {
+  font-size: 20px;
+  font-family: GothamRounded-Book;
+}

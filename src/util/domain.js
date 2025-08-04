@@ -4,13 +4,24 @@ import railIcon from 'icons/icon_rail.svg';
 import subwayIcon from 'icons/icon_subway.svg';
 import ferryIcon from 'icons/icon_ferry.svg';
 import trunkIcon from 'icons/icon_trunk.svg';
+import lRailIcon from 'icons/icon_L_rail.svg';
 
 import zoneByShortId from 'data/zoneByShortId';
+import { weekdays } from 'moment/moment';
 
-const TRUNK_ROUTES = ['550', '560', '500', '510', '200', '570'];
+// TODO: Get routes from api?
 const RAIL_ROUTE_ID_REGEXP = /^300[12]/;
 const SUBWAY_ROUTE_ID_REGEXP = /^31/;
 const U_LINE_REGEX = /^7/;
+
+const scheduleSegments = {
+  weekdays: 'mondays-fridays',
+  weekdaysExclFriday: 'mondays-thursdays',
+  fridays: 'fridays',
+  saturdays: 'saturdays',
+  sundays: 'sundays',
+  weekends: 'saturdays-sundays',
+};
 
 /**
  * Returns whether a route id is a so called number variant
@@ -37,15 +48,6 @@ function isRailRoute(routeId) {
  */
 function isSubwayRoute(routeId) {
   return SUBWAY_ROUTE_ID_REGEXP.test(routeId);
-}
-
-/**
- * Returns whether a route id is belongs to a trunk route
- * @param {String} routeId - Route id
- * @returns {String}
- */
-function isTrunkRoute(routeId) {
-  return TRUNK_ROUTES.includes(routeId);
 }
 
 function isULine(routeId) {
@@ -107,11 +109,14 @@ function getZoneName(shortId) {
 
 const colorsByMode = {
   TRUNK: '#ff6319',
+  LIGHT_TRUNK: '#FFE0D1',
   TRAM: '#00985f',
   RAIL: '#8c4799',
   SUBWAY: '#ff6319',
   BUS: '#007AC9',
   FERRY: '#00B9E4',
+  L_RAIL: '#0098A1',
+  LIGHT_L_RAIL: '#e5f4f5',
 };
 
 const iconsByMode = {
@@ -121,17 +126,18 @@ const iconsByMode = {
   SUBWAY: subwayIcon,
   FERRY: ferryIcon,
   TRUNK: trunkIcon,
+  L_RAIL: lRailIcon,
 };
 
 function getColor(route) {
-  if (isTrunkRoute(route.routeId)) {
+  if (route.trunkRoute) {
     return colorsByMode.TRUNK;
   }
   return colorsByMode[route.mode];
 }
 
 function getIcon(route) {
-  if (isTrunkRoute(route.routeId)) {
+  if (route.trunkRoute) {
     return iconsByMode.TRUNK;
   }
   return iconsByMode[route.mode];
@@ -213,8 +219,8 @@ function groupOnConsecutive(groupedOnVersion) {
 }
 
 function getListOfVersionsAsString(versions) {
-  const alsoBasic = versions.some(version => version.trim() === '');
-  const letters = versions.filter(version => version.trim() !== '').sort();
+  const alsoBasic = versions.some(version => version && version.trim() === '');
+  const letters = versions.filter(version => version && version.trim() !== '').sort();
   if (letters.length === 0) return '';
   const letterString = letters.join(',');
   if (alsoBasic) return `(${letterString})`;
@@ -234,6 +240,14 @@ function labelAsComponents(routes) {
     if (routeGroup.routes.length === 2) {
       return {
         text: `${routeGroup.routes[0]}${letterString} ${routeGroup.routes[1]}${letterString}`,
+        type,
+      };
+    }
+    if (routeGroup.versions.length === 1) {
+      return {
+        text: `${routeGroup.routes[0]}${letterString}-${
+          routeGroup.routes[routeGroup.routes.length - 1]
+        }${letterString}`,
         type,
       };
     }
@@ -279,11 +293,73 @@ function routeGeneralizer(routes) {
   return labelAsComponents(flatListOnConsecutiveRouteNumbers);
 }
 
+function filterRoute(props) {
+  const { filter } = props;
+  const { routeId } = props;
+  const routeIdParsed = trimRouteId(routeId);
+  if (!filter) {
+    return true;
+  }
+
+  const filteredRoutes = filter.split(',').map(routeIdToFilter => routeIdToFilter.trim());
+  let routeMatchesFilter = false;
+  filteredRoutes.forEach(filterRouteId => {
+    if (routeId.includes(filterRouteId) && filterRouteId === routeIdParsed) {
+      routeMatchesFilter = true;
+    }
+  });
+  return !routeMatchesFilter;
+}
+
+function formatRouteString(route) {
+  const routeProps = route.route?.nodes[0];
+  let routeString;
+  if (route.plateViaFi || route.plateViaSe) {
+    routeString = `${trimRouteId(route.routeId)} ${routeProps.destinationFi} kautta ${
+      route.plateViaFi
+    } / ${routeProps.destinationSe} via ${route.plateViaSe}`;
+  } else {
+    routeString = `${trimRouteId(route.routeId)} ${routeProps.destinationFi} / ${
+      routeProps.destinationSe
+    }`;
+  }
+  return routeString;
+}
+
+function getFormattedRouteList(routes) {
+  const routeStringArray = routes.map(routeChange => {
+    return formatRouteString(routeChange);
+  });
+
+  return routeStringArray;
+}
+
+function getShelterText(stopType) {
+  switch (stopType) {
+    case '01':
+    case '08':
+      return 'Lasikatos';
+    case '02':
+      return 'Teräskatos';
+    case '03':
+      return 'Terminaali';
+    case '04':
+      return 'Tolppa';
+    case '05':
+      return 'Urbankatos';
+    case '06':
+      return 'Betonikatos';
+    case '07':
+      return 'Puukatos';
+    default:
+      return 'Varustelutieto puuttuu';
+  }
+}
+
 export {
   isNumberVariant,
   isRailRoute,
   isSubwayRoute,
-  isTrunkRoute,
   isULine,
   trimRouteId,
   isDropOffOnly,
@@ -293,4 +369,9 @@ export {
   getColor,
   getIcon,
   routeGeneralizer,
+  filterRoute,
+  scheduleSegments,
+  getFormattedRouteList,
+  formatRouteString,
+  getShelterText,
 };

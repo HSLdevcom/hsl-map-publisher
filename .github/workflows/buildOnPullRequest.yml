@@ -1,0 +1,22 @@
+name: Build
+
+on:
+  pull_request:
+    branches-ignore:
+      - 'master'
+
+jobs:
+  build-container:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          tags: hsldevcom/hsl-map-publisher:dev
+          build-args: |
+            BUILD_ENV=dev
+            DIGITRANSIT_APIKEY=${{ secrets.KARTAT_DIGITRANSITAPIKEY_DEV }}

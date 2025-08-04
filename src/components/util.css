@@ -1,7 +1,7 @@
 .row {
   display: flex;
   align-items: center;
-  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 .justifiedRow {
@@ -37,4 +37,52 @@
   align-items: stretch;
   justify-content: space-between;
   height: 100%;
+}
+
+/* PlatformSymbol styles */
+.PScontainer {
+  display: block;
+}
+
+.PScircle {
+  fill: none;
+  stroke: var(--hsl-blue);
+  stroke-width: 3;
+}
+
+.PStext {
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-family: GothamRounded-Medium;
+  fill: var(--hsl-blue);
+}
+
+.printBtn {
+  margin-left: 2rem;
+  background-color: var(--hsl-blue);
+  margin-top: 1.5rem;
+  height: 2rem;
+  width: fit-content;
+  padding: 0 1rem 0 1rem;
+  font-size: 0.9rem;
+  border-radius: 10px;
+  color: white;
+  border: none;
+}
+
+.printBtn:hover {
+  background-color: white;
+  cursor: pointer;
+  color: var(--hsl-blue);
+  border: 1px solid var(--hsl-blue);
+}
+
+@media print {
+  .noPrint,
+  .noPrint * {
+    display: none !important;
+  }
+  .row * {
+    break-inside: avoid;
+  }
 }

@@ -6,20 +6,24 @@ import hslMapStyle from 'hsl-map-style';
 import { fetchMap } from 'util/map';
 import promiseWrapper from 'util/promiseWrapper';
 import MapImage from './mapImage';
-import { mapValues } from 'lodash';
 
 const propsMapper = mapProps(({ options, components, date, extraLayers }) => {
   const mapStyle = hslMapStyle.generateStyle({
+    sourcesUrl: process.env.DIGITRANSIT_URL,
+    queryParams: [
+      {
+        url: process.env.DIGITRANSIT_URL,
+        name: 'digitransit-subscription-key',
+        value: process.env.DIGITRANSIT_APIKEY,
+      },
+    ],
     components,
+    joreDate: date,
   });
 
-  const sources = mapValues(mapStyle.sources, (value, key) => {
-    // eslint-disable-next-line no-param-reassign
-    value.url += `?date=${date}`;
-    return value;
-  });
-
-  mapStyle.sources = sources;
+  if (extraLayers) {
+    mapStyle.layers = [...mapStyle.layers, ...extraLayers];
+  }
 
   // Remove source containing bus routes (rail and subway routes have separate sources)
   if (components.routes && components.routes.enabled && components.routes.hideBusRoutes) {
@@ -32,9 +36,6 @@ const propsMapper = mapProps(({ options, components, date, extraLayers }) => {
     };
   }
 
-  if (extraLayers) {
-    mapStyle.layers = [...mapStyle.layers, ...extraLayers];
-  }
   return { src: fetchMap(options, mapStyle) };
 });
 
@@ -60,7 +61,6 @@ MapImageContainer.propTypes = {
   components: PropTypes.objectOf(
     PropTypes.shape({
       enabled: PropTypes.bool.isRequired,
-      hideBusRoutes: PropTypes.bool,
     }),
   ).isRequired,
   date: PropTypes.string,

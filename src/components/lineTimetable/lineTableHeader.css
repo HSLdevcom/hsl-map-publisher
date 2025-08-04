@@ -1,0 +1,37 @@
+.headerContainer {
+  display: block;
+  break-inside: avoid;
+  break-before: avoid-page;
+  margin-bottom: 1.3rem;
+}
+
+.flexHeader {
+  display: flex;
+}
+
+.stop {
+  flex-grow: 1;
+  height: 50px;
+  padding-right: 16px;
+  margin-bottom: 1rem;
+}
+
+.stopNamePrimary {
+  font-size: 1rem;
+  margin: 0 0 0.2rem 1.2rem;
+  font-family: GothamRounded-Medium;
+  letter-spacing: normal;
+  break-inside: avoid;
+}
+
+.stopNameSecondary {
+  font-size: 1rem;
+  margin: 0 0 0 1.2rem;
+  font-family: GothamRounded-Book;
+  letter-spacing: normal;
+}
+
+.directionBracket {
+  font-family: GothamRounded-Medium;
+  font-size: 1rem;
+}

@@ -1,0 +1,71 @@
+services:
+  
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+
+  publisher-postgres:
+    image: postgres
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - dev_postgres:/var/lib/postgresql/data
+
+  publisher-server:
+    image: hsl-map-publisher
+    build:
+      context: .
+      args:
+        - BUILD_ENV=local
+        - DIGITRANSIT_APIKEY=${DIGITRANSIT_APIKEY}
+      platforms:
+        - "linux/amd64"
+    ports:
+      - 4000:4000
+    environment:
+      - SERVICE=server:production
+    volumes:
+      - ./output:/opt/publisher/output
+      - ./fonts:/fonts
+    depends_on:
+      publisher-postgres:
+        condition: service_started
+      redis:
+        condition: service_started
+  
+  publisher-render:
+    image: hsl-map-publisher
+    pull_policy: never # use the same build as publisher-server
+    ports:
+      - 5000:5000
+    environment:
+      - SERVICE=start:production
+    volumes:
+      - ./fonts:/fonts
+    depends_on:
+      publisher-postgres:
+        condition: service_started
+      redis:
+        condition: service_started
+  
+  publisher-worker:
+    image: hsl-map-publisher
+    pull_policy: never # use the same build as publisher-server
+    deploy:
+      replicas: 2
+    environment:
+      - SERVICE=worker:production
+    volumes:
+      - ./output:/opt/publisher/output
+      - ./fonts:/fonts
+    depends_on:
+      publisher-postgres:
+        condition: service_started
+      redis:
+        condition: service_started
+
+volumes:
+  dev_postgres:

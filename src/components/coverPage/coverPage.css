@@ -1,0 +1,32 @@
+.coverPageContainer {
+  height: 1110px;
+  width: 100%;
+  font-family: GothamRounded-Medium;
+}
+
+.greyscale {
+  background: white;
+  color: black;
+  --timetable-accent-color: #eaeaea;
+}
+
+.date {
+  padding-top: 3rem;
+  font-size: 2rem;
+  margin-left: 2rem;
+}
+
+.margin {
+  margin: 10px 2rem;
+}
+
+.stopRow {
+  font-family: GothamRounded-Book;
+  font-size: 0.8rem;
+  padding: 3px 0;
+}
+
+.rowContainer {
+  margin-top: 1rem;
+  margin-left: 2rem;
+}

@@ -20,15 +20,19 @@ class CustomMap extends Component {
     setMapHeight: PropTypes.func.isRequired,
     mapZoneSymbols: PropTypes.bool,
     mapZones: PropTypes.bool,
+    showSalesPoint: PropTypes.bool,
     minimapZoneSymbols: PropTypes.bool,
     minimapZones: PropTypes.bool,
+    legend: PropTypes.bool,
   };
 
   static defaultProps = {
     mapZoneSymbols: false,
     mapZones: false,
+    showSalesPoint: false,
     minimapZoneSymbols: false,
     minimapZones: false,
+    legend: false,
   };
 
   state = {
@@ -38,6 +42,14 @@ class CustomMap extends Component {
 
   componentDidMount() {
     renderQueue.add(this);
+  }
+
+  componentDidUpdate() {
+    renderQueue.remove(this);
+  }
+
+  componentWillUnmount() {
+    renderQueue.remove(this);
   }
 
   onResize = ({ client: { width, height } }) => {
@@ -51,15 +63,19 @@ class CustomMap extends Component {
       return;
     }
 
-    setMapHeight(height);
+    if (height !== mapHeight) {
+      setMapHeight(height);
+    }
 
-    this.setState(
-      {
-        mapWidth: width,
-        mapHeight: height,
-      },
-      () => renderQueue.remove(this),
-    );
+    if (height !== mapHeight || width !== mapWidth) {
+      this.setState(
+        {
+          mapWidth: width,
+          mapHeight: height,
+        },
+        () => renderQueue.remove(this),
+      );
+    }
   };
 
   render() {
@@ -70,8 +86,10 @@ class CustomMap extends Component {
       isSummerTimetable,
       mapZoneSymbols,
       mapZones,
+      showSalesPoint,
       minimapZoneSymbols,
       minimapZones,
+      legend,
     } = this.props;
     const { mapWidth, mapHeight } = this.state;
 
@@ -135,8 +153,10 @@ class CustomMap extends Component {
                 showCitybikes={isSummerTimetable}
                 mapZoneSymbols={mapZoneSymbols}
                 mapZones={mapZones}
+                showSalesPoint={showSalesPoint}
                 minimapZoneSymbols={minimapZoneSymbols}
                 minimapZones={minimapZones}
+                legend={legend}
               />
             ) : null}
           </div>

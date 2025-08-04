@@ -43,8 +43,9 @@
 .routeContainer {
   display: flex;
   justify-content: left;
-  font-size: 0.7em;
+  font-size: 0.5em;
   padding: 0 0.285em 0 0;
+  font-family: GothamRounded-Book;
 }
 
 .titleContainer {
@@ -58,10 +59,15 @@
   align-items: center;
 }
 
+.compactRoutes {
+  max-width: 60px;
+}
+
 .terminalAreaRoutesTitle {
-  font-size: 0.7em;
+  font-size: 0.5em;
   white-space: initial;
   padding-bottom: 2px;
+  font-family: GothamRounded-Medium;
 }
 
 .icon {

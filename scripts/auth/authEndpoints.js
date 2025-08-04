@@ -1,24 +1,19 @@
-const { get, last, clone } = require('lodash');
+const { get, clone } = require('lodash');
 const AuthService = require('./authService');
 
-const { DOMAINS_ALLOWED_TO_LOGIN, PUBLISHER_TEST_GROUP } = require('../../constants');
+const { GROUP_GENERATE, GROUP_READONLY } = require('../../constants');
 
-const allowedDomains = DOMAINS_ALLOWED_TO_LOGIN.split(',');
+const hasAllowedGroup = async userInfo => {
+  const groups = get(userInfo, 'groups', {});
 
-const hasAllowedDomain = async userInfo => {
-  const groups = get(userInfo, 'groups');
-  const domain = last(userInfo.email.toLowerCase().split('@')) || '';
-
-  if (groups.includes(PUBLISHER_TEST_GROUP)) {
-    return true;
-  }
-
-  if (!allowedDomains.includes(domain) && !groups.includes(PUBLISHER_TEST_GROUP)) {
-    console.log(`User does not have allowed domain. Logging out.`);
+  if (!groups || !Array.isArray(groups)) {
+    console.log('User does not have valid groups assigned');
     return false;
   }
-
-  return true;
+  if (groups.includes(GROUP_GENERATE) || groups.includes(GROUP_READONLY)) {
+    return true;
+  }
+  return false;
 };
 
 const authorize = async (req, res, session) => {
@@ -47,22 +42,27 @@ const authorize = async (req, res, session) => {
     return {
       body: {
         isOk: false,
+        message: 'No authorization code',
       },
       status: 401,
     };
   }
-  const tokenResponse = await AuthService.requestAccessToken(authRequest.code);
+
+  const tokenResponse = await AuthService.requestAccessToken({
+    code: authRequest.code,
+    isTesting,
+  });
 
   if (session && tokenResponse.access_token) {
     modifiedSession.accessToken = tokenResponse.access_token;
     const userInfo = await AuthService.requestUserInfo(modifiedSession.accessToken);
-    const isAllowed = await hasAllowedDomain(userInfo);
+    const isAllowed = await hasAllowedGroup(userInfo);
     if (!isAllowed) {
       return {
         status: 401,
         body: {
           isOk: false,
-          message: 'No allowed group.',
+          message: 'User does not have valid groups assigned.',
         },
       };
     }
@@ -93,7 +93,7 @@ const authorize = async (req, res, session) => {
 
 const checkExistingSession = async (req, res, session) => {
   if (session && session.accessToken) {
-    const isAllowed = await hasAllowedDomain(session);
+    const isAllowed = await hasAllowedGroup(session);
     if (!isAllowed) {
       await AuthService.logoutFromIdentityProvider(session.accessToken);
       return {
@@ -111,7 +111,7 @@ const checkExistingSession = async (req, res, session) => {
       body: response,
     };
   }
-  console.log('No existing session');
+  // console.log('No existing session');
   const response = {
     isOk: false,
   };

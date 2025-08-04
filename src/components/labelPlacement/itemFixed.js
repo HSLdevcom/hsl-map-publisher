@@ -23,6 +23,12 @@ class ItemFixed extends Component {
 
   render() {
     const style = { ...this.state, position: 'absolute' };
+    if (this.props.width) {
+      style.width = this.props.width;
+    }
+    if (this.props.height) {
+      style.height = this.props.height;
+    }
     return (
       <div
         ref={ref => {
@@ -39,6 +45,13 @@ ItemFixed.propTypes = {
   top: PropTypes.number.isRequired,
   left: PropTypes.number.isRequired,
   children: PropTypes.element.isRequired,
+  width: PropTypes.number,
+  height: PropTypes.number,
+};
+
+ItemFixed.defaultProps = {
+  width: null,
+  height: null,
 };
 
 export default ItemFixed;

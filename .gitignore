@@ -10,3 +10,4 @@ graphql.config.json
 output/*
 .env
 secrets
+/test/results/*

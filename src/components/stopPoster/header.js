@@ -48,12 +48,14 @@ const Header = props => (
       <Title>{props.nameFi}</Title>
       {props.nameSe && <Subtitle>{props.nameSe}</Subtitle>}
     </Group>
-    <CenteringColumn>
-      <Title small>Pysäkkinumero</Title>
-      <Subtitle small>Hållplatsnummer</Subtitle>
-      <Subtitle small>Stop number</Subtitle>
-      <div className={styles.stop}>{props.shortId.replace(' ', '')}</div>
-    </CenteringColumn>
+    {props.shortId && (
+      <CenteringColumn>
+        <Title small>Pysäkkinumero</Title>
+        <Subtitle small>Hållplatsnummer</Subtitle>
+        <Subtitle small>Stop number</Subtitle>
+        <div className={styles.stop}>{props.shortId.replace(' ', '')}</div>
+      </CenteringColumn>
+    )}
     {props.stopZone && (
       <div className={styles.stopZoneColumn}>
         <div className={styles.zoneHeading}>
@@ -68,12 +70,13 @@ const Header = props => (
 
 Header.defaultProps = {
   nameSe: null,
+  shortId: null,
 };
 
 Header.propTypes = {
   nameFi: PropTypes.string.isRequired,
   nameSe: PropTypes.string,
-  shortId: PropTypes.string.isRequired,
+  shortId: PropTypes.string,
   stopZone: PropTypes.string.isRequired,
 };
 

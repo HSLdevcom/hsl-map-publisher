@@ -1,0 +1,22 @@
+name: Check version numbering is updated prior to merging
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  check_version:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Check if version has been updated
+      id: check
+      uses: EndBug/version-check@v2
+    - name: Fail if version is not changed prior to merge
+      if: steps.check.outputs.changed == 'false'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          core.setFailed('No version number change found. Run `yarn version`-command to upgrade version before merge can be completed.')

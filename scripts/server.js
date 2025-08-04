@@ -6,15 +6,21 @@ const Router = require('koa-router');
 const cors = require('@koa/cors');
 const jsonBody = require('koa-json-body');
 const fs = require('fs-extra');
+const { Queue } = require('bullmq');
+const Redis = require('ioredis');
+const { koaBody } = require('koa-body');
+const moment = require('moment');
 
-const generator = require('./generator');
+const fileHandler = require('./fileHandler');
 const authEndpoints = require('./auth/authEndpoints');
+const { matchStopDataToRules } = require('./util/rules');
 
-const { DOMAINS_ALLOWED_TO_GENERATE, PUBLISHER_TEST_GROUP } = require('../constants');
+const { generateRenderUrl, csvPath } = require('./generator');
+
+const { GROUP_GENERATE, GROUP_READONLY, REDIS_CONNECTION_STRING } = require('../constants');
 
 const {
   migrate,
-  addEvent,
   getBuilds,
   getBuild,
   addBuild,
@@ -31,58 +37,77 @@ const {
   removeImage,
   removeTemplate,
   getTemplate,
+  getStopInfo,
 } = require('./store');
 
 const { downloadPostersFromCloud } = require('./cloudService');
+const { forEach } = require('lodash');
 
 const PORT = 4000;
 
-async function generatePoster(buildId, component, template, props, index) {
+const RENDER_URL_COMPONENTS = {
+  TIMETABLE: 'Timetable',
+  LINE_TIMETABLE: 'LineTimetable',
+};
+
+const bullRedisConnection = new Redis(REDIS_CONNECTION_STRING, {
+  maxRetriesPerRequest: null,
+  enableReadyCheck: false,
+});
+const queue = new Queue('publisher', { connection: bullRedisConnection });
+
+const cancelSignalRedis = new Redis(REDIS_CONNECTION_STRING);
+
+async function generatePoster(buildId, component, props, index) {
+  const { stopId, date, template, selectedRuleTemplates } = props;
+
+  // RuleTemplates are not available for TerminalPoster, LineTimetable, CoverPage nor StopRoutePlate
+  const data =
+    component !== 'TerminalPoster' &&
+    component !== 'LineTimetable' &&
+    component !== 'CoverPage' &&
+    component !== 'StopRoutePlate'
+      ? await getStopInfo({ stopId, date })
+      : null;
+
+  // Checks if any rule template will match the stop, and returns *the first one*.
+  // If no match, returns the default template.
+  /* eslint-disable no-await-in-loop */
+  const selectTemplate = async () => {
+    for (const t of selectedRuleTemplates) {
+      const tData = await getTemplate({ id: t }, false);
+      if (tData && matchStopDataToRules(tData.rules, data)) return t;
+    }
+    return template;
+  };
+  /* eslint-enable no-await-in-loop */
+
+  const chosenTemplate = await selectTemplate();
+  const renderProps = { ...props };
+  delete renderProps.template;
+  delete renderProps.selectedRuleTemplates;
+
   const { id } = await addPoster({
     buildId,
     component,
-    template,
+    template: chosenTemplate,
     props,
     order: index,
   });
 
-  const onInfo = (message = 'No message.') => {
-    console.log(`${id}: ${message}`); // eslint-disable-line no-console
-    addEvent({
-      posterId: id,
-      type: 'INFO',
-      message,
-    });
-  };
-  const onError = error => {
-    console.error(`${id}: ${error.message} ${error.stack}`); // eslint-disable-line no-console
-    addEvent({
-      posterId: id,
-      type: 'ERROR',
-      message: error.message,
-    });
-  };
-
   const options = {
     id,
     component,
-    props,
-    template,
-    onInfo,
-    onError,
+    props: renderProps,
+    template: chosenTemplate,
   };
-  generator
-    .generate(options)
-    .then(({ success, uploaded }) => {
-      updatePoster({
-        id,
-        status: success && uploaded ? 'READY' : 'FAILED',
-      });
-    })
-    .catch(error => console.error(error)); // eslint-disable-line no-console
+
+  queue.add('generate', { options }, { jobId: id });
 
   return { id };
 }
+
+const isRunningOnLocalEnv = () => process.env.BUILD_ENV === 'local';
 
 const errorHandler = async (ctx, next) => {
   try {
@@ -90,19 +115,115 @@ const errorHandler = async (ctx, next) => {
   } catch (error) {
     ctx.status = error.status || 500;
     ctx.body = { message: error.message };
-    console.error(error); // eslint-disable-line no-console
+    if (ctx.status !== 401) {
+      console.error(error); // eslint-disable-line no-console
+    }
   }
 };
 
 const allowedToGenerate = user => {
+  if (isRunningOnLocalEnv()) return true;
   if (!user || !user.email) return false;
-  const domain = user.email.split('@')[1];
-  const parsedAllowedDomains = DOMAINS_ALLOWED_TO_GENERATE.split(',');
-  if (user.groups && user.groups.includes(PUBLISHER_TEST_GROUP)) {
+
+  if (user.groups && user.groups.includes(GROUP_GENERATE)) {
     return true;
   }
 
-  return parsedAllowedDomains.includes(domain);
+  return false;
+};
+
+const authMiddleware = async (ctx, next) => {
+  // Helper function to allow specific requests without authentication
+  const allowAuthException = ctx2 => {
+    const envHostUrl = new URL(process.env.REACT_APP_PUBLISHER_SERVER_URL);
+
+    // Allow API testing in local environment without authentication
+    if (isRunningOnLocalEnv()) {
+      return true;
+    }
+
+    // Allow session related requests
+    if (['/login', '/logout', '/session'].includes(ctx2.path)) {
+      return true;
+    }
+    // Allow GET /templates/..., so that puppeteer can get the template or StopRoutePlate props.
+    const startsWithAllowedPaths =
+      ctx2.path.startsWith('/templates/') || ctx2.path.startsWith('/posters/');
+
+    if (startsWithAllowedPaths && ctx.method === 'GET' && ctx.host === envHostUrl.host) {
+      return true;
+    }
+    return false;
+  };
+
+  if (allowAuthException(ctx)) {
+    // Do not check the authentication beforehands for session related paths.
+    await next();
+  } else {
+    const authResponse = await authEndpoints.checkExistingSession(
+      ctx.request,
+      ctx.response,
+      ctx.session,
+    );
+
+    if (!authResponse.body.isOk) {
+      // Not authenticated, throw 401
+      ctx.throw(401);
+    } else {
+      // If the request is CRUD, check if the user has privileges to perform the action
+      if (ctx.method !== 'GET' && ctx.method !== 'HEAD') {
+        const user = authResponse.body;
+        if (!allowedToGenerate(user)) {
+          ctx.throw(403, 'User does not have privileges to perform this action.');
+        }
+      }
+      await next();
+    }
+  }
+};
+
+const createBuildCoverPage = async (buildId, buildTitle, posters) => {
+  const filteredPosters = posters.filter(poster => poster.component === 'Timetable');
+
+  const stopIds = [...filteredPosters.map(poster => poster.props.stopId)];
+  const { date, dateBegin, dateEnd } = filteredPosters[0].props;
+
+  const component = 'CoverPage';
+  const props = {
+    title: buildTitle,
+    stopIds,
+    date,
+    dateBegin,
+    dateEnd,
+    selectedRuleTemplates: [],
+  };
+
+  const coverPagePosterId = await generatePoster(buildId, component, props, -2);
+  return coverPagePosterId;
+};
+
+const removeCoverPages = buildPosters => {
+  // Clear cover pages from the build after downloading
+  const coverPages = buildPosters.filter(poster => poster.order === -2);
+  if (coverPages.length > 0) {
+    forEach(coverPages, coverPage => {
+      removePoster({ id: coverPage.id });
+    });
+  }
+};
+
+const waitForPosterCompletion = async posterId => {
+  let isRendered = false;
+  while (!isRendered) {
+    // eslint-disable-next-line no-await-in-loop
+    const coverPagePoster = await getPoster(posterId);
+    if (coverPagePoster.status === 'READY') {
+      isRendered = true;
+    }
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise(resolve => setTimeout(resolve, 200)); // Limit rate for polling database for cover page completion
+  }
+  return isRendered;
 };
 
 async function main() {
@@ -110,6 +231,7 @@ async function main() {
 
   const app = new Koa();
   const router = new Router();
+  const unAuthorizedRouter = new Router();
 
   router.get('/images', async ctx => {
     ctx.body = await getImages();
@@ -188,7 +310,7 @@ async function main() {
   });
 
   router.post('/posters', async ctx => {
-    const { buildId, component, props, template } = ctx.request.body;
+    const { buildId, component, props } = ctx.request.body;
     const build = await getBuild({ id: buildId });
     const posters = [];
 
@@ -213,7 +335,12 @@ async function main() {
         null,
       );
       if (!orderNumber) orderNumber = i + build.posters.length;
-      posters.push(generatePoster(buildId, component, template, currentProps, orderNumber));
+      posters.push(generatePoster(buildId, component, currentProps, orderNumber));
+      if (component === 'StopRoutePlate' && currentProps.downloadTable) {
+        // Add the summary spreadsheet to generation queue as well
+        const summaryProps = { ...currentProps, downloadTable: false, downloadSummary: true };
+        posters.push(generatePoster(buildId, component, summaryProps, orderNumber++));
+      }
     }
 
     try {
@@ -229,42 +356,84 @@ async function main() {
     ctx.body = poster;
   });
 
+  router.post('/cancelPoster', async ctx => {
+    const { item } = ctx.request.body;
+    const jobId = item.id;
+    const poster = await updatePoster({ id: jobId, status: 'FAILED' });
+    const success = await queue.remove(jobId);
+    if (!success) {
+      cancelSignalRedis.publish('cancel', jobId);
+    }
+
+    ctx.body = poster;
+  });
+
   router.get('/downloadPoster/:id', async ctx => {
     const { id } = ctx.params;
-    const { component } = await getPoster({ id });
+    const { component, props } = await getPoster({ id });
     let filename;
 
-    const downloadedPosterIds = await downloadPostersFromCloud([id]);
+    let downloadedPosterIds;
+
+    if (component === 'StopRoutePlate') {
+      downloadedPosterIds = props.downloadSummary
+        ? await downloadPostersFromCloud([], [`summary-${id}`])
+        : await downloadPostersFromCloud([], [id]);
+    } else {
+      downloadedPosterIds = await downloadPostersFromCloud([id]);
+    }
     if (downloadedPosterIds.length < 1) {
       ctx.throw(404, 'Poster ids not found.');
     }
-    try {
-      filename = await generator.concatenate(downloadedPosterIds, `${component}-${id}`);
-      await generator.removeFiles(downloadedPosterIds);
-    } catch (err) {
-      ctx.throw(500, err.message || 'PDF concatenation failed.');
+
+    if (component === 'StopRoutePlate' && props.downloadTable) {
+      filename = csvPath(id);
+      ctx.type = 'text/csv';
+      ctx.set('Content-Disposition', `attachment; filename="Kilvitysohje-${id}.csv"`);
+      ctx.body = fs.createReadStream(filename);
+    } else if (component === 'StopRoutePlate' && props.downloadSummary) {
+      filename = csvPath(`summary-${id}`);
+      ctx.type = 'text/csv';
+      ctx.set('Content-Disposition', `attachment; filename="Yhteenveto-${id}.csv"`);
+      ctx.body = fs.createReadStream(filename);
+    } else {
+      try {
+        filename = await fileHandler.concatenate(downloadedPosterIds, `${component}-${id}`);
+        await fileHandler.removeFiles(downloadedPosterIds);
+      } catch (err) {
+        ctx.throw(500, err.message || 'PDF concatenation failed.');
+      }
+
+      console.log('PDF concatenation succeeded.');
+
+      ctx.type = 'application/pdf';
+      ctx.set('Content-Disposition', `attachment; filename="${component}-${id}.pdf"`);
+      ctx.body = fs.createReadStream(filename);
     }
-
-    console.log('PDF concatenation succeeded.');
-
-    ctx.type = 'application/pdf';
-    ctx.set('Content-Disposition', `attachment; filename="${component}-${id}.pdf"`);
-    ctx.body = fs.createReadStream(filename);
-
     await fs.remove(filename);
   });
 
   router.get('/downloadBuild/:id', async ctx => {
     const { id } = ctx.params;
-    const { first, last } = ctx.query;
-    const { title, posters } = await getBuild({ id });
-    const parsedTitle = first && last ? `${title}-${parseInt(first, 10) + 1}-${last}` : title;
+    const { first, last, printCoverPage } = ctx.query;
+    let build = await getBuild({ id });
+    const parsedTitle =
+      first && last ? `${build.title}-${parseInt(first, 10) + 1}-${last}` : build.title;
+
+    if (printCoverPage) {
+      const coverPage = await createBuildCoverPage(id, parsedTitle, build.posters);
+      await waitForPosterCompletion(coverPage);
+      // Refresh the build since we now also have the cover page rendered
+      build = await getBuild({ id });
+    }
+
     let filename;
-    let orderedPosters = posters.sort((a, b) => (a.order > b.order ? 1 : -1));
+    let orderedPosters = build.posters.sort((a, b) => (a.order > b.order ? 1 : -1));
     const slicedPosters = orderedPosters.slice(first, last);
     const posterIds = slicedPosters
-      .filter(poster => poster.status === 'READY')
+      .filter(poster => poster.status === 'READY' && poster.component !== 'StopRoutePlate') // Filter spreadsheets out, they are downloaded separately
       .map(poster => poster.id);
+
     const downloadedPosterIds = await downloadPostersFromCloud(posterIds);
 
     if (downloadedPosterIds.length < 1) {
@@ -272,34 +441,57 @@ async function main() {
     }
 
     try {
-      // Get the order of the downloaded posters and sort the posters before concatenation.
+      // Get the order of the downloaded PDF posters and sort the posters before PDF concatenation.
       orderedPosters = orderBy(
         downloadedPosterIds.map(downloadedId => ({
           id: downloadedId,
-          order: get(posters.find(({ id: posterId }) => posterId === downloadedId), 'order', 0),
+          order: get(
+            build.posters.find(({ id: posterId }) => posterId === downloadedId),
+            'order',
+            0,
+          ),
         })),
         'order',
         'asc',
       );
 
-      filename = await generator.concatenate(orderedPosters.map(poster => poster.id), parsedTitle);
-      await generator.removeFiles(downloadedPosterIds);
+      if (printCoverPage) {
+        // Place cover page as the first page of the PDF
+        const coverPage = orderedPosters.filter(poster => poster.order === -2);
+        const remainingPages = orderedPosters.filter(poster => poster.order !== -2);
+        orderedPosters = [...coverPage, ...orderBy(remainingPages, 'order', 'asc')];
+      }
+
+      filename = await fileHandler.concatenate(
+        orderedPosters.map(poster => poster.id),
+        parsedTitle,
+      );
+      await fileHandler.removeFiles(downloadedPosterIds);
+
+      if (printCoverPage) {
+        removeCoverPages(orderedPosters);
+      }
+
+      ctx.type = 'application/pdf';
+      ctx.set('Content-Disposition', `attachment; filename="${parsedTitle}-${id}.pdf"`);
+      ctx.body = fs.createReadStream(filename);
+      await fs.remove(filename);
     } catch (err) {
       ctx.throw(500, err.message || 'PDF concatenation failed.');
     }
-
-    ctx.type = 'application/pdf';
-    ctx.set('Content-Disposition', `attachment; filename="${parsedTitle}-${id}.pdf"`);
-    ctx.body = fs.createReadStream(filename);
-
-    await fs.remove(filename);
   });
 
   router.post('/login', async ctx => {
     const authResponse = await authEndpoints.authorize(ctx.request, ctx.response, ctx.session);
-    ctx.session = authResponse.modifiedSession;
-    ctx.body = authResponse.body;
-    ctx.response.status = authResponse.status;
+
+    if (authResponse.body.isOk) {
+      ctx.session = authResponse.modifiedSession;
+      ctx.body = authResponse.body;
+      ctx.response.status = authResponse.status;
+    } else {
+      ctx.body = authResponse.body.message;
+      ctx.response.status = authResponse.status;
+    }
   });
 
   router.get('/logout', async ctx => {
@@ -318,9 +510,60 @@ async function main() {
     ctx.response.status = authResponse.status;
   });
 
+  unAuthorizedRouter.get('/health', async ctx => {
+    ctx.status = 200;
+  });
+
+  const isAllowedComponent = component => {
+    return (
+      component === RENDER_URL_COMPONENTS.TIMETABLE ||
+      component === RENDER_URL_COMPONENTS.LINE_TIMETABLE
+    );
+  };
+
+  unAuthorizedRouter.post('/generateRenderUrl', koaBody(), async ctx => {
+    let { props } = ctx.request.body;
+    const { component } = ctx.request.body;
+    const { template } = props;
+    if (!isAllowedComponent(component)) {
+      // Return error if wrong components is requested, restrict render API only to less resource intensive timetables.
+      ctx.body = 'Requested component missing or invalid';
+      ctx.status = 400;
+      return;
+    }
+
+    if (component === RENDER_URL_COMPONENTS.LINE_TIMETABLE) {
+      if (!props.dateBegin && !props.dateEnd) {
+        // Add default date range if not provided, which is a week from today
+        props = {
+          ...props,
+          dateBegin: moment(Date())
+            .startOf('isoWeek')
+            .format('YYYY-MM-DD'),
+          dateEnd: moment(Date())
+            .endOf('isoWeek')
+            .format('YYYY-MM-DD'),
+        };
+      }
+    }
+
+    const renderUrl = generateRenderUrl(component, template, props);
+
+    if (props.redirect) {
+      ctx.redirect(renderUrl);
+    } else {
+      ctx.body = { renderUrl };
+    }
+  });
+
   app.keys = ['secret key'];
 
-  app.use(session(app));
+  const CONFIG = {
+    renew: true,
+    maxAge: 86400000 * 30,
+  };
+
+  app.use(session(CONFIG, app));
 
   app
     .use(errorHandler)
@@ -329,6 +572,8 @@ async function main() {
         credentials: true,
       }),
     )
+    .use(unAuthorizedRouter.routes())
+    .use(authMiddleware)
     .use(jsonBody({ fallback: true, limit: '10mb' }))
     .use(router.routes())
     .use(router.allowedMethods())
