@@ -107,7 +107,7 @@
     "moment": "^2.29.4",
     "node-fetch": "2.6.6",
     "p-map": "^1.2.0",
-    "pdf-merger-js": "^3.4.0",
+    "pdf-merger-js": "^5.1.2",
     "pg": "^8.7.3",
     "prop-types": "^15.6.0",
     "puppeteer": "^13.7.0",
