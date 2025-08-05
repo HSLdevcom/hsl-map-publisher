@@ -10,7 +10,7 @@ const path = require('path');
 const PRINT_COVER_PAGE = false;
 
 // Stop poster tests
-const stopIds = [/* '2311220', '1250108', '1040144', */ '1361108' /* , '4970238' */];
+const stopIds = ['2311220', '1250108', '1040144', '1361108', '4970238'];
 
 const testDateRange = {
   dateBegin: '2025-02-24',
@@ -33,22 +33,22 @@ const testTerminalPosters = [
 
 // LineTimetable tests
 const testLines = [
-  { lineId: '2015', dateBegin: '2024-12-01', dateEnd: '2024-12-10' },
-  { lineId: '1007', dateBegin: '2024-12-01', dateEnd: '2024-12-10' },
-  { lineId: '1005', dateBegin: '2024-12-01', dateEnd: '2024-12-10' },
-  { lineId: '1052', dateBegin: '2024-12-01', dateEnd: '2024-12-10' },
-  { lineId: '2510', dateBegin: '2024-12-01', dateEnd: '2024-12-10' },
+  { lineId: '2015', dateBegin: '2025-07-01', dateEnd: '2024-08-28' },
+  { lineId: '1007', dateBegin: '2025-07-01', dateEnd: '2024-08-28' },
+  { lineId: '1005', dateBegin: '2025-07-01', dateEnd: '2024-08-28' },
+  { lineId: '1052', dateBegin: '2025-07-01', dateEnd: '2024-08-28' },
+  { lineId: '2510', dateBegin: '2025-07-01', dateEnd: '2024-08-28' },
 ];
 
 const TEST_RESULTS_PATH = './test/results';
 
 const POSTER_COMPONENTS = {
-  // TIMETABLE: 'Timetable',
+  TIMETABLE: 'Timetable',
   // STOP_POSTER: 'StopPoster',
   // A3_STOP_POSTER: 'A3StopPoster',
-  // LINE_TIMETABLE: 'LineTimetable',
+  LINE_TIMETABLE: 'LineTimetable',
   // TERMINAL_POSTER: 'TerminalPoster',
-  STOP_ROUTE_PLATE: 'StopRoutePlate',
+  // STOP_ROUTE_PLATE: 'StopRoutePlate',
 };
 
 async function sleep(millis) {
@@ -85,7 +85,7 @@ function buildGenerationRequestBody(buildId, component, printAsA4) {
         printTimetablesAsA4: printAsA4,
         printTimetablesAsGreyscale: false,
         routeFilter: '',
-        salesPoint: true,
+        salesPoint: false,
         selectedRuleTemplates: [],
         stopId: terminalId,
         selectedStops: selectedStopIds.toString(),
@@ -120,7 +120,7 @@ function buildGenerationRequestBody(buildId, component, printAsA4) {
         printTimetablesAsA4: printAsA4,
         printTimetablesAsGreyscale: false,
         routeFilter: '',
-        salesPoint: true,
+        salesPoint: false,
         selectedRuleTemplates: [],
         stopId,
         template: 'default',

@@ -23,7 +23,7 @@
     "docker:rebuild": "yarn run docker:stop && yarn run docker:rm && yarn run docker:build && yarn run docker:run",
     "docker:logs": "docker logs publisher",
     "prepare": "husky install",
-    "test": "node -r dotenv/config test/testStops"
+    "test": "node -r dotenv/config test/tests"
   },
   "lint-staged": {
     "*.js": [
@@ -102,7 +102,7 @@
     "koa-body": "^6.0.1",
     "koa-json-body": "^5.3.0",
     "koa-router": "^7.4.0",
-    "koa-session": "^7.0.2",
+    "koa-session": "6.0.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "node-fetch": "2.6.6",
