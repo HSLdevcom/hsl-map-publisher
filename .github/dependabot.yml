@@ -1,14 +1,42 @@
-# Specify a non-default branch for pull requests for npm
-
 version: 2
 updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "daily"
-    # Raise pull requests for version updates
-    # to npm against the `development` branch
+      interval: "cron"
+      cronjob: "0 0 1 */3 *" # Every 3 months on the 1st day of the month
+    groups: 
+      # Group all major version updates together
+      major:
+        update-types:
+          - "major"
+    open-pull-requests-limit: 3
     target-branch: "development"
-    # Labels on pull requests for version updates only
-    labels:
-      - "NPM Dependencies"
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups: 
+      # Group all minor version updates together
+      minor:
+        update-types:
+          - "minor"
+          - "patch"
+    open-pull-requests-limit: 3
+    target-branch: "development"
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups: 
+      # Group all minor version updates together
+      minor:
+        update-types:
+          - "minor"
+          - "patch"
+    open-pull-requests-limit: 3
+    target-branch: "development"
