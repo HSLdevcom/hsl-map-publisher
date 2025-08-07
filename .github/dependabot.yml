@@ -7,36 +7,18 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "cron"
-      cronjob: "0 0 1 */3 *" # Every 3 months on the 1st day of the month
+      interval: "weekly"
+    cooldown:
+      semver-major-days: 90
+      semver-minor-days: 60
+      semver-patch-days: 30
     groups: 
-      # Group all major version updates together
       major:
         update-types:
           - "major"
-    open-pull-requests-limit: 3
-    target-branch: "development"
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "monthly"
-    groups: 
-      # Group all minor version updates together
       minor:
         update-types:
           - "minor"
           - "patch"
-    open-pull-requests-limit: 3
-    target-branch: "development"
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "monthly"
-    groups: 
-      # Group all minor version updates together
-      minor:
-        update-types:
-          - "minor"
-          - "patch"
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 5
     target-branch: "development"
