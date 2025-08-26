@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styles from './lineTimetable.css';
 import LineTimetableHeader from './lineTimetableHeader';
 import LineTableColumns from './lineTableColumns';
+import ErrorPage from '../errorPage/errorPage';
 import AllStopsList from './allStopsList';
 import { PrintButton } from '../util';
 import {
@@ -282,6 +283,10 @@ class LineTimetable extends Component {
   }
 
   render() {
+    if (this.props.error) {
+      return <ErrorPage error={this.props.error} renderProps={this.props} />;
+    }
+
     const { routes } = this.props;
     let { notes } = this.props.line;
     if (hasFridayDepartures(routes) && usesFridayDepartureNote(routes)) {
@@ -524,6 +529,7 @@ LineTimetable.defaultProps = {
   showPrintButton: false,
   lang: 'fi',
   printPageNumbers: true,
+  error: null,
 };
 
 LineTimetable.propTypes = {
@@ -532,6 +538,7 @@ LineTimetable.propTypes = {
   showPrintButton: PropTypes.bool,
   lang: PropTypes.string,
   printPageNumbers: PropTypes.bool,
+  error: PropTypes.object,
 };
 
 export default LineTimetable;
