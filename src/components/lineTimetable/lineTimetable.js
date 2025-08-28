@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import styles from './lineTimetable.css';
 import LineTimetableHeader from './lineTimetableHeader';
 import LineTableColumns from './lineTableColumns';
-import ErrorPage from '../errorPage/errorPage';
 import AllStopsList from './allStopsList';
 import { PrintButton } from '../util';
 import {
@@ -284,7 +283,10 @@ class LineTimetable extends Component {
 
   render() {
     if (this.props.error) {
-      return <ErrorPage error={this.props.error} renderProps={this.props} />;
+      console.error(this.props.error);
+      window.location.href =
+        'https://hslstoragekarttatuotanto.z6.web.core.windows.net/rendering-error.html'; // Redirect to error page
+      return <></>;
     }
 
     const { routes } = this.props;
