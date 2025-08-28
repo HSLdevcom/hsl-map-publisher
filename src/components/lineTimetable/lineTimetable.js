@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styles from './lineTimetable.css';
 import LineTimetableHeader from './lineTimetableHeader';
 import LineTableColumns from './lineTableColumns';
+import ErrorPage from '../errorPage/errorPage';
 import AllStopsList from './allStopsList';
 import { PrintButton } from '../util';
 import {
