@@ -220,39 +220,48 @@ const filterNotes = (notes, dateBegin) => {
 };
 
 const lineQueryMapper = mapProps(props => {
-  const line = props.data.lines.nodes[0];
-  const { showPrintButton, lang } = props;
+  try {
+    const line = props.data.lines.nodes[0];
+    const { showPrintButton, lang } = props;
 
-  const mergedRoutes = mergeExtraRoutes(line.routes.nodes);
+    const mergedRoutes = mergeExtraRoutes(line.routes.nodes);
 
-  const routesWithGroupedDepartures = mergedRoutes.map(route => {
-    const byValidityDateRange = groupByValidityDateRange(route.timedStopsDepartures.nodes);
-    const departuresByStopsAndDateRanges = groupDepartureDateRangesForStops(
-      route,
-      byValidityDateRange,
-    );
-    const dateRangesGroupedByStopAndDay = departuresByStopsAndDateRanges.map(
-      departuresByStopAndDateRange => {
-        return {
-          dateBegin: departuresByStopAndDateRange.dateBegin,
-          dateEnd: departuresByStopAndDateRange.dateEnd,
-          departuresByStop: groupDeparturesByWeekday(
-            departuresByStopAndDateRange.departuresPerStop,
-          ),
-        };
-      },
-    );
-    return { ...route, departuresByDateRanges: dateRangesGroupedByStopAndDay };
-  });
+    const routesWithGroupedDepartures = mergedRoutes.map(route => {
+      const byValidityDateRange = groupByValidityDateRange(route.timedStopsDepartures.nodes);
+      const departuresByStopsAndDateRanges = groupDepartureDateRangesForStops(
+        route,
+        byValidityDateRange,
+      );
+      const dateRangesGroupedByStopAndDay = departuresByStopsAndDateRanges.map(
+        departuresByStopAndDateRange => {
+          return {
+            dateBegin: departuresByStopAndDateRange.dateBegin,
+            dateEnd: departuresByStopAndDateRange.dateEnd,
+            departuresByStop: groupDeparturesByWeekday(
+              departuresByStopAndDateRange.departuresPerStop,
+            ),
+          };
+        },
+      );
+      return { ...route, departuresByDateRanges: dateRangesGroupedByStopAndDay };
+    });
 
-  const filteredNotes = filterNotes(line.notes.nodes, props.dateBegin);
+    const filteredNotes = filterNotes(line.notes.nodes, props.dateBegin);
 
-  return {
-    line: { ...line, notes: filteredNotes },
-    routes: filterRoutes(routesWithGroupedDepartures),
-    showPrintButton,
-    lang,
-  };
+    return {
+      line: { ...line, notes: filteredNotes },
+      routes: filterRoutes(routesWithGroupedDepartures),
+      showPrintButton,
+      lang,
+    };
+  } catch (error) {
+    return {
+      line: null,
+      routes: null,
+      ...props,
+      error,
+    };
+  }
 });
 
 const hoc = compose(graphql(lineQuery), apolloWrapper(lineQueryMapper));
