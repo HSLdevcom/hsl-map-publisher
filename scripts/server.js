@@ -521,6 +521,17 @@ async function main() {
     );
   };
 
+  const getCurrentWeekDates = () => {
+    return {
+      dateBegin: moment(Date())
+        .startOf('isoWeek')
+        .format('YYYY-MM-DD'),
+      dateEnd: moment(Date())
+        .endOf('isoWeek')
+        .format('YYYY-MM-DD'),
+    };
+  };
+
   unAuthorizedRouter.post('/generateRenderUrl', koaBody(), async ctx => {
     let { props } = ctx.request.body;
     const { component } = ctx.request.body;
@@ -537,12 +548,7 @@ async function main() {
         // Add default date range if not provided, which is a week from today
         props = {
           ...props,
-          dateBegin: moment(Date())
-            .startOf('isoWeek')
-            .format('YYYY-MM-DD'),
-          dateEnd: moment(Date())
-            .endOf('isoWeek')
-            .format('YYYY-MM-DD'),
+          ...getCurrentWeekDates(),
         };
       }
     }
@@ -550,6 +556,21 @@ async function main() {
     const renderUrl = generateRenderUrl(component, template, props);
 
     if (props.redirect) {
+      ctx.redirect(renderUrl);
+    } else {
+      ctx.body = { renderUrl };
+    }
+  });
+
+  unAuthorizedRouter.get('/weeklyLineTimetable/:lineId', koaBody(), async ctx => {
+    const { lineId } = ctx.params;
+    const { redirect } = ctx.request.query;
+    const modifiedLineId = lineId.substring(0, 4); // Skip letter variants
+    const renderUrl = generateRenderUrl('LineTimetable', 'default', {
+      lineId: modifiedLineId,
+      ...getCurrentWeekDates(),
+    });
+    if (redirect) {
       ctx.redirect(renderUrl);
     } else {
       ctx.body = { renderUrl };
