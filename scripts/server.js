@@ -564,13 +564,15 @@ async function main() {
 
   unAuthorizedRouter.get('/weeklyLineTimetable/:lineId', koaBody(), async ctx => {
     const { lineId } = ctx.params;
-    const { redirect } = ctx.request.query;
+    const { redirect, showPrintButton, lang } = ctx.request.query;
     const modifiedLineId = lineId.substring(0, 4); // Skip letter variants
     const renderUrl = generateRenderUrl('LineTimetable', 'default', {
       lineId: modifiedLineId,
       ...getCurrentWeekDates(),
+      showPrintButton,
+      lang,
     });
-    if (redirect) {
+    if (redirect === 'true') {
       ctx.redirect(renderUrl);
     } else {
       ctx.body = { renderUrl };
