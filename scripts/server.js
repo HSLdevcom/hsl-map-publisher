@@ -42,7 +42,6 @@ const {
 
 const { downloadPostersFromCloud } = require('./cloudService');
 const { forEach } = require('lodash');
-const { truncateLineId } = require('../src/util/domain');
 
 const PORT = 4000;
 
@@ -533,6 +532,10 @@ async function main() {
     };
   };
 
+  const truncateLineId = lineId => {
+    return lineId.substring(0, 4);
+  };
+
   unAuthorizedRouter.post('/generateRenderUrl', koaBody(), async ctx => {
     let { props } = ctx.request.body;
     const { component } = ctx.request.body;
@@ -546,12 +549,13 @@ async function main() {
 
     if (component === RENDER_URL_COMPONENTS.LINE_TIMETABLE) {
       const truncatedLineId = truncateLineId(props.lineId);
+      props.lineId = truncatedLineId; // Query "base" lineId only, letter variants are merged in the result.
+
       if (!props.dateBegin && !props.dateEnd) {
         // Add default date range if not provided, which is a week from today
         props = {
           ...props,
           ...getCurrentWeekDates(),
-          lineId: truncatedLineId,
         };
       }
     }

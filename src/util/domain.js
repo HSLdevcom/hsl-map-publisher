@@ -356,10 +356,6 @@ function getShelterText(stopType) {
   }
 }
 
-function truncateLineId(lineId) {
-  return lineId.substring(0, 4);
-}
-
 export {
   isNumberVariant,
   isRailRoute,
@@ -378,5 +374,4 @@ export {
   getFormattedRouteList,
   formatRouteString,
   getShelterText,
-  truncateLineId,
 };
