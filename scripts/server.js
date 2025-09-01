@@ -532,6 +532,10 @@ async function main() {
     };
   };
 
+  const truncateLineId = lineId => {
+    return lineId.substring(0, 4);
+  };
+
   unAuthorizedRouter.post('/generateRenderUrl', koaBody(), async ctx => {
     let { props } = ctx.request.body;
     const { component } = ctx.request.body;
@@ -544,6 +548,9 @@ async function main() {
     }
 
     if (component === RENDER_URL_COMPONENTS.LINE_TIMETABLE) {
+      const truncatedLineId = truncateLineId(props.lineId);
+      props.lineId = truncatedLineId; // Query "base" lineId only, letter variants are merged in the result.
+
       if (!props.dateBegin && !props.dateEnd) {
         // Add default date range if not provided, which is a week from today
         props = {
@@ -566,9 +573,9 @@ async function main() {
     const { lineId } = ctx.params;
     const { redirect, showPrintButton, lang } = ctx.request.query;
 
-    const modifiedLineId = lineId.substring(0, 4); // Skip letter variants
+    const truncatedLineId = truncateLineId(lineId); // Skip letter variants
     const renderUrl = generateRenderUrl('LineTimetable', 'default', {
-      lineId: modifiedLineId,
+      lineId: truncatedLineId,
       ...getCurrentWeekDates(),
       showPrintButton,
       lang,
