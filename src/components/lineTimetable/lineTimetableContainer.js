@@ -14,7 +14,7 @@ import { isNumberVariant } from '../../util/domain';
 
 const lineQuery = gql`
   query lineQuery($lineId: String!, $dateBegin: Date!, $dateEnd: Date!) {
-    lines: getLinesWithIdAndUserDateRange(
+    lines: getLinesWithBroadIdAndUserDateRange(
       id: $lineId
       lineDateBegin: $dateBegin
       lineDateEnd: $dateEnd
@@ -219,12 +219,26 @@ const filterNotes = (notes, dateBegin) => {
   return duplicatesRemoved;
 };
 
+const mergeLines = lines => {
+  const allRoutes = lines
+    .filter(line => line.routes.nodes.length > 0)
+    .flatMap(line => line.routes.nodes);
+
+  return {
+    originalLines: lines,
+    allRoutes,
+  };
+};
+
 const lineQueryMapper = mapProps(props => {
   try {
     const line = props.data.lines.nodes[0];
+    const mergedLines = mergeLines(props.data.lines.nodes);
+    console.log(mergedLines);
+
     const { showPrintButton, lang } = props;
 
-    const mergedRoutes = mergeExtraRoutes(line.routes.nodes);
+    const mergedRoutes = mergeExtraRoutes(mergedLines.allRoutes);
 
     const routesWithGroupedDepartures = mergedRoutes.map(route => {
       const byValidityDateRange = groupByValidityDateRange(route.timedStopsDepartures.nodes);
@@ -247,10 +261,21 @@ const lineQueryMapper = mapProps(props => {
     });
 
     const filteredNotes = filterNotes(line.notes.nodes, props.dateBegin);
+    const filteredRoutes = filterRoutes(routesWithGroupedDepartures);
+
+    const sortedFilteredRoutes = filteredRoutes.sort((a, b) => {
+      if (a.routeIdParsed === b.routeIdParsed) {
+        return a.direction - b.direction;
+      }
+      return (
+        a.routeIdParsed.length - b.routeIdParsed.length ||
+        a.routeIdParsed.localeCompare(b.routeIdParsed)
+      );
+    });
 
     return {
       line: { ...line, notes: filteredNotes },
-      routes: filterRoutes(routesWithGroupedDepartures),
+      routes: sortedFilteredRoutes,
       showPrintButton,
       lang,
     };
