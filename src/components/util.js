@@ -114,13 +114,19 @@ Spacer.propTypes = {
 
 const FlexSpacer = () => <div style={{ flex: '2' }} />;
 
-const InlineSVG = props => (
-  <div
-    // eslint-disable-next-line react/no-danger
-    dangerouslySetInnerHTML={{ __html: props.src }}
-    {...omit(props, 'src')}
-  />
-);
+const InlineSVG = props => {
+  return (
+    <div
+      {...omit(props, 'src')}
+    >
+      <iframe
+        title="SVG"
+        srcDoc={`<html><body>${props.src}</body></html>`}
+        style={{ border: 'none', width: '100%', height: '100%' }}
+      />
+    </div>
+  );
+}
 
 InlineSVG.propTypes = {
   src: PropTypes.string.isRequired,
