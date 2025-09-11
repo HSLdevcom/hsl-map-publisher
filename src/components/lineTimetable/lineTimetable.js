@@ -479,6 +479,7 @@ class LineTimetable extends Component {
 
             if (
               hasDepartures &&
+              departuresByStop.length > 1 &&
               departuresByStop[0].stop.stopId === departuresByStop[1].stop.stopId
             ) {
               departuresByStop.pop(1);
