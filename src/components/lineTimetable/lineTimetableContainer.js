@@ -234,7 +234,6 @@ const lineQueryMapper = mapProps(props => {
   try {
     const line = props.data.lines.nodes[0];
     const mergedLines = mergeLines(props.data.lines.nodes);
-    console.log(mergedLines);
 
     const { showPrintButton, lang } = props;
 
@@ -289,7 +288,25 @@ const lineQueryMapper = mapProps(props => {
   }
 });
 
-const hoc = compose(graphql(lineQuery), apolloWrapper(lineQueryMapper));
+const hoc = compose(
+  graphql(lineQuery, {
+    options: props => {
+      // Fetch all variants
+      const lineId = String(props.lineId || '')
+        .trim()
+        .replace(/^(\d+)[A-Za-z]+$/, '$1');
+
+      return {
+        variables: {
+          lineId,
+          dateBegin: props.dateBegin,
+          dateEnd: props.dateEnd,
+        },
+      };
+    },
+  }),
+  apolloWrapper(lineQueryMapper),
+);
 
 const LineTimetableContainer = hoc(LineTimetable);
 
