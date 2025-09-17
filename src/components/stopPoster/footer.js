@@ -25,7 +25,7 @@ function getSvgElementPosition($element, widthModifier = 0, heightModifier = 0) 
   const height = isLine
     ? $element.attr('stroke-width')
       ? // The stroke-width can be defined either as an attribute or as a style.
-        parseAttr($element.attr('stroke-width'))
+      parseAttr($element.attr('stroke-width'))
       : parseAttr($element.css('stroke-width'))
     : parseAttr($element.attr('height'));
 
@@ -168,7 +168,7 @@ const Footer = props => {
             key={`slot_${slotIdx}_${slot.name}`}
             className={styles.dynamicSlot}
             style={slot.style}>
-            <div className={styles.svgContainer} dangerouslySetInnerHTML={{ __html: svg }} />
+            <InlineSVG className={styles.svgContainer} src={svg} />
             {slot.dynamicAreas.map((area, areaIdx) => {
               const url = get(urlsByType, get(area, 'data', ''), null);
 

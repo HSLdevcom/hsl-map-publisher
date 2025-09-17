@@ -9,7 +9,7 @@ const fs = require('fs-extra');
 const { Queue } = require('bullmq');
 const Redis = require('ioredis');
 const { koaBody } = require('koa-body');
-const validator = require('validator');
+const moment = require('moment');
 
 const fileHandler = require('./fileHandler');
 const authEndpoints = require('./auth/authEndpoints');
@@ -17,11 +17,7 @@ const { matchStopDataToRules } = require('./util/rules');
 
 const { generateRenderUrl, csvPath } = require('./generator');
 
-const {
-  DOMAINS_ALLOWED_TO_GENERATE,
-  PUBLISHER_TEST_GROUP,
-  REDIS_CONNECTION_STRING,
-} = require('../constants');
+const { GROUP_GENERATE, GROUP_READONLY, REDIS_CONNECTION_STRING } = require('../constants');
 
 const {
   migrate,
@@ -125,6 +121,17 @@ const errorHandler = async (ctx, next) => {
   }
 };
 
+const allowedToGenerate = user => {
+  if (isRunningOnLocalEnv()) return true;
+  if (!user || !user.email) return false;
+
+  if (user.groups && user.groups.includes(GROUP_GENERATE)) {
+    return true;
+  }
+
+  return false;
+};
+
 const authMiddleware = async (ctx, next) => {
   // Helper function to allow specific requests without authentication
   const allowAuthException = ctx2 => {
@@ -163,28 +170,16 @@ const authMiddleware = async (ctx, next) => {
       // Not authenticated, throw 401
       ctx.throw(401);
     } else {
+      // If the request is CRUD, check if the user has privileges to perform the action
+      if (ctx.method !== 'GET' && ctx.method !== 'HEAD') {
+        const user = authResponse.body;
+        if (!allowedToGenerate(user)) {
+          ctx.throw(403, 'User does not have privileges to perform this action.');
+        }
+      }
       await next();
     }
   }
-};
-
-const allowedToGenerate = user => {
-  if (isRunningOnLocalEnv()) return true;
-  if (!user || !user.email) return false;
-
-  const parsedAllowedDomains = DOMAINS_ALLOWED_TO_GENERATE.split(',');
-
-  if (user.groups && user.groups.includes(PUBLISHER_TEST_GROUP)) {
-    return true;
-  }
-
-  const emailCheckOpts = {
-    host_whitelist: parsedAllowedDomains,
-  };
-
-  const isAllowedToGenerate = validator.isEmail(user.email, emailCheckOpts);
-
-  return isAllowedToGenerate;
 };
 
 const createBuildCoverPage = async (buildId, buildTitle, posters) => {
@@ -488,9 +483,15 @@ async function main() {
 
   router.post('/login', async ctx => {
     const authResponse = await authEndpoints.authorize(ctx.request, ctx.response, ctx.session);
-    ctx.session = authResponse.modifiedSession;
-    ctx.body = authResponse.body;
-    ctx.response.status = authResponse.status;
+
+    if (authResponse.body.isOk) {
+      ctx.session = authResponse.modifiedSession;
+      ctx.body = authResponse.body;
+      ctx.response.status = authResponse.status;
+    } else {
+      ctx.body = authResponse.body.message;
+      ctx.response.status = authResponse.status;
+    }
   });
 
   router.get('/logout', async ctx => {
@@ -513,21 +514,73 @@ async function main() {
     ctx.status = 200;
   });
 
+  const isAllowedComponent = component => {
+    return (
+      component === RENDER_URL_COMPONENTS.TIMETABLE ||
+      component === RENDER_URL_COMPONENTS.LINE_TIMETABLE
+    );
+  };
+
+  const getCurrentWeekDates = () => {
+    return {
+      dateBegin: moment(Date())
+        .startOf('isoWeek')
+        .format('YYYY-MM-DD'),
+      dateEnd: moment(Date())
+        .endOf('isoWeek')
+        .format('YYYY-MM-DD'),
+    };
+  };
+
+  const truncateLineId = lineId => {
+    return lineId.substring(0, 4);
+  };
+
   unAuthorizedRouter.post('/generateRenderUrl', koaBody(), async ctx => {
-    const { props, component } = ctx.request.body;
+    let { props } = ctx.request.body;
+    const { component } = ctx.request.body;
     const { template } = props;
-    if (
-      component !== RENDER_URL_COMPONENTS.TIMETABLE &&
-      component !== RENDER_URL_COMPONENTS.LINE_TIMETABLE
-    ) {
+    if (!isAllowedComponent(component)) {
       // Return error if wrong components is requested, restrict render API only to less resource intensive timetables.
       ctx.body = 'Requested component missing or invalid';
       ctx.status = 400;
       return;
     }
+
+    if (component === RENDER_URL_COMPONENTS.LINE_TIMETABLE) {
+      const truncatedLineId = truncateLineId(props.lineId);
+      props.lineId = truncatedLineId; // Query "base" lineId only, letter variants are merged in the result.
+
+      if (!props.dateBegin && !props.dateEnd) {
+        // Add default date range if not provided, which is a week from today
+        props = {
+          ...props,
+          ...getCurrentWeekDates(),
+        };
+      }
+    }
+
     const renderUrl = generateRenderUrl(component, template, props);
 
     if (props.redirect) {
+      ctx.redirect(renderUrl);
+    } else {
+      ctx.body = { renderUrl };
+    }
+  });
+
+  unAuthorizedRouter.get('/weeklyLineTimetable/:lineId', koaBody(), async ctx => {
+    const { lineId } = ctx.params;
+    const { redirect, showPrintButton, lang } = ctx.request.query;
+
+    const truncatedLineId = truncateLineId(lineId); // Skip letter variants
+    const renderUrl = generateRenderUrl('LineTimetable', 'default', {
+      lineId: truncatedLineId,
+      ...getCurrentWeekDates(),
+      showPrintButton,
+      lang,
+    });
+    if (redirect === 'true') {
       ctx.redirect(renderUrl);
     } else {
       ctx.body = { renderUrl };

@@ -1,14 +1,24 @@
-# Specify a non-default branch for pull requests for npm
-
 version: 2
 updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "daily"
-    # Raise pull requests for version updates
-    # to npm against the `development` branch
+      interval: "weekly"
+    cooldown:
+      semver-major-days: 90
+      semver-minor-days: 60
+      semver-patch-days: 30
+    groups: 
+      major:
+        update-types:
+          - "major"
+      minor:
+        update-types:
+          - "minor"
+          - "patch"
+    open-pull-requests-limit: 5
     target-branch: "development"
-    # Labels on pull requests for version updates only
-    labels:
-      - "NPM Dependencies"

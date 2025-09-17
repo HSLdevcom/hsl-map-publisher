@@ -282,6 +282,13 @@ class LineTimetable extends Component {
   }
 
   render() {
+    if (this.props.error) {
+      console.error(this.props.error);
+      window.location.href =
+        'https://hslstoragekarttatuotanto.z6.web.core.windows.net/rendering-error.html'; // Redirect to error page
+      return <></>;
+    }
+
     const { routes } = this.props;
     let { notes } = this.props.line;
     if (hasFridayDepartures(routes) && usesFridayDepartureNote(routes)) {
@@ -472,6 +479,7 @@ class LineTimetable extends Component {
 
             if (
               hasDepartures &&
+              departuresByStop.length > 1 &&
               departuresByStop[0].stop.stopId === departuresByStop[1].stop.stopId
             ) {
               departuresByStop.pop(1);
@@ -524,6 +532,7 @@ LineTimetable.defaultProps = {
   showPrintButton: false,
   lang: 'fi',
   printPageNumbers: true,
+  error: null,
 };
 
 LineTimetable.propTypes = {
@@ -532,6 +541,7 @@ LineTimetable.propTypes = {
   showPrintButton: PropTypes.bool,
   lang: PropTypes.string,
   printPageNumbers: PropTypes.bool,
+  error: PropTypes.object,
 };
 
 export default LineTimetable;

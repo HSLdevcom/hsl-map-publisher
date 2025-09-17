@@ -314,10 +314,10 @@ function filterRoute(props) {
 function formatRouteString(route) {
   const routeProps = route.route?.nodes[0];
   let routeString;
-  if (route.viaFi || route.viaSe) {
+  if (route.plateViaFi || route.plateViaSe) {
     routeString = `${trimRouteId(route.routeId)} ${routeProps.destinationFi} kautta ${
-      route.viaFi
-    } / ${routeProps.destinationSe} via ${route.viaSe}`;
+      route.plateViaFi
+    } / ${routeProps.destinationSe} via ${route.plateViaSe}`;
   } else {
     routeString = `${trimRouteId(route.routeId)} ${routeProps.destinationFi} / ${
       routeProps.destinationSe

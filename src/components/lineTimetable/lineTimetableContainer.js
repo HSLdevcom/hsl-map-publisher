@@ -14,7 +14,7 @@ import { isNumberVariant } from '../../util/domain';
 
 const lineQuery = gql`
   query lineQuery($lineId: String!, $dateBegin: Date!, $dateEnd: Date!) {
-    lines: getLinesWithIdAndUserDateRange(
+    lines: getLinesWithBroadIdAndUserDateRange(
       id: $lineId
       lineDateBegin: $dateBegin
       lineDateEnd: $dateEnd
@@ -219,43 +219,94 @@ const filterNotes = (notes, dateBegin) => {
   return duplicatesRemoved;
 };
 
-const lineQueryMapper = mapProps(props => {
-  const line = props.data.lines.nodes[0];
-  const { showPrintButton, lang } = props;
-
-  const mergedRoutes = mergeExtraRoutes(line.routes.nodes);
-
-  const routesWithGroupedDepartures = mergedRoutes.map(route => {
-    const byValidityDateRange = groupByValidityDateRange(route.timedStopsDepartures.nodes);
-    const departuresByStopsAndDateRanges = groupDepartureDateRangesForStops(
-      route,
-      byValidityDateRange,
-    );
-    const dateRangesGroupedByStopAndDay = departuresByStopsAndDateRanges.map(
-      departuresByStopAndDateRange => {
-        return {
-          dateBegin: departuresByStopAndDateRange.dateBegin,
-          dateEnd: departuresByStopAndDateRange.dateEnd,
-          departuresByStop: groupDeparturesByWeekday(
-            departuresByStopAndDateRange.departuresPerStop,
-          ),
-        };
-      },
-    );
-    return { ...route, departuresByDateRanges: dateRangesGroupedByStopAndDay };
-  });
-
-  const filteredNotes = filterNotes(line.notes.nodes, props.dateBegin);
+const mergeLines = lines => {
+  const allRoutes = lines
+    .filter(line => line.routes.nodes.length > 0)
+    .flatMap(line => line.routes.nodes);
 
   return {
-    line: { ...line, notes: filteredNotes },
-    routes: filterRoutes(routesWithGroupedDepartures),
-    showPrintButton,
-    lang,
+    originalLines: lines,
+    allRoutes,
   };
+};
+
+const lineQueryMapper = mapProps(props => {
+  try {
+    const line = props.data.lines.nodes[0];
+    const mergedLines = mergeLines(props.data.lines.nodes);
+
+    const { showPrintButton, lang } = props;
+
+    const mergedRoutes = mergeExtraRoutes(mergedLines.allRoutes);
+
+    const routesWithGroupedDepartures = mergedRoutes.map(route => {
+      const byValidityDateRange = groupByValidityDateRange(route.timedStopsDepartures.nodes);
+      const departuresByStopsAndDateRanges = groupDepartureDateRangesForStops(
+        route,
+        byValidityDateRange,
+      );
+      const dateRangesGroupedByStopAndDay = departuresByStopsAndDateRanges.map(
+        departuresByStopAndDateRange => {
+          return {
+            dateBegin: departuresByStopAndDateRange.dateBegin,
+            dateEnd: departuresByStopAndDateRange.dateEnd,
+            departuresByStop: groupDeparturesByWeekday(
+              departuresByStopAndDateRange.departuresPerStop,
+            ),
+          };
+        },
+      );
+      return { ...route, departuresByDateRanges: dateRangesGroupedByStopAndDay };
+    });
+
+    const filteredNotes = filterNotes(line.notes.nodes, props.dateBegin);
+    const filteredRoutes = filterRoutes(routesWithGroupedDepartures);
+
+    const sortedFilteredRoutes = filteredRoutes.sort((a, b) => {
+      if (a.routeIdParsed === b.routeIdParsed) {
+        return a.direction - b.direction;
+      }
+      return (
+        a.routeIdParsed.length - b.routeIdParsed.length ||
+        a.routeIdParsed.localeCompare(b.routeIdParsed)
+      );
+    });
+
+    return {
+      line: { ...line, notes: filteredNotes },
+      routes: sortedFilteredRoutes,
+      showPrintButton,
+      lang,
+    };
+  } catch (error) {
+    return {
+      line: null,
+      routes: null,
+      ...props,
+      error,
+    };
+  }
 });
 
-const hoc = compose(graphql(lineQuery), apolloWrapper(lineQueryMapper));
+const hoc = compose(
+  graphql(lineQuery, {
+    options: props => {
+      // Fetch all variants
+      const lineId = String(props.lineId || '')
+        .trim()
+        .replace(/^(\d+)[A-Za-z]+$/, '$1');
+
+      return {
+        variables: {
+          lineId,
+          dateBegin: props.dateBegin,
+          dateEnd: props.dateEnd,
+        },
+      };
+    },
+  }),
+  apolloWrapper(lineQueryMapper),
+);
 
 const LineTimetableContainer = hoc(LineTimetable);
 
