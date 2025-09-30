@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
-import { InlineSVG } from 'components/util';
+import InlineSVG from 'components/inlineSVG';
 import renderQueue from 'util/renderQueue';
 import styles from './stopPoster.css';
 
@@ -66,7 +66,7 @@ class AdContainer extends Component {
           this.root = ref;
         }}>
         {ads.slice(0, this.state.spaces).map((src, i) => (
-          <InlineSVG key={i} style={iconStyle} src={src} />
+          <InlineSVG key={i} style={iconStyle} src={src} fitToSize />
         ))}
       </div>
     );

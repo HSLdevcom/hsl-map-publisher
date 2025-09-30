@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { InlineSVG } from 'components/util';
+import InlineSVG from 'components/inlineSVG';
 import markerIcon from 'icons/marker.svg';
 
 import Path from './path';
