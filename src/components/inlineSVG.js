@@ -1,64 +1,36 @@
 import React from 'react';
-import omit from 'lodash/omit';
 import PropTypes from 'prop-types';
 
-export default class InlineSVG extends React.Component {
-  constructor(props) {
-    super(props);
-    this.iframeRef = React.createRef();
-  }
+const getIframeStyle = (src, fitToSize) => {
+  let style = { border: 'none', height: '100%', width: '100%' };
 
-  componentDidMount() {
-    this.resizeIframeToFitSvg();
-  }
+  if (!fitToSize) return style;
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.src !== this.props.src) {
-      this.resizeIframeToFitSvg();
-    }
-  }
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(src, 'image/svg+xml');
+  const svg = doc.querySelector('svg');
 
-  resizeIframeToFitSvg() {
-    if (!this.props.fitToSize) return;
-    const iframe = this.iframeRef.current;
-    if (!iframe) return;
+  if (!svg) return style;
 
-    const doc = iframe.contentDocument || iframe.contentWindow?.document;
-    if (doc) {
-      doc.open();
-      doc.write(`<html><body style="margin:0;">${this.props.src}</body></html>`);
-      doc.close();
+  const width = svg.getAttribute('width') || (svg.viewBox?.baseVal?.width ?? null);
+  const height = svg.getAttribute('height') || (svg.viewBox?.baseVal?.height ?? null);
 
-      const svg = doc.querySelector('svg');
-      if (svg) {
-        const width =
-          svg.getAttribute('width') ||
-          (svg.viewBox?.baseVal?.width ? svg.viewBox.baseVal.width : null);
-        const height =
-          svg.getAttribute('height') ||
-          (svg.viewBox?.baseVal?.height ? svg.viewBox.baseVal.height : null);
+  if (!width || !height) return style;
 
-        if (width && height) {
-          iframe.style.width = `${width}px`;
-          iframe.style.height = `${height}px`;
-        }
-      }
-    }
-  }
+  style = { ...style, width: `${width}px`, height: `${height}px` };
+  return style;
+};
 
-  render() {
-    return (
-      <div {...omit(this.props, 'src')}>
-        <iframe
-          srcDoc={`<html><body>${this.props.src}</body></html>`}
-          title="SVG"
-          ref={this.iframeRef}
-          style={{ border: 'none', height: '100%', width: '100%' }}
-        />
-      </div>
-    );
-  }
-}
+const InlineSVG = ({ src, fitToSize = false, ...otherProps }) => {
+  const iframeStyle = getIframeStyle(src, fitToSize);
+  return (
+    <div
+      // eslint-disable-next-line react/no-danger
+      dangerouslySetInnerHTML={{ __html: src }}
+      {...otherProps}
+    />
+  );
+};
 
 InlineSVG.propTypes = {
   src: PropTypes.string.isRequired,
@@ -68,3 +40,5 @@ InlineSVG.propTypes = {
 InlineSVG.defaultProps = {
   fitToSize: false,
 };
+
+export default InlineSVG;
