@@ -5,7 +5,8 @@ import find from 'lodash/find';
 import ItemContainer from 'components/labelPlacement/itemContainer';
 import ItemFixed from 'components/labelPlacement/itemFixed';
 import ItemPositioned from 'components/labelPlacement/itemPositioned';
-import { Row, InlineSVG } from 'components/util';
+import { Row } from 'components/util';
+import InlineSVG from 'components/inlineSVG';
 
 import locationIcon from 'icons/marker.svg';
 import subwayStationIcon from 'icons/icon-subway-station.svg';
@@ -50,6 +51,7 @@ const LocationSymbol = props => (
 
 const getSalesPointIcon = type => (
   <InlineSVG
+    fitToSize
     src={type.toLowerCase() === 'myyntipiste' ? ticketSalesPointIcon : ticketMachineIcon}
   />
 );
@@ -73,7 +75,7 @@ const getZoneIcon = zone => {
   }
 };
 
-const ZoneLabel = props => (
+const ZoneLabel = () => (
   <div className={styles.zoneHeading}>
     <span>
       <strong>Vyöhyke</strong> Zon/Zone

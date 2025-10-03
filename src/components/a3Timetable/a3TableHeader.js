@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { InlineSVG } from 'components/util';
+import InlineSVG from 'components/inlineSVG';
 import timeLogo from '../../icons/time.svg';
 
 import styles from './a3TableHeader.css';
