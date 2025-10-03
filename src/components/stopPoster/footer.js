@@ -3,7 +3,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import QrCode from 'components/qrCode';
-import { InlineSVG } from 'components/util';
+import InlineSVG from 'components/inlineSVG';
 import classnames from 'classnames';
 import get from 'lodash/get';
 import cheerio from 'cheerio';
@@ -25,7 +25,7 @@ function getSvgElementPosition($element, widthModifier = 0, heightModifier = 0) 
   const height = isLine
     ? $element.attr('stroke-width')
       ? // The stroke-width can be defined either as an attribute or as a style.
-      parseAttr($element.attr('stroke-width'))
+        parseAttr($element.attr('stroke-width'))
       : parseAttr($element.css('stroke-width'))
     : parseAttr($element.attr('height'));
 
@@ -45,7 +45,7 @@ function getDynamicAreas(svg, widthModifier, heightModifier) {
   const dynamicAreas = $('.dynamic-area');
   const areas = [];
 
-  dynamicAreas.each((idx, element) => {
+  dynamicAreas.each((_, element) => {
     const area = $(element);
     const areaType = area.data('area-type');
     const areaData = area.data('area-data');

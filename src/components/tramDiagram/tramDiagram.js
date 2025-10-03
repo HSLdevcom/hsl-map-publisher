@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { InlineSVG } from 'components/util';
+import InlineSVG from 'components/inlineSVG';
 
 import styles from './tramDiagram.css';
 

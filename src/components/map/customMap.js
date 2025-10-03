@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import get from 'lodash/get';
 import Measure from 'react-measure';
 import StopMap from './stopMapContainer';
-import { InlineSVG } from '../util';
+import InlineSVG from 'components/inlineSVG';
 import renderQueue from '../../util/renderQueue';
 import { sizedSvg } from '../../util/sizedSvg';
 

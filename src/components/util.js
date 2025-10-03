@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import omit from 'lodash/omit';
 
 import styles from './util.css';
 
@@ -114,24 +113,6 @@ Spacer.propTypes = {
 
 const FlexSpacer = () => <div style={{ flex: '2' }} />;
 
-const InlineSVG = props => {
-  return (
-    <div
-      {...omit(props, 'src')}
-    >
-      <iframe
-        title="SVG"
-        srcDoc={`<html><body>${props.src}</body></html>`}
-        style={{ border: 'none', width: '100%', height: '100%' }}
-      />
-    </div>
-  );
-}
-
-InlineSVG.propTypes = {
-  src: PropTypes.string.isRequired,
-};
-
 const PrintButton = lang => {
   const PRINT_TEXT = {
     fi: 'TULOSTA AIKATAULU',
@@ -235,7 +216,6 @@ export {
   JustifiedColumn,
   Spacer,
   FlexSpacer,
-  InlineSVG,
   PlatformSymbol,
   getWeekdayName,
   PrintButton,

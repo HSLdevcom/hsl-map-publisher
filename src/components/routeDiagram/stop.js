@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { iconsByMode, trimRouteId, routeGeneralizer, getColor } from 'util/domain';
-import { Column, InlineSVG } from 'components/util';
+import { Column } from 'components/util';
+import InlineSVG from 'components/inlineSVG';
 import styles from './stop.css';
 
 const metroRegexp = / ?\(M\)$/;
@@ -45,7 +46,7 @@ class Stop extends Component {
     this.props.transferModes.forEach(mode => modes.add(mode));
 
     const terminalAreaRouteList = this.getTerminalAreaRoutes(this.props);
-    const terminalAreaRoutes = terminalAreaRouteList.routes.map((route, index) => {
+    const terminalAreaRoutes = terminalAreaRouteList.routes.map(route => {
       return {
         text: route.text,
         trunkRoute: terminalAreaRouteList.trunkRoutes.includes(route.text),

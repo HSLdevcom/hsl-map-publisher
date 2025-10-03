@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { chunk, cloneDeep, sortBy } from 'lodash';
-import { Row, Column, InlineSVG } from 'components/util';
+import { chunk, sortBy } from 'lodash';
+import { Row, Column } from 'components/util';
 import a3headerContainer from './a3headerContainer';
 import renderQueue from 'util/renderQueue';
 import { getColor } from 'util/domain';
