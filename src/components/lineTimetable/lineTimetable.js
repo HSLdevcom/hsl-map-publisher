@@ -236,7 +236,8 @@ RouteDepartures.propTypes = {
 
 const checkForTrainRoutes = routes => {
   return routes.map(route => {
-    if (route.mode === 'RAIL') {
+    const { mode } = route;
+    if (mode === 'RAIL' || mode === 'SUBWAY') {
       return { ...route, routeIdParsed: shortenTrainParsedLineId(route.routeIdParsed) };
     }
     return route;

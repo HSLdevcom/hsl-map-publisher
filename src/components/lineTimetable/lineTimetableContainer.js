@@ -292,10 +292,12 @@ const hoc = compose(
   graphql(lineQuery, {
     options: props => {
       // Fetch all variants
-      const lineId = String(props.lineId || '')
+      console.log(`lineId ${props.lineId}`);
+      const lineId = String('31M1B' || '')
         .trim()
-        .replace(/^(\d+)[A-Za-z]+$/, '$1');
+        .replace(/^([\dM]+)[A-Za-z]+$/, '$1');
 
+      console.log(`lineIdParsed ${lineId}`);
       return {
         variables: {
           lineId,
