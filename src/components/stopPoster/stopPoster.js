@@ -238,14 +238,7 @@ class StopPoster extends Component {
       }
 
       if (this.state.hasColumnTimetable) {
-        this.setState({
-          hasColumnTimetable: false,
-        });
-        return;
-      }
-
-      if (this.state.hasRoutes) {
-        this.setState({ hasRoutes: false });
+        this.setState({ hasColumnTimetable: false });
         return;
       }
 
@@ -273,6 +266,11 @@ class StopPoster extends Component {
           hasDiagram: true,
           diagramOptions: defaultDiagramOptions,
         });
+        return;
+      }
+
+      if (this.state.hasRoutes) {
+        this.setState({ hasRoutes: false });
         return;
       }
 
