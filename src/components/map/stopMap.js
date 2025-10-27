@@ -51,7 +51,6 @@ const LocationSymbol = props => (
 
 const getSalesPointIcon = type => (
   <InlineSVG
-    fitToSize
     src={type.toLowerCase() === 'myyntipiste' ? ticketSalesPointIcon : ticketMachineIcon}
   />
 );

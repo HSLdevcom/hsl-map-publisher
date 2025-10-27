@@ -66,7 +66,7 @@ class AdContainer extends Component {
           this.root = ref;
         }}>
         {ads.slice(0, this.state.spaces).map((src, i) => (
-          <InlineSVG key={i} style={iconStyle} src={src} fitToSize />
+          <InlineSVG key={i} style={iconStyle} src={src} />
         ))}
       </div>
     );
