@@ -7,8 +7,11 @@ const InlineSVG = ({ src, ...otherProps }) => {
   useEffect(() => {
     if (!containerRef.current || !src) return;
 
-    containerRef.current.innerHTML = '';
-    const shadow = containerRef.current.attachShadow({ mode: 'open' });
+    let shadow = containerRef.current.shadowRoot;
+    if (!shadow) {
+      shadow = containerRef.current.attachShadow({ mode: 'open' });
+    }
+
     shadow.innerHTML = src;
   }, [src]);
 
