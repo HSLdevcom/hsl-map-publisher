@@ -2,20 +2,13 @@ import React, { useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 const InlineSVG = ({ src, ...otherProps }) => {
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    if (!containerRef.current || !src) return;
-
-    let shadow = containerRef.current.shadowRoot;
-    if (!shadow) {
-      shadow = containerRef.current.attachShadow({ mode: 'open' });
-    }
-
-    shadow.innerHTML = src;
-  }, [src]);
-
-  return <div ref={containerRef} {...otherProps} />;
+  return (
+    <div
+      // eslint-disable-next-line react/no-danger
+      dangerouslySetInnerHTML={{ __html: src }}
+      {...otherProps}
+    />
+  );
 };
 
 InlineSVG.propTypes = {
