@@ -294,7 +294,7 @@ const hoc = compose(
       // Fetch all variants
       const lineId = String(props.lineId || '')
         .trim()
-        .replace(/^(\d+)[A-Za-z]+$/, '$1');
+        .replace(/^([\dM]+)[A-Za-z]+$/, '$1');
 
       return {
         variables: {

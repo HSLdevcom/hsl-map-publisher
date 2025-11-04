@@ -238,14 +238,7 @@ class StopPoster extends Component {
       }
 
       if (this.state.hasColumnTimetable) {
-        this.setState({
-          hasColumnTimetable: false,
-        });
-        return;
-      }
-
-      if (this.state.hasRoutes) {
-        this.setState({ hasRoutes: false });
+        this.setState({ hasColumnTimetable: false });
         return;
       }
 
@@ -276,6 +269,11 @@ class StopPoster extends Component {
         return;
       }
 
+      if (this.state.hasRoutes) {
+        this.setState({ hasRoutes: false });
+        return;
+      }
+
       this.onError('Failed to remove layout overflow');
       return;
     }
@@ -285,9 +283,11 @@ class StopPoster extends Component {
       return;
     }
 
-    if (this.state.template && this.state.removedAds.length > 0) {
-      const { template } = this.state;
-      const svg = get(template, 'areas', []).find(t => t.key === 'map').slots[0];
+    const { template } = this.state;
+    const mapTemplateArea = get(template, 'areas', []).find(t => t.key === 'map');
+
+    if (template && this.state.removedAds.length > 0 && mapTemplateArea) {
+      const svg = mapTemplateArea.slots[0];
       //  If using svg postpone adsPhase untill we have mapHeight.
       if (!svg.image) {
         this.setState({ adsPhase: true });
