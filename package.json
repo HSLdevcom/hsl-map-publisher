@@ -94,7 +94,7 @@
     "graphql": "^0.11.7",
     "graphql-tag": "^2.5.0",
     "haversine": "^1.1.1",
-    "hsl-map-style": "hsldevcom/hsl-map-style#zone_e_map_styles",
+    "hsl-map-style": "hsldevcom/hsl-map-style#master",
     "html-webpack-plugin": "^4.0.0-alpha",
     "ioredis": "^5.0.6",
     "knex": "^2.0.0",
