@@ -17,6 +17,7 @@ import aZone from 'icons/icon-Zone-A.svg';
 import bZone from 'icons/icon-Zone-B.svg';
 import cZone from 'icons/icon-Zone-C.svg';
 import dZone from 'icons/icon-Zone-D.svg';
+import eZone from 'icons/icon-Zone-E.svg';
 
 import MapCoordinateHelper from '../../util/mapCoordinateHelper';
 import MapImage from './mapImageContainer';
@@ -69,6 +70,8 @@ const getZoneIcon = zone => {
       return <InlineSVG src={dZone} style={{ width: '100%' }} />;
     case 'D2':
       return <InlineSVG src={dZone} style={{ width: '100%' }} />;
+    case 'E':
+      return <InlineSVG src={eZone} style={{ width: '100%' }} />;
     default:
       return <div />;
   }

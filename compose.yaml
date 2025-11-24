@@ -6,7 +6,7 @@ services:
       - 6379:6379
 
   publisher-postgres:
-    image: postgres
+    image: postgres:17
     ports:
       - 5433:5432
     environment:
