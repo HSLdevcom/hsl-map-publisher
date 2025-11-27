@@ -51,7 +51,7 @@ const TableHeader = props => {
         className={classNames(styles.subtitle, {
           [styles.compactSubtitle]: props.useCompactLayout,
         })}>
-        <div className={styles.strong}>Timme</div>
+        <div className={styles.strong}>Timme xxxxx</div>
         <div>
           <span className={styles.strong}>min</span> / linje Tiderna är beräknade
         </div>
