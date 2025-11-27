@@ -5,8 +5,9 @@ import classNames from 'classnames';
 import styles from './tableHeader.css';
 
 const TableHeader = props => {
+  const style = props.intervalTimetable ? { fontSize: '19.5px' } : undefined;
   const header = props.printAsA3 ? (
-    <div className={styles.inline}>
+    <div className={styles.inline} style={style}>
       <span>
         {' '}
         &nbsp;&nbsp;
@@ -18,7 +19,7 @@ const TableHeader = props => {
       </span>
     </div>
   ) : (
-    <div className={styles.inline}>
+    <div className={styles.inline} style={style}>
       <span>
         {' '}
         &nbsp;&nbsp;
@@ -36,36 +37,39 @@ const TableHeader = props => {
         <span className={styles.strong}>{props.title}</span>
         {header}
       </div>
+      {props.intervalTimetable || (
+        <>
+          <div
+            className={classNames(styles.subtitle, {
+              [styles.compactSubtitle]: props.useCompactLayout,
+            })}>
+            <div className={styles.strong}>Tunti</div>
+            <div>
+              <span className={styles.strong}>min</span> / linja Ajat ovat arvioituja
+            </div>
+          </div>
 
-      <div
-        className={classNames(styles.subtitle, {
-          [styles.compactSubtitle]: props.useCompactLayout,
-        })}>
-        <div className={styles.strong}>Tunti</div>
-        <div>
-          <span className={styles.strong}>min</span> / linja Ajat ovat arvioituja
-        </div>
-      </div>
+          <div
+            className={classNames(styles.subtitle, {
+              [styles.compactSubtitle]: props.useCompactLayout,
+            })}>
+            <div className={styles.strong}>Timme</div>
+            <div>
+              <span className={styles.strong}>min</span> / linje Tiderna är beräknade
+            </div>
+          </div>
 
-      <div
-        className={classNames(styles.subtitle, {
-          [styles.compactSubtitle]: props.useCompactLayout,
-        })}>
-        <div className={styles.strong}>Timme</div>
-        <div>
-          <span className={styles.strong}>min</span> / linje Tiderna är beräknade
-        </div>
-      </div>
-
-      <div
-        className={classNames(styles.subtitle, {
-          [styles.compactSubtitle]: props.useCompactLayout,
-        })}>
-        <div className={styles.strong}>Hour</div>
-        <div>
-          <span className={styles.strong}>min</span> / route The times are estimates
-        </div>
-      </div>
+          <div
+            className={classNames(styles.subtitle, {
+              [styles.compactSubtitle]: props.useCompactLayout,
+            })}>
+            <div className={styles.strong}>Hour</div>
+            <div>
+              <span className={styles.strong}>min</span> / route The times are estimates
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
@@ -74,6 +78,7 @@ TableHeader.defaultProps = {
   printingAsA4: false,
   printAsA3: false,
   useCompactLayout: false,
+  intervalTimetable: false,
 };
 
 TableHeader.propTypes = {
@@ -83,6 +88,7 @@ TableHeader.propTypes = {
   printingAsA4: PropTypes.bool,
   printAsA3: PropTypes.bool,
   useCompactLayout: PropTypes.bool,
+  intervalTimetable: PropTypes.bool,
 };
 
 export default TableHeader;
