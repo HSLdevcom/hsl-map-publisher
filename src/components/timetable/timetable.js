@@ -1,12 +1,23 @@
 import React, { Component } from 'react';
 import CoverPage from '../coverPage/coverPage';
 import PropTypes from 'prop-types';
-import { Spacer, PlatformSymbol, getWeekdayName, PrintButton } from 'components/util';
+import {
+  Spacer,
+  PlatformSymbol,
+  getWeekdayName,
+  PrintButton,
+  Row,
+  WrappingRow,
+} from 'components/util';
 import classNames from 'classnames';
+import clockIcon from 'icons/clock.svg';
+import InlineSVG from 'components/inlineSVG';
 
+import { prepareOrderedDepartureHoursByRoute } from './departureUtils';
 import TableHeader from './tableHeader';
 import TableRows from './tableRows';
 import SimpleRoutes from './simpleRoutes';
+import { getIcon, getColor } from 'util/domain';
 
 import styles from './timetable.css';
 
@@ -75,6 +86,8 @@ class Timetable extends Component {
   }
 
   render() {
+    const { combinedDays, routeIdToModeMap, intervalTimetable } = this.props;
+    const date = new Date(`${this.props.date}T00:00:00`);
     if (!this.props.hasDepartures) {
       return null;
     }
@@ -139,7 +152,7 @@ class Timetable extends Component {
               {this.props.showPrintButton ? <PrintButton lang={this.props.lang} /> : ''}
             </div>
           )}
-          {this.props.showValidityPeriod && (
+          {this.props.showValidityPeriod && !intervalTimetable && (
             <div
               className={classNames(styles.validity, {
                 [styles.coverPageMargin]: this.props.showCoverPage,
@@ -162,13 +175,18 @@ class Timetable extends Component {
             </div>
           )}
         </div>
-        {this.props.showComponentName && (
+        {this.props.showComponentName && !intervalTimetable && (
           <div className={styles.componentName}>
             <div className={styles.title}>Pysäkkiaikataulu&nbsp;&nbsp;</div>
             <div className={styles.subtitle}>Hållplatstidtabell</div>
             <div className={styles.subtitle}>Stop timetable</div>
           </div>
         )}
+        <div className={styles.validFrom}>
+          Aikataulu alkaen {formatDate(date)} - / Tidtabeller fran {formatDate(date)} - /Timetables
+          from {formatDate(date)} -
+        </div>
+
         {this.props.standalone && (
           <React.Fragment>
             <div className={styles.stopZone}>
@@ -197,6 +215,11 @@ class Timetable extends Component {
             dayNames.length > 1
               ? `${getWeekdayName(dayNames[0], 'en')} - ${getWeekdayName(dayNames[1], 'en')}`
               : `${getWeekdayName(dayNames[0], 'en')}`;
+
+          const departureIntervalsByRoute = prepareOrderedDepartureHoursByRoute(
+            combinedDays[combinedDay],
+          );
+
           return (
             <div key={`tableheader_container_${fiTitle}`}>
               <TableHeader
@@ -205,8 +228,53 @@ class Timetable extends Component {
                 subtitleEn={enTitle}
                 printingAsA4={this.props.printableAsA4}
                 useCompactLayout={this.props.useCompactLayout}
+                intervalTimetable={intervalTimetable}
               />
-              <TableRows departures={this.props.combinedDays[combinedDay]} />
+              {intervalTimetable ? (
+                <>
+                  <div className={styles.timetableRoutes}>
+                    <InlineSVG key="clock_svg" className={styles.icon} src={clockIcon} />
+                    {departureIntervalsByRoute.routeIds.map(routeId => {
+                      return (
+                        <div
+                          key={`route-${routeId}`}
+                          className={styles.routeHeadings}
+                          style={{ color: getColor({ mode: routeIdToModeMap[routeId] }) }}>
+                          <InlineSVG
+                            className={styles.icon}
+                            src={getIcon({ mode: routeIdToModeMap[routeId] })}
+                          />
+                          {routeId}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className={styles.timetableRoot}>
+                    {departureIntervalsByRoute.groupedDepartures.map(({ hours, departures }) => {
+                      try {
+                        return (
+                          <Row className={styles.timetableMinutes}>
+                            <div className={styles.hours}>{hours}</div>
+                            {departureIntervalsByRoute.routeIds.map(routeId => (
+                              <WrappingRow>
+                                <div className={styles.interval}>
+                                  {departures[routeId] ? `${departures[routeId]} min` : '-'}
+                                </div>
+                              </WrappingRow>
+                            ))}
+                          </Row>
+                        );
+                      } catch (err) {
+                        console.log(JSON.stringify(departureIntervalsByRoute));
+                        console.log('KEY:', hours);
+                        return <>errr</>;
+                      }
+                    })}
+                  </div>
+                </>
+              ) : (
+                <TableRows departures={this.props.combinedDays[combinedDay]} />
+              )}
             </div>
           );
         })}
@@ -223,6 +291,7 @@ class Timetable extends Component {
 }
 
 Timetable.defaultProps = {
+  intervalTimetable: false,
   saturdays: null,
   sundays: null,
   isSummerTimetable: false,
@@ -241,9 +310,11 @@ Timetable.defaultProps = {
   lang: 'fi',
   showCoverPage: false,
   useCompactLayout: false,
+  routeIdToModeMap: {},
 };
 
 Timetable.propTypes = {
+  intervalTimetable: PropTypes.bool,
   saturdays: PropTypes.arrayOf(PropTypes.shape(TableRows.propTypes.departures)),
   sundays: PropTypes.arrayOf(PropTypes.shape(TableRows.propTypes.departures)),
   notes: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
@@ -274,6 +345,7 @@ Timetable.propTypes = {
   lang: PropTypes.string,
   showCoverPage: PropTypes.bool,
   useCompactLayout: PropTypes.bool,
+  routeIdToModeMap: PropTypes.object,
 };
 
 export default Timetable;
