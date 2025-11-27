@@ -60,29 +60,32 @@ function isULine(routeId) {
  * @returns {String}
  */
 function trimRouteId(routeId, skipULine) {
-  if (isRailRoute(routeId) && isNumberVariant(routeId)) {
-    return routeId.substring(0, 5).replace(RAIL_ROUTE_ID_REGEXP, '');
-  }
-  if (isRailRoute(routeId)) {
-    return routeId.replace(RAIL_ROUTE_ID_REGEXP, '');
-  }
-  if (isSubwayRoute(routeId) && isNumberVariant(routeId)) {
-    return routeId.substring(1, 5).replace(SUBWAY_ROUTE_ID_REGEXP, '');
-  }
-  if (isSubwayRoute(routeId)) {
-    return routeId.replace(SUBWAY_ROUTE_ID_REGEXP, '');
-  }
+  const trimAreaCodeAndLeadingZeros = () => {
+    if (isRailRoute(routeId) && isNumberVariant(routeId)) {
+      return routeId.substring(0, 5).replace(RAIL_ROUTE_ID_REGEXP, '');
+    }
+    if (isRailRoute(routeId)) {
+      return routeId.replace(RAIL_ROUTE_ID_REGEXP, '');
+    }
+    if (isSubwayRoute(routeId) && isNumberVariant(routeId)) {
+      return routeId.substring(1, 5).replace(SUBWAY_ROUTE_ID_REGEXP, '');
+    }
+    if (isSubwayRoute(routeId)) {
+      return routeId.replace(SUBWAY_ROUTE_ID_REGEXP, '');
+    }
 
-  if (isULine(routeId) && !skipULine) {
-    return routeId.substring(0, 5).replace(U_LINE_REGEX, 'U');
-  }
+    if (isULine(routeId) && !skipULine) {
+      return routeId.substring(0, 5).replace(U_LINE_REGEX, 'U');
+    }
 
-  if (isNumberVariant(routeId)) {
-    // Do not show number variants
-    return routeId.substring(1, 5).replace(/^[0]+/g, '');
-  }
+    if (isNumberVariant(routeId)) {
+      // Do not show number variants
+      return routeId.substring(1, 5).replace(/^[0]+/g, '');
+    }
 
-  return routeId.substring(1).replace(/^[0]+/g, '');
+    return routeId.substring(1).replace(/^[0]+/g, '');
+  };
+  return trimAreaCodeAndLeadingZeros().trim();
 }
 
 /**
