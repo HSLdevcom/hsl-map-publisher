@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { Spacer, PlatformSymbol, getWeekdayName, PrintButton } from 'components/util';
 import classNames from 'classnames';
 
-import { prepareOrderedDepartureHoursByRoute } from './departureUtils';
 import TableHeader from './tableHeader';
 import TableRows from './tableRows';
 import SimpleRoutes from './simpleRoutes';
@@ -76,7 +75,6 @@ class Timetable extends Component {
   }
 
   render() {
-    const { combinedDays } = this.props;
     if (!this.props.hasDepartures) {
       return null;
     }
@@ -199,11 +197,6 @@ class Timetable extends Component {
             dayNames.length > 1
               ? `${getWeekdayName(dayNames[0], 'en')} - ${getWeekdayName(dayNames[1], 'en')}`
               : `${getWeekdayName(dayNames[0], 'en')}`;
-
-          const departureIntervalsByRoute = prepareOrderedDepartureHoursByRoute(
-            combinedDays[combinedDay],
-          );
-
           return (
             <div key={`tableheader_container_${fiTitle}`}>
               <TableHeader
@@ -213,34 +206,7 @@ class Timetable extends Component {
                 printingAsA4={this.props.printableAsA4}
                 useCompactLayout={this.props.useCompactLayout}
               />
-              {this.props.intervalTimetable ? (
-                <>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    {Object.keys(departureIntervalsByRoute).map(key => (
-                      <h2>{key}</h2>
-                    ))}
-                  </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    {Object.values(departureIntervalsByRoute).map(hourlyIntervals => {
-                      return (
-                        <div style={{ display: 'flex', flexDirection: 'column', width: '150px' }}>
-                          {hourlyIntervals.map(({ avgInterval, hours }) => {
-                            return (
-                              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <div>{hours}</div>
-                                <div>{avgInterval} min</div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </>
-              ) : (
-                <TableRows departures={this.props.combinedDays[combinedDay]} />
-              )}
+              <TableRows departures={this.props.combinedDays[combinedDay]} />
             </div>
           );
         })}
@@ -257,7 +223,6 @@ class Timetable extends Component {
 }
 
 Timetable.defaultProps = {
-  intervalTimetable: false,
   saturdays: null,
   sundays: null,
   isSummerTimetable: false,
@@ -279,7 +244,6 @@ Timetable.defaultProps = {
 };
 
 Timetable.propTypes = {
-  intervalTimetable: PropTypes.bool,
   saturdays: PropTypes.arrayOf(PropTypes.shape(TableRows.propTypes.departures)),
   sundays: PropTypes.arrayOf(PropTypes.shape(TableRows.propTypes.departures)),
   notes: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,

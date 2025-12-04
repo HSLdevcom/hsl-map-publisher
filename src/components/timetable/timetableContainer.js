@@ -416,7 +416,6 @@ const propsMapper = mapProps(props => {
     notes,
     dateBegin,
     dateEnd,
-    intervalTimetable: props.intervalTimetable,
     date: props.date,
     isSummerTimetable: props.isSummerTimetable,
     showValidityPeriod: props.showValidityPeriod,
@@ -450,7 +449,6 @@ const hoc = compose(graphql(timetableQuery), apolloWrapper(propsMapper));
 const TimetableContainer = hoc(Timetable);
 
 TimetableContainer.defaultProps = {
-  intervalTimetable: false,
   dateBegin: null,
   dateEnd: null,
   isSummerTimetable: false,
@@ -470,7 +468,6 @@ TimetableContainer.defaultProps = {
 };
 
 TimetableContainer.propTypes = {
-  intervalTimetable: PropTypes.bool,
   stopId: PropTypes.string.isRequired,
   date: PropTypes.string.isRequired,
   dateBegin: PropTypes.string,
@@ -482,7 +479,6 @@ TimetableContainer.propTypes = {
   showComponentName: PropTypes.bool,
   standalone: PropTypes.bool,
   printTimetablesAsA4: PropTypes.bool,
-  intervalTimeTable: PropTypes.bool,
   printTimetablesAsGreyscale: PropTypes.bool,
   specialSymbols: PropTypes.array,
   showStopInformation: PropTypes.bool,
