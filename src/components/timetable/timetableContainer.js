@@ -264,7 +264,7 @@ export function addMissingFridayNote(departure) {
     departure.dayType.includes('Pe') &&
     (!departure.note || !departure.note.includes('p'))
     ? 'p'
-    : departure.note;
+    : null;
 }
 
 function addMissingNonAccessibleNote(departure) {
