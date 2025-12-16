@@ -8,8 +8,6 @@ import flatMap from 'lodash/flatMap';
 import groupBy from 'lodash/groupBy';
 import uniq from 'lodash/uniq';
 import pick from 'lodash/pick';
-import fromPairs from 'lodash/fromPairs';
-import get from 'lodash/get';
 
 import apolloWrapper from 'util/apolloWrapper';
 import { isDropOffOnly, trimRouteId, filterRoute } from 'util/domain';
@@ -226,7 +224,6 @@ const timetableQuery = gql`
                 nodes {
                   destinationFi
                   destinationSe
-                  mode
                 }
               }
               notes(date: $date) {
@@ -295,15 +292,6 @@ function modifyNote(departureNote) {
 const propsMapper = mapProps(props => {
   let departures = flatMap(props.data.stop.siblings.nodes, stop =>
     filterDepartures(stop.departures.nodes, stop.routeSegments.nodes, props.routeFilter),
-  );
-
-  const routeIdToModeMap = fromPairs(
-    flatMap(props.data.stop.siblings.nodes, sibling =>
-      sibling.routeSegments.nodes.map(seg => [
-        trimRouteId(seg.routeId),
-        get(seg, 'route.nodes[0].mode'),
-      ]),
-    ),
   );
 
   let notes = flatMap(props.data.stop.siblings.nodes, stop =>
@@ -428,7 +416,6 @@ const propsMapper = mapProps(props => {
     notes,
     dateBegin,
     dateEnd,
-    intervalTimetable: props.intervalTimetable,
     date: props.date,
     isSummerTimetable: props.isSummerTimetable,
     showValidityPeriod: props.showValidityPeriod,
@@ -454,7 +441,6 @@ const propsMapper = mapProps(props => {
     lang: props.lang,
     showCoverPage: props.showCoverPage,
     useCompactLayout: props.useCompactLayout,
-    routeIdToModeMap,
   };
 });
 
@@ -463,7 +449,6 @@ const hoc = compose(graphql(timetableQuery), apolloWrapper(propsMapper));
 const TimetableContainer = hoc(Timetable);
 
 TimetableContainer.defaultProps = {
-  intervalTimetable: false,
   dateBegin: null,
   dateEnd: null,
   isSummerTimetable: false,
@@ -480,11 +465,9 @@ TimetableContainer.defaultProps = {
   lang: 'fi',
   showCoverPage: false,
   useCompactLayout: false,
-  routeIdToModeMap: {},
 };
 
 TimetableContainer.propTypes = {
-  intervalTimetable: PropTypes.bool,
   stopId: PropTypes.string.isRequired,
   date: PropTypes.string.isRequired,
   dateBegin: PropTypes.string,
@@ -496,7 +479,6 @@ TimetableContainer.propTypes = {
   showComponentName: PropTypes.bool,
   standalone: PropTypes.bool,
   printTimetablesAsA4: PropTypes.bool,
-  intervalTimeTable: PropTypes.bool,
   printTimetablesAsGreyscale: PropTypes.bool,
   specialSymbols: PropTypes.array,
   showStopInformation: PropTypes.bool,
@@ -506,7 +488,6 @@ TimetableContainer.propTypes = {
   lang: PropTypes.string,
   showCoverPage: PropTypes.bool,
   useCompactLayout: PropTypes.bool,
-  routeIdToModeMap: PropTypes.object,
 };
 
 export default TimetableContainer;

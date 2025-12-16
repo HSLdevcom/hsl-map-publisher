@@ -329,7 +329,6 @@ class StopPoster extends Component {
       minimapZoneSymbols,
       minimapZones,
       legend,
-      intervalTimetable,
     } = this.props;
     if (!hasRoutesProp) {
       return null;
@@ -355,7 +354,6 @@ class StopPoster extends Component {
     const StopPosterTimetable = props => (
       <div className={styles.timetable}>
         <Timetable
-          intervalTimetable={intervalTimetable}
           stopId={stopId}
           date={date}
           isSummerTimetable={isSummerTimetable}
@@ -494,7 +492,6 @@ class StopPoster extends Component {
 }
 
 StopPoster.propTypes = {
-  intervalTimetable: PropTypes.bool,
   stopId: PropTypes.string.isRequired,
   date: PropTypes.string.isRequired,
   isSummerTimetable: PropTypes.bool,
@@ -516,7 +513,6 @@ StopPoster.propTypes = {
 };
 
 StopPoster.defaultProps = {
-  intervalTimetable: false,
   isSummerTimetable: false,
   dateBegin: null,
   dateEnd: null,
