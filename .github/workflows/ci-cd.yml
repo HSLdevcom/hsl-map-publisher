@@ -1,0 +1,28 @@
+---
+name: "CI/CD: Continuous integration and continuous deployment"
+
+"on":
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  pull_request:
+  merge_group:
+
+env:
+  IMAGE_NAME_MIXEDCASE: "${{ github.repository }}"
+  TEST_STAGE: tester
+  PRODUCTION_STAGE: production
+
+jobs:
+  build-check-test-push:
+    uses: HSLdevcom/transitdata-shared-workflows/.github/workflows/ci-cd-typescript.yml@fix/test_skipping_building_image_still
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.KARTAT_DOCKERHUB_USER }}
+      DOCKER_PASSWORD: ${{ secrets.KARTAT_DOCKERHUB_TOKEN }}
+    with:
+      checkAndTestOutsideDocker: true
+      codeCoverageEnabled: true
+      performRelease: true
+      checkAndTestInsideDocker: false

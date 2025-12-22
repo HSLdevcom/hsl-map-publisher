@@ -1,6 +1,5 @@
 /* eslint-disable no-await-in-loop */
-/* eslint-disable-next-line */
-const { TEST_PUBLISHER_SERVER_URL } = require('../constants.js');
+const { TEST_PUBLISHER_SERVER_URL } = require('../constants');
 const fetch = require('node-fetch');
 const _ = require('lodash');
 const fs = require('fs');
