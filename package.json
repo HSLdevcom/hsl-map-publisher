@@ -12,10 +12,10 @@
     "serve": "serve -l 5000 dist",
     "start": "webpack-serve ./webpack.dev.js",
     "start:production": "serve -l 5000 dist",
-    "server": "node -r dotenv/config scripts/server",
-    "server:production": "node -r dotenv/config scripts/server.js",
-    "worker": "node -r dotenv/config scripts/worker",
-    "worker:production": "./fonts.sh && fc-cache -f -v && node -r dotenv/config scripts/worker.js",
+    "server": "node scripts/server",
+    "server:production": "node scripts/server.js",
+    "worker": "node scripts/worker",
+    "worker:production": "./fonts.sh && fc-cache -f -v && node scripts/worker.js",
     "knex": "PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres knex",
     "docker:build": "docker build -t hsl-map-publisher .",
     "docker:run": "docker run -d -p 4000:4000 --name publisher -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres -e \"PG_CONNECTION_STRING=postgres://postgres:postgres@publisher-postgres:5432/postgres\" --shm-size=1G hsl-map-publisher",
@@ -24,7 +24,7 @@
     "docker:rebuild": "npm run docker:stop && npm run docker:rm && npm run docker:build && npm run docker:run",
     "docker:logs": "docker logs publisher",
     "prepare": "husky install",
-    "test": "node -r dotenv/config test/tests"
+    "test": "node test/tests"
   },
   "lint-staged": {
     "*.js": [

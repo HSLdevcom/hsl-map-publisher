@@ -1,4 +1,4 @@
-FROM node:18-bullseye-slim as production
+FROM node:18-bullseye-slim AS production
 
 RUN apt-get -y update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -yq wget curl gnupg fontconfig fonts-liberation ca-certificates --no-install-recommends \
@@ -22,14 +22,7 @@ RUN npm ci && npm cache clean --force
 
 COPY . ${WORK}
 
-ARG BUILD_ENV=dev
-COPY .env.${BUILD_ENV} ${WORK}/.env
-
-ENV BUILD_ENV=${BUILD_ENV}
 RUN npm run build
-
-ARG SERVICE='start:production'
-ENV SERVICE=${SERVICE}
 
 CMD ["sh", "-c", "npm run ${SERVICE}"]
 
