@@ -24,4 +24,4 @@ COPY . ${WORK}
 
 RUN npm run build
 
-CMD ["sh", "-c", "node scripts/generate-config.js && npm run ${SERVICE}"]
+CMD ["sh", "-c", "node scripts/generateConfig.js && npm run ${SERVICE}"]
