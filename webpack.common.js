@@ -1,8 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const Dotenv = require('dotenv-webpack');
-
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 module.exports = {
@@ -12,7 +10,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Stop poster',
     }),
-    new Dotenv({ systemvars: true }),
   ],
   resolve: {
     modules: ['node_modules', 'src'],
