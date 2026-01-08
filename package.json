@@ -12,9 +12,9 @@
     "serve": "serve -l 5000 dist",
     "start": "webpack-serve ./webpack.dev.js",
     "start:production": "serve -l 5000 dist",
-    "server": "node scripts/server",
+    "server": "node -r dotenv/config scripts/server",
     "server:production": "node scripts/server.js",
-    "worker": "node scripts/worker",
+    "worker": "node -r dotenv/config scripts/worker",
     "worker:production": "./fonts.sh && fc-cache -f -v && node scripts/worker.js",
     "knex": "PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres knex",
     "docker:build": "docker build -t hsl-map-publisher .",
@@ -70,7 +70,6 @@
     "husky": "^8.0.0",
     "lint-staged": "^13.0.2",
     "prettier": "^1.14.3",
-    "react-refresh": "^0.14.0",
     "webpack-cli": "^3.0.8",
     "webpack-serve": "^1.0.4",
     "worker-loader": "^3.0.8"
@@ -78,7 +77,6 @@
   "dependencies": {
     "@azure/storage-blob": "^10.4.0",
     "@koa/cors": "^2.2.1",
-    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.11",
     "@turf/turf": "^6.5.0",
     "apollo-cache-inmemory": "^1.1.1",
     "apollo-client": "^2.0.3",

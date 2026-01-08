@@ -12,7 +12,7 @@ If ticket zone regions are changed, remember to update [ticket-zones-polygons.js
 Install dependencies:
 
 ```
-yarn
+npm install
 ```
 
 Also install Chrome. Refer the installation instructions of Chrome for your operating system.
@@ -83,17 +83,17 @@ REDIS_CONNECTION_STRING=redis://localhost:6379
 
 In development, start the Publisher backend server like this, (make sure you have connection strings in `.env`)
 ```bash
-yarn run server
+npm run server
 ```
 
 Then, start generator worker. (You can start multiple workers.)
 ```bash
-yarn run worker
+npm run worker
 ```
 
 Finally, start the React app/Rendering
 ```bash
-yarn run start
+npm run start
 ```
 
 Now you can use the UI with the server, or open a poster separately in your browser. The poster app needs `component` and `props` query parameters, and the server will echo the currently rendering URL in its console. But if you just need to open the poster app, you can use this link that will show H0454, Snellmaninkatu:
@@ -137,11 +137,6 @@ docker compose up
 ```
 
 Or in a single command:
-```bash
-docker compose up --build
-```
-
-You can also omit the `--env-file` flag, then the `DIGITRANSIT_APIKEY` parameter is read from the default `.env` file (everything else is passed from `.env.local` file per the `Dockerfile` build arguments):
 ```bash
 docker compose up --build
 ```

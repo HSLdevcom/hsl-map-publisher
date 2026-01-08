@@ -12,7 +12,7 @@ RUN apt-get -y update \
 
 ENV NODE_OPTIONS=--openssl-legacy-provider
 
-ENV WORK /opt/publisher
+ENV WORK=/opt/publisher
 
 RUN mkdir -p ${WORK}
 WORKDIR ${WORK}
@@ -25,3 +25,4 @@ COPY . ${WORK}
 RUN npm run build
 
 CMD ["sh", "-c", "node scripts/generateConfig.js && npm run ${SERVICE}"]
+

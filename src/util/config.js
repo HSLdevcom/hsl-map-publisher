@@ -11,8 +11,7 @@ const config = {
     'https://kartat.hsl.fi/jore/graphql',
   REACT_APP_PUBLISHER_SERVER_URL:
     runtimeConfig.REACT_APP_PUBLISHER_SERVER_URL || process.env.REACT_APP_PUBLISHER_SERVER_URL,
-  SALES_POINT_DATA_URL:
-    runtimeConfig.SALES_POINT_DATA_URL || process.env.SALES_POINT_DATA_URL,
+  SALES_POINT_DATA_URL: runtimeConfig.SALES_POINT_DATA_URL || process.env.SALES_POINT_DATA_URL,
 };
 
 export default config;
