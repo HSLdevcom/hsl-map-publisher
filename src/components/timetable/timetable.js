@@ -17,7 +17,8 @@ import { prepareOrderedDepartureHoursByRoute } from './departureUtils';
 import TableHeader from './tableHeader';
 import TableRows from './tableRows';
 import SimpleRoutes from './simpleRoutes';
-import { getIcon, getColor } from 'util/domain';
+import { getIcon, getColor, trimRouteId } from 'util/domain';
+import partition from 'lodash/partition';
 
 import styles from './timetable.css';
 
@@ -217,9 +218,25 @@ class Timetable extends Component {
               ? `${getWeekdayName(dayNames[0], 'en')} - ${getWeekdayName(dayNames[1], 'en')}`
               : `${getWeekdayName(dayNames[0], 'en')}`;
 
-          const departureIntervalsByRoute = prepareOrderedDepartureHoursByRoute(
-            combinedDays[combinedDay],
+          const nonBusRoutes = new Set();
+          const busRoutes = new Set();
+
+          for (const key in routeIdToModeMap) {
+            if (routeIdToModeMap[key] === 'BUS') {
+              busRoutes.add(key.replace(/\D+/g, ''));
+            } else {
+              nonBusRoutes.add(key);
+            }
+          }
+
+          const [nonBusDepartures, busDepartures] = partition(combinedDays[combinedDay], it =>
+            nonBusRoutes.has(trimRouteId(it.routeId)),
           );
+          // console.log('departureCount', combinedDays[combinedDay].length);
+          // console.log('nonBusDepartures', nonBusDepartures);
+          // console.log('busDepartures', busDepartures);
+          // console.log('condition', intervalTimetable && busDepartures.length > 0);
+          const departureIntervalsByRoute = prepareOrderedDepartureHoursByRoute(nonBusDepartures);
 
           return (
             <div key={`tableheader_container_${fiTitle}`}>
@@ -232,73 +249,192 @@ class Timetable extends Component {
                 intervalTimetable={intervalTimetable}
               />
               {intervalTimetable ? (
-                <>
-                  <div className={styles.timetableRoutes}>
-                    <InlineSVG key="clock_svg" className={styles.icon} src={clockIcon} />
-                    {departureIntervalsByRoute.routeIds.map(routeId => {
-                      return (
-                        <div
-                          key={`route-${routeId}`}
-                          className={styles.routeHeadings}
-                          style={{ color: getColor({ mode: routeIdToModeMap[routeId] }) }}>
-                          <InlineSVG
-                            className={styles.icon}
-                            src={getIcon({ mode: routeIdToModeMap[routeId] })}
-                          />
-                          {routeId}
+                busDepartures.length > 0 ? (
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      gap: 'calc((1 * var(--border-radius)) + 8px)',
+                    }}>
+                    <div
+                      style={{
+                        width: `${90 + departureIntervalsByRoute.routeIds.length * 60}px`,
+                        flex: 1,
+                      }}>
+                      <div className={styles.timetableRoutes}>
+                        <InlineSVG key="clock_svg" className={styles.icon} src={clockIcon} />
+                        {departureIntervalsByRoute.routeIds.map(routeId => {
+                          return (
+                            <div
+                              key={`route-${routeId}`}
+                              className={styles.routeHeadings}
+                              style={{
+                                color: getColor({
+                                  mode: routeIdToModeMap[routeId],
+                                  padding: '0.2em 0 0.2em calc(0.45em + var(--border-radius))',
+                                }),
+                              }}>
+                              <InlineSVG
+                                className={styles.icon}
+                                src={getIcon({ mode: routeIdToModeMap[routeId] })}
+                              />
+                              {routeId}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className={styles.firstAndLastDepartures}>
+                        <div className={styles.departureTitles}>
+                          <span>Ensimmäinen</span>
+                          <span>Första</span>
+                          <span>First</span>
                         </div>
-                      );
-                    })}
-                  </div>
-                  <div className={styles.firstAndLastDepartures}>
-                    <div className={styles.departureTitles}>
-                      <span>Ensimmäinen</span>
-                      <span>Första</span>
-                      <span>First</span>
-                    </div>
-                    {departureIntervalsByRoute.routeIds.map(routeId => (
-                      <div className={styles.firstAndLastDepartureValues}>
-                        {departureIntervalsByRoute.firstDepartures[routeId]}
+                        {departureIntervalsByRoute.routeIds.map(routeId => (
+                          <div className={styles.firstAndLastDepartureValues}>
+                            {departureIntervalsByRoute.firstDepartures[routeId]}
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                      <div className={styles.timetableRoot}>
+                        {departureIntervalsByRoute.groupedDepartures.map(({ hours, intervals }) => {
+                          try {
+                            return (
+                              <Row
+                                className={styles.timetableMinutes}
+                                style={{
+                                  padding: '0.2em 0 0.2em calc(0.45em + var(--border-radius))',
+                                }}>
+                                <div className={styles.hours}>{hours}</div>
+                                {departureIntervalsByRoute.routeIds.map(routeId => (
+                                  <WrappingRow>
+                                    <div className={styles.interval}>
+                                      {intervals[routeId] ? `${intervals[routeId]} min` : '-'}
+                                    </div>
+                                  </WrappingRow>
+                                ))}
+                              </Row>
+                            );
+                          } catch (err) {
+                            console.log(JSON.stringify(departureIntervalsByRoute));
+                            console.log('KEY:', hours);
+                            return <>errr</>;
+                          }
+                        })}
+                      </div>
+                      <div className={styles.firstAndLastDepartures}>
+                        <div className={styles.departureTitles}>
+                          <span>Viimeinen</span>
+                          <span>Sista</span>
+                          <span>Last</span>
+                        </div>
+                        {departureIntervalsByRoute.routeIds.map(routeId => (
+                          <div className={styles.firstAndLastDepartureValues}>
+                            {departureIntervalsByRoute.lastDepartures[routeId]}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div style={{ flex: 1 }}>
+                      <div
+                        className={styles.timetableRoutes}
+                        style={{
+                          display: 'flex',
+                          gap: '32px',
+                          marginLeft: 'calc(-1 * var(--border-radius))',
+                        }}>
+                        <InlineSVG key="clock_svg" className={styles.icon} src={clockIcon} />
+                        <div
+                          className={styles.routeHeadings}
+                          style={{ color: getColor({ mode: 'BUS' }) }}>
+                          <InlineSVG className={styles.icon} src={getIcon({ mode: 'BUS' })} />
+                          <> {Array.from(busRoutes).join(', ')} </>
+                        </div>
+                      </div>
+                      <TableRows
+                        noPadLeft={intervalTimetable && busDepartures.length > 0}
+                        departures={busDepartures}
+                      />
+                    </div>
                   </div>
-                  <div className={styles.timetableRoot}>
-                    {departureIntervalsByRoute.groupedDepartures.map(({ hours, intervals }) => {
-                      try {
+                ) : (
+                  <>
+                    <div
+                      className={styles.timetableRoutes}
+                      style={{ paddingRight: 'calc(0.45em + var(--border-radius))' }}>
+                      <InlineSVG key="clock_svg" className={styles.icon} src={clockIcon} />
+                      {departureIntervalsByRoute.routeIds.map(routeId => {
                         return (
-                          <Row className={styles.timetableMinutes}>
-                            <div className={styles.hours}>{hours}</div>
-                            {departureIntervalsByRoute.routeIds.map(routeId => (
-                              <WrappingRow>
-                                <div className={styles.interval}>
-                                  {intervals[routeId] ? `${intervals[routeId]} min` : '-'}
-                                </div>
-                              </WrappingRow>
-                            ))}
-                          </Row>
+                          <div
+                            key={`route-${routeId}`}
+                            className={styles.routeHeadings}
+                            style={{ color: getColor({ mode: routeIdToModeMap[routeId] }) }}>
+                            <InlineSVG
+                              className={styles.icon}
+                              src={getIcon({ mode: routeIdToModeMap[routeId] })}
+                            />
+                            {routeId}
+                          </div>
                         );
-                      } catch (err) {
-                        console.log(JSON.stringify(departureIntervalsByRoute));
-                        console.log('KEY:', hours);
-                        return <>errr</>;
-                      }
-                    })}
-                  </div>
-                  <div className={styles.firstAndLastDepartures}>
-                    <div className={styles.departureTitles}>
-                      <span>Viimeinen</span>
-                      <span>Sista</span>
-                      <span>Last</span>
+                      })}
                     </div>
-                    {departureIntervalsByRoute.routeIds.map(routeId => (
-                      <div className={styles.firstAndLastDepartureValues}>
-                        {departureIntervalsByRoute.lastDepartures[routeId]}
+                    <div
+                      className={styles.firstAndLastDepartures}
+                      style={{ paddingRight: 'calc(0.45em + var(--border-radius))' }}>
+                      <div className={styles.departureTitles}>
+                        <span>Ensimmäinen</span>
+                        <span>Första</span>
+                        <span>First</span>
                       </div>
-                    ))}
-                  </div>
-                </>
+                      {departureIntervalsByRoute.routeIds.map(routeId => (
+                        <div className={styles.firstAndLastDepartureValues}>
+                          {departureIntervalsByRoute.firstDepartures[routeId]}
+                        </div>
+                      ))}
+                    </div>
+                    <div className={styles.timetableRoot}>
+                      {departureIntervalsByRoute.groupedDepartures.map(({ hours, intervals }) => {
+                        try {
+                          return (
+                            <Row className={styles.timetableMinutes}>
+                              <div className={styles.hours}>{hours}</div>
+                              {departureIntervalsByRoute.routeIds.map(routeId => (
+                                <WrappingRow>
+                                  <div className={styles.interval}>
+                                    {intervals[routeId] ? `${intervals[routeId]} min` : '-'}
+                                  </div>
+                                </WrappingRow>
+                              ))}
+                            </Row>
+                          );
+                        } catch (err) {
+                          console.log(JSON.stringify(departureIntervalsByRoute));
+                          console.log('KEY:', hours);
+                          return <>errr</>;
+                        }
+                      })}
+                    </div>
+                    <div
+                      className={styles.firstAndLastDepartures}
+                      style={{ paddingRight: 'calc(0.45em + var(--border-radius))' }}>
+                      <div className={styles.departureTitles}>
+                        <span>Viimeinen</span>
+                        <span>Sista</span>
+                        <span>Last</span>
+                      </div>
+                      {departureIntervalsByRoute.routeIds.map(routeId => (
+                        <div className={styles.firstAndLastDepartureValues}>
+                          {departureIntervalsByRoute.lastDepartures[routeId]}
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )
               ) : (
-                <TableRows departures={this.props.combinedDays[combinedDay]} />
+                <TableRows
+                  noPadLeft={intervalTimetable && busDepartures.length > 0}
+                  departures={this.props.combinedDays[combinedDay]}
+                />
               )}
             </div>
           );

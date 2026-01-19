@@ -31,7 +31,7 @@ Departure.propTypes = {
 };
 
 const TableRow = props => (
-  <Row className={classNames({ [styles.compactRow]: props.useCompactLayout })}>
+  <Row className={classNames(props.className, { [styles.compactRow]: props.useCompactLayout })}>
     <div className={styles.hours}>{props.hours}</div>
     <WrappingRow>
       {sortBy(props.departures, a => a.minutes).map((departure, index) => (
@@ -43,12 +43,14 @@ const TableRow = props => (
 
 TableRow.defaultProps = {
   useCompactLayout: false,
+  className: undefined,
 };
 
 TableRow.propTypes = {
   hours: PropTypes.string.isRequired,
   departures: PropTypes.arrayOf(PropTypes.shape(Departure.propTypes)).isRequired,
   useCompactLayout: PropTypes.bool,
+  className: PropTypes.string,
 };
 
 const isEqualDepartureHour = (a, b) => {
@@ -170,6 +172,7 @@ const TableRows = props => {
           key={`${departuresHour.hour}${departuresHour.departures}`}
           hours={departuresHour.hour}
           departures={departuresHour.departures}
+          className={props.noPadLeft ? styles.noPadLeft : undefined}
           useCompactLayout
         />
       ))}
@@ -184,6 +187,11 @@ TableRows.propTypes = {
       ...Departure.propTypes,
     }),
   ).isRequired,
+  noPadLeft: PropTypes.bool,
+};
+
+TableRows.defaultProps = {
+  noPadLeft: false,
 };
 
 export default TableRows;

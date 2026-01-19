@@ -27,7 +27,7 @@
 }
 
 .timetableRoot > * {
-  margin: 0 calc(-1 * var(--border-radius));
+  margin: 0 0 0 calc(-1 * var(--border-radius));
   padding: 0.2em calc(0.45em + var(--border-radius));
 }
 
@@ -39,7 +39,8 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   gap: 0.2em;
-  padding: 0 0.45em;
+  padding: 0.2em 0 0.2em calc(0.45em + var(--border-radius));
+  margin: 0 0 0 calc(-1 * var(--border-radius));
 }
 
 .firstAndLastDepartures div {

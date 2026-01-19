@@ -48,7 +48,6 @@ const TableHeader = props => {
               <span className={styles.strong}>min</span> / linja Ajat ovat arvioituja
             </div>
           </div>
-
           <div
             className={classNames(styles.subtitle, {
               [styles.compactSubtitle]: props.useCompactLayout,
@@ -58,7 +57,6 @@ const TableHeader = props => {
               <span className={styles.strong}>min</span> / linje Tiderna är beräknade
             </div>
           </div>
-
           <div
             className={classNames(styles.subtitle, {
               [styles.compactSubtitle]: props.useCompactLayout,
