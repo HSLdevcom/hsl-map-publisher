@@ -243,12 +243,12 @@ class Timetable extends Component {
             it => intervalRoutes.has(trimRouteId(it.routeId).replace(/[^0-9]/g, '')),
             // .replace(/[^0-9]/g, '')),
           );
-          console.log('normalBusRoutes', normalBusRoutes);
-          console.log('intervalRoutes', intervalRoutes);
+          // console.log('normalBusRoutes', normalBusRoutes);
+          // console.log('intervalRoutes', intervalRoutes);
           // console.log(routeIdToModeMap);
           // console.log('departureCount', combinedDays[combinedDay].length);
-          console.log('nonBusDepartures', nonBusDepartures);
-          console.log('busDepartures', busDepartures);
+          // console.log('nonBusDepartures', nonBusDepartures);
+          // console.log('busDepartures', busDepartures);
           const departureIntervalsByRoute = prepareOrderedDepartureHoursByRoute(nonBusDepartures);
 
           return (
@@ -271,7 +271,7 @@ class Timetable extends Component {
                     }}>
                     <div
                       style={{
-                        minWidth: `${70 + departureIntervalsByRoute.routeIds.length * 50}px`,
+                        minWidth: `${70 + intervalRoutes.size * 50}px`,
                         flex: 1,
                       }}>
                       <div className={styles.timetableRoutes}>
