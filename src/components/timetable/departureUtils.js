@@ -90,7 +90,8 @@ export const prepareOrderedDepartureHoursByRoute = departures => {
       const { hours, isNextDay } = hourGroup[0];
 
       const routeGroups = groupBy(hourGroup, item => {
-        const trimmedRouteId = trimRouteId(item.routeId);
+        let trimmedRouteId = trimRouteId(item.routeId);
+        trimmedRouteId = trimmedRouteId.replace(/H$/, '');
         routeIds.add(trimmedRouteId);
         return trimmedRouteId;
       });

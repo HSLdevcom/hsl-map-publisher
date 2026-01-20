@@ -238,9 +238,13 @@ class Timetable extends Component {
             }
           }
 
-          const [nonBusDepartures, busDepartures] = partition(combinedDays[combinedDay], it =>
-            intervalRoutes.has(trimRouteId(it.routeId)),
+          const [nonBusDepartures, busDepartures] = partition(
+            combinedDays[combinedDay],
+            it => intervalRoutes.has(trimRouteId(it.routeId).replace(/[^0-9]/g, '')),
+            // .replace(/[^0-9]/g, '')),
           );
+          console.log('normalBusRoutes', normalBusRoutes);
+          console.log('intervalRoutes', intervalRoutes);
           // console.log(routeIdToModeMap);
           // console.log('departureCount', combinedDays[combinedDay].length);
           console.log('nonBusDepartures', nonBusDepartures);
