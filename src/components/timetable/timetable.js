@@ -250,6 +250,13 @@ class Timetable extends Component {
           // console.log('nonBusDepartures', nonBusDepartures);
           // console.log('busDepartures', busDepartures);
           const departureIntervalsByRoute = prepareOrderedDepartureHoursByRoute(nonBusDepartures);
+          // Sort routeIds so bus routes are last
+          departureIntervalsByRoute.routeIds.sort((a, b) => {
+            const aIsBus = routeIdToModeMap[a]?.mode === 'BUS';
+            const bIsBus = routeIdToModeMap[b]?.mode === 'BUS';
+            if (aIsBus === bIsBus) return a.localeCompare(b);
+            return aIsBus ? 1 : -1;
+          });
           // console.log('departureIntervalsByRoute', departureIntervalsByRoute);
 
           return (
