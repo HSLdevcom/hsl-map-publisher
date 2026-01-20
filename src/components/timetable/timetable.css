@@ -13,7 +13,7 @@
 
 .routeHeadings {
   display: flex;
-  gap: 0.3em;
+  gap: 0.2em;
   font-size: 20px;
   align-items: center;
 }
@@ -45,6 +45,7 @@
 
 .firstAndLastDepartures div {
   display: flex;
+  justify-content: center;
 }
 
 .departureTitles {
@@ -53,12 +54,18 @@
 
 .firstAndLastDepartureValues {
   align-items: center;
+  justify-content: center;
 }
 
 .timetableRoutes {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-  padding: 0 0.45em 0.5em;
+  padding: 0 0 0.5em 0.45em;
+  gap: 0.2em;
+}
+
+.timetableRoutes div {
+  justify-content: center;
 }
 
 .timetableMinutes {

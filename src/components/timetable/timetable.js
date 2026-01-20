@@ -250,6 +250,7 @@ class Timetable extends Component {
           // console.log('nonBusDepartures', nonBusDepartures);
           // console.log('busDepartures', busDepartures);
           const departureIntervalsByRoute = prepareOrderedDepartureHoursByRoute(nonBusDepartures);
+          // console.log('departureIntervalsByRoute', departureIntervalsByRoute);
 
           return (
             <div key={`tableheader_container_${fiTitle}`}>
@@ -319,7 +320,7 @@ class Timetable extends Component {
                                 }}>
                                 <div className={styles.hours}>{hours}</div>
                                 {departureIntervalsByRoute.routeIds.map(routeId => (
-                                  <WrappingRow>
+                                  <WrappingRow style={{ justifyContent: 'center' }}>
                                     <div className={styles.interval}>
                                       {intervals[routeId] ? `${intervals[routeId]} min` : '-'}
                                     </div>

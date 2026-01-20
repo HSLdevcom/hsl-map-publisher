@@ -131,10 +131,7 @@ export const prepareOrderedDepartureHoursByRoute = departures => {
       break;
     }
     for (const routeId of routeIdsArray) {
-      if (firstDepartures[routeId]) {
-        break;
-      }
-      if (sorted[i].intervals[routeId]) {
+      if (!firstDepartures[routeId] && sorted[i].intervals[routeId]) {
         firstDepartures[routeId] = `${sorted[i].hours}:${padHour(
           sorted[i].lowestMinutes[routeId],
         )}`;
@@ -146,11 +143,10 @@ export const prepareOrderedDepartureHoursByRoute = departures => {
       break;
     }
     for (const routeId of routeIdsArray) {
-      if (lastDepartures[routeId]) {
-        break;
-      }
-      if (sorted[i].intervals[routeId]) {
-        lastDepartures[routeId] = `${sorted[i].hours}:${padHour(sorted[i].lowestMinutes[routeId])}`;
+      if (!lastDepartures[routeId] && sorted[i].intervals[routeId]) {
+        lastDepartures[routeId] = `${sorted[i].hours}:${padHour(
+          sorted[i].highestMinutes[routeId],
+        )}`;
       }
     }
   }
