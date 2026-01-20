@@ -1,0 +1,356 @@
+[
+    {
+        "platform": null,
+        "routeSegments": {
+            "nodes": [
+                {
+                    "routeId": "1020",
+                    "viaFi": null,
+                    "viaSe": null,
+                    "hasRegularDayDepartures": true,
+                    "pickupDropoffType": 0,
+                    "line": {
+                        "nodes": [
+                            {
+                                "trunkRoute": "1",
+                                "__typename": "Line"
+                            }
+                        ],
+                        "__typename": "LinesConnection"
+                    },
+                    "route": {
+                        "nodes": [
+                            {
+                                "destinationFi": "Munkkivuori",
+                                "destinationSe": "Munkshöjden",
+                                "mode": "BUS",
+                                "__typename": "Route"
+                            }
+                        ],
+                        "__typename": "RoutesConnection"
+                    },
+                    "__typename": "RouteSegment"
+                },
+                {
+                    "routeId": "1020N",
+                    "viaFi": null,
+                    "viaSe": null,
+                    "hasRegularDayDepartures": false,
+                    "pickupDropoffType": 0,
+                    "line": {
+                        "nodes": [
+                            {
+                                "trunkRoute": "0",
+                                "__typename": "Line"
+                            }
+                        ],
+                        "__typename": "LinesConnection"
+                    },
+                    "route": {
+                        "nodes": [
+                            {
+                                "destinationFi": "Munkkivuori",
+                                "destinationSe": "Munkshöjden",
+                                "mode": "BUS",
+                                "__typename": "Route"
+                            }
+                        ],
+                        "__typename": "RoutesConnection"
+                    },
+                    "__typename": "RouteSegment"
+                },
+                {
+                    "routeId": "1022",
+                    "viaFi": null,
+                    "viaSe": null,
+                    "hasRegularDayDepartures": true,
+                    "pickupDropoffType": 0,
+                    "line": {
+                        "nodes": [
+                            {
+                                "trunkRoute": "0",
+                                "__typename": "Line"
+                            }
+                        ],
+                        "__typename": "LinesConnection"
+                    },
+                    "route": {
+                        "nodes": [
+                            {
+                                "destinationFi": "Katajaharju",
+                                "destinationSe": "Enåsen",
+                                "mode": "BUS",
+                                "__typename": "Route"
+                            }
+                        ],
+                        "__typename": "RoutesConnection"
+                    },
+                    "__typename": "RouteSegment"
+                },
+                {
+                    "routeId": "1022K",
+                    "viaFi": null,
+                    "viaSe": null,
+                    "hasRegularDayDepartures": true,
+                    "pickupDropoffType": 0,
+                    "line": {
+                        "nodes": [
+                            {
+                                "trunkRoute": "0",
+                                "__typename": "Line"
+                            }
+                        ],
+                        "__typename": "LinesConnection"
+                    },
+                    "route": {
+                        "nodes": [
+                            {
+                                "destinationFi": "Katajaharju",
+                                "destinationSe": "Enåsen",
+                                "mode": "BUS",
+                                "__typename": "Route"
+                            }
+                        ],
+                        "__typename": "RoutesConnection"
+                    },
+                    "__typename": "RouteSegment"
+                },
+                {
+                    "routeId": "1030",
+                    "viaFi": null,
+                    "viaSe": null,
+                    "hasRegularDayDepartures": true,
+                    "pickupDropoffType": 0,
+                    "line": {
+                        "nodes": [
+                            {
+                                "trunkRoute": "1",
+                                "__typename": "Line"
+                            }
+                        ],
+                        "__typename": "LinesConnection"
+                    },
+                    "route": {
+                        "nodes": [
+                            {
+                                "destinationFi": "Myyrmäki",
+                                "destinationSe": "Myrbacka",
+                                "mode": "BUS",
+                                "__typename": "Route"
+                            }
+                        ],
+                        "__typename": "RoutesConnection"
+                    },
+                    "__typename": "RouteSegment"
+                },
+                {
+                    "routeId": "1030N",
+                    "viaFi": null,
+                    "viaSe": null,
+                    "hasRegularDayDepartures": false,
+                    "pickupDropoffType": 0,
+                    "line": {
+                        "nodes": [
+                            {
+                                "trunkRoute": "0",
+                                "__typename": "Line"
+                            }
+                        ],
+                        "__typename": "LinesConnection"
+                    },
+                    "route": {
+                        "nodes": [
+                            {
+                                "destinationFi": "Myyrmäki",
+                                "destinationSe": "Myrbacka",
+                                "mode": "BUS",
+                                "__typename": "Route"
+                            }
+                        ],
+                        "__typename": "RoutesConnection"
+                    },
+                    "__typename": "RouteSegment"
+                }
+            ],
+            "__typename": "RouteSegmentsConnection"
+        },
+        "__typename": "Stop"
+    },
+    {
+        "platform": null,
+        "routeSegments": {
+            "nodes": [
+                {
+                    "routeId": "1001",
+                    "viaFi": null,
+                    "viaSe": null,
+                    "hasRegularDayDepartures": true,
+                    "pickupDropoffType": 0,
+                    "line": {
+                        "nodes": [
+                            {
+                                "trunkRoute": "0",
+                                "__typename": "Line"
+                            }
+                        ],
+                        "__typename": "LinesConnection"
+                    },
+                    "route": {
+                        "nodes": [
+                            {
+                                "destinationFi": "Käpylä",
+                                "destinationSe": "Kottby",
+                                "mode": "TRAM",
+                                "__typename": "Route"
+                            }
+                        ],
+                        "__typename": "RoutesConnection"
+                    },
+                    "__typename": "RouteSegment"
+                },
+                {
+                    "routeId": "1001H4",
+                    "viaFi": null,
+                    "viaSe": null,
+                    "hasRegularDayDepartures": false,
+                    "pickupDropoffType": 0,
+                    "line": {
+                        "nodes": [
+                            {
+                                "trunkRoute": "0",
+                                "__typename": "Line"
+                            }
+                        ],
+                        "__typename": "LinesConnection"
+                    },
+                    "route": {
+                        "nodes": [
+                            {
+                                "destinationFi": "Ooppera",
+                                "destinationSe": "Operan",
+                                "mode": "TRAM",
+                                "__typename": "Route"
+                            }
+                        ],
+                        "__typename": "RoutesConnection"
+                    },
+                    "__typename": "RouteSegment"
+                },
+                {
+                    "routeId": "1001H6",
+                    "viaFi": null,
+                    "viaSe": null,
+                    "hasRegularDayDepartures": true,
+                    "pickupDropoffType": 0,
+                    "line": {
+                        "nodes": [
+                            {
+                                "trunkRoute": "0",
+                                "__typename": "Line"
+                            }
+                        ],
+                        "__typename": "LinesConnection"
+                    },
+                    "route": {
+                        "nodes": [
+                            {
+                                "destinationFi": "Sörnäinen (M)",
+                                "destinationSe": "Sörnäs (M)",
+                                "mode": "TRAM",
+                                "__typename": "Route"
+                            }
+                        ],
+                        "__typename": "RoutesConnection"
+                    },
+                    "__typename": "RouteSegment"
+                },
+                {
+                    "routeId": "1003",
+                    "viaFi": null,
+                    "viaSe": null,
+                    "hasRegularDayDepartures": true,
+                    "pickupDropoffType": 0,
+                    "line": {
+                        "nodes": [
+                            {
+                                "trunkRoute": "0",
+                                "__typename": "Line"
+                            }
+                        ],
+                        "__typename": "LinesConnection"
+                    },
+                    "route": {
+                        "nodes": [
+                            {
+                                "destinationFi": "Kuusitie",
+                                "destinationSe": "Granvägen",
+                                "mode": "TRAM",
+                                "__typename": "Route"
+                            }
+                        ],
+                        "__typename": "RoutesConnection"
+                    },
+                    "__typename": "RouteSegment"
+                },
+                {
+                    "routeId": "1003H4",
+                    "viaFi": null,
+                    "viaSe": null,
+                    "hasRegularDayDepartures": true,
+                    "pickupDropoffType": 0,
+                    "line": {
+                        "nodes": [
+                            {
+                                "trunkRoute": "0",
+                                "__typename": "Line"
+                            }
+                        ],
+                        "__typename": "LinesConnection"
+                    },
+                    "route": {
+                        "nodes": [
+                            {
+                                "destinationFi": "Ylioppilastalo",
+                                "destinationSe": "Studenthuset",
+                                "mode": "TRAM",
+                                "__typename": "Route"
+                            }
+                        ],
+                        "__typename": "RoutesConnection"
+                    },
+                    "__typename": "RouteSegment"
+                },
+                {
+                    "routeId": "1003H6",
+                    "viaFi": null,
+                    "viaSe": null,
+                    "hasRegularDayDepartures": true,
+                    "pickupDropoffType": 0,
+                    "line": {
+                        "nodes": [
+                            {
+                                "trunkRoute": "0",
+                                "__typename": "Line"
+                            }
+                        ],
+                        "__typename": "LinesConnection"
+                    },
+                    "route": {
+                        "nodes": [
+                            {
+                                "destinationFi": "Ylioppilastalo",
+                                "destinationSe": "Studenthuset",
+                                "mode": "TRAM",
+                                "__typename": "Route"
+                            }
+                        ],
+                        "__typename": "RoutesConnection"
+                    },
+                    "__typename": "RouteSegment"
+                }
+            ],
+            "__typename": "RouteSegmentsConnection"
+        },
+        "__typename": "Stop"
+    }
+]

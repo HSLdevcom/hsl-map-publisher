@@ -86,6 +86,14 @@ class Timetable extends Component {
     }
   }
 
+  /**
+   * @param {string} id
+   * @returns {{mode: string, trunkRoute: boolean}}
+   */
+  getRoute(id) {
+    return this.props.routeIdToModeMap[id];
+  }
+
   render() {
     const { combinedDays, routeIdToModeMap, intervalTimetable } = this.props;
     const date = new Date(`${this.props.date}T00:00:00`);
@@ -218,24 +226,25 @@ class Timetable extends Component {
               ? `${getWeekdayName(dayNames[0], 'en')} - ${getWeekdayName(dayNames[1], 'en')}`
               : `${getWeekdayName(dayNames[0], 'en')}`;
 
-          const nonBusRoutes = new Set();
-          const busRoutes = new Set();
+          const intervalRoutes = new Set();
+          const normalBusRoutes = new Set();
 
           for (const key in routeIdToModeMap) {
-            if (routeIdToModeMap[key] === 'BUS') {
-              busRoutes.add(key.replace(/\D+/g, ''));
+            const routeDescription = this.getRoute(key);
+            if (routeDescription.mode === 'BUS' && !routeDescription.trunkRoute) {
+              normalBusRoutes.add(key);
             } else {
-              nonBusRoutes.add(key);
+              intervalRoutes.add(key);
             }
           }
 
           const [nonBusDepartures, busDepartures] = partition(combinedDays[combinedDay], it =>
-            nonBusRoutes.has(trimRouteId(it.routeId)),
+            intervalRoutes.has(trimRouteId(it.routeId)),
           );
+          // console.log(routeIdToModeMap);
           // console.log('departureCount', combinedDays[combinedDay].length);
-          // console.log('nonBusDepartures', nonBusDepartures);
-          // console.log('busDepartures', busDepartures);
-          // console.log('condition', intervalTimetable && busDepartures.length > 0);
+          console.log('nonBusDepartures', nonBusDepartures);
+          console.log('busDepartures', busDepartures);
           const departureIntervalsByRoute = prepareOrderedDepartureHoursByRoute(nonBusDepartures);
 
           return (
@@ -258,7 +267,7 @@ class Timetable extends Component {
                     }}>
                     <div
                       style={{
-                        width: `${90 + departureIntervalsByRoute.routeIds.length * 60}px`,
+                        minWidth: `${70 + departureIntervalsByRoute.routeIds.length * 50}px`,
                         flex: 1,
                       }}>
                       <div className={styles.timetableRoutes}>
@@ -270,13 +279,13 @@ class Timetable extends Component {
                               className={styles.routeHeadings}
                               style={{
                                 color: getColor({
-                                  mode: routeIdToModeMap[routeId],
+                                  ...this.getRoute(routeId),
                                   padding: '0.2em 0 0.2em calc(0.45em + var(--border-radius))',
                                 }),
                               }}>
                               <InlineSVG
                                 className={styles.icon}
-                                src={getIcon({ mode: routeIdToModeMap[routeId] })}
+                                src={getIcon({ ...this.getRoute(routeId) })}
                               />
                               {routeId}
                             </div>
@@ -348,7 +357,7 @@ class Timetable extends Component {
                           className={styles.routeHeadings}
                           style={{ color: getColor({ mode: 'BUS' }) }}>
                           <InlineSVG className={styles.icon} src={getIcon({ mode: 'BUS' })} />
-                          <> {Array.from(busRoutes).join(', ')} </>
+                          <> {Array.from(normalBusRoutes).join(', ')} </>
                         </div>
                       </div>
                       <TableRows
@@ -368,10 +377,10 @@ class Timetable extends Component {
                           <div
                             key={`route-${routeId}`}
                             className={styles.routeHeadings}
-                            style={{ color: getColor({ mode: routeIdToModeMap[routeId] }) }}>
+                            style={{ color: getColor({ ...this.getRoute(routeId) }) }}>
                             <InlineSVG
                               className={styles.icon}
-                              src={getIcon({ mode: routeIdToModeMap[routeId] })}
+                              src={getIcon({ ...this.getRoute(routeId) })}
                             />
                             {routeId}
                           </div>

@@ -12,7 +12,7 @@ import fromPairs from 'lodash/fromPairs';
 import get from 'lodash/get';
 
 import apolloWrapper from 'util/apolloWrapper';
-import { isDropOffOnly, trimRouteId, filterRoute } from 'util/domain';
+import { isDropOffOnly, trimRouteId, filterRoute, isNumberVariant } from 'util/domain';
 
 import Timetable from './timetable';
 
@@ -235,6 +235,11 @@ const timetableQuery = gql`
                   noteType
                 }
               }
+              line {
+                nodes {
+                  trunkRoute
+                }
+              }
             }
           }
 
@@ -299,10 +304,20 @@ const propsMapper = mapProps(props => {
 
   const routeIdToModeMap = fromPairs(
     flatMap(props.data.stop.siblings.nodes, sibling =>
-      sibling.routeSegments.nodes.map(seg => [
-        trimRouteId(seg.routeId),
-        get(seg, 'route.nodes[0].mode'),
-      ]),
+      sibling.routeSegments.nodes
+        .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
+        .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
+        .filter(routeSegment => !isDropOffOnly(routeSegment))
+        .filter(routeSegment =>
+          filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter }),
+        )
+        .map(seg => [
+          trimRouteId(seg.routeId),
+          {
+            mode: get(seg, 'route.nodes[0].mode'),
+            trunkRoute: seg.line.nodes[0].trunkRoute === '1',
+          },
+        ]),
     ),
   );
 

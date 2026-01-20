@@ -1,0 +1,226 @@
+[
+  {
+    "hours": 18,
+    "minutes": 53,
+    "note": null,
+    "routeId": "1001H6",
+    "direction": "1",
+    "dayType": [
+      "Pe",
+      "Ti",
+      "Ma",
+      "Ke",
+      "To"
+    ],
+    "isNextDay": false,
+    "isAccessible": true,
+    "dateBegin": "2025-12-29",
+    "dateEnd": "2026-04-06",
+    "__typename": "DepartureGroup"
+  },
+  {
+    "hours": 21,
+    "minutes": 21,
+    "note": null,
+    "routeId": "1001H6",
+    "direction": "1",
+    "dayType": [
+      "Ti",
+      "Pe",
+      "Ma",
+      "Ke",
+      "To"
+    ],
+    "isNextDay": false,
+    "isAccessible": true,
+    "dateBegin": "2025-12-29",
+    "dateEnd": "2026-04-06",
+    "__typename": "DepartureGroup"
+  },
+  {
+    "hours": 21,
+    "minutes": 32,
+    "note": null,
+    "routeId": "1001H6",
+    "direction": "1",
+    "dayType": [
+      "To",
+      "Ke",
+      "Ma",
+      "Pe",
+      "Ti"
+    ],
+    "isNextDay": false,
+    "isAccessible": true,
+    "dateBegin": "2025-12-29",
+    "dateEnd": "2026-04-06",
+    "__typename": "DepartureGroup"
+  },
+  {
+    "hours": 21,
+    "minutes": 43,
+    "note": null,
+    "routeId": "1001H6",
+    "direction": "1",
+    "dayType": [
+      "Pe",
+      "To",
+      "Ke",
+      "Ti",
+      "Ma"
+    ],
+    "isNextDay": false,
+    "isAccessible": true,
+    "dateBegin": "2025-12-29",
+    "dateEnd": "2026-04-06",
+    "__typename": "DepartureGroup"
+  },
+  {
+    "hours": 21,
+    "minutes": 54,
+    "note": null,
+    "routeId": "1001H6",
+    "direction": "1",
+    "dayType": [
+      "To",
+      "Pe",
+      "Ti",
+      "Ma",
+      "Ke"
+    ],
+    "isNextDay": false,
+    "isAccessible": true,
+    "dateBegin": "2025-12-29",
+    "dateEnd": "2026-04-06",
+    "__typename": "DepartureGroup"
+  },
+  {
+    "hours": 1,
+    "minutes": 54,
+    "note": null,
+    "routeId": "1003H4",
+    "direction": "1",
+    "dayType": [
+      "Pe",
+      "To",
+      "LP",
+      "UA",
+      "H4",
+      "Ke",
+      "Ma",
+      "H3",
+      "H5",
+      "Ti"
+    ],
+    "isNextDay": true,
+    "isAccessible": true,
+    "dateBegin": "2025-12-29",
+    "dateEnd": "2026-04-06",
+    "__typename": "DepartureGroup"
+  },
+  {
+    "hours": 18,
+    "minutes": 57,
+    "note": null,
+    "routeId": "1003H6",
+    "direction": "1",
+    "dayType": [
+      "Ma",
+      "Pe",
+      "Ke",
+      "Ti",
+      "To"
+    ],
+    "isNextDay": false,
+    "isAccessible": true,
+    "dateBegin": "2025-12-29",
+    "dateEnd": "2026-04-06",
+    "__typename": "DepartureGroup"
+  },
+  {
+    "hours": 22,
+    "minutes": 26,
+    "note": null,
+    "routeId": "1003H6",
+    "direction": "1",
+    "dayType": [
+      "Ke",
+      "Pe",
+      "Ti",
+      "To",
+      "Ma"
+    ],
+    "isNextDay": false,
+    "isAccessible": true,
+    "dateBegin": "2025-12-29",
+    "dateEnd": "2026-04-06",
+    "__typename": "DepartureGroup"
+  },
+  {
+    "hours": 22,
+    "minutes": 59,
+    "note": null,
+    "routeId": "1003H6",
+    "direction": "1",
+    "dayType": [
+      "Pe",
+      "Ke",
+      "Ma",
+      "Ti",
+      "To"
+    ],
+    "isNextDay": false,
+    "isAccessible": true,
+    "dateBegin": "2025-12-29",
+    "dateEnd": "2026-04-06",
+    "__typename": "DepartureGroup"
+  },
+  {
+    "hours": 1,
+    "minutes": 15,
+    "note": null,
+    "routeId": "1003H6",
+    "direction": "1",
+    "dayType": [
+      "To",
+      "UA",
+      "Ke",
+      "Pe",
+      "LP",
+      "H5",
+      "H3",
+      "H4",
+      "Ti",
+      "Ma"
+    ],
+    "isNextDay": true,
+    "isAccessible": true,
+    "dateBegin": "2025-12-29",
+    "dateEnd": "2026-04-06",
+    "__typename": "DepartureGroup"
+  },
+  {
+    "hours": 1,
+    "minutes": 34,
+    "note": null,
+    "routeId": "1003H6",
+    "direction": "1",
+    "dayType": [
+      "To",
+      "Ma",
+      "Ke",
+      "Pe",
+      "H5",
+      "UA",
+      "H4",
+      "Ti",
+      "H3",
+      "LP"
+    ],
+    "isNextDay": true,
+    "isAccessible": true,
+    "dateBegin": "2025-12-29",
+    "dateEnd": "2026-04-06",
+    "__typename": "DepartureGroup"
+  }
+]
