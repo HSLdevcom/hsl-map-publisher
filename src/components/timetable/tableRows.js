@@ -127,7 +127,6 @@ const TableRows = props => {
     props.departures,
     departure => (departure.isNextDay ? 24 : 0) + departure.hours,
   );
-
   const rows = Object.entries(departuresByHour).map(([hours, departures]) => ({
     hour: hours,
     departures,
@@ -162,6 +161,7 @@ const TableRows = props => {
   }
 
   const filteredDepartures = filterDuplicateDepartureHours(rowsByHour);
+  const useCompactLayout = true;
 
   return (
     <div className={styles.root}>
@@ -170,7 +170,7 @@ const TableRows = props => {
           key={`${departuresHour.hour}${departuresHour.departures}`}
           hours={departuresHour.hour}
           departures={departuresHour.departures}
-          useCompactLayout
+          useCompactLayout={useCompactLayout}
         />
       ))}
     </div>
