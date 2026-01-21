@@ -6,10 +6,10 @@ import clockIcon from 'icons/clock.svg';
 import { getIcon, getColor, trimRouteId } from 'util/domain';
 import partition from 'lodash/partition';
 import { prepareOrderedDepartureHoursByRoute } from './departureUtils';
-import styles from './timetable.css';
+import styles from './intervalTimetable.css';
 import TableRows from './tableRows';
 
-const IntervalTimetable = ({ routeIdToModeMap, departures }) => {
+const partitionToIntervalAndNonIntervalRoutes = routeIdToModeMap => {
   const intervalRoutes = new Set();
   const normalBusRoutes = new Set();
 
@@ -22,18 +22,30 @@ const IntervalTimetable = ({ routeIdToModeMap, departures }) => {
     }
   }
 
-  const [nonBusDepartures, busDepartures] = partition(departures, it =>
-    intervalRoutes.has(trimRouteId(it.routeId).replace(/[^0-9]/g, '')),
-  );
+  return { intervalRoutes, normalBusRoutes };
+};
 
-  const departureIntervalsByRoute = prepareOrderedDepartureHoursByRoute(nonBusDepartures);
-  // Sort routeIds so bus routes are last
-  departureIntervalsByRoute.routeIds.sort((a, b) => {
+const sortBusRoutesLast = (routeIds, routeIdToModeMap) => {
+  routeIds.sort((a, b) => {
     const aIsBus = routeIdToModeMap[a]?.mode === 'BUS';
     const bIsBus = routeIdToModeMap[b]?.mode === 'BUS';
     if (aIsBus === bIsBus) return a.localeCompare(b);
     return aIsBus ? 1 : -1;
   });
+};
+
+const IntervalTimetable = ({ routeIdToModeMap, departures }) => {
+  const { intervalRoutes, normalBusRoutes } = partitionToIntervalAndNonIntervalRoutes(
+    routeIdToModeMap,
+  );
+
+  const [nonBusDepartures, busDepartures] = partition(departures, it =>
+    intervalRoutes.has(trimRouteId(it.routeId).replace(/[^0-9]/g, '')),
+  );
+
+  const departureIntervalsByRoute = prepareOrderedDepartureHoursByRoute(nonBusDepartures);
+
+  sortBusRoutesLast(departureIntervalsByRoute.routeIds, routeIdToModeMap);
 
   const getRoute = id => routeIdToModeMap[id];
 

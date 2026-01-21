@@ -1,0 +1,66 @@
+.routeHeadings {
+  display: flex;
+  gap: 0.2em;
+  font-size: 20px;
+  align-items: center;
+}
+
+.interval {
+  color: var(--hsl-blue);
+}
+
+.timetableRoot {
+  color: black;
+}
+
+.timetableRoot > * {
+  margin: 0 0 0 calc(-1 * var(--border-radius));
+  padding: 0.2em calc(0.45em + var(--border-radius));
+}
+
+.timetableRoot > *:nth-child(odd) {
+  background-color: var(--timetable-accent-color);
+}
+
+.firstAndLastDepartures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 0.2em;
+  padding: 0.2em 0 0.2em calc(0.45em + var(--border-radius));
+  margin: 0 0 0 calc(-1 * var(--border-radius));
+}
+
+.firstAndLastDepartures div {
+  display: flex;
+  justify-content: center;
+}
+
+.departureTitles {
+  flex-direction: column;
+}
+
+.firstAndLastDepartureValues {
+  align-items: center;
+  justify-content: center;
+}
+
+.timetableRoutes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  padding: 0 0 0.5em 0.45em;
+  gap: 0.2em;
+}
+
+.timetableRoutes div {
+  justify-content: center;
+}
+
+.timetableMinutes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+}
