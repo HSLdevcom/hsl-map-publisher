@@ -29,12 +29,25 @@ import { normalizeDepartures } from './intervalsNormalizer.mjs';
  * @property {number} avgInterval - average interval in minutes, 60 if only one departure
  */
 
+const DEPOT_RUNS_LETTER = 'H';
+
+/**
+ * @param {DepartureGroup[]} departures
+ * @returns {DepartureGroup[]}
+ */
+const filterNonDepotDepartures = departures =>
+  departures.filter(d => !d.routeId.includes(DEPOT_RUNS_LETTER));
+
 /**
  * @param {number} n
  * @returns {string}
  */
 const padHour = n => padStart(String(n), 2, '0');
 
+/**
+ * @param {Array<{hours: string, intervals: Object}>} entries
+ * @returns {Array<{hours: string, intervals: Object}>}
+ */
 const mergeConsecutiveHoursWithSameDepartures = entries => {
   if (!entries.length) return [];
 
@@ -72,7 +85,8 @@ const mergeConsecutiveHoursWithSameDepartures = entries => {
 /**
  * @param {number[]} nums
  * @returns {number}
- */ const calculateAverageInterval = nums => {
+ */
+const calculateAverageInterval = nums => {
   if (nums.length < 2) return 60;
   const sorted = [...nums].sort((a, b) => a - b);
   const intervals = sorted.slice(1).map((v, i) => v - sorted[i]);
@@ -80,12 +94,18 @@ const mergeConsecutiveHoursWithSameDepartures = entries => {
 };
 
 /**
- * @param {DepartureGroup[]} departures
+ * @param {DepartureGroup[]} filteredDepartures
+ * @param {Set<string>} routeIds
+ * @returns {Object<string, {
+ *   hours: string,
+ *   isNextDay: boolean,
+ *   intervals: Object<string, number>,
+ *   lowestMinutes: Object<string, number>,
+ *   highestMinutes: Object<string, number>
+ * }>}
  */
-export const prepareOrderedDepartureHoursByRoute = departures => {
-  const filteredDepartures = departures.filter(d => !d.routeId.includes('H'));
-  const routeIds = new Set();
-  const grouped = mapValues(
+const groupDeparturesByHour = (filteredDepartures, routeIds) => {
+  return mapValues(
     groupBy(filteredDepartures, d => `${d.hours}_${d.isNextDay}`),
     hourGroup => {
       const { hours, isNextDay } = hourGroup[0];
@@ -116,13 +136,21 @@ export const prepareOrderedDepartureHoursByRoute = departures => {
       };
     },
   );
+};
 
-  const sorted = Object.values(grouped).sort((a, b) => {
-    const aTime = +a.hours + (a.isNextDay ? 24 : 0);
-    const bTime = +b.hours + (b.isNextDay ? 24 : 0);
-    return aTime - bTime;
-  });
-
+/**
+ * @param {Array<{
+ *   hours: string,
+ *   isNextDay: boolean,
+ *   intervals: Object<string, number>,
+ *   lowestMinutes: Object<string, number>,
+ *   highestMinutes: Object<string, number>
+ * }>} sorted
+ * @param {Set<string>} routeIds
+ * @returns {{firstDepartures: Object<string, string>,
+ *   lastDepartures: Object<string, string>}}
+ */
+const calculateFirstAndLastDepartures = (sorted, routeIds) => {
   const routeIdsArray = [...routeIds];
   const firstDepartures = {};
   const lastDepartures = {};
@@ -150,6 +178,30 @@ export const prepareOrderedDepartureHoursByRoute = departures => {
       }
     }
   }
+  return { firstDepartures, lastDepartures };
+};
+
+/**
+ * @param {DepartureGroup[]} departures
+ * @returns {{
+ *   groupedDepartures: Array<{hours: string, intervals: Object}>,
+ *   routeIds: string[],
+ *   firstDepartures: Object<string, string>,
+ *   lastDepartures: Object<string, string>
+ * }}
+ */
+export const prepareOrderedDepartureHoursByRoute = departures => {
+  const filteredDepartures = filterNonDepotDepartures(departures);
+  const routeIds = new Set();
+  const grouped = groupDeparturesByHour(filteredDepartures, routeIds);
+
+  const sorted = Object.values(grouped).sort((a, b) => {
+    const aTime = +a.hours + (a.isNextDay ? 24 : 0);
+    const bTime = +b.hours + (b.isNextDay ? 24 : 0);
+    return aTime - bTime;
+  });
+
+  const { firstDepartures, lastDepartures } = calculateFirstAndLastDepartures(sorted, routeIds);
 
   const normalized = normalizeDepartures(sorted);
 

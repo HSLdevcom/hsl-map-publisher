@@ -63,4 +63,38 @@
 .icon {
   width: 20px;
   height: 20px;
+  justify-content: center;
+}
+
+.compactPaddingRight {
+  padding-right: calc(0.45em + var(--border-radius));
+}
+
+.routeHeadingsNonCompact {
+  padding: 0.2em 0 0.2em calc(0.45em + var(--border-radius));
+}
+
+.timetableMinutesNonCompact {
+  padding: 0.2em 0 0.2em calc(0.45em + var(--border-radius));
+}
+
+.flexContainer {
+  display: flex;
+  justify-content: space-between;
+  gap: calc((1 * var(--border-radius)) + 8px);
+}
+
+.leftPanel {
+  flex: 1;
+}
+
+.busRoutesContainer {
+  display: flex;
+  gap: 12px;
+  margin-left: calc(-1 * var(--border-radius));
+  padding: 0 0 0.4em 0.938em;
+}
+
+.rightPanel {
+  flex: 1;
 }

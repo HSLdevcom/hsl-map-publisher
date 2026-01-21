@@ -7,7 +7,8 @@ import trunkIcon from 'icons/icon_trunk.svg';
 import lRailIcon from 'icons/icon_L_rail.svg';
 
 import zoneByShortId from 'data/zoneByShortId';
-import { weekdays } from 'moment/moment';
+
+export const BUS_MODE = 'BUS';
 
 // TODO: Get routes from api?
 const RAIL_ROUTE_ID_REGEXP = /^300[12]/;
@@ -116,14 +117,14 @@ const colorsByMode = {
   TRAM: '#00985f',
   RAIL: '#8c4799',
   SUBWAY: '#ff6319',
-  BUS: '#007AC9',
+  [BUS_MODE]: '#007AC9',
   FERRY: '#00B9E4',
   L_RAIL: '#0098A1',
   LIGHT_L_RAIL: '#e5f4f5',
 };
 
 const iconsByMode = {
-  BUS: busIcon,
+  [BUS_MODE]: busIcon,
   TRAM: tramIcon,
   RAIL: railIcon,
   SUBWAY: subwayIcon,
