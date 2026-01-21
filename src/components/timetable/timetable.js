@@ -1,24 +1,13 @@
 import React, { Component } from 'react';
 import CoverPage from '../coverPage/coverPage';
 import PropTypes from 'prop-types';
-import {
-  Spacer,
-  PlatformSymbol,
-  getWeekdayName,
-  PrintButton,
-  Row,
-  WrappingRow,
-} from 'components/util';
+import { Spacer, PlatformSymbol, getWeekdayName, PrintButton } from 'components/util';
 import classNames from 'classnames';
-import clockIcon from 'icons/clock.svg';
-import InlineSVG from 'components/inlineSVG';
 
-import { prepareOrderedDepartureHoursByRoute } from './departureUtils';
 import TableHeader from './tableHeader';
 import TableRows from './tableRows';
 import SimpleRoutes from './simpleRoutes';
-import { getIcon, getColor, trimRouteId } from 'util/domain';
-import partition from 'lodash/partition';
+import IntervalTimetable from './intervalTimetable';
 
 import styles from './timetable.css';
 
@@ -226,39 +215,6 @@ class Timetable extends Component {
               ? `${getWeekdayName(dayNames[0], 'en')} - ${getWeekdayName(dayNames[1], 'en')}`
               : `${getWeekdayName(dayNames[0], 'en')}`;
 
-          const intervalRoutes = new Set();
-          const normalBusRoutes = new Set();
-
-          for (const key in routeIdToModeMap) {
-            const routeDescription = this.getRoute(key);
-            if (routeDescription.mode === 'BUS' && !routeDescription.trunkRoute) {
-              normalBusRoutes.add(key);
-            } else {
-              intervalRoutes.add(key);
-            }
-          }
-
-          const [nonBusDepartures, busDepartures] = partition(
-            combinedDays[combinedDay],
-            it => intervalRoutes.has(trimRouteId(it.routeId).replace(/[^0-9]/g, '')),
-            // .replace(/[^0-9]/g, '')),
-          );
-          // console.log('normalBusRoutes', normalBusRoutes);
-          // console.log('intervalRoutes', intervalRoutes);
-          // console.log(routeIdToModeMap);
-          // console.log('departureCount', combinedDays[combinedDay].length);
-          // console.log('nonBusDepartures', nonBusDepartures);
-          // console.log('busDepartures', busDepartures);
-          const departureIntervalsByRoute = prepareOrderedDepartureHoursByRoute(nonBusDepartures);
-          // Sort routeIds so bus routes are last
-          departureIntervalsByRoute.routeIds.sort((a, b) => {
-            const aIsBus = routeIdToModeMap[a]?.mode === 'BUS';
-            const bIsBus = routeIdToModeMap[b]?.mode === 'BUS';
-            if (aIsBus === bIsBus) return a.localeCompare(b);
-            return aIsBus ? 1 : -1;
-          });
-          // console.log('departureIntervalsByRoute', departureIntervalsByRoute);
-
           return (
             <div key={`tableheader_container_${fiTitle}`}>
               <TableHeader
@@ -270,192 +226,15 @@ class Timetable extends Component {
                 intervalTimetable={intervalTimetable}
               />
               {intervalTimetable ? (
-                busDepartures.length > 0 ? (
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      gap: 'calc((1 * var(--border-radius)) + 8px)',
-                    }}>
-                    <div
-                      style={{
-                        minWidth: `${70 + intervalRoutes.size * 50}px`,
-                        flex: 1,
-                      }}>
-                      <div className={styles.timetableRoutes}>
-                        <InlineSVG key="clock_svg" className={styles.icon} src={clockIcon} />
-                        {departureIntervalsByRoute.routeIds.map(routeId => {
-                          return (
-                            <div
-                              key={`route-${routeId}`}
-                              className={styles.routeHeadings}
-                              style={{
-                                color: getColor({
-                                  ...this.getRoute(routeId),
-                                  padding: '0.2em 0 0.2em calc(0.45em + var(--border-radius))',
-                                }),
-                              }}>
-                              <InlineSVG
-                                className={styles.icon}
-                                src={getIcon({ ...this.getRoute(routeId) })}
-                              />
-                              {routeId}
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <div className={styles.firstAndLastDepartures}>
-                        <div className={styles.departureTitles}>
-                          <span>Ensimmäinen</span>
-                          <span>Första</span>
-                          <span>First</span>
-                        </div>
-                        {departureIntervalsByRoute.routeIds.map(routeId => (
-                          <div className={styles.firstAndLastDepartureValues}>
-                            {departureIntervalsByRoute.firstDepartures[routeId]}
-                          </div>
-                        ))}
-                      </div>
-                      <div className={styles.timetableRoot}>
-                        {departureIntervalsByRoute.groupedDepartures.map(({ hours, intervals }) => {
-                          try {
-                            return (
-                              <Row
-                                className={styles.timetableMinutes}
-                                style={{
-                                  padding: '0.2em 0 0.2em calc(0.45em + var(--border-radius))',
-                                }}>
-                                <div className={styles.hours}>{hours}</div>
-                                {departureIntervalsByRoute.routeIds.map(routeId => (
-                                  <WrappingRow style={{ justifyContent: 'center' }}>
-                                    <div className={styles.interval}>
-                                      {intervals[routeId] ? `${intervals[routeId]} min` : '-'}
-                                    </div>
-                                  </WrappingRow>
-                                ))}
-                              </Row>
-                            );
-                          } catch (err) {
-                            console.log(JSON.stringify(departureIntervalsByRoute));
-                            console.log('KEY:', hours);
-                            return <>errr</>;
-                          }
-                        })}
-                      </div>
-                      <div className={styles.firstAndLastDepartures}>
-                        <div className={styles.departureTitles}>
-                          <span>Viimeinen</span>
-                          <span>Sista</span>
-                          <span>Last</span>
-                        </div>
-                        {departureIntervalsByRoute.routeIds.map(routeId => (
-                          <div className={styles.firstAndLastDepartureValues}>
-                            {departureIntervalsByRoute.lastDepartures[routeId]}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div style={{ flex: 1 }}>
-                      <div
-                        className={styles.timetableRoutes}
-                        style={{
-                          display: 'flex',
-                          gap: '32px',
-                          marginLeft: 'calc(-1 * var(--border-radius))',
-                        }}>
-                        <InlineSVG key="clock_svg" className={styles.icon} src={clockIcon} />
-                        <div
-                          className={styles.routeHeadings}
-                          style={{ color: getColor({ mode: 'BUS' }) }}>
-                          <InlineSVG className={styles.icon} src={getIcon({ mode: 'BUS' })} />
-                          <> {Array.from(normalBusRoutes).join(', ')} </>
-                        </div>
-                      </div>
-                      <TableRows
-                        noPadLeft={intervalTimetable && busDepartures.length > 0}
-                        departures={busDepartures}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div
-                      className={styles.timetableRoutes}
-                      style={{ paddingRight: 'calc(0.45em + var(--border-radius))' }}>
-                      <InlineSVG key="clock_svg" className={styles.icon} src={clockIcon} />
-                      {departureIntervalsByRoute.routeIds.map(routeId => {
-                        return (
-                          <div
-                            key={`route-${routeId}`}
-                            className={styles.routeHeadings}
-                            style={{ color: getColor({ ...this.getRoute(routeId) }) }}>
-                            <InlineSVG
-                              className={styles.icon}
-                              src={getIcon({ ...this.getRoute(routeId) })}
-                            />
-                            {routeId}
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <div
-                      className={styles.firstAndLastDepartures}
-                      style={{ paddingRight: 'calc(0.45em + var(--border-radius))' }}>
-                      <div className={styles.departureTitles}>
-                        <span>Ensimmäinen</span>
-                        <span>Första</span>
-                        <span>First</span>
-                      </div>
-                      {departureIntervalsByRoute.routeIds.map(routeId => (
-                        <div className={styles.firstAndLastDepartureValues}>
-                          {departureIntervalsByRoute.firstDepartures[routeId]}
-                        </div>
-                      ))}
-                    </div>
-                    <div className={styles.timetableRoot}>
-                      {departureIntervalsByRoute.groupedDepartures.map(({ hours, intervals }) => {
-                        try {
-                          return (
-                            <Row className={styles.timetableMinutes}>
-                              <div className={styles.hours}>{hours}</div>
-                              {departureIntervalsByRoute.routeIds.map(routeId => (
-                                <WrappingRow>
-                                  <div className={styles.interval}>
-                                    {intervals[routeId] ? `${intervals[routeId]} min` : '-'}
-                                  </div>
-                                </WrappingRow>
-                              ))}
-                            </Row>
-                          );
-                        } catch (err) {
-                          console.log(JSON.stringify(departureIntervalsByRoute));
-                          console.log('KEY:', hours);
-                          return <>errr</>;
-                        }
-                      })}
-                    </div>
-                    <div
-                      className={styles.firstAndLastDepartures}
-                      style={{ paddingRight: 'calc(0.45em + var(--border-radius))' }}>
-                      <div className={styles.departureTitles}>
-                        <span>Viimeinen</span>
-                        <span>Sista</span>
-                        <span>Last</span>
-                      </div>
-                      {departureIntervalsByRoute.routeIds.map(routeId => (
-                        <div className={styles.firstAndLastDepartureValues}>
-                          {departureIntervalsByRoute.lastDepartures[routeId]}
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )
-              ) : (
-                <TableRows
-                  noPadLeft={intervalTimetable && busDepartures.length > 0}
-                  departures={this.props.combinedDays[combinedDay]}
+                <IntervalTimetable
+                  combinedDay={combinedDay}
+                  routeIdToModeMap={routeIdToModeMap}
+                  departures={combinedDays[combinedDay]}
+                  printableAsA4={this.props.printableAsA4}
+                  useCompactLayout={this.props.useCompactLayout}
                 />
+              ) : (
+                <TableRows departures={this.props.combinedDays[combinedDay]} />
               )}
             </div>
           );

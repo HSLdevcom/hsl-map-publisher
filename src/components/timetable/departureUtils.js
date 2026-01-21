@@ -83,7 +83,7 @@ const mergeConsecutiveHoursWithSameDepartures = entries => {
  * @param {DepartureGroup[]} departures
  */
 export const prepareOrderedDepartureHoursByRoute = departures => {
-  const filteredDepartures = departures.filter(d => d.routeId.includes('H'));
+  const filteredDepartures = departures.filter(d => !d.routeId.includes('H'));
   const routeIds = new Set();
   const grouped = mapValues(
     groupBy(filteredDepartures, d => `${d.hours}_${d.isNextDay}`),
