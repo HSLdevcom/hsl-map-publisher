@@ -9,9 +9,14 @@ import { prepareOrderedDepartureHoursByRoute } from './departureUtils';
 import styles from './intervalTimetable.css';
 import TableRows from './tableRows';
 
-const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompact }) => {
-  const getRoute = id => routeIdToModeMap[id];
+/**
+ * @param {Object} routeIdToModeMap
+ * @param {string} id
+ * @returns {{mode: string, trunkRoute: boolean}}
+ */
+const getRoute = (routeIdToModeMap, id) => routeIdToModeMap[id];
 
+const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompact }) => {
   return (
     <>
       <div
@@ -24,13 +29,16 @@ const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompac
             className={styles.routeHeadings}
             style={{
               color: getColor({
-                ...getRoute(routeId),
+                ...getRoute(routeIdToModeMap, routeId),
                 ...(isCompact
                   ? {}
                   : { padding: '0.2em 0 0.2em calc(0.45em + var(--border-radius))' }),
               }),
             }}>
-            <InlineSVG className={styles.icon} src={getIcon({ ...getRoute(routeId) })} />
+            <InlineSVG
+              className={styles.icon}
+              src={getIcon({ ...getRoute(routeIdToModeMap, routeId) })}
+            />
             {routeId}
           </div>
         ))}
@@ -141,8 +149,6 @@ const IntervalTimetable = ({ routeIdToModeMap, departures }) => {
 
   sortBusRoutesLast(departureIntervalsByRoute.routeIds, routeIdToModeMap);
 
-  const getRoute = id => routeIdToModeMap[id];
-
   return busDepartures.length > 0 ? (
     <div
       style={{
@@ -158,7 +164,6 @@ const IntervalTimetable = ({ routeIdToModeMap, departures }) => {
         <IntervalDisplay
           departureIntervalsByRoute={departureIntervalsByRoute}
           routeIdToModeMap={routeIdToModeMap}
-          isCompact={false}
         />
       </div>
 
