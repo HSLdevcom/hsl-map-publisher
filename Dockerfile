@@ -1,8 +1,7 @@
-FROM node:18-bullseye-slim
+FROM node:18-bullseye-slim AS production
 
 RUN apt-get -y update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -yq wget curl gnupg fontconfig fonts-liberation ca-certificates --no-install-recommends \
-    # This installs the necessary libs to make the bundled version of Chromium that Puppeteer installs work
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && sh -c 'echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' \
     && apt-get update \
@@ -13,26 +12,17 @@ RUN apt-get -y update \
 
 ENV NODE_OPTIONS=--openssl-legacy-provider
 
-ENV WORK /opt/publisher
+ENV WORK=/opt/publisher
 
 RUN mkdir -p ${WORK}
 WORKDIR ${WORK}
 
-# Install app dependencies
-COPY yarn.lock package.json ${WORK}/
-RUN yarn && yarn cache clean
+COPY package.json package-lock.json .npmrc ${WORK}/
+RUN npm ci && npm cache clean --force
 
 COPY . ${WORK}
 
-ARG BUILD_ENV=prod
-COPY .env.${BUILD_ENV} ${WORK}/.env
+RUN npm run build
 
-ARG DIGITRANSIT_APIKEY
-ENV DIGITRANSIT_APIKEY=${DIGITRANSIT_APIKEY}
-ENV BUILD_ENV=${BUILD_ENV}
-RUN yarn run build
+CMD ["sh", "-c", "node scripts/generateConfig.js && npm run ${SERVICE}"]
 
-ARG SERVICE='start:production'
-ENV SERVICE=${SERVICE}
-
-CMD yarn run ${SERVICE}

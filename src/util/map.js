@@ -1,3 +1,4 @@
+import config from 'util/config';
 import renderQueue from 'util/renderQueue';
 
 const scale = 5;
@@ -9,7 +10,7 @@ const scale = 5;
  */
 // eslint-disable-next-line import/prefer-default-export
 export async function fetchMap(mapOptions, mapStyle) {
-  const serverUrl = process.env.GENERATE_API_URL || 'https://kartat.hsl.fi';
+  const serverUrl = config.GENERATE_API_URL;
   window.serverLog(`Generating the map with ${serverUrl}`);
 
   const options = {

@@ -3,18 +3,19 @@ import compose from 'recompose/compose';
 import mapProps from 'recompose/mapProps';
 import hslMapStyle from 'hsl-map-style';
 
+import config from 'util/config';
 import { fetchMap } from 'util/map';
 import promiseWrapper from 'util/promiseWrapper';
 import MapImage from './mapImage';
 
 const propsMapper = mapProps(({ options, components, date, extraLayers }) => {
   const mapStyle = hslMapStyle.generateStyle({
-    sourcesUrl: process.env.DIGITRANSIT_URL,
+    sourcesUrl: config.DIGITRANSIT_URL,
     queryParams: [
       {
-        url: process.env.DIGITRANSIT_URL,
+        url: config.DIGITRANSIT_URL,
         name: 'digitransit-subscription-key',
-        value: process.env.DIGITRANSIT_APIKEY,
+        value: config.DIGITRANSIT_APIKEY,
       },
     ],
     components,

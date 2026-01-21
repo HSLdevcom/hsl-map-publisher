@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { get, cloneDeep } from 'lodash';
 import { JustifiedColumn, Spacer } from 'components/util';
+import config from 'util/config';
 import renderQueue from 'util/renderQueue';
 import { colorsByMode } from 'util/domain';
 import Measure from 'react-measure';
@@ -69,10 +70,8 @@ class TerminalPoster extends Component {
       let templateBody = null;
 
       try {
-        // This url will probably always be the same. If you find yourself
-        // changing it, please make an .env setup while you're at it.
         templateReq = await window.fetch(
-          `${process.env.REACT_APP_PUBLISHER_SERVER_URL}/templates/${this.props.template}`,
+          `${config.REACT_APP_PUBLISHER_SERVER_URL}/templates/${this.props.template}`,
         );
         templateBody = await templateReq.json();
       } catch (err) {

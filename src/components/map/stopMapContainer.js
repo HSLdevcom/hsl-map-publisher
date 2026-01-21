@@ -9,6 +9,7 @@ import { PerspectiveMercatorViewport } from 'viewport-mercator-project';
 import haversine from 'haversine';
 
 import apolloWrapper from 'util/apolloWrapper';
+import config from 'util/config';
 import promiseWrapper from 'util/promiseWrapper';
 import { isNumberVariant, trimRouteId, isDropOffOnly } from 'util/domain';
 import { calculateStopsViewport } from 'util/stopPoster';
@@ -296,7 +297,7 @@ const mapInterestsMapper = mapProps(props => {
 });
 
 const getSalePoints = () => {
-  return fetch(process.env.SALES_POINT_DATA_URL, { method: 'GET' })
+  return fetch(config.SALES_POINT_DATA_URL, { method: 'GET' })
     .then(response => response.json())
     .then(data => {
       try {
