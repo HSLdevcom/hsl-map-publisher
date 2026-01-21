@@ -11,9 +11,12 @@ module.exports = {
     new CleanWebpackPlugin(['dist']),
     new HtmlWebpackPlugin({
       title: 'Stop poster',
+      template: path.resolve(__dirname, 'src/template.html'),
+      inject: 'body',
+      scriptLoading: 'blocking',
     }),
-    new Dotenv({ systemvars: true }),
-  ],
+    isDevelopment && new Dotenv({ systemvars: true }),
+  ].filter(Boolean),
   resolve: {
     modules: ['node_modules', 'src'],
   },
@@ -60,14 +63,6 @@ module.exports = {
       {
         test: /\.svg$/,
         loader: 'raw-loader',
-      },
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: /node_modules/,
-        options: {
-          plugins: [isDevelopment && require.resolve('react-refresh/babel')].filter(Boolean),
-        },
       },
     ],
   },

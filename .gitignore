@@ -9,5 +9,6 @@ yarn-error.log
 graphql.config.json
 output/*
 .env
+.env.local
 secrets
 /test/results/*

@@ -14,6 +14,7 @@ import CoverPage from 'components/coverPage/coverPageContainer';
 import * as StopRoutePlate from './stopRoutePlate/stopRoutePlateContainer';
 import renderQueue from 'util/renderQueue';
 import { parseRenderParams } from '../util/client';
+import config from 'util/config';
 
 const components = {
   StopPoster,
@@ -25,10 +26,8 @@ const components = {
   StopRoutePlate,
 };
 
-const graphqlUrl = process.env.JORE_GRAPHQL_URL || 'https://kartat.hsl.fi/jore/graphql';
-
 const client = new ApolloClient({
-  link: createHttpLink({ uri: graphqlUrl }),
+  link: createHttpLink({ uri: config.JORE_GRAPHQL_URL }),
   cache: new InMemoryCache(),
 });
 
@@ -74,7 +73,7 @@ class App extends Component {
 
       if (renderComponent === components.StopRoutePlate && posterId) {
         const stopPosterPropsReq = await window.fetch(
-          `${process.env.REACT_APP_PUBLISHER_SERVER_URL}/posters/${posterId}`,
+          `${config.REACT_APP_PUBLISHER_SERVER_URL}/posters/${posterId}`,
         );
         if (!stopPosterPropsReq.ok) {
           throw new Error(`Failed to fetch props for id ${posterId}`);

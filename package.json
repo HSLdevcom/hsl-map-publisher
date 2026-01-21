@@ -8,22 +8,23 @@
     "prettier": "prettier \"src/**/*.{js,css}\" \"scripts/**/*.js\" \"migrations/**/*.js\" \"seeds/**/*.js\" \"*.js\" --write",
     "lint": "eslint \"src/**/*.js\" \"scripts/**/*.js\" --fix",
     "build": "cross-env NODE_ENV=production webpack --config webpack.prod.js",
+    "check-and-build": "npm run eslint-check  && npm run build",
     "serve": "serve -l 5000 dist",
     "start": "webpack-serve ./webpack.dev.js",
     "start:production": "serve -l 5000 dist",
     "server": "node -r dotenv/config scripts/server",
-    "server:production": "node -r dotenv/config scripts/server.js",
+    "server:production": "node scripts/server.js",
     "worker": "node -r dotenv/config scripts/worker",
-    "worker:production": "./fonts.sh && fc-cache -f -v && node -r dotenv/config scripts/worker.js",
+    "worker:production": "./fonts.sh && fc-cache -f -v && node scripts/worker.js",
     "knex": "PG_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/postgres knex",
     "docker:build": "docker build -t hsl-map-publisher .",
     "docker:run": "docker run -d -p 4000:4000 --name publisher -v $(pwd)/output:/output -v $(pwd)/fonts:/fonts --link publisher-postgres -e \"PG_CONNECTION_STRING=postgres://postgres:postgres@publisher-postgres:5432/postgres\" --shm-size=1G hsl-map-publisher",
     "docker:stop": "docker stop publisher",
     "docker:rm": "docker rm publisher",
-    "docker:rebuild": "yarn run docker:stop && yarn run docker:rm && yarn run docker:build && yarn run docker:run",
+    "docker:rebuild": "npm run docker:stop && npm run docker:rm && npm run docker:build && npm run docker:run",
     "docker:logs": "docker logs publisher",
     "prepare": "husky install",
-    "test": "node -r dotenv/config test/tests"
+    "test": "node test/tests"
   },
   "lint-staged": {
     "*.js": [
@@ -69,7 +70,6 @@
     "husky": "^8.0.0",
     "lint-staged": "^13.0.2",
     "prettier": "^1.14.3",
-    "react-refresh": "^0.14.0",
     "webpack-cli": "^3.0.8",
     "webpack-serve": "^1.0.4",
     "worker-loader": "^3.0.8"
@@ -77,7 +77,6 @@
   "dependencies": {
     "@azure/storage-blob": "^10.4.0",
     "@koa/cors": "^2.2.1",
-    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.11",
     "@turf/turf": "^6.5.0",
     "apollo-cache-inmemory": "^1.1.1",
     "apollo-client": "^2.0.3",

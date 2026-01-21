@@ -18,15 +18,14 @@ services:
     image: hsl-map-publisher
     build:
       context: .
-      args:
-        - BUILD_ENV=local
-        - DIGITRANSIT_APIKEY=${DIGITRANSIT_APIKEY}
       platforms:
         - "linux/amd64"
     ports:
       - 4000:4000
     environment:
       - SERVICE=server:production
+    env_file:
+      - ./.env.local
     volumes:
       - ./output:/opt/publisher/output
       - ./fonts:/fonts
@@ -43,6 +42,8 @@ services:
       - 5000:5000
     environment:
       - SERVICE=start:production
+    env_file:
+      - path: ./.env.local
     volumes:
       - ./fonts:/fonts
     depends_on:
@@ -58,6 +59,8 @@ services:
       replicas: 2
     environment:
       - SERVICE=worker:production
+    env_file:
+      - path: ./.env.local
     volumes:
       - ./output:/opt/publisher/output
       - ./fonts:/fonts
