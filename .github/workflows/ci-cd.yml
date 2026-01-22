@@ -5,6 +5,7 @@ name: "CI/CD: Continuous integration and continuous deployment"
   push:
     branches:
       - main
+      - development
     tags:
       - "v*"
   pull_request:
@@ -19,5 +20,5 @@ jobs:
     with:
       checkAndTestOutsideDocker: true
       codeCoverageEnabled: true
-      performRelease: true
+      performRelease: false
       checkAndTestInsideDocker: false
