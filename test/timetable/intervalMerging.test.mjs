@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert';
-import { normalizeDepartures } from './intervalsNormalizer.mjs';
+import { normalizeDepartures } from '../../src/components/timetable/intervalsNormalizer.mjs';
 
 function assertNormalized(input, expected) {
   const output = normalizeDepartures(input);
