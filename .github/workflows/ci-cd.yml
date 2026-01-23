@@ -20,5 +20,5 @@ jobs:
     with:
       checkAndTestOutsideDocker: true
       codeCoverageEnabled: true
-      performRelease: false
+      performRelease: true
       checkAndTestInsideDocker: false
