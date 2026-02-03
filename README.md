@@ -190,4 +190,4 @@ docker run -d --name publisher-worker -v $(pwd)/output:/output -v $(pwd)/fonts:/
 ```
 
 ### Testing
-After setting up the local dev environment you can run `yarn test` to generate a list of test stops.
+After setting up the local dev environment you can run `npm test` to generate a list of test stops.
