@@ -109,7 +109,7 @@
     "pdf-merger-js": "^3.4.0",
     "pg": "^8.7.3",
     "prop-types": "^15.6.0",
-    "puppeteer": "^13.7.0",
+    "puppeteer": "^24.36.1",
     "qrcode": "^1.5.4",
     "qs": "^6.5.2",
     "raw-loader": "^0.5.1",
