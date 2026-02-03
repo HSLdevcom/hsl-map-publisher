@@ -4,7 +4,7 @@ name: "CI/CD: Continuous integration and continuous deployment"
 "on":
   push:
     branches:
-      - main
+      - master
       - development
     tags:
       - "v*"
