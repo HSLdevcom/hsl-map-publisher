@@ -8,7 +8,15 @@ yarn-error.log
 /templates
 graphql.config.json
 output/*
+<<<<<<< Updated upstream
 .env
+<<<<<<< Updated upstream
 .env.local
+=======
+=======
+.env*
+!.env.template
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 secrets
 /test/results/*
