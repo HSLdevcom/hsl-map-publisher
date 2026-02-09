@@ -9,7 +9,6 @@ name: "CI/CD: Continuous integration and continuous deployment"
     tags:
       - "v*"
   pull_request:
-  merge_group:
 
 jobs:
   build-check-test-push:
@@ -20,5 +19,5 @@ jobs:
     with:
       checkAndTestOutsideDocker: true
       codeCoverageEnabled: true
-      performRelease: false
+      performRelease: true
       checkAndTestInsideDocker: false
