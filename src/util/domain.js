@@ -7,7 +7,8 @@ import trunkIcon from 'icons/icon_trunk.svg';
 import lRailIcon from 'icons/icon_L_rail.svg';
 
 import zoneByShortId from 'data/zoneByShortId';
-import { weekdays } from 'moment/moment';
+
+export const BUS_MODE = 'BUS';
 
 // TODO: Get routes from api?
 const RAIL_ROUTE_ID_REGEXP = /^300[12]/;
@@ -60,29 +61,32 @@ function isULine(routeId) {
  * @returns {String}
  */
 function trimRouteId(routeId, skipULine) {
-  if (isRailRoute(routeId) && isNumberVariant(routeId)) {
-    return routeId.substring(0, 5).replace(RAIL_ROUTE_ID_REGEXP, '');
-  }
-  if (isRailRoute(routeId)) {
-    return routeId.replace(RAIL_ROUTE_ID_REGEXP, '');
-  }
-  if (isSubwayRoute(routeId) && isNumberVariant(routeId)) {
-    return routeId.substring(1, 5).replace(SUBWAY_ROUTE_ID_REGEXP, '');
-  }
-  if (isSubwayRoute(routeId)) {
-    return routeId.replace(SUBWAY_ROUTE_ID_REGEXP, '');
-  }
+  const trimAreaCodeAndLeadingZeros = () => {
+    if (isRailRoute(routeId) && isNumberVariant(routeId)) {
+      return routeId.substring(0, 5).replace(RAIL_ROUTE_ID_REGEXP, '');
+    }
+    if (isRailRoute(routeId)) {
+      return routeId.replace(RAIL_ROUTE_ID_REGEXP, '');
+    }
+    if (isSubwayRoute(routeId) && isNumberVariant(routeId)) {
+      return routeId.substring(1, 5).replace(SUBWAY_ROUTE_ID_REGEXP, '');
+    }
+    if (isSubwayRoute(routeId)) {
+      return routeId.replace(SUBWAY_ROUTE_ID_REGEXP, '');
+    }
 
-  if (isULine(routeId) && !skipULine) {
-    return routeId.substring(0, 5).replace(U_LINE_REGEX, 'U');
-  }
+    if (isULine(routeId) && !skipULine) {
+      return routeId.substring(0, 5).replace(U_LINE_REGEX, 'U');
+    }
 
-  if (isNumberVariant(routeId)) {
-    // Do not show number variants
-    return routeId.substring(1, 5).replace(/^[0]+/g, '');
-  }
+    if (isNumberVariant(routeId)) {
+      // Do not show number variants
+      return routeId.substring(1, 5).replace(/^[0]+/g, '');
+    }
 
-  return routeId.substring(1).replace(/^[0]+/g, '');
+    return routeId.substring(1).replace(/^[0]+/g, '');
+  };
+  return trimAreaCodeAndLeadingZeros().trim();
 }
 
 /**
@@ -113,14 +117,14 @@ const colorsByMode = {
   TRAM: '#00985f',
   RAIL: '#8c4799',
   SUBWAY: '#ff6319',
-  BUS: '#007AC9',
+  [BUS_MODE]: '#007AC9',
   FERRY: '#00B9E4',
   L_RAIL: '#0098A1',
   LIGHT_L_RAIL: '#e5f4f5',
 };
 
 const iconsByMode = {
-  BUS: busIcon,
+  [BUS_MODE]: busIcon,
   TRAM: tramIcon,
   RAIL: railIcon,
   SUBWAY: subwayIcon,

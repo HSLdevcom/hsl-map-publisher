@@ -11,6 +11,10 @@
   background-color: var(--timetable-accent-color);
 }
 
+.root > *.noPadLeft {
+  padding-left: 0;
+}
+
 .a3root {
   margin: 0px;
   padding: 0px;
