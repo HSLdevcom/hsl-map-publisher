@@ -14,6 +14,7 @@ const createEmptyTemplate = require('./util/createEmptyTemplate');
 const cleanup = require('./util/cleanup');
 
 const { JORE_GRAPHQL_URL } = require('../constants');
+const { processSVGWithUniqueIds } = require('../src/util/processSVG');
 
 // Must cleanup knex, otherwise the process keeps going.
 cleanup(() => {
@@ -269,9 +270,10 @@ async function saveAreaImages(slots) {
       .where({ name: imageName })
       .first();
 
-    const svgContent = get(slot, 'image.svg', '');
+    let svgContent = get(slot, 'image.svg', '');
 
     if (svgContent) {
+      svgContent = processSVGWithUniqueIds(svgContent);
       const newImage = {
         name: imageName,
         svg: svgContent,
