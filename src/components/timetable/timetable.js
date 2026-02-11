@@ -173,10 +173,12 @@ class Timetable extends Component {
             <div className={styles.subtitle}>Stop timetable</div>
           </div>
         )}
-        <div className={styles.validFrom}>
-          Aikataulu alkaen {formatDate(date)} - / Tidtabeller fran {formatDate(date)} - /Timetables
-          from {formatDate(date)} -
-        </div>
+        {intervalTimetable && (
+          <div className={styles.validFrom}>
+            Aikataulu alkaen {formatDate(date)} - / Tidtabeller fran {formatDate(date)} -
+            /Timetables from {formatDate(date)} -
+          </div>
+        )}
 
         {this.props.standalone && (
           <React.Fragment>
