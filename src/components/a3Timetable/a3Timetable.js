@@ -338,7 +338,7 @@ class Timetable extends Component {
           [styles.greyscale]: this.props.greyscale,
         })}>
         {this.props.standalone && (
-          <>
+          <React.Fragment>
             <div className={styles.stopZone}>
               <div className={styles.zoneTitle}>Vyöhyke</div>
               <div className={styles.zoneSubtitle}>Zon/Zone</div>
@@ -351,7 +351,7 @@ class Timetable extends Component {
               </div>
             </div>
             <SimpleRoutes stopId={this.props.stopId} date={this.props.date} />
-          </>
+          </React.Fragment>
         )}
 
         {weekdaysRows.length > 0 && (

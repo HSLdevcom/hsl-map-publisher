@@ -358,30 +358,28 @@ class TerminalPoster extends Component {
 
     if (tramImage) useDiagram = false;
 
-    function TerminalPosterTimetable(props) {
-      return (
-        <>
-          {stops.map(id => (
-            <div className={styles.timetable} key={id}>
-              <Timetable
-                stopId={id}
-                date={date}
-                isSummerTimetable={isSummerTimetable}
-                dateBegin={dateBegin}
-                dateEnd={dateEnd}
-                showValidityPeriod={!props.hideDetails}
-                showNotes={!props.hideDetails}
-                showComponentName={false}
-                segments={props.segments}
-                routeFilter={props.routeFilter}
-                platformInfo
-                showStopInformation
-              />
-            </div>
-          ))}
-        </>
-      );
-    }
+    const TerminalPosterTimetable = props => (
+      <React.Fragment>
+        {stops.map(id => (
+          <div className={styles.timetable} key={id}>
+            <Timetable
+              stopId={id}
+              date={date}
+              isSummerTimetable={isSummerTimetable}
+              dateBegin={dateBegin}
+              dateEnd={dateEnd}
+              showValidityPeriod={!props.hideDetails}
+              showNotes={!props.hideDetails}
+              showComponentName={false}
+              segments={props.segments}
+              routeFilter={props.routeFilter}
+              platformInfo
+              showStopInformation
+            />
+          </div>
+        ))}
+      </React.Fragment>
+    );
 
     return (
       <CropMarks>

@@ -7,7 +7,7 @@ import classnames from 'classnames';
 import { isArray, filter, isEmpty, groupBy } from 'lodash';
 import { filterDuplicateDepartureHours, getDuplicateCutOff } from '../timetable/tableRows';
 
-function LineTimetableRow(props) {
+const LineTimetableRow = props => {
   const { hour, departures } = props;
   const sortedMinuteDepartures = departures.sort((a, b) => {
     return a.minutes - b.minutes;
@@ -30,14 +30,14 @@ function LineTimetableRow(props) {
       </WrappingRow>
     </div>
   );
-}
+};
 
 LineTimetableRow.propTypes = {
   hour: PropTypes.number.isRequired,
   departures: PropTypes.array.isRequired,
 };
 
-function DeparturesColumn(props) {
+const DeparturesColumn = props => {
   const { departures, stop } = props;
 
   if (departures) {
@@ -108,7 +108,7 @@ function DeparturesColumn(props) {
       <LineTableHeader stop={stop} />
     </div>
   );
-}
+};
 
 DeparturesColumn.propTypes = {
   departures: PropTypes.array.isRequired,
@@ -117,7 +117,7 @@ DeparturesColumn.propTypes = {
   isLastStop: PropTypes.bool.isRequired,
 };
 
-function LineTableColumns(props) {
+const LineTableColumns = props => {
   const selectedDepartureDays = props.days;
   const { showDivider, departuresByStop } = props;
 
@@ -154,7 +154,7 @@ function LineTableColumns(props) {
   });
 
   return <div className={styles.tableContainer}>{departureColums}</div>;
-}
+};
 
 LineTableColumns.propTypes = {
   departuresByStop: PropTypes.arrayOf(PropTypes.any).isRequired,

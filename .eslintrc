@@ -47,6 +47,8 @@
     "react/no-unused-class-component-methods": 0,
     "react/static-property-placement": 0,
     "react/state-in-constructor": 0,
+    "react/function-component-definition": 0,
+    "react/jsx-fragments": 0,
     "jsx-a11y/img-has-alt": [0],
     "jsx-a11y/alt-text": 0
   },

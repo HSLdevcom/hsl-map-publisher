@@ -20,7 +20,7 @@ module.exports = {
   resolve: {
     modules: ['node_modules', 'src'],
     fallback: {
-      assert: false,
+      assert: require.resolve('assert'),
     },
   },
   output: {
@@ -41,7 +41,13 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
+        // Global styles (no CSS Modules) — @font-face, :root vars, body reset
+        test: /styles[\\/]base\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
         test: /\.css$/,
+        exclude: /styles[\\/]base\.css$/,
         use: [
           'style-loader',
           {
@@ -49,8 +55,10 @@ module.exports = {
             options: {
               modules: {
                 localIdentName: '[name]_[local]_[hash:base64:5]',
+                exportLocalsConvention: 'as-is',
               },
               importLoaders: 1,
+              esModule: false,
             },
           },
         ],

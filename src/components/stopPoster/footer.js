@@ -6,7 +6,7 @@ import QrCode from 'components/qrCode';
 import InlineSVG from 'components/inlineSVG';
 import classnames from 'classnames';
 import get from 'lodash/get';
-import * as cheerio from 'cheerio';
+import { load as cheerioLoad } from 'cheerio';
 import tagsByShortId from 'data/tagsByShortId';
 import { getFeedbackUrl } from 'data/feedbackCodes';
 import dottedLine from 'svg/dotted_line.svg';
@@ -41,7 +41,7 @@ function getSvgElementPosition($element, widthModifier = 0, heightModifier = 0) 
 }
 
 function getDynamicAreas(svg, widthModifier, heightModifier) {
-  const $ = cheerio.load(svg);
+  const $ = cheerioLoad(svg);
   const dynamicAreas = $('.dynamic-area');
   const areas = [];
 
@@ -101,7 +101,7 @@ function createTemplateSlots(areaSlots) {
     const marginToWidth = size > 1 ? (size - 1) * slotMargin : 0;
     const width = slotWidth * size + marginToWidth;
     const left = firstSlotLeftPosition + slotWidth * idx + slotMargin * idx;
-    const $svg = cheerio.load(svg);
+    const $svg = cheerioLoad(svg);
 
     const svgViewBox = $svg('svg')
       .attr('viewBox')
@@ -129,7 +129,7 @@ function createTemplateSlots(areaSlots) {
   }, []);
 }
 
-function Footer(props) {
+const Footer = props => {
   const urlsByType = {
     ticketsales: tagsByShortId[props.shortId.replace(/\s/g, '')],
     stopinfo: `http://hsl.fi/pysakit/${props.shortId.replace(/\s/g, '')}`,
@@ -208,7 +208,7 @@ function Footer(props) {
       })}
     </div>
   );
-}
+};
 
 Footer.propTypes = {
   template: PropTypes.any,

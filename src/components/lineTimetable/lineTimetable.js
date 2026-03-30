@@ -58,7 +58,7 @@ const hasTimedStopRoutes = routes => {
   return filter(routes, route => route.timedStops.nodes.length > 1).length > 0;
 };
 
-function RouteDepartures(props) {
+const RouteDepartures = props => {
   const {
     lang,
     departuresByStop,
@@ -210,7 +210,7 @@ function RouteDepartures(props) {
   });
 
   return <div>{combinedDepartureTables}</div>;
-}
+};
 
 RouteDepartures.defaultProps = {
   routeIdParsed: '',

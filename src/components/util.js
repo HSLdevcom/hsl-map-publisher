@@ -3,13 +3,11 @@ import PropTypes from 'prop-types';
 
 import styles from './util.css';
 
-function Row(props) {
-  return (
-    <div className={[styles.row, props.className].join(' ')} style={props.style}>
-      {props.children}
-    </div>
-  );
-}
+const Row = props => (
+  <div className={[styles.row, props.className].join(' ')} style={props.style}>
+    {props.children}
+  </div>
+);
 
 Row.defaultProps = {
   style: {},
@@ -22,13 +20,11 @@ Row.propTypes = {
   style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 };
 
-function JustifiedRow(props) {
-  return (
-    <div className={styles.justifiedRow} style={props.style}>
-      {props.children}
-    </div>
-  );
-}
+const JustifiedRow = props => (
+  <div className={styles.justifiedRow} style={props.style}>
+    {props.children}
+  </div>
+);
 
 JustifiedRow.defaultProps = {
   style: {},
@@ -39,13 +35,11 @@ JustifiedRow.propTypes = {
   style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 };
 
-function WrappingRow(props) {
-  return (
-    <div className={styles.wrappingRow} style={props.style}>
-      {props.children}
-    </div>
-  );
-}
+const WrappingRow = props => (
+  <div className={styles.wrappingRow} style={props.style}>
+    {props.children}
+  </div>
+);
 
 WrappingRow.defaultProps = {
   style: {},
@@ -56,13 +50,11 @@ WrappingRow.propTypes = {
   style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 };
 
-function Column(props) {
-  return (
-    <div className={[styles.column, props.className].join(' ')} style={props.style}>
-      {props.children}
-    </div>
-  );
-}
+const Column = props => (
+  <div className={[styles.column, props.className].join(' ')} style={props.style}>
+    {props.children}
+  </div>
+);
 
 Column.defaultProps = {
   style: {},
@@ -75,13 +67,11 @@ Column.propTypes = {
   style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 };
 
-function CenteringColumn(props) {
-  return (
-    <div className={styles.centeringColumn} style={props.style}>
-      {props.children}
-    </div>
-  );
-}
+const CenteringColumn = props => (
+  <div className={styles.centeringColumn} style={props.style}>
+    {props.children}
+  </div>
+);
 
 CenteringColumn.defaultProps = {
   style: {},
@@ -92,13 +82,11 @@ CenteringColumn.propTypes = {
   style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 };
 
-function JustifiedColumn(props) {
-  return (
-    <div className={styles.justifiedColumn} style={props.style}>
-      {props.children}
-    </div>
-  );
-}
+const JustifiedColumn = props => (
+  <div className={styles.justifiedColumn} style={props.style}>
+    {props.children}
+  </div>
+);
 
 JustifiedColumn.defaultProps = {
   style: {},
@@ -109,9 +97,9 @@ JustifiedColumn.propTypes = {
   style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
 };
 
-function Spacer(props) {
-  return <div style={{ flex: '0 0 auto', width: props.width, height: props.height }} />;
-}
+const Spacer = props => (
+  <div style={{ flex: '0 0 auto', width: props.width, height: props.height }} />
+);
 
 Spacer.defaultProps = {
   width: 0,
@@ -123,11 +111,9 @@ Spacer.propTypes = {
   height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
-function FlexSpacer() {
-  return <div style={{ flex: '2' }} />;
-}
+const FlexSpacer = () => <div style={{ flex: '2' }} />;
 
-function PrintButton(lang) {
+const PrintButton = lang => {
   const PRINT_TEXT = {
     fi: 'TULOSTA AIKATAULU',
     sv: 'SKRIV UT TIDTABEL',
@@ -141,33 +127,31 @@ function PrintButton(lang) {
       </button>
     </div>
   );
-}
+};
 
 PrintButton.propTypes = {
   lang: PropTypes.string.isRequired,
 };
 
-function PlatformSymbol({ platform, size, color }) {
-  return (
-    <svg className={styles.PScontainer} width={size} height={size}>
-      <circle
-        className={styles.PScircle}
-        style={{ stroke: color }}
-        cx={size / 2}
-        cy={size / 2}
-        r={size / 2 - 2}
-      />
-      <text
-        className={styles.PStext}
-        style={{ fill: color }}
-        x={size / 2}
-        y={size / 2}
-        fontSize={size / 2}>
-        {platform}
-      </text>
-    </svg>
-  );
-}
+const PlatformSymbol = ({ platform, size, color }) => (
+  <svg className={styles.PScontainer} width={size} height={size}>
+    <circle
+      className={styles.PScircle}
+      style={{ stroke: color }}
+      cx={size / 2}
+      cy={size / 2}
+      r={size / 2 - 2}
+    />
+    <text
+      className={styles.PStext}
+      style={{ fill: color }}
+      x={size / 2}
+      y={size / 2}
+      fontSize={size / 2}>
+      {platform}
+    </text>
+  </svg>
+);
 
 const translations = {
   fi: {

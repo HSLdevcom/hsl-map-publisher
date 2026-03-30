@@ -1,4 +1,4 @@
-import * as cheerio from 'cheerio';
+import { load as cheerioLoad } from 'cheerio';
 
 const parseAttr = attr => Math.round(parseInt(attr, 10));
 
@@ -13,7 +13,7 @@ export function sizedSvg(svgSource, width, height) {
 
   let svgOrigWidth = 0;
   let svgOrigHeight = 0;
-  const $svg = cheerio.load(svgSource);
+  const $svg = cheerioLoad(svgSource);
 
   // Figure out the aspect ratio of the svg from the width/height or the viewBox.
   if ($svg('svg').attr('width')) {

@@ -12,15 +12,13 @@ const rootStyle = {
   marginBottom: -repeatHeight / 2,
 };
 
-function Dot() {
-  return (
-    <svg width={lineWidth} height={repeatHeight}>
-      <circle cx={lineWidth / 2} cy={repeatHeight / 2} r={lineWidth / 2} fill={lineColor} />
-    </svg>
-  );
-}
+const Dot = () => (
+  <svg width={lineWidth} height={repeatHeight}>
+    <circle cx={lineWidth / 2} cy={repeatHeight / 2} r={lineWidth / 2} fill={lineColor} />
+  </svg>
+);
 
-function Gap() {
+const Gap = () => {
   const dots = [];
   for (let i = 0; i < dotCount; i++) {
     dots.push(<Dot key={i} />);
@@ -31,6 +29,6 @@ function Gap() {
       {dots}
     </div>
   );
-}
+};
 
 export default Gap;

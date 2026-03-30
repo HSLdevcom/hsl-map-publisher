@@ -103,7 +103,8 @@ async function renderComponent(options) {
 
   if (component === 'StopRoutePlate' && (props.downloadTable || props.downloadSummary)) {
     // Allow the downloading of CSV file since the component just sends it to the client instead of actually rendering
-    await page._client.send('Page.setDownloadBehavior', {
+    const client = await page.createCDPSession();
+    await client.send('Page.setDownloadBehavior', {
       behavior: 'allow',
       downloadPath: fileOutputDir,
     });

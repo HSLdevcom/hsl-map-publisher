@@ -181,7 +181,7 @@ class Timetable extends Component {
         )}
 
         {this.props.standalone && (
-          <>
+          <React.Fragment>
             <div className={styles.stopZone}>
               <div className={styles.zoneTitle}>Vyöhyke</div>
               <div className={styles.zoneSubtitle}>Zon/Zone</div>
@@ -192,7 +192,7 @@ class Timetable extends Component {
               </div>
             </div>
             <SimpleRoutes stopId={this.props.stopId} date={this.props.date} />
-          </>
+          </React.Fragment>
         )}
         {Object.keys(this.props.combinedDays).map(combinedDay => {
           const dayNames = combinedDay.split('-');
