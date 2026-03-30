@@ -6,21 +6,15 @@ import { JustifiedRow, CenteringColumn } from 'components/util';
 import styles from './header.css';
 import ZoneIcon from './zoneIcon';
 
-function Group(props) {
-  return <div style={{ marginLeft: 15, marginRight: 15 }}>{props.children}</div>;
-}
+const Group = props => <div style={{ marginLeft: 15, marginRight: 15 }}>{props.children}</div>;
 
 Group.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-function Title(props) {
-  return (
-    <div className={classNames(styles.title, { [styles.small]: props.small })}>
-      {props.children}
-    </div>
-  );
-}
+const Title = props => (
+  <div className={classNames(styles.title, { [styles.small]: props.small })}>{props.children}</div>
+);
 
 Title.defaultProps = {
   small: false,
@@ -31,13 +25,11 @@ Title.propTypes = {
   small: PropTypes.bool,
 };
 
-function Subtitle(props) {
-  return (
-    <div className={classNames(styles.subtitle, { [styles.small]: props.small })}>
-      {props.children}
-    </div>
-  );
-}
+const Subtitle = props => (
+  <div className={classNames(styles.subtitle, { [styles.small]: props.small })}>
+    {props.children}
+  </div>
+);
 
 Subtitle.defaultProps = {
   small: false,
@@ -50,33 +42,31 @@ Subtitle.propTypes = {
 
 // TODO: Fix alignment of zone letter for each letter.
 
-function Header(props) {
-  return (
-    <JustifiedRow style={{ margin: '0 10px' }}>
-      <Group>
-        <Title>{props.nameFi}</Title>
-        {props.nameSe && <Subtitle>{props.nameSe}</Subtitle>}
-      </Group>
-      {props.shortId && (
-        <CenteringColumn>
-          <Title small>Pysäkkinumero</Title>
-          <Subtitle small>Hållplatsnummer</Subtitle>
-          <Subtitle small>Stop number</Subtitle>
-          <div className={styles.stop}>{props.shortId.replace(' ', '')}</div>
-        </CenteringColumn>
-      )}
-      {props.stopZone && (
-        <div className={styles.stopZoneColumn}>
-          <div className={styles.zoneHeading}>
-            <Title>Vyöhyke</Title>
-            <Subtitle>Zon/Zone</Subtitle>
-          </div>
-          <ZoneIcon zone={props.stopZone} />
+const Header = props => (
+  <JustifiedRow style={{ margin: '0 10px' }}>
+    <Group>
+      <Title>{props.nameFi}</Title>
+      {props.nameSe && <Subtitle>{props.nameSe}</Subtitle>}
+    </Group>
+    {props.shortId && (
+      <CenteringColumn>
+        <Title small>Pysäkkinumero</Title>
+        <Subtitle small>Hållplatsnummer</Subtitle>
+        <Subtitle small>Stop number</Subtitle>
+        <div className={styles.stop}>{props.shortId.replace(' ', '')}</div>
+      </CenteringColumn>
+    )}
+    {props.stopZone && (
+      <div className={styles.stopZoneColumn}>
+        <div className={styles.zoneHeading}>
+          <Title>Vyöhyke</Title>
+          <Subtitle>Zon/Zone</Subtitle>
         </div>
-      )}
-    </JustifiedRow>
-  );
-}
+        <ZoneIcon zone={props.stopZone} />
+      </div>
+    )}
+  </JustifiedRow>
+);
 
 Header.defaultProps = {
   nameSe: null,

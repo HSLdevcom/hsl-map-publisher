@@ -7,7 +7,7 @@ import styles from './stopLabel.css';
 
 const strokeWidth = 5;
 
-function StopSymbol(props) {
+const StopSymbol = props => {
   const modes = [...new Set(props.routes.map(({ mode }) => mode))];
   const colors = [];
   if (props.routes.some(route => route.trunkRoute)) {
@@ -50,7 +50,7 @@ function StopSymbol(props) {
       </text>
     </svg>
   );
-}
+};
 
 StopSymbol.defaultProps = {
   platform: null,

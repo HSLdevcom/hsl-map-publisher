@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function InlineSVG({ src, ...otherProps }) {
+const InlineSVG = ({ src, ...otherProps }) => {
   return (
     <div
       // eslint-disable-next-line react/no-danger
@@ -9,7 +9,7 @@ function InlineSVG({ src, ...otherProps }) {
       {...otherProps}
     />
   );
-}
+};
 
 InlineSVG.propTypes = {
   src: PropTypes.string.isRequired,

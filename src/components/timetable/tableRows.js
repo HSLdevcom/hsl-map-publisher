@@ -9,19 +9,17 @@ import classNames from 'classnames';
 
 import styles from './tableRows.css';
 
-function Departure(props) {
-  return (
-    <div className={styles.item}>
-      <div className={styles.minutes}>
-        {props.minutes < 10 && '0'}
-        {props.minutes}
-      </div>
-      /&#x202F;
-      {trimRouteId(props.routeId, true)}
-      {props.note}
+const Departure = props => (
+  <div className={styles.item}>
+    <div className={styles.minutes}>
+      {props.minutes < 10 && '0'}
+      {props.minutes}
     </div>
-  );
-}
+    /&#x202F;
+    {trimRouteId(props.routeId, true)}
+    {props.note}
+  </div>
+);
 
 Departure.defaultProps = {
   note: null,
@@ -32,18 +30,16 @@ Departure.propTypes = {
   note: PropTypes.string,
 };
 
-function TableRow(props) {
-  return (
-    <Row className={classNames(props.className, { [styles.compactRow]: props.useCompactLayout })}>
-      <div className={styles.hours}>{props.hours}</div>
-      <WrappingRow>
-        {sortBy(props.departures, a => a.minutes).map((departure, index) => (
-          <Departure key={index} {...departure} />
-        ))}
-      </WrappingRow>
-    </Row>
-  );
-}
+const TableRow = props => (
+  <Row className={classNames(props.className, { [styles.compactRow]: props.useCompactLayout })}>
+    <div className={styles.hours}>{props.hours}</div>
+    <WrappingRow>
+      {sortBy(props.departures, a => a.minutes).map((departure, index) => (
+        <Departure key={index} {...departure} />
+      ))}
+    </WrappingRow>
+  </Row>
+);
 
 TableRow.defaultProps = {
   useCompactLayout: false,
@@ -128,7 +124,7 @@ export const filterDuplicateDepartureHours = departureRows => {
   return uniqBy(departureRows, 'departures');
 };
 
-function TableRows(props) {
+const TableRows = props => {
   const departuresByHour = groupBy(
     props.departures,
     departure => (departure.isNextDay ? 24 : 0) + departure.hours,
@@ -182,7 +178,7 @@ function TableRows(props) {
       ))}
     </div>
   );
-}
+};
 
 TableRows.propTypes = {
   departures: PropTypes.arrayOf(

@@ -5,13 +5,11 @@ import InlineSVG from 'components/inlineSVG';
 
 import styles from './tramDiagram.css';
 
-function TramDiagram(props) {
-  return (
-    <div className={styles.root}>
-      <InlineSVG className={styles.diagram} src={props.svg} />
-    </div>
-  );
-}
+const TramDiagram = props => (
+  <div className={styles.root}>
+    <InlineSVG className={styles.diagram} src={props.svg} />
+  </div>
+);
 
 TramDiagram.propTypes = {
   svg: PropTypes.any.isRequired,
