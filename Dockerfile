@@ -1,4 +1,4 @@
-FROM node:18-bullseye-slim AS production
+FROM node:20-bullseye-slim AS production
 
 RUN apt-get -y update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -yq wget curl gnupg fontconfig fonts-liberation ca-certificates --no-install-recommends \
@@ -10,7 +10,8 @@ RUN apt-get -y update \
     && cp ./azcopy /usr/bin/ \
     && rm -rf /var/lib/apt/lists/*
 
-ENV NODE_OPTIONS=--openssl-legacy-provider
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
 ENV WORK=/opt/publisher
 

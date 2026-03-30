@@ -4,7 +4,7 @@ import styles from './stopRoutePlateRow.css';
 
 const strToParagraph = str => <p>{str}</p>;
 
-const StopRoutePlateRow = props => {
+function StopRoutePlateRow(props) {
   const { stop, routeChanges } = props;
 
   const unchangedRoutes = routeChanges?.formatted.unchanged.map(strToParagraph);
@@ -28,7 +28,7 @@ const StopRoutePlateRow = props => {
       <td>{endResults}</td>
     </tr>
   );
-};
+}
 
 StopRoutePlateRow.propTypes = {
   stop: PropTypes.object.isRequired,

@@ -1,4 +1,4 @@
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 
 const parseAttr = attr => Math.round(parseInt(attr, 10));
 

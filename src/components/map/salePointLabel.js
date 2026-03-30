@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import styles from './stopLabel.css';
 
-const SalePointLabel = props => {
+function SalePointLabel(props) {
   // Round the distance to the next 10 meter
   const roundedDistance = Math.ceil(props.distance / 10) * 10;
 
@@ -33,7 +33,7 @@ const SalePointLabel = props => {
       </div>
     </div>
   );
-};
+}
 
 SalePointLabel.propTypes = {
   type: PropTypes.string.isRequired,

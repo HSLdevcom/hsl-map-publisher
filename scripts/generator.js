@@ -23,9 +23,13 @@ const pdfPath = id => path.join(fileOutputDir, `${id}.pdf`);
 const csvPath = id => path.join(fileOutputDir, `${id}.csv`);
 
 async function initialize() {
-  browser = await puppeteer.launch({
+  const launchOptions = {
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security'],
-  });
+  };
+  if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+    launchOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
+  }
+  browser = await puppeteer.launch(launchOptions);
   browser.on('disconnected', () => {
     browser = null;
   });
@@ -51,7 +55,9 @@ function generateRenderUrl(component, template, props, id) {
 }
 
 async function sleep(millis) {
-  return new Promise(resolve => setTimeout(resolve, millis));
+  return new Promise(resolve => {
+    setTimeout(resolve, millis);
+  });
 }
 
 async function waitFile(filePath) {
@@ -178,9 +184,9 @@ async function generate(options) {
         onInfo('Creating new browser instance');
         await initialize();
       }
-      const timeout = new Promise((resolve, reject) =>
-        setTimeout(reject, RENDER_TIMEOUT, new Error('Render timeout')),
-      );
+      const timeout = new Promise((resolve, reject) => {
+        setTimeout(reject, RENDER_TIMEOUT, new Error('Render timeout'));
+      });
 
       const posterUploaded = await Promise.race([renderComponent(options), timeout]);
       const uploadFailed = !posterUploaded && AZURE_STORAGE_ACCOUNT && AZURE_STORAGE_KEY;

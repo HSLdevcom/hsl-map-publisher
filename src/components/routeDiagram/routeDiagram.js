@@ -8,7 +8,7 @@ import markerIcon from 'icons/marker.svg';
 import Path from './path';
 import styles from './routeDiagram.css';
 
-const RouteDiagram = props => {
+function RouteDiagram(props) {
   const { printAsA3, useWide, useCompactLayout, tree } = props;
   tree.useCompactLayout = useCompactLayout;
   return (
@@ -37,7 +37,7 @@ const RouteDiagram = props => {
       <Path {...tree} />
     </div>
   );
-};
+}
 
 RouteDiagram.defaultProps = {
   printAsA3: false,

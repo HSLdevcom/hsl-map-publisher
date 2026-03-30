@@ -30,7 +30,7 @@ const spansFiveOrMoreHours = hoursRange => {
  */
 const getRoute = (routeIdToModeMap, id) => routeIdToModeMap[id];
 
-const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompact }) => {
+function IntervalDisplay({ departureIntervalsByRoute, routeIdToModeMap, isCompact }) {
   return (
     <>
       <div
@@ -112,7 +112,7 @@ const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompac
       </div>
     </>
   );
-};
+}
 
 IntervalDisplay.propTypes = {
   departureIntervalsByRoute: PropTypes.object.isRequired,
@@ -149,7 +149,7 @@ const sortBusRoutesLast = (routeIds, routeIdToModeMap) => {
   });
 };
 
-const IntervalTimetable = ({ routeIdToModeMap, departures }) => {
+function IntervalTimetable({ routeIdToModeMap, departures }) {
   const { intervalRoutes, normalBusRoutes } = partitionToIntervalAndNonIntervalRoutes(
     routeIdToModeMap,
   );
@@ -194,7 +194,7 @@ const IntervalTimetable = ({ routeIdToModeMap, departures }) => {
       isCompact
     />
   );
-};
+}
 
 IntervalTimetable.propTypes = {
   combinedDay: PropTypes.string.isRequired,

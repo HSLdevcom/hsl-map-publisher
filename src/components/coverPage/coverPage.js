@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import styles from './coverPage.css';
 import { getShelterText } from '../../util/domain';
 
-const StopRow = props => {
+function StopRow(props) {
   const {
     shortId,
     nameFi,
@@ -23,13 +23,13 @@ const StopRow = props => {
       } Julistepaikat: ${posterCount}`}</span>
     </div>
   );
-};
+}
 
 StopRow.propTypes = {
   stop: PropTypes.object.isRequired,
 };
 
-const CoverPage = props => {
+function CoverPage(props) {
   const { title, date, stops, dateBegin, dateEnd } = props;
 
   const mappedStops = stops.map(stop => {
@@ -45,7 +45,7 @@ const CoverPage = props => {
       <div className={styles.rowContainer}>{mappedStops}</div>
     </div>
   );
-};
+}
 
 CoverPage.defaultProps = {
   title: '',

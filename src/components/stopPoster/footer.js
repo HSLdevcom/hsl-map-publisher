@@ -6,7 +6,7 @@ import QrCode from 'components/qrCode';
 import InlineSVG from 'components/inlineSVG';
 import classnames from 'classnames';
 import get from 'lodash/get';
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 import tagsByShortId from 'data/tagsByShortId';
 import { getFeedbackUrl } from 'data/feedbackCodes';
 import dottedLine from 'svg/dotted_line.svg';
@@ -129,7 +129,7 @@ function createTemplateSlots(areaSlots) {
   }, []);
 }
 
-const Footer = props => {
+function Footer(props) {
   const urlsByType = {
     ticketsales: tagsByShortId[props.shortId.replace(/\s/g, '')],
     stopinfo: `http://hsl.fi/pysakit/${props.shortId.replace(/\s/g, '')}`,
@@ -208,7 +208,7 @@ const Footer = props => {
       })}
     </div>
   );
-};
+}
 
 Footer.propTypes = {
   template: PropTypes.any,

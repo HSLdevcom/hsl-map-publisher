@@ -109,24 +109,26 @@ class A3StopPoster extends Component {
     }
 
     const printAsA3 = true;
-    const StopPosterTimetable = props => (
-      <Timetable
-        stopId={stopId}
-        date={date}
-        isSummerTimetable={isSummerTimetable}
-        dateBegin={dateBegin}
-        dateEnd={dateEnd}
-        showValidityPeriod={!props.hideDetails}
-        showNotes={!props.hideDetails}
-        showComponentName={!props.hideDetails}
-        segments={props.segments}
-        routeFilter={props.routeFilter}
-        printAsA3={printAsA3}
-        updateHook={props.updateHook}
-        groupedRows={props.groupedRows}
-        diagram={props.diagram}
-      />
-    );
+    function StopPosterTimetable(props) {
+      return (
+        <Timetable
+          stopId={stopId}
+          date={date}
+          isSummerTimetable={isSummerTimetable}
+          dateBegin={dateBegin}
+          dateEnd={dateEnd}
+          showValidityPeriod={!props.hideDetails}
+          showNotes={!props.hideDetails}
+          showComponentName={!props.hideDetails}
+          segments={props.segments}
+          routeFilter={props.routeFilter}
+          printAsA3={printAsA3}
+          updateHook={props.updateHook}
+          groupedRows={props.groupedRows}
+          diagram={props.diagram}
+        />
+      );
+    }
     const containerStyle = {};
     if (isTrunkStop) {
       containerStyle['--background'] = colorsByMode.TRUNK;

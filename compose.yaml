@@ -64,11 +64,14 @@ services:
     volumes:
       - ./output:/opt/publisher/output
       - ./fonts:/fonts
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       publisher-postgres:
         condition: service_started
       redis:
         condition: service_started
+
 
 volumes:
   dev_postgres:

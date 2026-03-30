@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import styles from './lineTimetableHeader.css';
 import { PrintButton } from '../util';
 
-const LineTimetableHeader = props => {
+function LineTimetableHeader(props) {
   const { routeIdParsed, nameFi, nameSe } = props;
   return (
     <div className={styles.header}>
@@ -21,7 +21,7 @@ const LineTimetableHeader = props => {
       </div>
     </div>
   );
-};
+}
 
 LineTimetableHeader.defaultProps = {
   nameFi: '',

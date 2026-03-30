@@ -1,6 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -8,7 +8,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 module.exports = {
   entry: ['babel-polyfill', './src/index.js'],
   plugins: [
-    new CleanWebpackPlugin(['dist']),
+    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       title: 'Stop poster',
       template: path.resolve(__dirname, 'src/template.html'),
@@ -19,6 +19,9 @@ module.exports = {
   ].filter(Boolean),
   resolve: {
     modules: ['node_modules', 'src'],
+    fallback: {
+      assert: false,
+    },
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -27,15 +30,6 @@ module.exports = {
   },
   module: {
     rules: [
-      {
-        test: /\.js$/,
-        loader: 'eslint-loader',
-        enforce: 'pre',
-        exclude: /node_modules/,
-        options: {
-          cache: true,
-        },
-      },
       {
         test: /\.js$/,
         loader: 'babel-loader',
@@ -53,9 +47,10 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              modules: true,
+              modules: {
+                localIdentName: '[name]_[local]_[hash:base64:5]',
+              },
               importLoaders: 1,
-              localIdentName: '[name]_[local]_[hash:base64:5]',
             },
           },
         ],
