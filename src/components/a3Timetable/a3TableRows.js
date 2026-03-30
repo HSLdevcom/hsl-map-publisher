@@ -9,17 +9,19 @@ import RouteDiagram from 'components/routeDiagram/routeDiagramContainer';
 
 import styles from './a3TableRows.css';
 
-const Departure = props => (
-  <div className={styles.item}>
-    <div className={styles.minutes}>
-      {props.minutes < 10 && '0'}
-      {props.minutes}
+function Departure(props) {
+  return (
+    <div className={styles.item}>
+      <div className={styles.minutes}>
+        {props.minutes < 10 && '0'}
+        {props.minutes}
+      </div>
+      /&#x202F;
+      {trimRouteId(props.routeId, true)}
+      {props.note}
     </div>
-    /&#x202F;
-    {trimRouteId(props.routeId, true)}
-    {props.note}
-  </div>
-);
+  );
+}
 
 Departure.defaultProps = {
   note: null,
@@ -30,16 +32,18 @@ Departure.propTypes = {
   note: PropTypes.string,
 };
 
-const TableRow = props => (
-  <Row>
-    <div className={styles.hours}>{props.hours}</div>
-    <WrappingRow>
-      {sortBy(props.departures, a => a.minutes).map((departure, index) => (
-        <Departure key={index} {...departure} />
-      ))}
-    </WrappingRow>
-  </Row>
-);
+function TableRow(props) {
+  return (
+    <Row>
+      <div className={styles.hours}>{props.hours}</div>
+      <WrappingRow>
+        {sortBy(props.departures, a => a.minutes).map((departure, index) => (
+          <Departure key={index} {...departure} />
+        ))}
+      </WrappingRow>
+    </Row>
+  );
+}
 
 const SEGMENT_TEXTS = {
   'Maanantai - Perjantai': {
@@ -61,7 +65,7 @@ TableRow.propTypes = {
   departures: PropTypes.arrayOf(PropTypes.shape(Departure.propTypes)).isRequired,
 };
 
-const TableRows = props => {
+function TableRows(props) {
   // Split columns to multiple divs if there's a day divider.
   const indexesToSplit = keys(pickBy(props.departures, 'segment'));
   const diagramExists = keys(pickBy(props.departures, 'diagram'));
@@ -142,7 +146,7 @@ const TableRows = props => {
       })}
     </div>
   );
-};
+}
 
 TableRows.defaultProps = {
   diagram: null,

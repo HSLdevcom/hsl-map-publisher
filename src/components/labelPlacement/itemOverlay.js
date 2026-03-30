@@ -3,15 +3,17 @@ import PropTypes from 'prop-types';
 
 const MASK_MARGIN = 5;
 
-const Line = props => (
-  <path
-    d={`M${props.x} ${props.y} L${props.x + props.cx} ${props.y + props.cy}`}
-    fill="none"
-    stroke="#333333"
-    strokeWidth="2"
-    clipPath={`url(#label-mask-${props.index})`}
-  />
-);
+function Line(props) {
+  return (
+    <path
+      d={`M${props.x} ${props.y} L${props.x + props.cx} ${props.y + props.cy}`}
+      fill="none"
+      stroke="#333333"
+      strokeWidth="2"
+      clipPath={`url(#label-mask-${props.index})`}
+    />
+  );
+}
 
 const LineItemPropTypes = {
   x: PropTypes.number.isRequired,
@@ -25,10 +27,11 @@ Line.propTypes = {
   index: PropTypes.number.isRequired,
 };
 
-const ClipPath = props => (
-  <clipPath id={`label-mask-${props.index}`}>
-    <path
-      d={`
+function ClipPath(props) {
+  return (
+    <clipPath id={`label-mask-${props.index}`}>
+      <path
+        d={`
                 M0 0 h${props.totalWidth} v${props.totalHeight} H0z
                 M${props.x + props.cx - props.width / 2 + MASK_MARGIN}
                  ${props.y + props.cy - props.height / 2 + MASK_MARGIN}
@@ -36,9 +39,10 @@ const ClipPath = props => (
                 h${props.width - 2 * MASK_MARGIN}
                 v-${props.height - 2 * MASK_MARGIN}z
               `}
-    />
-  </clipPath>
-);
+      />
+    </clipPath>
+  );
+}
 
 const ClipPathItemPropTypes = {
   x: PropTypes.number.isRequired,
@@ -56,24 +60,26 @@ ClipPath.propTypes = {
   index: PropTypes.number.isRequired,
 };
 
-const ItemOverlay = props => (
-  <svg width={props.width} height={props.height}>
-    <defs>
+function ItemOverlay(props) {
+  return (
+    <svg width={props.width} height={props.height}>
+      <defs>
+        {props.items.map((item, index) => (
+          <ClipPath
+            key={index}
+            index={index}
+            totalWidth={props.width}
+            totalHeight={props.height}
+            {...item}
+          />
+        ))}
+      </defs>
       {props.items.map((item, index) => (
-        <ClipPath
-          key={index}
-          index={index}
-          totalWidth={props.width}
-          totalHeight={props.height}
-          {...item}
-        />
+        <Line key={index} index={index} {...item} />
       ))}
-    </defs>
-    {props.items.map((item, index) => (
-      <Line key={index} index={index} {...item} />
-    ))}
-  </svg>
-);
+    </svg>
+  );
+}
 
 ItemOverlay.propTypes = {
   width: PropTypes.number.isRequired,

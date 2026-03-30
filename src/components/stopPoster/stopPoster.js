@@ -351,23 +351,25 @@ class StopPoster extends Component {
     const useTramDiagram = (isTramStop || isLightRail) && tramImage;
     const useDiagram = hasDiagram && !useTramDiagram;
 
-    const StopPosterTimetable = props => (
-      <div className={styles.timetable}>
-        <Timetable
-          intervalTimetable={intervalTimetable}
-          stopId={stopId}
-          date={date}
-          isSummerTimetable={isSummerTimetable}
-          dateBegin={dateBegin}
-          dateEnd={dateEnd}
-          showValidityPeriod={!props.hideDetails}
-          showNotes={!props.hideDetails}
-          showComponentName={!props.hideDetails}
-          segments={props.segments}
-          routeFilter={props.routeFilter}
-        />
-      </div>
-    );
+    function StopPosterTimetable(props) {
+      return (
+        <div className={styles.timetable}>
+          <Timetable
+            intervalTimetable={intervalTimetable}
+            stopId={stopId}
+            date={date}
+            isSummerTimetable={isSummerTimetable}
+            dateBegin={dateBegin}
+            dateEnd={dateEnd}
+            showValidityPeriod={!props.hideDetails}
+            showNotes={!props.hideDetails}
+            showComponentName={!props.hideDetails}
+            segments={props.segments}
+            routeFilter={props.routeFilter}
+          />
+        </div>
+      );
+    }
 
     let alternativeStyle = null;
     if (isTrunkStop) {

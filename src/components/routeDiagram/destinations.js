@@ -8,7 +8,7 @@ import routeCompare from 'util/routeCompare';
 
 import styles from './destinations.css';
 
-const Destinations = props => {
+function Destinations(props) {
   if (!props.destinations) {
     return null;
   }
@@ -38,7 +38,7 @@ const Destinations = props => {
       ))}
     </div>
   );
-};
+}
 
 Destinations.propTypes = {
   destinations: PropTypes.arrayOf(

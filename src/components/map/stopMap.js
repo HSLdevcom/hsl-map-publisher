@@ -42,13 +42,17 @@ const ZONE_SYMBOL_MAP_PADDING_EXTRA = 200;
 const INFO_MARGIN_BOTTOM = 78;
 const INFO_MARGIN_LEFT = 44;
 
-const Attribution = () => <div className={styles.attribution}>&copy; OpenStreetMap</div>;
+function Attribution() {
+  return <div className={styles.attribution}>&copy; OpenStreetMap</div>;
+}
 
-const LocationSymbol = props => (
-  <div style={{ width: props.size, height: props.size }}>
-    <InlineSVG src={locationIcon} style={{ width: '100%' }} />
-  </div>
-);
+function LocationSymbol(props) {
+  return (
+    <div style={{ width: props.size, height: props.size }}>
+      <InlineSVG src={locationIcon} style={{ width: '100%' }} />
+    </div>
+  );
+}
 
 const getSalesPointIcon = type => (
   <InlineSVG
@@ -77,20 +81,24 @@ const getZoneIcon = zone => {
   }
 };
 
-const ZoneLabel = () => (
-  <div className={styles.zoneHeading}>
-    <span>
-      <strong>Vyöhyke</strong> Zon/Zone
-    </span>
-  </div>
-);
+function ZoneLabel() {
+  return (
+    <div className={styles.zoneHeading}>
+      <span>
+        <strong>Vyöhyke</strong> Zon/Zone
+      </span>
+    </div>
+  );
+}
 
-const ZoneSymbol = props => (
-  <Row>
-    <div className={styles.zoneSymbol}>{getZoneIcon(props.zone)}</div>
-    <ZoneLabel />
-  </Row>
-);
+function ZoneSymbol(props) {
+  return (
+    <Row>
+      <div className={styles.zoneSymbol}>{getZoneIcon(props.zone)}</div>
+      <ZoneLabel />
+    </Row>
+  );
+}
 
 LocationSymbol.propTypes = {
   size: PropTypes.number.isRequired,
@@ -296,7 +304,7 @@ const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
   };
 };
 
-const StopMap = props => {
+function StopMap(props) {
   const mapStyle = {
     width: props.mapOptions.width,
     height: props.mapOptions.height,
@@ -498,7 +506,7 @@ const StopMap = props => {
       </div>
     </div>
   );
-};
+}
 
 const StopType = PropTypes.shape({
   x: PropTypes.number.isRequired,

@@ -6,7 +6,7 @@ import { CSVLink } from 'react-csv';
 import styles from './stopRoutePlate.css';
 import { forEach } from 'lodash';
 
-const CSVDownload = props => {
+function CSVDownload(props) {
   const btnRef = useRef(null);
   useEffect(() => btnRef.current?.click(), [btnRef]);
   return (
@@ -14,7 +14,7 @@ const CSVDownload = props => {
       <span ref={btnRef} />
     </CSVLink>
   );
-};
+}
 
 const formatSummaryInfo = (dateBegin, dateEnd, routeDiffs) => {
   let totalRemoved = 0;
@@ -33,7 +33,7 @@ const formatSummaryInfo = (dateBegin, dateEnd, routeDiffs) => {
   `;
 };
 
-const StopRoutePlate = props => {
+function StopRoutePlate(props) {
   const {
     routeDiffs,
     downloadTable,
@@ -128,7 +128,7 @@ const StopRoutePlate = props => {
       )}
     </div>
   );
-};
+}
 
 StopRoutePlate.defaultProps = {
   downloadTable: false,

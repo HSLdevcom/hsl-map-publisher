@@ -36,7 +36,7 @@ const parseStopNames = stops => {
   };
 };
 
-const StopList = props => {
+function StopList(props) {
   const { stops, lang, routeIdParsed } = props;
   return (
     <div className={styles.stopList}>
@@ -44,7 +44,7 @@ const StopList = props => {
       <p className={styles.stopListText}>{stops.join(' - ')}</p>
     </div>
   );
-};
+}
 
 StopList.propTypes = {
   stops: PropTypes.array.isRequired,
@@ -52,7 +52,7 @@ StopList.propTypes = {
   routeIdParsed: PropTypes.string.isRequired,
 };
 
-const AllStopsList = props => {
+function AllStopsList(props) {
   const { stops, routeIdParsed } = props;
   const parsedStopLists = parseStopNames(stops);
   return (
@@ -61,7 +61,7 @@ const AllStopsList = props => {
       <StopList stops={parsedStopLists.namesSe} lang={TEXT_LANG.SE} routeIdParsed={routeIdParsed} />
     </div>
   );
-};
+}
 
 AllStopsList.propTypes = {
   stops: PropTypes.array.isRequired,

@@ -6,33 +6,35 @@ import timeLogo from '../../icons/time.svg';
 
 import styles from './a3TableHeader.css';
 
-const a3TableHeader = props => (
-  <div className={classNames(styles.root)}>
-    <div className={styles.title}>
-      <span className={styles.strong}>{props.title}</span>
-      <span>
-        {' '}
-        &nbsp;&nbsp;
-        {props.subtitleSw}
-      </span>
-      <span className={styles.italics}>
-        &nbsp;&nbsp;
-        {props.subtitleEn}
-      </span>
-    </div>
-    <div className={styles.subtitle}>
-      <InlineSVG className={classNames(styles.timeLogo)} src={timeLogo} />
+function a3TableHeader(props) {
+  return (
+    <div className={classNames(styles.root)}>
+      <div className={styles.title}>
+        <span className={styles.strong}>{props.title}</span>
+        <span>
+          {' '}
+          &nbsp;&nbsp;
+          {props.subtitleSw}
+        </span>
+        <span className={styles.italics}>
+          &nbsp;&nbsp;
+          {props.subtitleEn}
+        </span>
+      </div>
+      <div className={styles.subtitle}>
+        <InlineSVG className={classNames(styles.timeLogo)} src={timeLogo} />
 
-      <div className={styles.subtitleContent}>min {props.extended ? '/' : ''}</div>
-      <div className={styles.subtitleContent}>linja</div>
-      <div className={styles.subtitleContent}>linje</div>
-      <div className={styles.subtitleContent}>route</div>
-      <div className={styles.subtitleContentExtraPadding}>Ajat ovat arvioituja</div>
-      <div className={styles.subtitleContent}>Tiderna är beräknade</div>
-      <div className={styles.subtitleContent}>The times are estimates</div>
+        <div className={styles.subtitleContent}>min {props.extended ? '/' : ''}</div>
+        <div className={styles.subtitleContent}>linja</div>
+        <div className={styles.subtitleContent}>linje</div>
+        <div className={styles.subtitleContent}>route</div>
+        <div className={styles.subtitleContentExtraPadding}>Ajat ovat arvioituja</div>
+        <div className={styles.subtitleContent}>Tiderna är beräknade</div>
+        <div className={styles.subtitleContent}>The times are estimates</div>
+      </div>
     </div>
-  </div>
-);
+  );
+}
 
 a3TableHeader.defaultProps = {
   extended: false,

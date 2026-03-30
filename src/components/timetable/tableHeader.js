@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 import styles from './tableHeader.css';
 
-const TableHeader = props => {
+function TableHeader(props) {
   const style = props.intervalTimetable ? { fontSize: '19.5px' } : undefined;
   const header = props.printAsA3 ? (
     <div className={styles.inline} style={style}>
@@ -70,7 +70,7 @@ const TableHeader = props => {
       )}
     </div>
   );
-};
+}
 
 TableHeader.defaultProps = {
   printingAsA4: false,

@@ -52,7 +52,7 @@ const routeIdComponentWidth = routes => {
   return width;
 };
 
-const RouteList = props => {
+function RouteList(props) {
   if (props.routes.length > MAX_LABEL_ROWS) {
     let rowLength = 0;
     return (
@@ -102,7 +102,7 @@ const RouteList = props => {
       })}
     </div>
   );
-};
+}
 
 RouteList.propTypes = {
   routes: PropTypes.arrayOf(
@@ -114,17 +114,19 @@ RouteList.propTypes = {
   ).isRequired,
 };
 
-const StopLabel = props => (
-  <div className={styles.label}>
-    <div className={styles.title}>
-      {props.nameFi} {props.shortId && `(${props.shortId.replace(/\s+/g, '')})`}
+function StopLabel(props) {
+  return (
+    <div className={styles.label}>
+      <div className={styles.title}>
+        {props.nameFi} {props.shortId && `(${props.shortId.replace(/\s+/g, '')})`}
+      </div>
+      <div className={styles.subtitle}>{props.nameSe}</div>
+      <div className={styles.content}>
+        <RouteList routes={props.routes} />
+      </div>
     </div>
-    <div className={styles.subtitle}>{props.nameSe}</div>
-    <div className={styles.content}>
-      <RouteList routes={props.routes} />
-    </div>
-  </div>
-);
+  );
+}
 
 StopLabel.defaultProps = {
   nameSe: null,

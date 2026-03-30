@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import styles from './lineTableHeader.css';
 
-const LineTableHeader = props => {
+function LineTableHeader(props) {
   const { stop, isLastStop } = props;
   return (
     <div className={styles.headerContainer}>
@@ -16,7 +16,7 @@ const LineTableHeader = props => {
       </div>
     </div>
   );
-};
+}
 
 LineTableHeader.propTypes = {
   stop: PropTypes.object.isRequired,
