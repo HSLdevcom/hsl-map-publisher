@@ -42,7 +42,7 @@ function getSvgElementPosition($element, widthModifier = 0, heightModifier = 0) 
 
 function getDynamicAreas(svg, widthModifier, heightModifier) {
   const $ = cheerioLoad(svg);
-  const dynamicAreas = $('.dynamic-area');
+  const dynamicAreas = $('[data-area-type]');
   const areas = [];
 
   dynamicAreas.each((_, element) => {
