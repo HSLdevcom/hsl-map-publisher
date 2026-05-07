@@ -1,7 +1,7 @@
 const { Worker, QueueScheduler } = require('bullmq');
 const Redis = require('ioredis');
 
-const { generate } = require('./generator');
+const { generate, closeBrowser } = require('./generator');
 const { addEvent, updatePoster } = require('./store');
 const { REDIS_CONNECTION_STRING } = require('../constants');
 
@@ -75,9 +75,18 @@ worker.on('failed', (job, err) => {
 
 worker.on('drained', () => console.log('Job queue empty! Waiting for new jobs...'));
 
-process.on('SIGINT', () => {
-  console.log('Shutting down worker...');
-  worker.close(true);
-  queueScheduler.close();
+async function shutdown(signal) {
+  console.log(`Shutting down worker (${signal})...`);
+  try {
+    await worker.close(true);
+    await queueScheduler.close();
+    await closeBrowser();
+  } catch (err) {
+    console.error(`Error during shutdown: ${err.message}`);
+  }
   process.exit(0);
-});
+}
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+// Docker / Kubernetes sends SIGTERM; handle it so the process drains cleanly.
+process.on('SIGTERM', () => shutdown('SIGTERM'));
