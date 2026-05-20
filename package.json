@@ -78,7 +78,7 @@
     "lint-staged": "^15.5.0",
     "prettier": "^1.14.3",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.2.3",
+    "webpack-dev-server": "^5.2.4",
     "worker-loader": "^3.0.8"
   },
   "dependencies": {
