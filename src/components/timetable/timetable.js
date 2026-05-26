@@ -107,6 +107,7 @@ class Timetable extends Component {
           [styles.printable]: this.props.printableAsA4,
           [styles.standalone]: this.props.standalone,
           [styles.greyscale]: this.props.greyscale,
+          [styles.interval]: this.props.intervalTimetable,
         })}
         ref={ref => {
           this.content = ref;

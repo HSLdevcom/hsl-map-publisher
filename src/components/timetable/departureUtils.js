@@ -214,3 +214,46 @@ export const prepareOrderedDepartureHoursByRoute = departures => {
     lastDepartures,
   };
 };
+
+/**
+ * Groups route IDs by their mode+trunk combination.
+ * Routes in the same group share mode and trunkRoute flag.
+ *
+ * @param {string[]} routeIds
+ * @param {Object.<string, {mode: string, trunkRoute: boolean}>} routeIdToModeMap
+ * @returns {Array<{key: string, routeIds: string[], mode: string, trunkRoute: boolean}>}
+ *   Ordered list of groups preserving original route order.
+ */
+export const groupRoutesByModeAndTrunk = (routeIds, routeIdToModeMap) => {
+  const groupMap = new Map();
+  const groupOrder = [];
+
+  for (const routeId of routeIds) {
+    const desc = routeIdToModeMap[routeId];
+    if (!desc) continue;
+    const key = `${desc.mode}_${desc.trunkRoute ? '1' : '0'}`;
+    if (!groupMap.has(key)) {
+      groupMap.set(key, { key, routeIds: [], mode: desc.mode, trunkRoute: !!desc.trunkRoute });
+      groupOrder.push(key);
+    }
+    groupMap.get(key).routeIds.push(routeId);
+  }
+
+  return groupOrder.map(k => groupMap.get(k));
+};
+
+/**
+ * For a group with 2+ routes, computes the synthetic "combined" column data:
+ * - intervals: max interval per hour range across all routes in the group
+ * - firstDepartures / lastDepartures: always null (shown as blank in the UI)
+ *
+ * @param {string[]} groupRouteIds
+ * @param {Array<{hours: string, intervals: Object.<string, number|null>}>} groupedDepartures
+ * @returns {Array<{hours: string, maxInterval: number|null}>}
+ */
+export const computeCombinedColumn = (groupRouteIds, groupedDepartures) => {
+  return groupedDepartures.map(({ hours, intervals }) => {
+    const vals = groupRouteIds.map(id => intervals[id]).filter(v => v != null);
+    return { hours, maxInterval: vals.length > 0 ? Math.max(...vals) : null };
+  });
+};

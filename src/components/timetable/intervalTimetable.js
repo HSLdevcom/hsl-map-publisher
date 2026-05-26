@@ -1,116 +1,185 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import classNames from 'classnames';
-import { Row, WrappingRow } from 'components/util';
+
 import InlineSVG from 'components/inlineSVG';
 import clockIcon from 'icons/clock.svg';
 import { getIcon, getColor, trimRouteId, BUS_MODE } from 'util/domain';
 import partition from 'lodash/partition';
-import { prepareOrderedDepartureHoursByRoute } from './departureUtils';
+import {
+  prepareOrderedDepartureHoursByRoute,
+  groupRoutesByModeAndTrunk,
+  computeCombinedColumn,
+} from './departureUtils';
 import styles from './intervalTimetable.css';
 import TableRows from './tableRows';
 
-/**
- * @param {string} hoursRange - e.g., "01-06", "19-03", "01"
- * @returns {boolean} - true if the range spans 5 or more hours
- */
-const spansFiveOrMoreHours = hoursRange => {
-  const parts = hoursRange.split('-');
-  if (parts.length !== 2) return false;
-  const start = parseInt(parts[0], 10);
-  const end = parseInt(parts[1], 10);
-  const span = end < start ? 24 - start + end : end - start;
-  return span >= 5;
-};
+const INTERVAL_ROW_HEIGHT = 26;
+const HEADING_ROW_HEIGHT = 44;
+const DEPARTURE_ROW_HEIGHT = 28;
 
-/**
- * @param {Object} routeIdToModeMap
- * @param {string} id
- * @returns {{mode: string, trunkRoute: boolean}}
- */
 const getRoute = (routeIdToModeMap, id) => routeIdToModeMap[id];
 
-const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompact }) => {
+/**
+ * Background stripe layer — absolutely fills the container, padded to align
+ * with the interval rows in the column layout above/below.
+ */
+const StripeBackground = ({ groupedDepartures, paddingTop }) => {
+  const rows = [
+    { key: 'first', height: DEPARTURE_ROW_HEIGHT },
+    ...groupedDepartures.map(({ hours }) => ({
+      key: hours,
+      height: INTERVAL_ROW_HEIGHT,
+    })),
+    { key: 'last', height: DEPARTURE_ROW_HEIGHT },
+  ];
   return (
-    <>
-      <div
-        className={classNames(styles.timetableRoutes, { [styles.compactPaddingRight]: isCompact })}>
-        <InlineSVG key="clock_svg" className={styles.icon} src={clockIcon} />
-        {departureIntervalsByRoute.routeIds.map(routeId => (
-          <div
-            key={`route-${routeId}`}
-            className={classNames(styles.routeHeadings)}
-            style={{
-              color: getColor(getRoute(routeIdToModeMap, routeId)),
-            }}>
-            <InlineSVG
-              className={styles.icon}
-              src={getIcon({ ...getRoute(routeIdToModeMap, routeId) })}
-            />
-            {routeId}
+    <div className={styles.stripeBackground} style={{ paddingTop }}>
+      {rows.map(({ key, height }, rowIdx) => (
+        <div
+          key={key}
+          className={classNames(styles.stripeRow, { [styles.stripeRowAlt]: rowIdx % 2 === 0 })}
+          style={{ height }}
+        />
+      ))}
+    </div>
+  );
+};
+
+StripeBackground.propTypes = {
+  groupedDepartures: PropTypes.array.isRequired,
+  paddingTop: PropTypes.number.isRequired,
+};
+
+const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompact }) => {
+  const {
+    groupedDepartures,
+    routeIds,
+    firstDepartures,
+    lastDepartures,
+  } = departureIntervalsByRoute;
+
+  const columnGroups = groupRoutesByModeAndTrunk(routeIds, routeIdToModeMap);
+
+  return (
+    <div className={styles.intervalDisplay}>
+      {/* Stripe background — absolutely fills the container, offset by fixed row heights */}
+      <StripeBackground groupedDepartures={groupedDepartures} paddingTop={HEADING_ROW_HEIGHT} />
+
+      {/* Column layout — on top of stripes */}
+      <div className={styles.columnLayout}>
+        {/* Hours column */}
+        <div className={styles.hoursColumn}>
+          <div className={styles.headingCell} style={{ height: HEADING_ROW_HEIGHT }}>
+            <InlineSVG className={styles.icon} src={clockIcon} />
           </div>
-        ))}
-      </div>
-      <div
-        className={classNames(styles.firstAndLastDepartures, {
-          [styles.compactPaddingRight]: isCompact,
-        })}>
-        <div className={styles.departureTitles}>
-          <span>Ensimmäinen</span>
-          <span>Första</span>
-          <span>First</span>
+          <div className={styles.labelCell} style={{ height: DEPARTURE_ROW_HEIGHT }}>
+            <div className={styles.departureTitles}>
+              <span>Ensimmäinen</span>
+              <span>Första / First</span>
+            </div>
+          </div>
+          {groupedDepartures.map(({ hours }) => (
+            <div
+              key={hours}
+              className={styles.intervalHoursCell}
+              style={{ height: INTERVAL_ROW_HEIGHT }}>
+              {hours}
+            </div>
+          ))}
+          <div className={styles.labelCell} style={{ height: DEPARTURE_ROW_HEIGHT }}>
+            <div className={styles.departureTitles}>
+              <span>Viimeinen</span>
+              <span>Sista / Last</span>
+            </div>
+          </div>
         </div>
-        {departureIntervalsByRoute.routeIds.map(routeId => (
-          <div className={styles.firstAndLastDepartureValues}>
-            {departureIntervalsByRoute.firstDepartures[routeId]}
-          </div>
-        ))}
-      </div>
-      <div className={styles.timetableRoot}>
-        {departureIntervalsByRoute.groupedDepartures.map(({ hours, intervals }) => {
-          const isLongInterval = spansFiveOrMoreHours(hours);
-          return (
-            <Row
-              className={classNames(styles.timetableMinutes, {
-                [styles.timetableMinutesNonCompact]: !isCompact,
-                [styles.timetableMinutesLong]: isLongInterval,
-              })}>
+
+        {/* Route groups */}
+        <div className={styles.routeGroupsContainer}>
+          {columnGroups.map(group => {
+            const groupColor = getColor({ mode: group.mode, trunkRoute: group.trunkRoute });
+            const hasCombined = group.routeIds.length >= 2;
+            const combinedIntervals = hasCombined
+              ? computeCombinedColumn(group.routeIds, groupedDepartures)
+              : null;
+
+            return (
               <div
-                className={classNames(styles.hours, {
-                  [styles.hoursLong]: isLongInterval,
-                })}>
-                {hours}
-              </div>
-              {departureIntervalsByRoute.routeIds.map(routeId => (
-                <WrappingRow style={{ justifyContent: 'center' }}>
-                  <div
-                    className={classNames(styles.interval, {
-                      [styles.intervalLong]: isLongInterval,
-                    })}>
-                    {intervals[routeId] ? `${intervals[routeId]} min` : '-'}
+                key={group.key}
+                className={classNames(styles.routeGroup, {
+                  [styles.routeGroupBordered]: hasCombined,
+                })}
+                style={hasCombined ? { borderColor: groupColor } : undefined}>
+                {group.routeIds.map(routeId => (
+                  <div key={routeId} className={styles.routeColumn}>
+                    <div className={styles.headingCell} style={{ height: HEADING_ROW_HEIGHT }}>
+                      <div className={styles.routeHeadings} style={{ color: groupColor }}>
+                        <InlineSVG
+                          className={styles.icon}
+                          src={getIcon(getRoute(routeIdToModeMap, routeId))}
+                        />
+                        {routeId}
+                      </div>
+                    </div>
+                    <div className={styles.departureCell} style={{ height: DEPARTURE_ROW_HEIGHT }}>
+                      {firstDepartures[routeId] || ''}
+                    </div>
+                    {groupedDepartures.map(({ hours, intervals }) => (
+                      <div
+                        key={hours}
+                        className={styles.intervalCell}
+                        style={{ height: INTERVAL_ROW_HEIGHT }}>
+                        <span className={styles.interval}>
+                          {intervals[routeId] ? `${intervals[routeId]} min` : '-'}
+                        </span>
+                      </div>
+                    ))}
+                    <div className={styles.departureCell} style={{ height: DEPARTURE_ROW_HEIGHT }}>
+                      {lastDepartures[routeId] || ''}
+                    </div>
                   </div>
-                </WrappingRow>
-              ))}
-            </Row>
-          );
-        })}
-      </div>
-      <div
-        className={classNames(styles.firstAndLastDepartures, {
-          [styles.compactPaddingRight]: isCompact,
-        })}>
-        <div className={styles.departureTitles}>
-          <span>Viimeinen</span>
-          <span>Sista</span>
-          <span>Last</span>
+                ))}
+                {hasCombined && (
+                  <div
+                    className={classNames(styles.routeColumn, styles.combinedColumn)}
+                    style={{ '--combined-separator-color': groupColor }}>
+                    <div className={styles.headingCell} style={{ height: HEADING_ROW_HEIGHT }}>
+                      <div className={styles.routeHeadings}>
+                        <span className={styles.combinedHeading}>
+                          <span>Yhteinen vuoroväli</span>
+                          <span>Gemensam turtäthet</span>
+                          <span>Combined headway</span>
+                        </span>
+                      </div>
+                    </div>
+                    <div
+                      className={styles.departureCell}
+                      style={{ height: DEPARTURE_ROW_HEIGHT }}
+                    />
+                    {combinedIntervals.map(({ hours, maxInterval }) => (
+                      <div
+                        key={hours}
+                        className={styles.intervalCell}
+                        style={{ height: INTERVAL_ROW_HEIGHT }}>
+                        <span className={styles.interval} style={{ color: groupColor }}>
+                          {maxInterval ? `${maxInterval} min` : '-'}
+                        </span>
+                      </div>
+                    ))}
+                    <div
+                      className={styles.departureCell}
+                      style={{ height: DEPARTURE_ROW_HEIGHT }}
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
-        {departureIntervalsByRoute.routeIds.map(routeId => (
-          <div className={styles.firstAndLastDepartureValues}>
-            {departureIntervalsByRoute.lastDepartures[routeId]}
-          </div>
-        ))}
       </div>
-    </>
+    </div>
   );
 };
 
@@ -167,13 +236,10 @@ const IntervalTimetable = ({ routeIdToModeMap, departures }) => {
       <div className={styles.leftPanel} style={{ minWidth: `${70 + intervalRoutes.size * 60}px` }}>
         <IntervalDisplay
           departureIntervalsByRoute={departureIntervalsByRoute}
-          intervalRoutes={intervalRoutes}
-          normalBusRoutes={normalBusRoutes}
           routeIdToModeMap={routeIdToModeMap}
           isCompact={false}
         />
       </div>
-
       <div className={styles.rightPanel}>
         <div className={styles.busRoutesContainer}>
           <InlineSVG key="clock_svg" className={styles.icon} src={clockIcon} />
@@ -188,8 +254,6 @@ const IntervalTimetable = ({ routeIdToModeMap, departures }) => {
   ) : (
     <IntervalDisplay
       departureIntervalsByRoute={departureIntervalsByRoute}
-      intervalRoutes={intervalRoutes}
-      normalBusRoutes={normalBusRoutes}
       routeIdToModeMap={routeIdToModeMap}
       isCompact
     />

@@ -1,3 +1,155 @@
+/* ─── Outer container ────────────────────────────────────────────────────── */
+
+.intervalDisplay {
+  position: relative;
+  color: black;
+  /* Stretch to fill .root including its horizontal padding */
+  margin-left: calc(-1 * var(--border-radius) / 2);
+  margin-right: calc(-1 * var(--border-radius) / 2);
+  padding-left: calc(var(--border-radius) / 2);
+  padding-right: calc(var(--border-radius) / 2);
+}
+
+/* ─── Stripe background — absolutely fills the container ─────────────────── */
+
+.stripeBackground {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+  /* padding-top/bottom set inline to align stripes with interval rows */
+}
+
+.stripeRow {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.stripeRowAlt {
+  background-color: var(--timetable-accent-color);
+}
+
+/* ─── Column layout — on top of stripes ──────────────────────────────────── */
+
+.columnLayout {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+
+.routeGroupsContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: space-evenly;
+}
+
+/* ─── Hours column ───────────────────────────────────────────────────────── */
+
+.hoursColumn {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+/* ─── Route group wrapper — single border element ────────────────────────── */
+
+.routeGroup {
+  display: flex;
+  flex-direction: row;
+  border-radius: 8px;
+  margin: 0 3px;
+}
+
+.routeGroupBordered {
+  border: 2px solid;
+}
+
+/* ─── Individual route column ────────────────────────────────────────────── */
+
+.routeColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+  padding: 0 4px;
+}
+
+/* ─── Combined headway column — left border separator ────────────────────── */
+
+.combinedColumn {
+  position: relative;
+  width: 90px;
+  min-width: 90px;
+  flex-shrink: 0;
+}
+
+.combinedColumn::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background-color: var(--combined-separator-color);
+}
+
+/* ─── Heading cell (fixed height set inline) ─────────────────────────────── */
+
+.headingCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ─── Departure value cell (fixed height set inline) ─────────────────────── */
+
+.departureCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ─── Label cell in hours column (fixed height set inline) ───────────────── */
+
+.labelCell {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* ─── Individual interval cell (height set inline) ───────────────────────── */
+
+.intervalCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ─── Hours interval cell (height set inline) ────────────────────────────── */
+
+.intervalHoursCell {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* ─── Route heading ──────────────────────────────────────────────────────── */
+
 .routeHeadings {
   display: flex;
   gap: 0.2em;
@@ -5,78 +157,28 @@
   align-items: center;
 }
 
-.interval {
-  color: var(--hsl-blue);
-}
+/* ─── Combined headway heading text ─────────────────────────────────────── */
 
-.timetableRoot {
-  color: black;
-}
-
-.timetableRoot > * {
-  margin: 0 0 0 calc(-1 * var(--border-radius));
-  padding: 0.2em calc(0.45em + var(--border-radius));
-}
-
-.timetableRoot > *:nth-child(odd) {
-  background-color: var(--timetable-accent-color);
-}
-
-.firstAndLastDepartures {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-  gap: 0.2em;
-  padding: 0.2em 0 0.2em calc(0.45em + var(--border-radius));
-  margin: 0 0 0 calc(-1 * var(--border-radius));
-}
-
-.firstAndLastDepartures div {
+.combinedHeading {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  font-size: 11px;
+  line-height: 1.3;
+  text-align: center;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
+
+/* ─── Departure label stacks ─────────────────────────────────────────────── */
 
 .departureTitles {
+  display: flex;
   flex-direction: column;
+  font-size: 13px;
+  line-height: 1.3;
 }
 
-.firstAndLastDepartureValues {
-  align-items: center;
-  justify-content: center;
-}
-
-.timetableRoutes {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-  padding: 0 0 0.5em 0.45em;
-  gap: 0.2em;
-}
-
-.timetableRoutes div {
-  justify-content: center;
-}
-
-.timetableMinutes {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-}
-
-.icon {
-  width: 20px;
-  height: 20px;
-  justify-content: center;
-}
-
-.compactPaddingRight {
-  padding-right: calc(0.45em + var(--border-radius));
-}
-
-.routeHeadingsNonCompact {
-  padding: 0.2em 0 0.2em calc(0.45em + var(--border-radius));
-}
-
-.timetableMinutesNonCompact {
-  padding: 0.2em 0 0.2em calc(0.45em + var(--border-radius));
-}
+/* ─── Two-panel split layout ─────────────────────────────────────────────── */
 
 .flexContainer {
   display: flex;
@@ -88,6 +190,10 @@
   flex: 1;
 }
 
+.rightPanel {
+  flex: 1;
+}
+
 .busRoutesContainer {
   display: flex;
   gap: 12px;
@@ -95,22 +201,10 @@
   padding: 0 0 0.4em 0.938em;
 }
 
-.rightPanel {
-  flex: 1;
-}
+/* ─── Icon ───────────────────────────────────────────────────────────────── */
 
-.hours {
-  /* Default styles for hours div */
-}
-
-.hoursLong {
-  font-size: 19px;
-}
-
-.timetableMinutesLong {
-  height: 30px;
-}
-
-.intervalLong {
-  font-size: 19px;
+.icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
