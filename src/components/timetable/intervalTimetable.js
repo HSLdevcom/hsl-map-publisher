@@ -13,6 +13,7 @@ import {
   computeCombinedColumn,
 } from './departureUtils';
 import styles from './intervalTimetable.css';
+import tableRowsStyles from './tableRows.css';
 import TableRows from './tableRows';
 
 const INTERVAL_ROW_HEIGHT = 26;
@@ -233,7 +234,7 @@ const IntervalTimetable = ({ routeIdToModeMap, departures }) => {
 
   return busDepartures.length > 0 ? (
     <div className={styles.flexContainer}>
-      <div className={styles.leftPanel} style={{ minWidth: `${70 + intervalRoutes.size * 60}px` }}>
+      <div className={styles.leftPanel}>
         <IntervalDisplay
           departureIntervalsByRoute={departureIntervalsByRoute}
           routeIdToModeMap={routeIdToModeMap}
@@ -248,7 +249,7 @@ const IntervalTimetable = ({ routeIdToModeMap, departures }) => {
             {Array.from(normalBusRoutes).join(', ')}
           </div>
         </div>
-        <TableRows noPadLeft={busDepartures.length > 0} departures={busDepartures} />
+        <TableRows className={tableRowsStyles.inset} departures={busDepartures} />
       </div>
     </div>
   ) : (

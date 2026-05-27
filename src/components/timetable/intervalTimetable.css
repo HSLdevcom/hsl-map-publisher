@@ -182,22 +182,24 @@
 
 .flexContainer {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: calc((1 * var(--border-radius)) + 8px);
 }
 
 .leftPanel {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .rightPanel {
-  flex: 1;
+  flex: 1 1 300px;
+  min-width: 300px;
 }
 
 .busRoutesContainer {
   display: flex;
   gap: 12px;
-  margin-left: calc(-1 * var(--border-radius));
   padding: 0 0 0.4em 0.938em;
 }
 
