@@ -367,22 +367,40 @@ function getShelterText(stopType) {
  * @returns {Array} Filtered segments
  */
 function filterRouteSegments(segments) {
-  const variantIdsWithDepartures = segments
-    .filter(s => isNumberVariant(s.routeId) && s.hasRegularDayDepartures === true)
-    .map(s => s.routeId);
+  const variantsWithDepartures = segments.filter(
+    s => isNumberVariant(s.routeId) && s.hasRegularDayDepartures === true,
+  );
+
+  const variantIdssWithDepartures = variantsWithDepartures.map(s => s.routeId);
 
   const baseRouteIdsWithVariantDepartures = new Set(
     segments
       .filter(s => !isNumberVariant(s.routeId))
-      .filter(s => variantIdsWithDepartures.some(variantId => variantId.startsWith(s.routeId)))
+      .filter(s => variantIdssWithDepartures.some(variantId => variantId.startsWith(s.routeId)))
       .map(s => s.routeId),
   );
 
-  return segments
-    .filter(
-      s => s.hasRegularDayDepartures === true || baseRouteIdsWithVariantDepartures.has(s.routeId),
-    )
-    .filter(s => !isNumberVariant(s.routeId));
+  const filtered = segments.filter(
+    s => s.hasRegularDayDepartures === true || baseRouteIdsWithVariantDepartures.has(s.routeId),
+  );
+
+  return filtered
+    .filter(s => !isNumberVariant(s.routeId))
+    .map(s => {
+      // If this base route was promoted (no own departures), copy destination/via from its variant
+      if (baseRouteIdsWithVariantDepartures.has(s.routeId) && s.hasRegularDayDepartures !== true) {
+        const variant = variantsWithDepartures.find(v => v.routeId.startsWith(s.routeId));
+        if (variant) {
+          return {
+            ...s,
+            viaFi: variant.viaFi,
+            viaSe: variant.viaSe,
+            route: variant.route,
+          };
+        }
+      }
+      return s;
+    });
 }
 
 export {
