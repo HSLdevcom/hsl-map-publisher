@@ -387,15 +387,15 @@ function filterRouteSegments(segments) {
   return filtered
     .filter(s => !isNumberVariant(s.routeId))
     .map(s => {
-      // If this base route was promoted (no own departures), copy destination/via from its variant
       if (baseRouteIdsWithVariantDepartures.has(s.routeId) && s.hasRegularDayDepartures !== true) {
         const variant = variantsWithDepartures.find(v => v.routeId.startsWith(s.routeId));
         if (variant) {
+          // promote variant to main route
+          // but keep the base routeId and platform.
           return {
-            ...s,
-            viaFi: variant.viaFi,
-            viaSe: variant.viaSe,
-            route: variant.route,
+            ...variant,
+            routeId: s.routeId,
+            platform: s.platform,
           };
         }
       }
