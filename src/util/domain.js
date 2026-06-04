@@ -223,7 +223,7 @@ function groupOnConsecutive(groupedOnVersion) {
 }
 
 function getListOfVersionsAsString(versions) {
-  const alsoBasic = versions.some(version => version && version.trim() === '');
+  const alsoBasic = versions.some(version => version != null && version.trim() === '');
   const letters = versions.filter(version => version && version.trim() !== '').sort();
   if (letters.length === 0) return '';
   const letterString = letters.join(',');
@@ -360,6 +360,31 @@ function getShelterText(stopType) {
   }
 }
 
+/**
+ * Filters route segments, keeping only non-number-variant segments that either have regular day
+ * departures themselves, or have a numbered variant that does.
+ * @param {Array} segments
+ * @returns {Array} Filtered segments
+ */
+function filterRouteSegments(segments) {
+  const variantIdsWithDepartures = segments
+    .filter(s => isNumberVariant(s.routeId) && s.hasRegularDayDepartures === true)
+    .map(s => s.routeId);
+
+  const baseRouteIdsWithVariantDepartures = new Set(
+    segments
+      .filter(s => !isNumberVariant(s.routeId))
+      .filter(s => variantIdsWithDepartures.some(variantId => variantId.startsWith(s.routeId)))
+      .map(s => s.routeId),
+  );
+
+  return segments
+    .filter(
+      s => s.hasRegularDayDepartures === true || baseRouteIdsWithVariantDepartures.has(s.routeId),
+    )
+    .filter(s => !isNumberVariant(s.routeId));
+}
+
 export {
   isNumberVariant,
   isRailRoute,
@@ -378,4 +403,5 @@ export {
   getFormattedRouteList,
   formatRouteString,
   getShelterText,
+  filterRouteSegments,
 };
