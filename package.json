@@ -119,7 +119,7 @@
     "prop-types": "^15.6.0",
     "puppeteer": "^24.4.0",
     "qrcode": "^1.5.4",
-    "qs": "^6.5.2",
+    "qs": "^6.15.2",
     "raw-loader": "^0.5.1",
     "react": "18.2.0",
     "react-apollo": "^2.0.1",
