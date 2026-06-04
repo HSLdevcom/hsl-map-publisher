@@ -223,7 +223,7 @@ function groupOnConsecutive(groupedOnVersion) {
 }
 
 function getListOfVersionsAsString(versions) {
-  const alsoBasic = versions.some(version => version && version.trim() === '');
+  const alsoBasic = versions.some(version => version != null && version.trim() === '');
   const letters = versions.filter(version => version && version.trim() !== '').sort();
   if (letters.length === 0) return '';
   const letterString = letters.join(',');
@@ -360,6 +360,49 @@ function getShelterText(stopType) {
   }
 }
 
+/**
+ * Filters route segments, keeping only non-number-variant segments that either have regular day
+ * departures themselves, or have a numbered variant that does.
+ * @param {Array} segments
+ * @returns {Array} Filtered segments
+ */
+function filterRouteSegments(segments) {
+  const variantsWithDepartures = segments.filter(
+    s => isNumberVariant(s.routeId) && s.hasRegularDayDepartures === true,
+  );
+
+  const variantIdssWithDepartures = variantsWithDepartures.map(s => s.routeId);
+
+  const baseRouteIdsWithVariantDepartures = new Set(
+    segments
+      .filter(s => !isNumberVariant(s.routeId))
+      .filter(s => variantIdssWithDepartures.some(variantId => variantId.startsWith(s.routeId)))
+      .map(s => s.routeId),
+  );
+
+  const filtered = segments.filter(
+    s => s.hasRegularDayDepartures === true || baseRouteIdsWithVariantDepartures.has(s.routeId),
+  );
+
+  return filtered
+    .filter(s => !isNumberVariant(s.routeId))
+    .map(s => {
+      if (baseRouteIdsWithVariantDepartures.has(s.routeId) && s.hasRegularDayDepartures !== true) {
+        const variant = variantsWithDepartures.find(v => v.routeId.startsWith(s.routeId));
+        if (variant) {
+          // promote variant to main route
+          // but keep the base routeId and platform.
+          return {
+            ...variant,
+            routeId: s.routeId,
+            platform: s.platform,
+          };
+        }
+      }
+      return s;
+    });
+}
+
 export {
   isNumberVariant,
   isRailRoute,
@@ -378,4 +421,5 @@ export {
   getFormattedRouteList,
   formatRouteString,
   getShelterText,
+  filterRouteSegments,
 };

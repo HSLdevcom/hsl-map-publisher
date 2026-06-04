@@ -5,7 +5,7 @@ import compose from 'recompose/compose';
 import mapProps from 'recompose/mapProps';
 import flatMap from 'lodash/flatMap';
 import sortBy from 'lodash/sortBy';
-import { isNumberVariant, trimRouteId, isDropOffOnly, filterRoute } from 'util/domain';
+import { trimRouteId, isDropOffOnly, filterRoute, filterRouteSegments } from 'util/domain';
 import apolloWrapper from 'util/apolloWrapper';
 import { routesToTree } from 'util/routes';
 
@@ -100,11 +100,9 @@ const nodeToStop = ({ stopByStopId }) => {
 
 const propsMapper = mapProps(props => {
   const routes = flatMap(props.data.stops.nodes, s =>
-    flatMap(s.siblings.nodes, stop =>
-      stop.routeSegments.nodes
-        // Select regular routes that allow boarding from current stop
-        .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
-        .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
+    flatMap(s.siblings.nodes, stop => {
+      const allSegments = stop.routeSegments.nodes;
+      return filterRouteSegments(allSegments)
         .filter(routeSegment => !isDropOffOnly(routeSegment))
         .filter(routeSegment =>
           filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter }),
@@ -115,8 +113,8 @@ const propsMapper = mapProps(props => {
           trunkRoute: routeSegment.line.nodes[0].trunkRoute === '1',
           // List all stops (including drop-off only) for each route
           stops: sortBy(routeSegment.nextStops.nodes, node => node.stopIndex).map(nodeToStop),
-        })),
-    ),
+        }));
+    }),
   );
   const treeMaxWidth = props.maxColumns ? props.maxColumns : props.printAsA3 ? 5 : 6; // Defaults 6 for normal posters and 5 for a3 posters.
 

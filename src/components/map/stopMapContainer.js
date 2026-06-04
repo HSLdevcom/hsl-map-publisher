@@ -11,7 +11,7 @@ import haversine from 'haversine';
 import apolloWrapper from 'util/apolloWrapper';
 import config from 'util/config';
 import promiseWrapper from 'util/promiseWrapper';
-import { isNumberVariant, trimRouteId, isDropOffOnly } from 'util/domain';
+import { trimRouteId, isDropOffOnly, filterRouteSegments } from 'util/domain';
 import { calculateStopsViewport } from 'util/stopPoster';
 import routeCompare from 'util/routeCompare';
 
@@ -100,14 +100,14 @@ const nearbyItemsQuery = gql`
   }
 `;
 
-const stopsMapper = stopGroup => ({
-  ...stopGroup,
-  // Assume all stops face the same way
-  calculatedHeading: stopGroup.stops.nodes[0].calculatedHeading,
-  routes: flatMap(stopGroup.stops.nodes, node =>
-    node.routeSegments.nodes
-      .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
-      .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
+const stopsMapper = stopGroup => {
+  const allSegments = flatMap(stopGroup.stops.nodes, node => node.routeSegments.nodes);
+
+  return {
+    ...stopGroup,
+    // Assume all stops face the same way
+    calculatedHeading: stopGroup.stops.nodes[0].calculatedHeading,
+    routes: filterRouteSegments(allSegments)
       .filter(routeSegment => !isDropOffOnly(routeSegment))
       .map(routeSegment => {
         const mergedRouteSegment = mergeRouteSegments(
@@ -141,9 +141,10 @@ const stopsMapper = stopGroup => ({
           mode: mergedRouteSegment.route.nodes[0].mode,
           trunkRoute,
         };
-      }),
-  ).sort(routeCompare),
-});
+      })
+      .sort(routeCompare),
+  };
+};
 
 const nearbyItemsMapper = mapProps(props => {
   const stops = props.data.stopGroups.nodes

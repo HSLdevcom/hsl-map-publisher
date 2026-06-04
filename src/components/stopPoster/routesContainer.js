@@ -7,7 +7,7 @@ import flatMap from 'lodash/flatMap';
 import groupBy from 'lodash/groupBy';
 import compact from 'lodash/compact';
 
-import { isNumberVariant, trimRouteId, isDropOffOnly, filterRoute } from 'util/domain';
+import { trimRouteId, isDropOffOnly, filterRoute, filterRouteSegments } from 'util/domain';
 import apolloWrapper from 'util/apolloWrapper';
 import routeCompare from 'util/routeCompare';
 
@@ -47,18 +47,16 @@ const routesQuery = gql`
 
 const propsMapper = mapProps(props => {
   const { data, routeFilter, ...propsToForward } = props;
-  const stops = flatMap(
+
+  const allSegments = flatMap(
     data.stop.siblings.nodes.map(s =>
-      s.routeSegments.nodes
-        .map(routeSegment => ({ ...routeSegment, platform: s.platform }))
-        .filter(routeSegment => routeSegment.hasRegularDayDepartures === true)
-        .filter(routeSegment => !isNumberVariant(routeSegment.routeId))
-        .filter(routeSegment => !isDropOffOnly(routeSegment))
-        .filter(routeSegment =>
-          filterRoute({ routeId: routeSegment.routeId, filter: routeFilter }),
-        ),
+      s.routeSegments.nodes.map(routeSegment => ({ ...routeSegment, platform: s.platform })),
     ),
   );
+
+  const stops = filterRouteSegments(allSegments)
+    .filter(routeSegment => !isDropOffOnly(routeSegment))
+    .filter(routeSegment => filterRoute({ routeId: routeSegment.routeId, filter: routeFilter }));
   const routes = stops.map(routeSegment => ({
     ...routeSegment.route.nodes[0],
     viaFi: routeSegment.viaFi,
@@ -69,7 +67,6 @@ const propsMapper = mapProps(props => {
     platform: routeSegment.platform,
   }));
 
-  // Group similar routes and place the platforminfo in the list
   const routesGrouped = Object.values(groupBy(routes, r => r.routeId + r.destinationFi))
     .map(r =>
       r.reduce((prev, curr) => ({ ...prev, platforms: prev.platforms.concat(curr.platform) }), {
