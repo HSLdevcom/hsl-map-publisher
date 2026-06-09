@@ -194,7 +194,7 @@ IntervalDisplay.defaultProps = {
   isCompact: false,
 };
 
-const partitionToIntervalAndNonIntervalRoutes = routeIdToModeMap => {
+export const partitionToIntervalAndNonIntervalRoutes = routeIdToModeMap => {
   const intervalRoutes = new Set();
   const normalBusRoutes = new Set();
 
