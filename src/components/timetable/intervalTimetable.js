@@ -159,13 +159,13 @@ const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompac
                       className={styles.departureCell}
                       style={{ height: DEPARTURE_ROW_HEIGHT }}
                     />
-                    {combinedIntervals.map(({ hours, maxInterval }) => (
+                    {combinedIntervals.map(({ hours, combinedInterval }) => (
                       <div
                         key={hours}
                         className={styles.intervalCell}
                         style={{ height: INTERVAL_ROW_HEIGHT }}>
                         <span className={styles.interval} style={{ color: groupColor }}>
-                          {maxInterval ? `${maxInterval} min` : '-'}
+                          {combinedInterval ? `${combinedInterval} min` : '-'}
                         </span>
                       </div>
                     ))}

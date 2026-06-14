@@ -1,12 +1,13 @@
 import mapValues from 'lodash/mapValues';
 import groupBy from 'lodash/groupBy';
-import mean from 'lodash/mean';
 import sortBy from 'lodash/sortBy';
 import padStart from 'lodash/padStart';
 import omit from 'lodash/omit';
 import cloneDeep from 'lodash/cloneDeep';
 import { trimRouteId } from 'util/domain';
 import { normalizeDepartures } from './intervalsNormalizer.mjs';
+
+export { computeCombinedColumn } from './combinedColumn.mjs';
 
 /**
  * @typedef {Object} DepartureGroup
@@ -88,9 +89,7 @@ const mergeConsecutiveHoursWithSameDepartures = entries => {
  */
 const calculateAverageInterval = nums => {
   if (nums.length < 2) return 60;
-  const sorted = [...nums].sort((a, b) => a - b);
-  const intervals = sorted.slice(1).map((v, i) => v - sorted[i]);
-  return Math.round(mean(intervals));
+  return Math.round(60 / nums.length);
 };
 
 /**
@@ -240,20 +239,4 @@ export const groupRoutesByModeAndTrunk = (routeIds, routeIdToModeMap) => {
   }
 
   return groupOrder.map(k => groupMap.get(k));
-};
-
-/**
- * For a group with 2+ routes, computes the synthetic "combined" column data:
- * - intervals: max interval per hour range across all routes in the group
- * - firstDepartures / lastDepartures: always null (shown as blank in the UI)
- *
- * @param {string[]} groupRouteIds
- * @param {Array<{hours: string, intervals: Object.<string, number|null>}>} groupedDepartures
- * @returns {Array<{hours: string, maxInterval: number|null}>}
- */
-export const computeCombinedColumn = (groupRouteIds, groupedDepartures) => {
-  return groupedDepartures.map(({ hours, intervals }) => {
-    const vals = groupRouteIds.map(id => intervals[id]).filter(v => v != null);
-    return { hours, maxInterval: vals.length > 0 ? Math.max(...vals) : null };
-  });
 };
