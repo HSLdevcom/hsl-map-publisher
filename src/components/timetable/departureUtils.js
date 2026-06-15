@@ -6,6 +6,7 @@ import omit from 'lodash/omit';
 import cloneDeep from 'lodash/cloneDeep';
 import { trimRouteId } from 'util/domain';
 import { normalizeDepartures } from './intervalsNormalizer.mjs';
+import { calculateAverageInterval, fixFirstLastHourIntervals } from './intervalCalculation.mjs';
 
 export { computeCombinedColumn } from './combinedColumn.mjs';
 
@@ -84,21 +85,13 @@ const mergeConsecutiveHoursWithSameDepartures = entries => {
 };
 
 /**
- * @param {number[]} nums
- * @returns {number}
- */
-const calculateAverageInterval = nums => {
-  if (nums.length < 2) return 60;
-  return Math.round(60 / nums.length);
-};
-
-/**
  * @param {DepartureGroup[]} filteredDepartures
  * @param {Set<string>} routeIds
  * @returns {Object<string, {
  *   hours: string,
  *   isNextDay: boolean,
  *   intervals: Object<string, number>,
+ *   counts: Object<string, number>,
  *   lowestMinutes: Object<string, number>,
  *   highestMinutes: Object<string, number>
  * }>}
@@ -116,12 +109,14 @@ const groupDeparturesByHour = (filteredDepartures, routeIds) => {
       });
 
       const intervals = {};
+      const counts = {};
       const lowestMinutes = {};
       const highestMinutes = {};
 
       for (const [routeId, items] of Object.entries(routeGroups)) {
         const minutesArray = items.map(item => item.minutes);
-        intervals[routeId] = calculateAverageInterval(minutesArray);
+        counts[routeId] = minutesArray.length;
+        intervals[routeId] = calculateAverageInterval(minutesArray.length);
         lowestMinutes[routeId] = Math.min(...minutesArray);
         highestMinutes[routeId] = Math.max(...minutesArray);
       }
@@ -130,6 +125,7 @@ const groupDeparturesByHour = (filteredDepartures, routeIds) => {
         hours: padHour(hours),
         isNextDay,
         intervals,
+        counts,
         lowestMinutes,
         highestMinutes,
       };
@@ -199,6 +195,8 @@ export const prepareOrderedDepartureHoursByRoute = departures => {
     const bTime = +b.hours + (b.isNextDay ? 24 : 0);
     return aTime - bTime;
   });
+
+  fixFirstLastHourIntervals(sorted);
 
   const { firstDepartures, lastDepartures } = calculateFirstAndLastDepartures(sorted, routeIds);
 
