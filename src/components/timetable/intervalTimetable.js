@@ -77,8 +77,8 @@ const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompac
           </div>
           <div className={styles.labelCell} style={{ height: DEPARTURE_ROW_HEIGHT }}>
             <div className={styles.departureTitles}>
-              <span>Ensimmäinen</span>
-              <span>Första / First</span>
+              <span>Ens.</span>
+              <span>Först. / First</span>
             </div>
           </div>
           {groupedDepartures.map(({ hours }) => (
@@ -91,8 +91,8 @@ const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompac
           ))}
           <div className={styles.labelCell} style={{ height: DEPARTURE_ROW_HEIGHT }}>
             <div className={styles.departureTitles}>
-              <span>Viimeinen</span>
-              <span>Sista / Last</span>
+              <span>Viim.</span>
+              <span>Sist. / Last</span>
             </div>
           </div>
         </div>
@@ -149,9 +149,9 @@ const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompac
                     <div className={styles.headingCell} style={{ height: HEADING_ROW_HEIGHT }}>
                       <div className={styles.routeHeadings}>
                         <span className={styles.combinedHeading}>
-                          <span>Yhteinen vuoroväli</span>
-                          <span>Gemensam turtäthet</span>
-                          <span>Combined headway</span>
+                          <span>Vuoroväli</span>
+                          <span>Turtäthet</span>
+                          <span>Headway</span>
                         </span>
                       </div>
                     </div>
