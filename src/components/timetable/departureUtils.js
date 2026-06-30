@@ -6,7 +6,7 @@ import omit from 'lodash/omit';
 import cloneDeep from 'lodash/cloneDeep';
 import { trimRouteId } from 'util/domain';
 import { normalizeDepartures } from './intervalsNormalizer.mjs';
-import { calculateAverageInterval, fixFirstLastHourIntervals } from './intervalCalculation.mjs';
+import { calculateIntervals } from './intervalCalculation.mjs';
 
 export { computeCombinedColumn } from './combinedColumn.mjs';
 
@@ -112,13 +112,15 @@ const groupDeparturesByHour = (filteredDepartures, routeIds) => {
       const counts = {};
       const lowestMinutes = {};
       const highestMinutes = {};
+      const minutesByRoute = {};
 
       for (const [routeId, items] of Object.entries(routeGroups)) {
-        const minutesArray = items.map(item => item.minutes);
+        const minutesArray = items.map(item => item.minutes).sort((a, b) => a - b);
         counts[routeId] = minutesArray.length;
-        intervals[routeId] = calculateAverageInterval(minutesArray.length);
-        lowestMinutes[routeId] = Math.min(...minutesArray);
-        highestMinutes[routeId] = Math.max(...minutesArray);
+        intervals[routeId] = null; // filled in by calculateIntervals
+        [lowestMinutes[routeId]] = minutesArray;
+        highestMinutes[routeId] = minutesArray[minutesArray.length - 1];
+        minutesByRoute[routeId] = minutesArray;
       }
 
       return {
@@ -128,6 +130,7 @@ const groupDeparturesByHour = (filteredDepartures, routeIds) => {
         counts,
         lowestMinutes,
         highestMinutes,
+        minutesByRoute,
       };
     },
   );
@@ -196,7 +199,7 @@ export const prepareOrderedDepartureHoursByRoute = departures => {
     return aTime - bTime;
   });
 
-  fixFirstLastHourIntervals(sorted);
+  calculateIntervals(sorted);
 
   const { firstDepartures, lastDepartures } = calculateFirstAndLastDepartures(sorted, routeIds);
 

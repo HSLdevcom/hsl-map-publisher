@@ -1,49 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert';
-import {
-  calculateAverageInterval,
-  fixFirstLastHourIntervals,
-} from '../../src/components/timetable/intervalCalculation.mjs';
+import { calculateIntervals } from '../../src/components/timetable/intervalCalculation.mjs';
 
-// ─── calculateAverageInterval ────────────────────────────────────────────────
-
-test('default window: 6 departures → 10 min', () => {
-  assert.strictEqual(calculateAverageInterval(6), 10);
-});
-
-test('default window: 4 departures → 15 min', () => {
-  assert.strictEqual(calculateAverageInterval(4), 15);
-});
-
-test('single departure → 60 min (cannot estimate headway)', () => {
-  assert.strictEqual(calculateAverageInterval(1), 60);
-});
-
-test('zero departures → 60 min', () => {
-  assert.strictEqual(calculateAverageInterval(0), 60);
-});
-
-test('custom window: 3 departures in 30-minute window → 10 min', () => {
-  assert.strictEqual(calculateAverageInterval(3, 30), 10);
-});
-
-test('first-hour formula: 2 departures, window = 60 - 45 = 15 → 8 min', () => {
-  assert.strictEqual(calculateAverageInterval(2, 60 - 45), 8);
-});
-
-test('last-hour formula: 3 departures, window = 30 → 10 min', () => {
-  assert.strictEqual(calculateAverageInterval(3, 30), 10);
-});
-
-// ─── fixFirstLastHourIntervals ───────────────────────────────────────────────
+// ─── helpers ─────────────────────────────────────────────────────────────────
 
 function makeEntry(hours, routeData) {
   const intervals = {};
   const counts = {};
   const lowestMinutes = {};
   const highestMinutes = {};
-  for (const [id, { interval, count, low, high }] of Object.entries(routeData)) {
-    intervals[id] = interval;
+  for (const [id, { count, low, high }] of Object.entries(routeData)) {
+    intervals[id] = null;
     counts[id] = count;
     lowestMinutes[id] = low;
     highestMinutes[id] = high;
@@ -51,77 +18,114 @@ function makeEntry(hours, routeData) {
   return { hours, intervals, counts, lowestMinutes, highestMinutes };
 }
 
-test('first hour adjusted when route starts mid-hour', () => {
-  // Route A: hour 07 starts at minute 45 with 2 departures (default would be 60/2=30)
-  // first-hour window = 60-45 = 15 → 15/2 = 7.5 → 8
-  // hour 08 is a genuine middle hour (not first, not last) → unchanged
+// ─── three-hour example from spec ────────────────────────────────────────────
+
+test('spec example: three hours with cross-hour borrowing', () => {
+  // hour1: 10 30 50
+  // hour2: 5 20 35 50
+  // hour3: 10 30 50
   const sorted = [
-    makeEntry('07', { A: { interval: 30, count: 2, low: 45, high: 55 } }),
-    makeEntry('08', { A: { interval: 10, count: 6, low: 0, high: 50 } }),
-    makeEntry('22', { A: { interval: 10, count: 6, low: 0, high: 50 } }),
+    makeEntry('01', { A: { count: 3, low: 10, high: 50 } }),
+    makeEntry('02', { A: { count: 4, low: 5,  high: 50 } }),
+    makeEntry('03', { A: { count: 3, low: 10, high: 50 } }),
   ];
-  fixFirstLastHourIntervals(sorted);
-  assert.strictEqual(sorted[0].intervals.A, 8); // (60-45)/2 = 8
-  assert.strictEqual(sorted[1].intervals.A, 10); // middle hour unchanged
+  calculateIntervals(sorted);
+
+  // hour1: first=10 (no prev), last=5+60=65, gaps=2+1=3 → (65-10)/3 = 55/3 ≈ 18
+  assert.strictEqual(sorted[0].intervals.A, 18);
+  // hour2: first=50-60=-10, last=10+60=70, gaps=3+2=5 → 80/5 = 16
+  assert.strictEqual(sorted[1].intervals.A, 16);
+  // hour3: first=50-60=-10, last=50 (no next), gaps=2+1=3 → 60/3 = 20
+  assert.strictEqual(sorted[2].intervals.A, 20);
 });
 
-test('last hour adjusted when route ends mid-hour', () => {
-  // Route A: full service in hour 08, ends at minute 30 in hour 22 with 3 departures
-  // last-hour window = 30 → 30/3 = 10
+// ─── edge: first hour of service (borrow right only) ─────────────────────────
+
+test('first hour of service only borrows from next hour', () => {
+  // hour07: 30 50 (no prev)
+  // hour08: 10 30 50
   const sorted = [
-    makeEntry('08', { A: { interval: 10, count: 6, low: 0, high: 50 } }),
-    makeEntry('22', { A: { interval: 20, count: 3, low: 10, high: 30 } }),
+    makeEntry('07', { A: { count: 2, low: 30, high: 50 } }),
+    makeEntry('08', { A: { count: 3, low: 10, high: 50 } }),
   ];
-  fixFirstLastHourIntervals(sorted);
-  assert.strictEqual(sorted[0].intervals.A, 10); // first hour (here also middle) unchanged
-  assert.strictEqual(sorted[1].intervals.A, 10); // 30/3 = 10
+  calculateIntervals(sorted);
+
+  // hour07: first=30, last=10+60=70, gaps=1+1=2 → (70-30)/2 = 20
+  assert.strictEqual(sorted[0].intervals.A, 20);
+  // hour08: first=50-60=-10, no next → last=50, gaps=2+1=3 → (50-(-10))/3 = 20
+  assert.strictEqual(sorted[1].intervals.A, 20);
 });
 
-test('both first and last hour adjusted across three hours', () => {
+// ─── edge: last hour of service (borrow left only) ───────────────────────────
+
+test('last hour of service only borrows from previous hour', () => {
+  // hour07: 10 30 50
+  // hour22: 10 30 (no next)
   const sorted = [
-    makeEntry('07', { A: { interval: 30, count: 2, low: 45, high: 55 } }),
-    makeEntry('08', { A: { interval: 10, count: 6, low: 0, high: 50 } }),
-    makeEntry('22', { A: { interval: 20, count: 3, low: 10, high: 30 } }),
+    makeEntry('07', { A: { count: 3, low: 10, high: 50 } }),
+    makeEntry('22', { A: { count: 2, low: 10, high: 30 } }),
   ];
-  fixFirstLastHourIntervals(sorted);
-  assert.strictEqual(sorted[0].intervals.A, 8); // (60-45)/2 = 8
-  assert.strictEqual(sorted[1].intervals.A, 10); // middle, unchanged
-  assert.strictEqual(sorted[2].intervals.A, 10); // 30/3 = 10
+  calculateIntervals(sorted);
+
+  // hour07: no prev → first=10, next.low=10 → last=10+60=70, gaps=2+1=3 → (70-10)/3 = 20
+  assert.strictEqual(sorted[0].intervals.A, 20);
+  // hour22: prev.high=50 → first=50-60=-10, no next → last=30, gaps=1+1=2 → (30-(-10))/2 = 20
+  assert.strictEqual(sorted[1].intervals.A, 20);
 });
 
-test('route in a single hour is not adjusted', () => {
-  // Only one entry for route A — cannot distinguish first from last
-  const sorted = [makeEntry('14', { A: { interval: 20, count: 3, low: 10, high: 40 } })];
-  fixFirstLastHourIntervals(sorted);
-  assert.strictEqual(sorted[0].intervals.A, 20); // unchanged
+// ─── single hour, single departure → fallback 60 ─────────────────────────────
+
+test('single departure with no adjacent hours falls back to 60', () => {
+  const sorted = [makeEntry('14', { A: { count: 1, low: 30, high: 30 } })];
+  calculateIntervals(sorted);
+  assert.strictEqual(sorted[0].intervals.A, 60);
 });
 
-test('two routes are adjusted independently', () => {
-  // Route A: 2 entries, starts late in hour 07, ends early in hour 22
-  // Route B: 3 entries, starts at minute 0 (first-hour window = 60, unchanged)
+// ─── two routes adjusted independently ───────────────────────────────────────
+
+test('two routes in same hours are calculated independently', () => {
+  // Route A: 3 hours
+  // Route B: only in hours 07 and 22 (no middle hour)
   const sorted = [
     makeEntry('07', {
-      A: { interval: 30, count: 2, low: 45, high: 55 },
-      B: { interval: 10, count: 6, low: 0, high: 50 },
+      A: { count: 2, low: 30, high: 50 },
+      B: { count: 3, low: 0,  high: 40 },
     }),
     makeEntry('12', {
-      A: { interval: 10, count: 6, low: 0, high: 50 },
-      B: { interval: 10, count: 6, low: 0, high: 50 },
+      A: { count: 6, low: 0,  high: 50 },
     }),
     makeEntry('22', {
-      A: { interval: 20, count: 3, low: 5, high: 25 },
-      B: { interval: 20, count: 3, low: 0, high: 55 },
+      A: { count: 3, low: 10, high: 30 },
+      B: { count: 2, low: 20, high: 50 },
     }),
   ];
-  fixFirstLastHourIntervals(sorted);
+  calculateIntervals(sorted);
 
-  // Route A
-  assert.strictEqual(sorted[0].intervals.A, 8); // (60-45)/2 = 8
-  assert.strictEqual(sorted[1].intervals.A, 10); // middle, unchanged
-  assert.strictEqual(sorted[2].intervals.A, 8); // 25/3 = 8.3 → 8
+  // Route A hour07: no prev, next(12).low=0 → last=60, first=30, gaps=1+1=2 → (60-30)/2 = 15
+  assert.strictEqual(sorted[0].intervals.A, 15);
+  // Route A hour12: prev(07).high=50 → first=-10, next(22).low=10 → last=70, gaps=5+2=7 → 80/7 ≈ 11
+  assert.strictEqual(sorted[1].intervals.A, 11);
+  // Route A hour22: prev(12).high=50 → first=-10, no next → last=30, gaps=2+1=3 → 40/3 ≈ 13
+  assert.strictEqual(sorted[2].intervals.A, 13);
 
-  // Route B: first hour starts at 0 → window = 60 → same as default (10)
-  assert.strictEqual(sorted[0].intervals.B, 10); // (60-0)/6 = 10
-  assert.strictEqual(sorted[1].intervals.B, 10); // middle, unchanged
-  assert.strictEqual(sorted[2].intervals.B, 18); // 55/3 = 18.3 → 18
+  // Route B hour07: no prev, next(12) doesn't have B → no borrow → first=0, last=40, gaps=2 → 40/2 = 20
+  assert.strictEqual(sorted[0].intervals.B, 20);
+  // Route B hour22: prev(12) doesn't have B, but prev(07) is not adjacent → no borrow → first=20, last=50, gaps=1 → 30/1 = 30
+  assert.strictEqual(sorted[2].intervals.B, 30);
+});
+
+// ─── middle hour with even spacing ───────────────────────────────────────────
+
+test('evenly spaced departures produce exact interval', () => {
+  // prev hour ends at 50, cur: 10 20 30 40 50, next starts at 0
+  // first = 50-60 = -10, last = 0+60 = 60, gaps = 4+2 = 6 → 70/6 ≈ 12
+  const sorted = [
+    makeEntry('06', { A: { count: 6, low: 0,  high: 50 } }),
+    makeEntry('07', { A: { count: 5, low: 10, high: 50 } }),
+    makeEntry('08', { A: { count: 6, low: 0,  high: 50 } }),
+  ];
+  calculateIntervals(sorted);
+
+  // hour07: first=50-60=-10, last=0+60=60, gaps=4+2=6 → 70/6 ≈ 12
+  assert.strictEqual(sorted[1].intervals.A, 12);
 });

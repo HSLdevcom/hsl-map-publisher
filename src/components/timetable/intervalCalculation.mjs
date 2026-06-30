@@ -1,73 +1,88 @@
 /**
- * Compute the average interval (headway) in minutes.
+ * Compute the interval (headway) in minutes using the span formula:
  *
- * For a full hour use the default windowMinutes=60, which gives 60/count.
- * For the first hour of service pass (60 - firstDepartureMinute) as the window,
- * because the route is only active from that minute to the end of the hour.
- * For the last hour of service pass lastDepartureMinute as the window,
- * because the route is only active from the start of the hour to that minute.
+ *   interval = (lastMinute - firstMinute) / (count - 1)
  *
- * @param {number} count - number of departures in the window
- * @param {number} [windowMinutes=60] - effective service window in minutes
- * @returns {number} rounded average headway in minutes, or 60 when count < 2
+ * firstMinute and lastMinute are the effective endpoints after cross-hour
+ * borrowing has been applied:
+ *   - borrow previous hour's last departure as (highestMinutes - 60)
+ *   - borrow next hour's first departure as (lowestMinutes + 60)
+ *
+ * Falls back to 60 only when count < 2 and no borrowing is possible.
+ *
+ * @param {number} firstMinute - effective first minute (may be negative after borrowing)
+ * @param {number} lastMinute  - effective last minute (may be > 59 after borrowing)
+ * @param {number} count       - number of departures in this hour
+ * @returns {number} rounded headway in minutes
  */
-export const calculateAverageInterval = (count, windowMinutes = 60) => {
-  if (count < 2) return 60;
-  return Math.round(windowMinutes / count);
+const spanInterval = (firstMinute, lastMinute, count) => {
+  const gaps = count - 1;
+  if (gaps < 1) return 60;
+  return Math.round((lastMinute - firstMinute) / gaps);
 };
 
 /**
- * Adjusts the interval for the first and last hour of service for each route.
+ * Fills in `intervals` for every hour entry in `sorted` using the span
+ * formula with cross-hour borrowing.
  *
- * In a middle hour buses are assumed to cover the full 60-minute window, so
- * interval = 60/count.  At the edges this over- or under-estimates the headway:
+ * For each hour and each route present in that hour:
+ *   - effectiveFirst = previous hour's highestMinutes[route] - 60
+ *                      (if previous hour has that route), else lowestMinutes
+ *   - effectiveLast  = next hour's lowestMinutes[route] + 60
+ *                      (if next hour has that route), else highestMinutes
+ *   - interval = (effectiveLast - effectiveFirst) / (allDepartures - 1)
+ *     where allDepartures = count of current hour only (the span already
+ *     accounts for the borrowed endpoints, not the borrowed departures
+ *     themselves).
  *
- *  - First hour: the route starts at lowestMinutes[routeId], so the effective
- *    window is (60 - lowestMinutes[routeId]).
- *  - Last hour: the route ends at highestMinutes[routeId], so the effective
- *    window is highestMinutes[routeId].
+ * Actually the span covers all gaps including the borrowed ones, so we count
+ * the total number of gaps spanned:
+ *   gaps = (current count - 1)
+ *        + 1 if we borrowed from previous (adds one gap on the left)
+ *        + 1 if we borrowed from next     (adds one gap on the right)
  *
- * Mutates the sorted array in place.
- * Routes that only appear in a single hour are left unchanged (default window).
+ * Mutates `intervals` in place.
  *
  * @param {Array<{
  *   hours: string,
- *   intervals: Object<string, number>,
+ *   intervals: Object<string, number|null>,
  *   counts: Object<string, number>,
  *   lowestMinutes: Object<string, number>,
- *   highestMinutes: Object<string, number>
+ *   highestMinutes: Object<string, number>,
  * }>} sorted - hour entries sorted chronologically
  */
-export const fixFirstLastHourIntervals = (sorted) => {
+export const calculateIntervals = (sorted) => {
   const allRouteIds = new Set(sorted.flatMap((e) => Object.keys(e.intervals)));
 
   for (const routeId of allRouteIds) {
-    let firstIdx = -1;
-    let lastIdx = -1;
-
     for (let i = 0; i < sorted.length; i++) {
-      if (routeId in sorted[i].intervals) {
-        if (firstIdx === -1) firstIdx = i;
-        lastIdx = i;
+      const cur = sorted[i];
+      if (!(routeId in cur.counts)) continue;
+
+      const count = cur.counts[routeId];
+      let firstMinute = cur.lowestMinutes[routeId];
+      let lastMinute = cur.highestMinutes[routeId];
+      let gaps = count - 1;
+
+      // Borrow from previous hour (only if there is one with this route)
+      const prev = i > 0 ? sorted[i - 1] : null;
+      if (prev && routeId in prev.highestMinutes) {
+        firstMinute = prev.highestMinutes[routeId] - 60;
+        gaps += 1;
+      }
+
+      // Borrow from next hour (only if there is one with this route)
+      const next = i < sorted.length - 1 ? sorted[i + 1] : null;
+      if (next && routeId in next.lowestMinutes) {
+        lastMinute = next.lowestMinutes[routeId] + 60;
+        gaps += 1;
+      }
+
+      if (gaps < 1) {
+        cur.intervals[routeId] = 60;
+      } else {
+        cur.intervals[routeId] = Math.round((lastMinute - firstMinute) / gaps);
       }
     }
-
-    // Route only appears in a single hour — cannot distinguish first vs last,
-    // leave the default (60 / count) unchanged.
-    if (firstIdx === -1 || firstIdx === lastIdx) continue;
-
-    // First hour: window starts at the first departure minute
-    const first = sorted[firstIdx];
-    first.intervals[routeId] = calculateAverageInterval(
-      first.counts[routeId],
-      60 - first.lowestMinutes[routeId],
-    );
-
-    // Last hour: window ends at the last departure minute
-    const last = sorted[lastIdx];
-    last.intervals[routeId] = calculateAverageInterval(
-      last.counts[routeId],
-      last.highestMinutes[routeId],
-    );
   }
 };
