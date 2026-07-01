@@ -1,12 +1,14 @@
 import mapValues from 'lodash/mapValues';
 import groupBy from 'lodash/groupBy';
-import mean from 'lodash/mean';
 import sortBy from 'lodash/sortBy';
 import padStart from 'lodash/padStart';
 import omit from 'lodash/omit';
 import cloneDeep from 'lodash/cloneDeep';
 import { trimRouteId } from 'util/domain';
 import { normalizeDepartures } from './intervalsNormalizer.mjs';
+import { calculateIntervals } from './intervalCalculation.mjs';
+
+export { computeCombinedColumn } from './combinedColumn.mjs';
 
 /**
  * @typedef {Object} DepartureGroup
@@ -83,23 +85,13 @@ const mergeConsecutiveHoursWithSameDepartures = entries => {
 };
 
 /**
- * @param {number[]} nums
- * @returns {number}
- */
-const calculateAverageInterval = nums => {
-  if (nums.length < 2) return 60;
-  const sorted = [...nums].sort((a, b) => a - b);
-  const intervals = sorted.slice(1).map((v, i) => v - sorted[i]);
-  return Math.round(mean(intervals));
-};
-
-/**
  * @param {DepartureGroup[]} filteredDepartures
  * @param {Set<string>} routeIds
  * @returns {Object<string, {
  *   hours: string,
  *   isNextDay: boolean,
  *   intervals: Object<string, number>,
+ *   counts: Object<string, number>,
  *   lowestMinutes: Object<string, number>,
  *   highestMinutes: Object<string, number>
  * }>}
@@ -117,22 +109,28 @@ const groupDeparturesByHour = (filteredDepartures, routeIds) => {
       });
 
       const intervals = {};
+      const counts = {};
       const lowestMinutes = {};
       const highestMinutes = {};
+      const minutesByRoute = {};
 
       for (const [routeId, items] of Object.entries(routeGroups)) {
-        const minutesArray = items.map(item => item.minutes);
-        intervals[routeId] = calculateAverageInterval(minutesArray);
-        lowestMinutes[routeId] = Math.min(...minutesArray);
-        highestMinutes[routeId] = Math.max(...minutesArray);
+        const minutesArray = items.map(item => item.minutes).sort((a, b) => a - b);
+        counts[routeId] = minutesArray.length;
+        intervals[routeId] = null; // filled in by calculateIntervals
+        [lowestMinutes[routeId]] = minutesArray;
+        highestMinutes[routeId] = minutesArray[minutesArray.length - 1];
+        minutesByRoute[routeId] = minutesArray;
       }
 
       return {
         hours: padHour(hours),
         isNextDay,
         intervals,
+        counts,
         lowestMinutes,
         highestMinutes,
+        minutesByRoute,
       };
     },
   );
@@ -201,6 +199,8 @@ export const prepareOrderedDepartureHoursByRoute = departures => {
     return aTime - bTime;
   });
 
+  calculateIntervals(sorted);
+
   const { firstDepartures, lastDepartures } = calculateFirstAndLastDepartures(sorted, routeIds);
 
   const normalized = normalizeDepartures(sorted);
@@ -213,4 +213,31 @@ export const prepareOrderedDepartureHoursByRoute = departures => {
     firstDepartures,
     lastDepartures,
   };
+};
+
+/**
+ * Groups route IDs by their mode+trunk combination.
+ * Routes in the same group share mode and trunkRoute flag.
+ *
+ * @param {string[]} routeIds
+ * @param {Object.<string, {mode: string, trunkRoute: boolean}>} routeIdToModeMap
+ * @returns {Array<{key: string, routeIds: string[], mode: string, trunkRoute: boolean}>}
+ *   Ordered list of groups preserving original route order.
+ */
+export const groupRoutesByModeAndTrunk = (routeIds, routeIdToModeMap) => {
+  const groupMap = new Map();
+  const groupOrder = [];
+
+  for (const routeId of routeIds) {
+    const desc = routeIdToModeMap[routeId];
+    if (!desc) continue;
+    const key = `${desc.mode}_${desc.trunkRoute ? '1' : '0'}`;
+    if (!groupMap.has(key)) {
+      groupMap.set(key, { key, routeIds: [], mode: desc.mode, trunkRoute: !!desc.trunkRoute });
+      groupOrder.push(key);
+    }
+    groupMap.get(key).routeIds.push(routeId);
+  }
+
+  return groupOrder.map(k => groupMap.get(k));
 };

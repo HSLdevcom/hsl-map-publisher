@@ -11,8 +11,10 @@
   background-color: var(--timetable-accent-color);
 }
 
-.root > *.noPadLeft {
-  padding-left: 0;
+/* Used inside the interval timetable right panel where the container is already inset */
+.root.inset > * {
+  margin: 0 calc(-0.5 * var(--border-radius));
+  padding: 0 calc(var(--border-radius) * 0.5);
 }
 
 .a3root {
