@@ -91,9 +91,7 @@ class Timetable extends Component {
     const effectiveInterval =
       intervalTimetable &&
       Object.values(combinedDays).some(dayDepartures =>
-        dayDepartures.some(it =>
-          intervalRoutes.has(trimRouteId(it.routeId).replace(/[^0-9]/g, '')),
-        ),
+        dayDepartures.some(it => intervalRoutes.has(trimRouteId(it.routeId))),
       );
     const opts = { year: 'numeric', month: 'numeric', day: 'numeric' };
     const today = new Date().toLocaleDateString('fi', opts);
@@ -190,8 +188,9 @@ class Timetable extends Component {
         )}
         {effectiveInterval && (
           <div className={styles.validFrom}>
-            Aikataulu alkaen {formatDate(date)} - / Tidtabeller fran {formatDate(date)} -
-            /Timetables from {formatDate(date)} -
+            <span>Aikataulu alkaen {formatDate(date)}</span>
+            <span>&nbsp;&nbsp;{`Tidtabeller från ${formatDate(date)}`}</span>
+            <span>&nbsp;&nbsp;{`Timetables from ${formatDate(date)}`}</span>
           </div>
         )}
 
@@ -235,9 +234,7 @@ class Timetable extends Component {
                 intervalTimetable={effectiveInterval}
               />
               {effectiveInterval &&
-              combinedDays[combinedDay].some(it =>
-                intervalRoutes.has(trimRouteId(it.routeId).replace(/[^0-9]/g, '')),
-              ) ? (
+              combinedDays[combinedDay].some(it => intervalRoutes.has(trimRouteId(it.routeId))) ? (
                 <IntervalTimetable
                   combinedDay={combinedDay}
                   routeIdToModeMap={routeIdToModeMap}

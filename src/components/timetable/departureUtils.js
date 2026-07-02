@@ -180,6 +180,32 @@ const calculateFirstAndLastDepartures = (sorted, routeIds) => {
 };
 
 /**
+ * Natural numeric sort for route IDs: "1" < "2" < "9" < "9N" < "13"
+ * Splits each id into numeric and non-numeric parts and compares them in order.
+ * @param {string} a
+ * @param {string} b
+ * @returns {number}
+ */
+export const compareRouteIds = (a, b) => {
+  const tokenize = s => s.match(/(\d+|\D+)/g) || [];
+  const ta = tokenize(a);
+  const tb = tokenize(b);
+  for (let i = 0; i < Math.max(ta.length, tb.length); i++) {
+    if (i >= ta.length) return -1;
+    if (i >= tb.length) return 1;
+    const na = parseInt(ta[i], 10);
+    const nb = parseInt(tb[i], 10);
+    if (!isNaN(na) && !isNaN(nb)) {
+      if (na !== nb) return na - nb;
+    } else {
+      const cmp = ta[i].localeCompare(tb[i]);
+      if (cmp !== 0) return cmp;
+    }
+  }
+  return 0;
+};
+
+/**
  * @param {DepartureGroup[]} departures
  * @returns {{
  *   groupedDepartures: Array<{hours: string, intervals: Object}>,
@@ -209,7 +235,7 @@ export const prepareOrderedDepartureHoursByRoute = departures => {
 
   return {
     groupedDepartures: result,
-    routeIds: Array.from(routeIds),
+    routeIds: Array.from(routeIds).sort(compareRouteIds),
     firstDepartures,
     lastDepartures,
   };
@@ -222,7 +248,7 @@ export const prepareOrderedDepartureHoursByRoute = departures => {
  * @param {string[]} routeIds
  * @param {Object.<string, {mode: string, trunkRoute: boolean}>} routeIdToModeMap
  * @returns {Array<{key: string, routeIds: string[], mode: string, trunkRoute: boolean}>}
- *   Ordered list of groups preserving original route order.
+ *   Ordered list of groups with route IDs sorted numerically within each group.
  */
 export const groupRoutesByModeAndTrunk = (routeIds, routeIdToModeMap) => {
   const groupMap = new Map();
@@ -239,5 +265,9 @@ export const groupRoutesByModeAndTrunk = (routeIds, routeIdToModeMap) => {
     groupMap.get(key).routeIds.push(routeId);
   }
 
-  return groupOrder.map(k => groupMap.get(k));
+  return groupOrder.map(k => {
+    const group = groupMap.get(k);
+    group.routeIds.sort(compareRouteIds);
+    return group;
+  });
 };
