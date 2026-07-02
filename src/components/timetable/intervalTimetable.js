@@ -11,6 +11,7 @@ import {
   prepareOrderedDepartureHoursByRoute,
   groupRoutesByModeAndTrunk,
   computeCombinedColumn,
+  compareRouteIds,
 } from './departureUtils';
 import styles from './intervalTimetable.css';
 import tableRowsStyles from './tableRows.css';
@@ -101,7 +102,7 @@ const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompac
         <div className={styles.routeGroupsContainer}>
           {columnGroups.map(group => {
             const groupColor = getColor({ mode: group.mode, trunkRoute: group.trunkRoute });
-            const hasCombined = group.routeIds.length >= 2;
+            const hasCombined = group.routeIds.length >= 1;
             const combinedIntervals = hasCombined
               ? computeCombinedColumn(group.routeIds, groupedDepartures)
               : null;
@@ -164,7 +165,7 @@ const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompac
                         key={hours}
                         className={styles.intervalCell}
                         style={{ height: INTERVAL_ROW_HEIGHT }}>
-                        <span className={styles.interval} style={{ color: groupColor }}>
+                        <span className={styles.interval}>
                           {combinedInterval ? `${combinedInterval} min` : '-'}
                         </span>
                       </div>
@@ -214,7 +215,7 @@ const sortBusRoutesLast = (routeIds, routeIdToModeMap) => {
   routeIds.sort((a, b) => {
     const aIsBus = routeIdToModeMap[a]?.mode === BUS_MODE;
     const bIsBus = routeIdToModeMap[b]?.mode === BUS_MODE;
-    if (aIsBus === bIsBus) return a.localeCompare(b);
+    if (aIsBus === bIsBus) return compareRouteIds(a, b);
     return aIsBus ? 1 : -1;
   });
 };
@@ -225,7 +226,7 @@ const IntervalTimetable = ({ routeIdToModeMap, departures }) => {
   );
 
   const [nonBusDepartures, busDepartures] = partition(departures, it =>
-    intervalRoutes.has(trimRouteId(it.routeId).replace(/[^0-9]/g, '')),
+    intervalRoutes.has(trimRouteId(it.routeId)),
   );
 
   const departureIntervalsByRoute = prepareOrderedDepartureHoursByRoute(nonBusDepartures);

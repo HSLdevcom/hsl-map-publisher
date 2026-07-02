@@ -311,13 +311,12 @@ const propsMapper = mapProps(props => {
         .filter(routeSegment =>
           filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter }),
         )
-        .map(seg => [
-          trimRouteId(seg.routeId),
-          {
-            mode: get(seg, 'route.nodes[0].mode'),
-            trunkRoute: seg.line.nodes[0].trunkRoute === '1',
-          },
-        ]),
+        .map(seg => {
+          const trimmed = trimRouteId(seg.routeId);
+          const mode = get(seg, 'route.nodes[0].mode');
+          const trunkRoute = seg.line.nodes[0].trunkRoute === '1';
+          return [trimmed, { mode, trunkRoute }];
+        }),
     ),
   );
 

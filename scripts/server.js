@@ -221,7 +221,9 @@ const waitForPosterCompletion = async posterId => {
       isRendered = true;
     }
     // eslint-disable-next-line no-await-in-loop
-    await new Promise(resolve => setTimeout(resolve, 200)); // Limit rate for polling database for cover page completion
+    await new Promise(resolve => {
+      setTimeout(resolve, 200);
+    }); // Limit rate for polling database for cover page completion
   }
   return isRendered;
 };

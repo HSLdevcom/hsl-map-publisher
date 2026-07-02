@@ -30,19 +30,19 @@ const PAGE_NUMBER_HEIGHT = 21;
 const getScheduleWeekdaysText = dayType => {
   switch (dayType) {
     case scheduleSegments.weekdays:
-      return 'Maanantai-Perjantai / Måndag-Fredag';
+      return { fi: 'Maanantai-Perjantai', sv: 'Måndag-Fredag' };
     case scheduleSegments.weekdaysExclFriday:
-      return 'Maanantai-Torstai / Måndag-Torsdag';
+      return { fi: 'Maanantai-Torstai', sv: 'Måndag-Torsdag' };
     case scheduleSegments.fridays:
-      return 'Perjantai / Fredag';
+      return { fi: 'Perjantai', sv: 'Fredag' };
     case scheduleSegments.saturdays:
-      return 'Lauantai / Lördag';
+      return { fi: 'Lauantai', sv: 'Lördag' };
     case scheduleSegments.sundays:
-      return 'Sunnuntai / Söndag';
+      return { fi: 'Sunnuntai', sv: 'Söndag' };
     case scheduleSegments.weekends:
-      return 'Lauantai-Sunnuntai / Lördag-Söndag';
+      return { fi: 'Lauantai-Sunnuntai', sv: 'Lördag-Söndag' };
     default:
-      return '';
+      return { fi: '', sv: '' };
   }
 };
 
@@ -195,7 +195,8 @@ const RouteDepartures = props => {
           nameSe={nameSe}
           lang={lang}
         />
-        <span className={styles.timetableDays}>{getScheduleWeekdaysText(key)}</span>
+        <span className={styles.timetableDays}>{getScheduleWeekdaysText(key).fi}</span>
+        <span className={styles.timetableDays}>{getScheduleWeekdaysText(key).sv}</span>
         <span className={styles.timetableDates}>
           {formatDate(new Date(dateBegin))}-{formatDate(new Date(dateEnd))}
         </span>

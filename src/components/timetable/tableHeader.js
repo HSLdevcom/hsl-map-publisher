@@ -6,26 +6,14 @@ import styles from './tableHeader.css';
 
 const TableHeader = props => {
   const style = props.intervalTimetable ? { fontSize: '19.5px' } : undefined;
-  const header = props.printAsA3 ? (
+  const header = (
     <div className={styles.inline} style={style}>
-      <span>
+      <span className={styles.strong}>
         {' '}
         &nbsp;&nbsp;
         {props.subtitleSw}
       </span>
-      <span className={styles.italics}>
-        &nbsp;&nbsp;
-        {props.subtitleEn}
-      </span>
-    </div>
-  ) : (
-    <div className={styles.inline} style={style}>
-      <span>
-        {' '}
-        &nbsp;&nbsp;
-        {props.subtitleSw}
-      </span>
-      <span className={styles.italics}>
+      <span className={styles.strong}>
         &nbsp;&nbsp;
         {props.subtitleEn}
       </span>
