@@ -5,9 +5,9 @@ import classNames from 'classnames';
 import styles from './tableHeader.css';
 
 const TableHeader = props => {
-  const style = props.intervalTimetable ? { fontSize: '19.5px' } : undefined;
+  const titleStyle = props.intervalTimetable ? { fontSize: '19.5px' } : undefined;
   const header = (
-    <div className={styles.inline} style={style}>
+    <div className={styles.inline}>
       <span className={styles.strong}>
         {' '}
         &nbsp;&nbsp;
@@ -21,7 +21,9 @@ const TableHeader = props => {
   );
   return (
     <div className={styles.root}>
-      <div className={classNames(styles.title, { [styles.compactTitle]: props.useCompactLayout })}>
+      <div
+        className={classNames(styles.title, { [styles.compactTitle]: props.useCompactLayout })}
+        style={titleStyle}>
         <span className={styles.strong}>{props.title}</span>
         {header}
       </div>

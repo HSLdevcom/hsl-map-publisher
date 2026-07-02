@@ -189,8 +189,8 @@ class Timetable extends Component {
         {effectiveInterval && (
           <div className={styles.validFrom}>
             <span>Aikataulu alkaen {formatDate(date)}</span>
-            <span>&nbsp;&nbsp;{`Tidtabeller från ${formatDate(date)}`}</span>
-            <span>&nbsp;&nbsp;{`Timetables from ${formatDate(date)}`}</span>
+            <span>{`Tidtabeller från ${formatDate(date)}`}</span>
+            <span>{`Timetables from ${formatDate(date)}`}</span>
           </div>
         )}
 

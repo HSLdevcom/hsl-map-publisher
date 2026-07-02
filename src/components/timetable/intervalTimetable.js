@@ -79,7 +79,7 @@ const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompac
           <div className={styles.labelCell} style={{ height: DEPARTURE_ROW_HEIGHT }}>
             <div className={styles.departureTitles}>
               <span>Ens.</span>
-              <span>Först. / First</span>
+              <span>Först. First</span>
             </div>
           </div>
           {groupedDepartures.map(({ hours }) => (
@@ -93,7 +93,7 @@ const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompac
           <div className={styles.labelCell} style={{ height: DEPARTURE_ROW_HEIGHT }}>
             <div className={styles.departureTitles}>
               <span>Viim.</span>
-              <span>Sist. / Last</span>
+              <span>Sist. Last</span>
             </div>
           </div>
         </div>
