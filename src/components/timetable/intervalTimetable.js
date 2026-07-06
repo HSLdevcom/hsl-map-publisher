@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import classNames from 'classnames';
@@ -16,6 +16,7 @@ import {
 import styles from './intervalTimetable.css';
 import tableRowsStyles from './tableRows.css';
 import TableRows from './tableRows';
+import renderQueue from 'util/renderQueue';
 
 const INTERVAL_ROW_HEIGHT = 26;
 const HEADING_ROW_HEIGHT = 44;
@@ -220,47 +221,109 @@ const sortBusRoutesLast = (routeIds, routeIdToModeMap) => {
   });
 };
 
-const IntervalTimetable = ({ routeIdToModeMap, departures }) => {
-  const { intervalRoutes, normalBusRoutes } = partitionToIntervalAndNonIntervalRoutes(
-    routeIdToModeMap,
-  );
+const STACK_THRESHOLD_PX = 40;
 
-  const [nonBusDepartures, busDepartures] = partition(departures, it =>
-    intervalRoutes.has(trimRouteId(it.routeId)),
-  );
+class IntervalTimetable extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { stackBelow: false, measured: false };
+    this.leftPanel = null;
+    this.rightPanel = null;
+  }
 
-  const departureIntervalsByRoute = prepareOrderedDepartureHoursByRoute(nonBusDepartures);
+  componentDidMount() {
+    const { busDepartures } = this;
+    if (!busDepartures || busDepartures.length === 0) return;
 
-  sortBusRoutesLast(departureIntervalsByRoute.routeIds, routeIdToModeMap);
+    renderQueue.add(this);
+    renderQueue.onEmpty(
+      error => {
+        if (error) return;
+        this.measure();
+      },
+      { ignore: this },
+    );
+  }
 
-  return busDepartures.length > 0 ? (
-    <div className={styles.flexContainer}>
-      <div className={styles.leftPanel}>
+  componentDidUpdate() {
+    const { measured } = this.state;
+    if (measured) {
+      renderQueue.remove(this);
+    }
+  }
+
+  measure() {
+    if (!this.leftPanel || !this.rightPanel) {
+      renderQueue.remove(this);
+      return;
+    }
+    const leftHeight = this.leftPanel.scrollHeight;
+    const rightHeight = this.rightPanel.scrollHeight;
+    if (rightHeight - leftHeight > STACK_THRESHOLD_PX) {
+      this.setState({ stackBelow: true, measured: true });
+    } else {
+      renderQueue.remove(this);
+    }
+  }
+
+  render() {
+    const { routeIdToModeMap, departures } = this.props;
+    const { stackBelow } = this.state;
+
+    const { intervalRoutes, normalBusRoutes } = partitionToIntervalAndNonIntervalRoutes(
+      routeIdToModeMap,
+    );
+
+    const [nonBusDepartures, busDepartures] = partition(departures, it =>
+      intervalRoutes.has(trimRouteId(it.routeId)),
+    );
+    // Store for componentDidMount to check without re-partitioning
+    this.busDepartures = busDepartures;
+
+    const departureIntervalsByRoute = prepareOrderedDepartureHoursByRoute(nonBusDepartures);
+    sortBusRoutesLast(departureIntervalsByRoute.routeIds, routeIdToModeMap);
+
+    if (busDepartures.length === 0) {
+      return (
         <IntervalDisplay
           departureIntervalsByRoute={departureIntervalsByRoute}
           routeIdToModeMap={routeIdToModeMap}
-          isCompact={false}
+          isCompact
         />
-      </div>
-      <div className={styles.rightPanel}>
-        <div className={styles.busRoutesContainer}>
-          <InlineSVG key="clock_svg" className={styles.icon} src={clockIcon} />
-          <div className={styles.routeHeadings} style={{ color: getColor({ mode: BUS_MODE }) }}>
-            <InlineSVG className={styles.icon} src={getIcon({ mode: BUS_MODE })} />
-            {Array.from(normalBusRoutes).join(', ')}
-          </div>
+      );
+    }
+
+    return (
+      <div className={classNames(styles.flexContainer, { [styles.stackedLayout]: stackBelow })}>
+        <div
+          className={stackBelow ? styles.topPanel : styles.leftPanel}
+          ref={ref => {
+            this.leftPanel = ref;
+          }}>
+          <IntervalDisplay
+            departureIntervalsByRoute={departureIntervalsByRoute}
+            routeIdToModeMap={routeIdToModeMap}
+            isCompact={false}
+          />
         </div>
-        <TableRows className={tableRowsStyles.inset} departures={busDepartures} />
+        <div
+          className={stackBelow ? styles.bottomPanel : styles.rightPanel}
+          ref={ref => {
+            this.rightPanel = ref;
+          }}>
+          <div className={styles.busRoutesContainer}>
+            <InlineSVG key="clock_svg" className={styles.icon} src={clockIcon} />
+            <div className={styles.routeHeadings} style={{ color: getColor({ mode: BUS_MODE }) }}>
+              <InlineSVG className={styles.icon} src={getIcon({ mode: BUS_MODE })} />
+              {Array.from(normalBusRoutes).join(', ')}
+            </div>
+          </div>
+          <TableRows className={tableRowsStyles.inset} departures={busDepartures} />
+        </div>
       </div>
-    </div>
-  ) : (
-    <IntervalDisplay
-      departureIntervalsByRoute={departureIntervalsByRoute}
-      routeIdToModeMap={routeIdToModeMap}
-      isCompact
-    />
-  );
-};
+    );
+  }
+}
 
 IntervalTimetable.propTypes = {
   combinedDay: PropTypes.string.isRequired,

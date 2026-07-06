@@ -196,6 +196,20 @@
   min-width: 300px;
 }
 
+/* ─── Stacked layout (normal timetable has more rows than interval) ────────── */
+
+.stackedLayout {
+  flex-direction: column;
+}
+
+.topPanel {
+  width: 100%;
+}
+
+.bottomPanel {
+  width: 100%;
+}
+
 .busRoutesContainer {
   display: flex;
   gap: 12px;
