@@ -54,31 +54,40 @@ const mergeConsecutiveHoursWithSameDepartures = entries => {
   if (!entries.length) return [];
 
   const merged = [];
-  let { hours: startHour, intervals: prevIntervals } = entries[0];
+  let { hours: startHour, intervals: prevIntervals, hasPeNote: prevHasPeNote } = entries[0];
   let endHour = startHour;
+  let accumulatedHasPeNote = { ...prevHasPeNote };
 
   for (let i = 1; i < entries.length; i++) {
-    const { hours: currentHour, intervals } = entries[i];
+    const { hours: currentHour, intervals, hasPeNote } = entries[i];
     const prevHourNum = parseInt(endHour, 10);
 
     const sameDepartures = JSON.stringify(intervals) === JSON.stringify(prevIntervals);
 
     if (sameDepartures && parseInt(currentHour, 10) === prevHourNum + 1) {
       endHour = currentHour;
+      // OR-combine: if any hour in the merged range has a 'pe' note, mark it
+      for (const routeId of Object.keys(hasPeNote)) {
+        accumulatedHasPeNote[routeId] = !!accumulatedHasPeNote[routeId] || !!hasPeNote[routeId];
+      }
     } else {
       merged.push({
         hours: startHour === endHour ? startHour : `${startHour}-${endHour}`,
         intervals: prevIntervals,
+        hasPeNote: accumulatedHasPeNote,
       });
       startHour = currentHour;
       endHour = currentHour;
       prevIntervals = intervals;
+      prevHasPeNote = hasPeNote;
+      accumulatedHasPeNote = { ...hasPeNote };
     }
   }
 
   merged.push({
     hours: startHour === endHour ? startHour : `${startHour}-${endHour}`,
     intervals: prevIntervals,
+    hasPeNote: accumulatedHasPeNote,
   });
 
   return merged;
@@ -113,6 +122,7 @@ const groupDeparturesByHour = (filteredDepartures, routeIds) => {
       const lowestMinutes = {};
       const highestMinutes = {};
       const minutesByRoute = {};
+      const hasPeNote = {};
 
       for (const [routeId, items] of Object.entries(routeGroups)) {
         const minutesArray = items.map(item => item.minutes).sort((a, b) => a - b);
@@ -121,6 +131,7 @@ const groupDeparturesByHour = (filteredDepartures, routeIds) => {
         [lowestMinutes[routeId]] = minutesArray;
         highestMinutes[routeId] = minutesArray[minutesArray.length - 1];
         minutesByRoute[routeId] = minutesArray;
+        hasPeNote[routeId] = items.some(item => item.note && item.note.includes('pe'));
       }
 
       return {
@@ -131,6 +142,7 @@ const groupDeparturesByHour = (filteredDepartures, routeIds) => {
         lowestMinutes,
         highestMinutes,
         minutesByRoute,
+        hasPeNote,
       };
     },
   );

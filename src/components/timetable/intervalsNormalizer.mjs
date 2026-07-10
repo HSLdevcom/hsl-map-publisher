@@ -51,7 +51,11 @@ function normalizeByContiguousClusters(arr) {
  * }>}
  */
 export const normalizeDepartures = data => {
-  const result = data.map(r => ({ ...r, intervals: { ...r.intervals } }));
+  const result = data.map(r => ({
+    ...r,
+    intervals: { ...r.intervals },
+    hasPeNote: r.hasPeNote ? { ...r.hasPeNote } : {},
+  }));
   const keys = [...new Set(data.flatMap(r => Object.keys(r.intervals)))];
 
   for (const key of keys) {

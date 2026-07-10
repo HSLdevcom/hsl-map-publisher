@@ -131,13 +131,17 @@ const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompac
                     <div className={styles.departureCell} style={{ height: DEPARTURE_ROW_HEIGHT }}>
                       {firstDepartures[routeId] || ''}
                     </div>
-                    {groupedDepartures.map(({ hours, intervals }) => (
+                    {groupedDepartures.map(({ hours, intervals, hasPeNote }) => (
                       <div
                         key={hours}
                         className={styles.intervalCell}
                         style={{ height: INTERVAL_ROW_HEIGHT }}>
                         <span className={styles.interval}>
-                          {intervals[routeId] ? `${intervals[routeId]} min` : '-'}
+                          {intervals[routeId]
+                            ? `${intervals[routeId]} min${
+                                hasPeNote && hasPeNote[routeId] ? ' (pe)' : ''
+                              }`
+                            : '-'}
                         </span>
                       </div>
                     ))}
