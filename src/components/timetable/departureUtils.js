@@ -41,10 +41,36 @@ const filterNonDepotDepartures = departures =>
   departures.filter(d => !d.routeId.includes(DEPOT_RUNS_LETTER));
 
 /**
+ * Returns only depot-run departures (routeId contains 'H').
+ * @param {DepartureGroup[]} departures
+ * @returns {DepartureGroup[]}
+ */
+export const filterDepotDepartures = departures =>
+  departures.filter(d => d.routeId.includes(DEPOT_RUNS_LETTER));
+
+/**
  * @param {number} n
  * @returns {string}
  */
 const padHour = n => padStart(String(n), 2, '0');
+
+/**
+ * Groups depot departures by hour and returns sorted departure objects per hour.
+ * @param {DepartureGroup[]} depotDepartures
+ * @returns {Object<string, DepartureGroup[]>} map of padded hour string → departures sorted by minute
+ */
+export const groupDepotDeparturesByHour = depotDepartures => {
+  const byHour = {};
+  for (const d of depotDepartures) {
+    const hourKey = padHour(d.hours + (d.isNextDay ? 24 : 0));
+    if (!byHour[hourKey]) byHour[hourKey] = [];
+    byHour[hourKey].push(d);
+  }
+  for (const key of Object.keys(byHour)) {
+    byHour[key] = byHour[key].sort((a, b) => a.minutes - b.minutes);
+  }
+  return byHour;
+};
 
 /**
  * @param {Array<{hours: string, intervals: Object}>} entries

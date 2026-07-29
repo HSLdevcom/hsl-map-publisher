@@ -443,6 +443,7 @@ const propsMapper = mapProps(props => {
     dateBegin,
     dateEnd,
     intervalTimetable: props.intervalTimetable,
+    showDepotRuns: props.showDepotRuns,
     date: props.date,
     isSummerTimetable: props.isSummerTimetable,
     showValidityPeriod: props.showValidityPeriod,
@@ -478,6 +479,7 @@ const TimetableContainer = hoc(Timetable);
 
 TimetableContainer.defaultProps = {
   intervalTimetable: false,
+  showDepotRuns: false,
   dateBegin: null,
   dateEnd: null,
   isSummerTimetable: false,
@@ -499,6 +501,7 @@ TimetableContainer.defaultProps = {
 
 TimetableContainer.propTypes = {
   intervalTimetable: PropTypes.bool,
+  showDepotRuns: PropTypes.bool,
   stopId: PropTypes.string.isRequired,
   date: PropTypes.string.isRequired,
   dateBegin: PropTypes.string,

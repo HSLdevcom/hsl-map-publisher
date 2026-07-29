@@ -9,7 +9,7 @@ import classNames from 'classnames';
 
 import styles from './tableRows.css';
 
-const Departure = props => (
+export const Departure = props => (
   <div className={styles.item}>
     <div className={styles.minutes}>
       {props.minutes < 10 && '0'}

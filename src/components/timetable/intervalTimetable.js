@@ -13,8 +13,14 @@ import {
   groupRoutesByModeAndTrunk,
   computeCombinedColumn,
   compareRouteIds,
+  filterDepotDepartures,
+  groupDepotDeparturesByHour,
 } from './departureUtils';
-import TableRows, { getDuplicateCutOff, filterDuplicateDepartureHours } from './tableRows';
+import TableRows, {
+  getDuplicateCutOff,
+  filterDuplicateDepartureHours,
+  Departure,
+} from './tableRows';
 import styles from './intervalTimetable.css';
 import tableRowsStyles from './tableRows.css';
 
@@ -55,7 +61,12 @@ StripeBackground.propTypes = {
   paddingTop: PropTypes.number.isRequired,
 };
 
-const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompact }) => {
+const IntervalDisplay = ({
+  departureIntervalsByRoute,
+  routeIdToModeMap,
+  isCompact,
+  depotDeparturesByHour,
+}) => {
   const {
     groupedDepartures,
     routeIds,
@@ -99,16 +110,21 @@ const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompac
           </div>
         </div>
 
-        {/* Route groups */}
+        {/* Route groups + depot column appended inside the last group */}
         <div
           className={styles.routeGroupsContainer}
-          style={columnGroups.length === 1 ? { justifyContent: 'flex-start' } : undefined}>
-          {columnGroups.map(group => {
+          style={
+            columnGroups.length === 1 && !depotDeparturesByHour
+              ? { justifyContent: 'flex-start' }
+              : undefined
+          }>
+          {columnGroups.map((group, groupIdx) => {
             const groupColor = getColor({ mode: group.mode, trunkRoute: group.trunkRoute });
             const hasCombined = group.routeIds.length >= 1;
             const combinedIntervals = hasCombined
               ? computeCombinedColumn(group.routeIds, groupedDepartures)
               : null;
+            const isLastGroup = groupIdx === columnGroups.length - 1;
 
             return (
               <div
@@ -183,6 +199,49 @@ const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompac
                     />
                   </div>
                 )}
+                {/* Depot H column — appended inside the last route group's border */}
+                {isLastGroup && depotDeparturesByHour && (
+                  <div
+                    className={classNames(styles.routeColumn, styles.depotColumn)}
+                    style={{ '--depot-separator-color': groupColor }}>
+                    <div className={styles.headingCell} style={{ height: HEADING_ROW_HEIGHT }}>
+                      <div className={styles.routeHeadings} style={{ color: '#555' }}>
+                        H
+                      </div>
+                    </div>
+                    <div
+                      className={styles.departureCell}
+                      style={{ height: DEPARTURE_ROW_HEIGHT }}
+                    />
+                    {groupedDepartures.map(({ hours }) => {
+                      const lookupHour = hours.split('-')[0];
+                      const deps = depotDeparturesByHour[lookupHour];
+                      return (
+                        <div
+                          key={hours}
+                          className={styles.intervalCell}
+                          style={{ height: INTERVAL_ROW_HEIGHT }}>
+                          <div className={styles.depotMinutes}>
+                            {deps && deps.length > 0
+                              ? deps.map((d, i) => (
+                                  <Departure
+                                    key={i}
+                                    minutes={d.minutes}
+                                    routeId={d.routeId}
+                                    note={d.note}
+                                  />
+                                ))
+                              : null}
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <div
+                      className={styles.departureCell}
+                      style={{ height: DEPARTURE_ROW_HEIGHT }}
+                    />
+                  </div>
+                )}
               </div>
             );
           })}
@@ -196,10 +255,12 @@ IntervalDisplay.propTypes = {
   departureIntervalsByRoute: PropTypes.object.isRequired,
   routeIdToModeMap: PropTypes.object.isRequired,
   isCompact: PropTypes.bool,
+  depotDeparturesByHour: PropTypes.object,
 };
 
 IntervalDisplay.defaultProps = {
   isCompact: false,
+  depotDeparturesByHour: null,
 };
 
 export const partitionToIntervalAndNonIntervalRoutes = routeIdToModeMap => {
@@ -258,7 +319,7 @@ const estimateBusHeight = departures => {
   );
 };
 
-const IntervalTimetable = ({ routeIdToModeMap, departures }) => {
+const IntervalTimetable = ({ routeIdToModeMap, departures, showDepotRuns }) => {
   const { intervalRoutes, normalBusRoutes } = partitionToIntervalAndNonIntervalRoutes(
     routeIdToModeMap,
   );
@@ -270,12 +331,17 @@ const IntervalTimetable = ({ routeIdToModeMap, departures }) => {
   const departureIntervalsByRoute = prepareOrderedDepartureHoursByRoute(nonBusDepartures);
   sortBusRoutesLast(departureIntervalsByRoute.routeIds, routeIdToModeMap);
 
+  const depotDeparturesByHour = showDepotRuns
+    ? groupDepotDeparturesByHour(filterDepotDepartures(departures))
+    : null;
+
   if (busDepartures.length === 0) {
     return (
       <IntervalDisplay
         departureIntervalsByRoute={departureIntervalsByRoute}
         routeIdToModeMap={routeIdToModeMap}
         isCompact
+        depotDeparturesByHour={depotDeparturesByHour}
       />
     );
   }
@@ -291,6 +357,7 @@ const IntervalTimetable = ({ routeIdToModeMap, departures }) => {
           departureIntervalsByRoute={departureIntervalsByRoute}
           routeIdToModeMap={routeIdToModeMap}
           isCompact={false}
+          depotDeparturesByHour={depotDeparturesByHour}
         />
       </div>
       <div className={stackBelow ? styles.bottomPanel : styles.rightPanel}>
@@ -314,12 +381,14 @@ IntervalTimetable.propTypes = {
   intervalTimetable: PropTypes.bool,
   printableAsA4: PropTypes.bool,
   useCompactLayout: PropTypes.bool,
+  showDepotRuns: PropTypes.bool,
 };
 
 IntervalTimetable.defaultProps = {
   intervalTimetable: false,
   printableAsA4: false,
   useCompactLayout: false,
+  showDepotRuns: false,
 };
 
 export default IntervalTimetable;
