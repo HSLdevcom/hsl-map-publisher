@@ -44,11 +44,11 @@
 }
 
 .routeGroupsContainer {
-  flex: 1;
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  justify-content: space-evenly;
+  justify-content: flex-start;
+  gap: 6px;
 }
 
 /* ─── Hours column ───────────────────────────────────────────────────────── */
@@ -196,16 +196,53 @@
   min-width: 300px;
 }
 
+/* ─── Stacked layout (normal timetable has more rows than interval) ────────── */
+
+.stackedLayout {
+  flex-direction: column;
+}
+
+.topPanel {
+  width: 100%;
+}
+
+.bottomPanel {
+  width: 100%;
+}
+
 .busRoutesContainer {
   display: flex;
   gap: 12px;
   padding: 0 0 0.4em 0.938em;
 }
 
-/* ─── Icon ───────────────────────────────────────────────────────────────── */
+/* ─── Depot column (H) ───────────────────────────────────────────────────── */
 
-.icon {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
+.depotColumn {
+  position: relative;
+  min-width: 0;
+}
+
+.depotColumn::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background-color: var(--depot-separator-color);
+}
+
+.depotMinutes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  padding: 0 2px;
+}
+
+.depotMinutes > * {
+  min-width: 0;
+  padding: 0;
+  margin-right: 0.15em;
+  font-size: 13px;
 }

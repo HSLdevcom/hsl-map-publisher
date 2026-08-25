@@ -7,14 +7,22 @@ import InlineSVG from 'components/inlineSVG';
 import clockIcon from 'icons/clock.svg';
 import { getIcon, getColor, trimRouteId, BUS_MODE } from 'util/domain';
 import partition from 'lodash/partition';
+import groupBy from 'lodash/groupBy';
 import {
   prepareOrderedDepartureHoursByRoute,
   groupRoutesByModeAndTrunk,
   computeCombinedColumn,
+  compareRouteIds,
+  filterDepotDepartures,
+  groupDepotDeparturesByHour,
 } from './departureUtils';
+import TableRows, {
+  getDuplicateCutOff,
+  filterDuplicateDepartureHours,
+  Departure,
+} from './tableRows';
 import styles from './intervalTimetable.css';
 import tableRowsStyles from './tableRows.css';
-import TableRows from './tableRows';
 
 const INTERVAL_ROW_HEIGHT = 26;
 const HEADING_ROW_HEIGHT = 44;
@@ -53,7 +61,12 @@ StripeBackground.propTypes = {
   paddingTop: PropTypes.number.isRequired,
 };
 
-const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompact }) => {
+const IntervalDisplay = ({
+  departureIntervalsByRoute,
+  routeIdToModeMap,
+  isCompact,
+  depotDeparturesByHour,
+}) => {
   const {
     groupedDepartures,
     routeIds,
@@ -78,7 +91,7 @@ const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompac
           <div className={styles.labelCell} style={{ height: DEPARTURE_ROW_HEIGHT }}>
             <div className={styles.departureTitles}>
               <span>Ens.</span>
-              <span>Först. / First</span>
+              <span>Först. First</span>
             </div>
           </div>
           {groupedDepartures.map(({ hours }) => (
@@ -92,19 +105,26 @@ const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompac
           <div className={styles.labelCell} style={{ height: DEPARTURE_ROW_HEIGHT }}>
             <div className={styles.departureTitles}>
               <span>Viim.</span>
-              <span>Sist. / Last</span>
+              <span>Sist. Last</span>
             </div>
           </div>
         </div>
 
-        {/* Route groups */}
-        <div className={styles.routeGroupsContainer}>
-          {columnGroups.map(group => {
+        {/* Route groups + depot column appended inside the last group */}
+        <div
+          className={styles.routeGroupsContainer}
+          style={
+            columnGroups.length === 1 && !depotDeparturesByHour
+              ? { justifyContent: 'flex-start' }
+              : undefined
+          }>
+          {columnGroups.map((group, groupIdx) => {
             const groupColor = getColor({ mode: group.mode, trunkRoute: group.trunkRoute });
-            const hasCombined = group.routeIds.length >= 2;
+            const hasCombined = group.routeIds.length >= 1;
             const combinedIntervals = hasCombined
               ? computeCombinedColumn(group.routeIds, groupedDepartures)
               : null;
+            const isLastGroup = groupIdx === columnGroups.length - 1;
 
             return (
               <div
@@ -127,13 +147,17 @@ const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompac
                     <div className={styles.departureCell} style={{ height: DEPARTURE_ROW_HEIGHT }}>
                       {firstDepartures[routeId] || ''}
                     </div>
-                    {groupedDepartures.map(({ hours, intervals }) => (
+                    {groupedDepartures.map(({ hours, intervals, hasPeNote }) => (
                       <div
                         key={hours}
                         className={styles.intervalCell}
                         style={{ height: INTERVAL_ROW_HEIGHT }}>
                         <span className={styles.interval}>
-                          {intervals[routeId] ? `${intervals[routeId]} min` : '-'}
+                          {intervals[routeId]
+                            ? `${intervals[routeId]} min${
+                                hasPeNote && hasPeNote[routeId] ? ' (pe)' : ''
+                              }`
+                            : '-'}
                         </span>
                       </div>
                     ))}
@@ -164,11 +188,54 @@ const IntervalDisplay = ({ departureIntervalsByRoute, routeIdToModeMap, isCompac
                         key={hours}
                         className={styles.intervalCell}
                         style={{ height: INTERVAL_ROW_HEIGHT }}>
-                        <span className={styles.interval} style={{ color: groupColor }}>
+                        <span className={styles.interval}>
                           {combinedInterval ? `${combinedInterval} min` : '-'}
                         </span>
                       </div>
                     ))}
+                    <div
+                      className={styles.departureCell}
+                      style={{ height: DEPARTURE_ROW_HEIGHT }}
+                    />
+                  </div>
+                )}
+                {/* Depot H column — appended inside the last route group's border */}
+                {isLastGroup && depotDeparturesByHour && (
+                  <div
+                    className={classNames(styles.routeColumn, styles.depotColumn)}
+                    style={{ '--depot-separator-color': groupColor }}>
+                    <div className={styles.headingCell} style={{ height: HEADING_ROW_HEIGHT }}>
+                      <div className={styles.routeHeadings} style={{ color: '#555' }}>
+                        H
+                      </div>
+                    </div>
+                    <div
+                      className={styles.departureCell}
+                      style={{ height: DEPARTURE_ROW_HEIGHT }}
+                    />
+                    {groupedDepartures.map(({ hours }) => {
+                      const lookupHour = hours.split('-')[0];
+                      const deps = depotDeparturesByHour[lookupHour];
+                      return (
+                        <div
+                          key={hours}
+                          className={styles.intervalCell}
+                          style={{ height: INTERVAL_ROW_HEIGHT }}>
+                          <div className={styles.depotMinutes}>
+                            {deps && deps.length > 0
+                              ? deps.map((d, i) => (
+                                  <Departure
+                                    key={i}
+                                    minutes={d.minutes}
+                                    routeId={d.routeId}
+                                    note={d.note}
+                                  />
+                                ))
+                              : null}
+                          </div>
+                        </div>
+                      );
+                    })}
                     <div
                       className={styles.departureCell}
                       style={{ height: DEPARTURE_ROW_HEIGHT }}
@@ -188,10 +255,12 @@ IntervalDisplay.propTypes = {
   departureIntervalsByRoute: PropTypes.object.isRequired,
   routeIdToModeMap: PropTypes.object.isRequired,
   isCompact: PropTypes.bool,
+  depotDeparturesByHour: PropTypes.object,
 };
 
 IntervalDisplay.defaultProps = {
   isCompact: false,
+  depotDeparturesByHour: null,
 };
 
 export const partitionToIntervalAndNonIntervalRoutes = routeIdToModeMap => {
@@ -214,34 +283,84 @@ const sortBusRoutesLast = (routeIds, routeIdToModeMap) => {
   routeIds.sort((a, b) => {
     const aIsBus = routeIdToModeMap[a]?.mode === BUS_MODE;
     const bIsBus = routeIdToModeMap[b]?.mode === BUS_MODE;
-    if (aIsBus === bIsBus) return a.localeCompare(b);
+    if (aIsBus === bIsBus) return compareRouteIds(a, b);
     return aIsBus ? 1 : -1;
   });
 };
 
-const IntervalTimetable = ({ routeIdToModeMap, departures }) => {
+/**
+ * Estimates the rendered height of a bus timetable by counting visible rows
+ * and how many wrap-lines each row produces based on its departure count.
+ *
+ * Each departure item is ~56px wide (min-width: 3.75em at 15px font). The right
+ * panel is min-width 300px; the hours column takes ~70px, leaving ~230px for
+ * departure items → roughly 4 items fit per line before wrapping.
+ *
+ * Returns a unitless height score comparable to the interval table's row count
+ * (where each interval row is one unit tall).
+ */
+const ITEMS_PER_LINE = 4;
+
+const estimateBusHeight = departures => {
+  const departuresByHour = groupBy(departures, d => (d.isNextDay ? 24 : 0) + d.hours);
+  const rows = Object.entries(departuresByHour).map(([hours, deps]) => ({
+    hour: hours,
+    departures: deps,
+  }));
+  const rowsByHour = [];
+  for (let i = 0; i < rows.length; i++) {
+    const cutOff = getDuplicateCutOff(i, rows);
+    rowsByHour.push({ hour: rows[i].hour, departures: rows[i].departures });
+    i = cutOff;
+  }
+  return filterDuplicateDepartureHours(rowsByHour).reduce(
+    (sum, row) => sum + Math.ceil(row.departures.length / ITEMS_PER_LINE),
+    0,
+  );
+};
+
+const IntervalTimetable = ({ routeIdToModeMap, departures, showDepotRuns }) => {
   const { intervalRoutes, normalBusRoutes } = partitionToIntervalAndNonIntervalRoutes(
     routeIdToModeMap,
   );
 
   const [nonBusDepartures, busDepartures] = partition(departures, it =>
-    intervalRoutes.has(trimRouteId(it.routeId).replace(/[^0-9]/g, '')),
+    intervalRoutes.has(trimRouteId(it.routeId)),
   );
 
   const departureIntervalsByRoute = prepareOrderedDepartureHoursByRoute(nonBusDepartures);
-
   sortBusRoutesLast(departureIntervalsByRoute.routeIds, routeIdToModeMap);
 
-  return busDepartures.length > 0 ? (
-    <div className={styles.flexContainer}>
-      <div className={styles.leftPanel}>
+  const depotDeparturesByHour = showDepotRuns
+    ? groupDepotDeparturesByHour(filterDepotDepartures(departures))
+    : null;
+
+  if (busDepartures.length === 0) {
+    return (
+      <IntervalDisplay
+        departureIntervalsByRoute={departureIntervalsByRoute}
+        routeIdToModeMap={routeIdToModeMap}
+        isCompact
+        depotDeparturesByHour={depotDeparturesByHour}
+      />
+    );
+  }
+
+  const intervalRowCount = departureIntervalsByRoute.groupedDepartures.length;
+  const busHeight = estimateBusHeight(busDepartures);
+  const stackBelow = busHeight > intervalRowCount;
+
+  return (
+    <div className={classNames(styles.flexContainer, { [styles.stackedLayout]: stackBelow })}>
+      <div className={stackBelow ? styles.topPanel : styles.leftPanel}>
         <IntervalDisplay
           departureIntervalsByRoute={departureIntervalsByRoute}
           routeIdToModeMap={routeIdToModeMap}
           isCompact={false}
+          depotDeparturesByHour={depotDeparturesByHour}
         />
       </div>
-      <div className={styles.rightPanel}>
+      <div className={stackBelow ? styles.bottomPanel : styles.rightPanel}>
         <div className={styles.busRoutesContainer}>
           <InlineSVG key="clock_svg" className={styles.icon} src={clockIcon} />
           <div className={styles.routeHeadings} style={{ color: getColor({ mode: BUS_MODE }) }}>
@@ -252,12 +371,6 @@ const IntervalTimetable = ({ routeIdToModeMap, departures }) => {
         <TableRows className={tableRowsStyles.inset} departures={busDepartures} />
       </div>
     </div>
-  ) : (
-    <IntervalDisplay
-      departureIntervalsByRoute={departureIntervalsByRoute}
-      routeIdToModeMap={routeIdToModeMap}
-      isCompact
-    />
   );
 };
 
@@ -268,12 +381,14 @@ IntervalTimetable.propTypes = {
   intervalTimetable: PropTypes.bool,
   printableAsA4: PropTypes.bool,
   useCompactLayout: PropTypes.bool,
+  showDepotRuns: PropTypes.bool,
 };
 
 IntervalTimetable.defaultProps = {
   intervalTimetable: false,
   printableAsA4: false,
   useCompactLayout: false,
+  showDepotRuns: false,
 };
 
 export default IntervalTimetable;

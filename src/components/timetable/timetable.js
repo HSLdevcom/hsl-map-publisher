@@ -77,7 +77,7 @@ class Timetable extends Component {
   }
 
   render() {
-    const { combinedDays, routeIdToModeMap, intervalTimetable } = this.props;
+    const { combinedDays, routeIdToModeMap, intervalTimetable, showDepotRuns } = this.props;
     const date = new Date(`${this.props.date}T00:00:00`);
     if (!this.props.hasDepartures) {
       return null;
@@ -91,9 +91,7 @@ class Timetable extends Component {
     const effectiveInterval =
       intervalTimetable &&
       Object.values(combinedDays).some(dayDepartures =>
-        dayDepartures.some(it =>
-          intervalRoutes.has(trimRouteId(it.routeId).replace(/[^0-9]/g, '')),
-        ),
+        dayDepartures.some(it => intervalRoutes.has(trimRouteId(it.routeId))),
       );
     const opts = { year: 'numeric', month: 'numeric', day: 'numeric' };
     const today = new Date().toLocaleDateString('fi', opts);
@@ -190,8 +188,9 @@ class Timetable extends Component {
         )}
         {effectiveInterval && (
           <div className={styles.validFrom}>
-            Aikataulu alkaen {formatDate(date)} - / Tidtabeller fran {formatDate(date)} -
-            /Timetables from {formatDate(date)} -
+            <span>Aikataulu alkaen {formatDate(date)}</span>
+            <span>{`Tidtabeller från ${formatDate(date)}`}</span>
+            <span>{`Timetables from ${formatDate(date)}`}</span>
           </div>
         )}
 
@@ -235,15 +234,14 @@ class Timetable extends Component {
                 intervalTimetable={effectiveInterval}
               />
               {effectiveInterval &&
-              combinedDays[combinedDay].some(it =>
-                intervalRoutes.has(trimRouteId(it.routeId).replace(/[^0-9]/g, '')),
-              ) ? (
+              combinedDays[combinedDay].some(it => intervalRoutes.has(trimRouteId(it.routeId))) ? (
                 <IntervalTimetable
                   combinedDay={combinedDay}
                   routeIdToModeMap={routeIdToModeMap}
                   departures={combinedDays[combinedDay]}
                   printableAsA4={this.props.printableAsA4}
                   useCompactLayout={this.props.useCompactLayout}
+                  showDepotRuns={showDepotRuns}
                 />
               ) : (
                 <TableRows departures={this.props.combinedDays[combinedDay]} />
@@ -265,6 +263,7 @@ class Timetable extends Component {
 
 Timetable.defaultProps = {
   intervalTimetable: false,
+  showDepotRuns: false,
   saturdays: null,
   sundays: null,
   isSummerTimetable: false,
@@ -288,6 +287,7 @@ Timetable.defaultProps = {
 
 Timetable.propTypes = {
   intervalTimetable: PropTypes.bool,
+  showDepotRuns: PropTypes.bool,
   saturdays: PropTypes.arrayOf(PropTypes.shape(TableRows.propTypes.departures)),
   sundays: PropTypes.arrayOf(PropTypes.shape(TableRows.propTypes.departures)),
   notes: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,

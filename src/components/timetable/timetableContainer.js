@@ -311,13 +311,12 @@ const propsMapper = mapProps(props => {
         .filter(routeSegment =>
           filterRoute({ routeId: routeSegment.routeId, filter: props.routeFilter }),
         )
-        .map(seg => [
-          trimRouteId(seg.routeId),
-          {
-            mode: get(seg, 'route.nodes[0].mode'),
-            trunkRoute: seg.line.nodes[0].trunkRoute === '1',
-          },
-        ]),
+        .map(seg => {
+          const trimmed = trimRouteId(seg.routeId);
+          const mode = get(seg, 'route.nodes[0].mode');
+          const trunkRoute = seg.line.nodes[0].trunkRoute === '1';
+          return [trimmed, { mode, trunkRoute }];
+        }),
     ),
   );
 
@@ -444,6 +443,7 @@ const propsMapper = mapProps(props => {
     dateBegin,
     dateEnd,
     intervalTimetable: props.intervalTimetable,
+    showDepotRuns: props.showDepotRuns,
     date: props.date,
     isSummerTimetable: props.isSummerTimetable,
     showValidityPeriod: props.showValidityPeriod,
@@ -479,6 +479,7 @@ const TimetableContainer = hoc(Timetable);
 
 TimetableContainer.defaultProps = {
   intervalTimetable: false,
+  showDepotRuns: false,
   dateBegin: null,
   dateEnd: null,
   isSummerTimetable: false,
@@ -500,6 +501,7 @@ TimetableContainer.defaultProps = {
 
 TimetableContainer.propTypes = {
   intervalTimetable: PropTypes.bool,
+  showDepotRuns: PropTypes.bool,
   stopId: PropTypes.string.isRequired,
   date: PropTypes.string.isRequired,
   dateBegin: PropTypes.string,
