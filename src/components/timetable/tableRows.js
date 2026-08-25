@@ -9,7 +9,7 @@ import classNames from 'classnames';
 
 import styles from './tableRows.css';
 
-const Departure = props => (
+export const Departure = props => (
   <div className={styles.item}>
     <div className={styles.minutes}>
       {props.minutes < 10 && '0'}
@@ -166,13 +166,12 @@ const TableRows = props => {
   const filteredDepartures = filterDuplicateDepartureHours(rowsByHour);
 
   return (
-    <div className={styles.root}>
+    <div className={classNames(styles.root, props.className)}>
       {filteredDepartures.map(departuresHour => (
         <TableRow
           key={`${departuresHour.hour}${departuresHour.departures}`}
           hours={departuresHour.hour}
           departures={departuresHour.departures}
-          className={props.noPadLeft ? styles.noPadLeft : undefined}
           useCompactLayout
         />
       ))}
@@ -187,11 +186,11 @@ TableRows.propTypes = {
       ...Departure.propTypes,
     }),
   ).isRequired,
-  noPadLeft: PropTypes.bool,
+  className: PropTypes.string,
 };
 
 TableRows.defaultProps = {
-  noPadLeft: false,
+  className: undefined,
 };
 
 export default TableRows;

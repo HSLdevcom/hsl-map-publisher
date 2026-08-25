@@ -5,27 +5,15 @@ import classNames from 'classnames';
 import styles from './tableHeader.css';
 
 const TableHeader = props => {
-  const style = props.intervalTimetable ? { fontSize: '19.5px' } : undefined;
-  const header = props.printAsA3 ? (
-    <div className={styles.inline} style={style}>
-      <span>
+  const titleStyle = props.intervalTimetable ? { fontSize: '19.5px' } : undefined;
+  const header = (
+    <div className={styles.inline}>
+      <span className={styles.strong}>
         {' '}
         &nbsp;&nbsp;
         {props.subtitleSw}
       </span>
-      <span className={styles.italics}>
-        &nbsp;&nbsp;
-        {props.subtitleEn}
-      </span>
-    </div>
-  ) : (
-    <div className={styles.inline} style={style}>
-      <span>
-        {' '}
-        &nbsp;&nbsp;
-        {props.subtitleSw}
-      </span>
-      <span className={styles.italics}>
+      <span className={styles.strong}>
         &nbsp;&nbsp;
         {props.subtitleEn}
       </span>
@@ -33,7 +21,9 @@ const TableHeader = props => {
   );
   return (
     <div className={styles.root}>
-      <div className={classNames(styles.title, { [styles.compactTitle]: props.useCompactLayout })}>
+      <div
+        className={classNames(styles.title, { [styles.compactTitle]: props.useCompactLayout })}
+        style={titleStyle}>
         <span className={styles.strong}>{props.title}</span>
         {header}
       </div>

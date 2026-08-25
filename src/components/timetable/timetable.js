@@ -7,7 +7,8 @@ import classNames from 'classnames';
 import TableHeader from './tableHeader';
 import TableRows from './tableRows';
 import SimpleRoutes from './simpleRoutes';
-import IntervalTimetable from './intervalTimetable';
+import IntervalTimetable, { partitionToIntervalAndNonIntervalRoutes } from './intervalTimetable';
+import { trimRouteId } from 'util/domain';
 
 import styles from './timetable.css';
 
@@ -76,11 +77,22 @@ class Timetable extends Component {
   }
 
   render() {
-    const { combinedDays, routeIdToModeMap, intervalTimetable } = this.props;
+    const { combinedDays, routeIdToModeMap, intervalTimetable, showDepotRuns } = this.props;
     const date = new Date(`${this.props.date}T00:00:00`);
     if (!this.props.hasDepartures) {
       return null;
     }
+
+    // Only treat this as an interval timetable if there are actually interval departures.
+    // If intervalTimetable=true but all routes are normal buses, fall back to normal rendering.
+    const intervalRoutes = intervalTimetable
+      ? partitionToIntervalAndNonIntervalRoutes(routeIdToModeMap).intervalRoutes
+      : null;
+    const effectiveInterval =
+      intervalTimetable &&
+      Object.values(combinedDays).some(dayDepartures =>
+        dayDepartures.some(it => intervalRoutes.has(trimRouteId(it.routeId))),
+      );
     const opts = { year: 'numeric', month: 'numeric', day: 'numeric' };
     const today = new Date().toLocaleDateString('fi', opts);
     const address = this.props.addressFi ? ` ${this.props.addressFi},` : '';
@@ -107,6 +119,7 @@ class Timetable extends Component {
           [styles.printable]: this.props.printableAsA4,
           [styles.standalone]: this.props.standalone,
           [styles.greyscale]: this.props.greyscale,
+          [styles.interval]: effectiveInterval,
         })}
         ref={ref => {
           this.content = ref;
@@ -143,7 +156,7 @@ class Timetable extends Component {
               {this.props.showPrintButton ? <PrintButton lang={this.props.lang} /> : ''}
             </div>
           )}
-          {this.props.showValidityPeriod && !intervalTimetable && (
+          {this.props.showValidityPeriod && !effectiveInterval && (
             <div
               className={classNames(styles.validity, {
                 [styles.coverPageMargin]: this.props.showCoverPage,
@@ -166,17 +179,18 @@ class Timetable extends Component {
             </div>
           )}
         </div>
-        {this.props.showComponentName && !intervalTimetable && (
+        {this.props.showComponentName && !effectiveInterval && (
           <div className={styles.componentName}>
             <div className={styles.title}>Pysäkkiaikataulu&nbsp;&nbsp;</div>
             <div className={styles.subtitle}>Hållplatstidtabell</div>
             <div className={styles.subtitle}>Stop timetable</div>
           </div>
         )}
-        {intervalTimetable && (
+        {effectiveInterval && (
           <div className={styles.validFrom}>
-            Aikataulu alkaen {formatDate(date)} - / Tidtabeller fran {formatDate(date)} -
-            /Timetables from {formatDate(date)} -
+            <span>Aikataulu alkaen {formatDate(date)}</span>
+            <span>{`Tidtabeller från ${formatDate(date)}`}</span>
+            <span>{`Timetables from ${formatDate(date)}`}</span>
           </div>
         )}
 
@@ -217,15 +231,17 @@ class Timetable extends Component {
                 subtitleEn={enTitle}
                 printingAsA4={this.props.printableAsA4}
                 useCompactLayout={this.props.useCompactLayout}
-                intervalTimetable={intervalTimetable}
+                intervalTimetable={effectiveInterval}
               />
-              {intervalTimetable ? (
+              {effectiveInterval &&
+              combinedDays[combinedDay].some(it => intervalRoutes.has(trimRouteId(it.routeId))) ? (
                 <IntervalTimetable
                   combinedDay={combinedDay}
                   routeIdToModeMap={routeIdToModeMap}
                   departures={combinedDays[combinedDay]}
                   printableAsA4={this.props.printableAsA4}
                   useCompactLayout={this.props.useCompactLayout}
+                  showDepotRuns={showDepotRuns}
                 />
               ) : (
                 <TableRows departures={this.props.combinedDays[combinedDay]} />
@@ -247,6 +263,7 @@ class Timetable extends Component {
 
 Timetable.defaultProps = {
   intervalTimetable: false,
+  showDepotRuns: false,
   saturdays: null,
   sundays: null,
   isSummerTimetable: false,
@@ -270,6 +287,7 @@ Timetable.defaultProps = {
 
 Timetable.propTypes = {
   intervalTimetable: PropTypes.bool,
+  showDepotRuns: PropTypes.bool,
   saturdays: PropTypes.arrayOf(PropTypes.shape(TableRows.propTypes.departures)),
   sundays: PropTypes.arrayOf(PropTypes.shape(TableRows.propTypes.departures)),
   notes: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,

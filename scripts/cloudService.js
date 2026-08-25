@@ -156,7 +156,6 @@ async function downloadPostersFromCloud(posterIds, spreadSheetIds) {
           const content = await streamToString(downloadResponse.readableStreamBody);
           await fs.outputFile(csvPath(id), content);
           downloadedPosterIds.push(id);
-          return;
         } catch (err) {
           console.log(err);
           console.log(`Something went wrong downloading blob ${id}.csv`);
