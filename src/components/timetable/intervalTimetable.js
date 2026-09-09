@@ -334,13 +334,18 @@ const IntervalTimetable = ({ routeIdToModeMap, departures, showDepotRuns }) => {
     it.routeId.includes(DEPOT_RUNS_LETTER),
   );
 
-  // Only depot runs belonging to an interval-eligible route (trunk bus, tram,
-  // metro, rail) should be grouped into the interval display's shared "H"
-  // column. Depot runs belonging to a normal bus route are not related to the
-  // interval routes shown above and belong in the bus table below, in their
-  // own route's row, like any other departure.
-  const [intervalDepotDepartures, busDepotDepartures] = partition(depotDepartures, it =>
-    intervalRoutes.has(trimRouteId(getBaseRouteId(it.routeId))),
+  // Only depot runs whose base routeId is confirmed to be a normal bus route
+  // belong in the bus table below, in that route's own row, like any other
+  // departure. Everything else — depot runs belonging to an interval-eligible
+  // route (trunk bus, tram, metro, rail), AND depot runs whose base routeId
+  // doesn't match any known route at all (e.g. "HE"-style ids that don't
+  // parse cleanly yet) — default to the interval display's shared "H" column,
+  // since we're already generating an interval timetable here.
+  // TODO: fix getBaseRouteId to correctly parse all depot routeId formats
+  // (e.g. "100HE4"/"100HE5" don't fit the "route + H + variant digit" shape),
+  // then this fallback can be removed/tightened.
+  const [busDepotDepartures, intervalDepotDepartures] = partition(depotDepartures, it =>
+    normalBusRoutes.has(trimRouteId(getBaseRouteId(it.routeId))),
   );
 
   const [nonBusDepartures, plainBusDepartures] = partition(plainDepartures, it =>
