@@ -1,4 +1,4 @@
-FROM node:20-bullseye-slim AS production
+FROM node:20-bookworm-slim AS production
 
 RUN apt-get -y update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -yq wget curl gnupg fontconfig fonts-liberation ca-certificates --no-install-recommends \

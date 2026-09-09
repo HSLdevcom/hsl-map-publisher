@@ -13,8 +13,8 @@ import {
   groupRoutesByModeAndTrunk,
   computeCombinedColumn,
   compareRouteIds,
-  filterDepotDepartures,
   groupDepotDeparturesByHour,
+  DEPOT_RUNS_LETTER,
 } from './departureUtils';
 import TableRows, {
   getDuplicateCutOff,
@@ -319,20 +319,46 @@ const estimateBusHeight = departures => {
   );
 };
 
+// Depot routeIds carry a trailing depot letter (e.g. "1017H") on top of their
+// real route's id, which breaks a plain trimRouteId/intervalRoutes lookup.
+// Strip the trailing depot letter first so we can tell which "real" route a
+// depot departure belongs to.
+const getBaseRouteId = routeId => routeId.replace(new RegExp(`${DEPOT_RUNS_LETTER}$`), '');
+
 const IntervalTimetable = ({ routeIdToModeMap, departures, showDepotRuns }) => {
   const { intervalRoutes, normalBusRoutes } = partitionToIntervalAndNonIntervalRoutes(
     routeIdToModeMap,
   );
 
-  const [nonBusDepartures, busDepartures] = partition(departures, it =>
+  const [depotDepartures, plainDepartures] = partition(departures, it =>
+    it.routeId.includes(DEPOT_RUNS_LETTER),
+  );
+
+  // Only depot runs belonging to an interval-eligible route (trunk bus, tram,
+  // metro, rail) should be grouped into the interval display's shared "H"
+  // column. Depot runs belonging to a normal bus route are not related to the
+  // interval routes shown above and belong in the bus table below, in their
+  // own route's row, like any other departure.
+  const [intervalDepotDepartures, busDepotDepartures] = partition(depotDepartures, it =>
+    intervalRoutes.has(trimRouteId(getBaseRouteId(it.routeId))),
+  );
+
+  const [nonBusDepartures, plainBusDepartures] = partition(plainDepartures, it =>
     intervalRoutes.has(trimRouteId(it.routeId)),
   );
+
+  // Reunite bus-route depot departures with the rest of their route's
+  // departures so they render in their own row in the bus table, instead of
+  // being lumped into the interval display's shared "H" column.
+  const busDepartures = showDepotRuns
+    ? [...plainBusDepartures, ...busDepotDepartures]
+    : plainBusDepartures;
 
   const departureIntervalsByRoute = prepareOrderedDepartureHoursByRoute(nonBusDepartures);
   sortBusRoutesLast(departureIntervalsByRoute.routeIds, routeIdToModeMap);
 
   const depotDeparturesByHour = showDepotRuns
-    ? groupDepotDeparturesByHour(filterDepotDepartures(departures))
+    ? groupDepotDeparturesByHour(intervalDepotDepartures)
     : null;
 
   if (busDepartures.length === 0) {
