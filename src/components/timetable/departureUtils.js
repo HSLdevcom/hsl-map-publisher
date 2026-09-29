@@ -31,13 +31,13 @@ export { computeCombinedColumn } from './combinedColumn.mjs';
  * @property {number} avgInterval - average interval in minutes, 60 if only one departure
  */
 
-const DEPOT_RUNS_LETTER = 'H';
+export const DEPOT_RUNS_LETTER = 'H';
 
 /**
  * @param {DepartureGroup[]} departures
  * @returns {DepartureGroup[]}
  */
-const filterNonDepotDepartures = departures =>
+export const filterNonDepotDepartures = departures =>
   departures.filter(d => !d.routeId.includes(DEPOT_RUNS_LETTER));
 
 /**
