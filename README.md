@@ -9,6 +9,8 @@ If ticket zone regions are changed, remember to update [ticket-zones-polygons.js
 
 ### Dependencies
 
+Requires Node.js >= 22.12.0.
+
 Install dependencies:
 
 ```
