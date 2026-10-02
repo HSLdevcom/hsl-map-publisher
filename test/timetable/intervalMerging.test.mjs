@@ -4,7 +4,10 @@ import { normalizeDepartures } from '../../src/components/timetable/intervalsNor
 
 function assertNormalized(input, expected) {
   const output = normalizeDepartures(input);
-  assert.deepStrictEqual(output, expected);
+  assert.deepStrictEqual(
+    output,
+    expected.map(e => ({ hasPeNote: {}, ...e })),
+  );
 }
 
 test('No change', () => {
