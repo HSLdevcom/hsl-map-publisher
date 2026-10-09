@@ -11,7 +11,7 @@ name: "CI/CD: Continuous integration and continuous deployment"
 
 jobs:
   build-check-test-push:
-    uses: HSLdevcom/transitdata-shared-workflows/.github/workflows/ci-cd-typescript.yml@feature/codecov-action-v5.5.5
+    uses: HSLdevcom/transitdata-shared-workflows/.github/workflows/ci-cd-typescript.yml@feature/megalinter
     secrets: inherit
     with:
       checkAndTestOutsideDocker: true
