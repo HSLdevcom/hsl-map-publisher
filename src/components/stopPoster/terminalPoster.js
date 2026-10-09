@@ -328,7 +328,6 @@ class TerminalPoster extends Component {
       dateEnd,
       mapZoneSymbols,
       mapZones,
-      salesPoint,
       minimapZoneSymbols,
       minimapZones,
       legend,
@@ -464,7 +463,6 @@ class TerminalPoster extends Component {
                           }
                           mapZoneSymbols={mapZoneSymbols}
                           mapZones={mapZones}
-                          showSalesPoint={salesPoint}
                           minimapZoneSymbols={minimapZoneSymbols}
                           minimapZones={minimapZones}
                           legend={legend}
@@ -517,7 +515,6 @@ TerminalPoster.propTypes = {
   template: PropTypes.any.isRequired,
   mapZoneSymbols: PropTypes.bool,
   mapZones: PropTypes.bool,
-  salesPoint: PropTypes.bool,
   minimapZoneSymbols: PropTypes.bool,
   minimapZones: PropTypes.bool,
   routeFilter: PropTypes.string,
@@ -532,7 +529,6 @@ TerminalPoster.defaultProps = {
   dateEnd: null,
   mapZoneSymbols: false,
   mapZones: false,
-  salesPoint: false,
   minimapZoneSymbols: false,
   minimapZones: false,
   routeFilter: '',
