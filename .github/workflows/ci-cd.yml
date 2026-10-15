@@ -16,7 +16,7 @@ jobs:
       contents: read
       packages: read
     # ponytail: SHA of feature/megalinter head; repin to a release tag/SHA on main after merge
-    uses: HSLdevcom/transitdata-shared-workflows/.github/workflows/ci-cd-typescript.yml@47f143871a8b94f013e55b3529f0202eea98714f  # feature/megalinter
+    uses: HSLdevcom/transitdata-shared-workflows/.github/workflows/ci-cd-typescript.yml@553e348b679cffb9cf561f1da88d8dcd4ace3b3e  # feature/megalinter
     secrets: inherit  # zizmor: ignore[secrets-inherit] shared workflow declares no secrets: block
     with:
       checkAndTestOutsideDocker: true
