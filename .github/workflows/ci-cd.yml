@@ -1,4 +1,3 @@
----
 name: "CI/CD: Continuous integration and continuous deployment"
 
 "on":
@@ -9,10 +8,16 @@ name: "CI/CD: Continuous integration and continuous deployment"
       - "v*"
   pull_request:
 
+permissions: {}
+
 jobs:
   build-check-test-push:
-    uses: HSLdevcom/transitdata-shared-workflows/.github/workflows/ci-cd-typescript.yml@feature/codecov-action-v5.5.5
-    secrets: inherit
+    permissions:
+      contents: read
+      packages: read
+    # ponytail: SHA of feature/megalinter head; repin to a release tag/SHA on main after merge
+    uses: HSLdevcom/transitdata-shared-workflows/.github/workflows/ci-cd-typescript.yml@47f143871a8b94f013e55b3529f0202eea98714f  # feature/megalinter
+    secrets: inherit  # zizmor: ignore[secrets-inherit] shared workflow declares no secrets: block
     with:
       checkAndTestOutsideDocker: true
       performRelease: false

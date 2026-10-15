@@ -1,0 +1,50 @@
+# Extends shared HSL defaults; only publisher-specific overrides below.
+EXTENDS:
+  - https://raw.githubusercontent.com/HSLdevcom/transitdata-shared-workflows/feature/megalinter/megalinter/base.yml
+
+VALIDATE_ALL_CODEBASE: true  # CI overrides on pull requests
+
+# Generated / vendor / data dirs
+FILTER_REGEX_EXCLUDE: '(^|/)(node_modules|dist|build|output|output-v2|fonts|test/results|\.idea|\.husky|lcov\.info|junit\.xml|package-lock\.json)(/|$)'
+
+JAVASCRIPT_DEFAULT_STYLE: prettier
+MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .markdownlint.yml
+
+# Extra disables on top of the shared list (lists are replaced, not merged, so repeat the shared ones)
+DISABLE_LINTERS:
+  - COPYPASTE_JSCPD
+  - SPELL_CSPELL
+  - SPELL_LYCHEE
+  - REPOSITORY_DEVSKIM
+  - REPOSITORY_GRYPE
+  - REPOSITORY_OSV_SCANNER
+  - REPOSITORY_KINGFISHER
+  - REPOSITORY_BETTERLEAKS
+  - REPOSITORY_DUSTILOCK
+  - REPOSITORY_SECRETLINT
+  - REPOSITORY_TRUFFLEHOG
+  - REPOSITORY_CHECKOV
+  - JAVASCRIPT_STANDARD
+  # Project formats with Prettier 1.x via ESLint; the image's Prettier 3 would reformat ~all files.
+  - JAVASCRIPT_PRETTIER
+  - JSON_PRETTIER
+  - YAML_PRETTIER
+  # ESLint runs via `npm run lint` (ESLint 8 + airbnb); the image's ESLint 10 crashes on @babel/eslint-parser.
+  # ponytail: re-enable after an ESLint 9+/flat-config migration
+  - JAVASCRIPT_ES
+  - JSX_ESLINT
+  - JSON_ESLINT_PLUGIN_JSONC
+  - HTML_DJLINT  # no template HTML
+  - HTML_HTMLHINT
+
+# Advisory until legacy findings are cleaned up (see shared list + these)
+DISABLE_ERRORS_LINTERS:
+  - CSS_STYLELINT
+  - MARKDOWN_MARKDOWNLINT
+  - MARKDOWN_MARKDOWN_TABLE_FORMATTER
+  - MARKDOWN_REMARK_LINT
+  - REPOSITORY_TRIVY
+  - DOCKERFILE_HADOLINT
+  - YAML_V8R
+  - BASH_SHELLCHECK
+  - YAML_YAMLLINT

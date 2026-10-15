@@ -1,5 +1,4 @@
 .root {
-  margin: 0.938em 0;
   font-family: GothamRounded-Book;
   color: var(--timetable-text-color);
   break-after: avoid;

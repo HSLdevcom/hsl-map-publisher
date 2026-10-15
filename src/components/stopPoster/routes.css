@@ -36,7 +36,7 @@
   width: auto;
   align-items: center;
   max-width: 750px;
-  padding: 0px;
+  padding: 0;
 }
 
 .column.a3 {
@@ -45,7 +45,7 @@
 }
 
 .column.a3:nth-child(even) {
-  padding-right: 0px;
+  padding-right: 0;
 }
 
 .group {
@@ -71,8 +71,7 @@
 .simple .groupA4 {
   height: auto;
   margin-top: 0.25rem;
-  flex-wrap: nowrap;
-  flex-direction: row;
+  flex-flow: row nowrap;
   align-items: flex-start;
   justify-content: flex-start;
 }
@@ -105,12 +104,13 @@
 
 .routeTitles {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-flow: row wrap;
 }
 
 .title {
-  /* padding-right: 0.893em; */ /* Removed to allow more space for overflow */
+  /* padding-right: 0.893em; */
+
+  /* Removed to allow more space for overflow */
   font-family: GothamXNarrow-Medium;
   font-size: 0.83em;
 }

@@ -2,7 +2,7 @@
   margin: 0 1rem 1rem 1.2rem;
   font-size: 0.8em;
   font-family: GothamRounded-Book;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .timetableDates {

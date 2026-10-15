@@ -6,6 +6,9 @@
   "scripts": {
     "eslint-check": "eslint --print-config . | eslint-config-prettier-check",
     "prettier": "prettier \"src/**/*.{js,css}\" \"scripts/**/*.js\" \"migrations/**/*.js\" \"seeds/**/*.js\" \"*.js\" --write",
+    "lint:mega": "npx --yes mega-linter-runner@9 --flavor all --release v9.6.0",
+    "lint:mega:fix": "npx --yes mega-linter-runner@9 --flavor all --release v9.6.0 --fix",
+    "lint:mega:changed": "npx --yes mega-linter-runner@9 --flavor all --release v9.6.0 -e VALIDATE_ALL_CODEBASE=false",
     "lint": "eslint \"src/**/*.js\" \"scripts/**/*.js\" --fix",
     "build": "cross-env NODE_ENV=production webpack --config webpack.prod.js",
     "test:unit": "node --test --experimental-test-coverage --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=lcov.info --test-reporter=junit --test-reporter-destination=junit.xml \"test/**/*.test.mjs\"",

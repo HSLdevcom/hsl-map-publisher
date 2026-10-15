@@ -15,3 +15,5 @@ secrets
 
 lcov.info
 junit.xml
+
+megalinter-reports/
