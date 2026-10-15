@@ -12,3 +12,8 @@ output/*
 !.env.template
 secrets
 /test/results/*
+
+lcov.info
+junit.xml
+
+megalinter-reports/

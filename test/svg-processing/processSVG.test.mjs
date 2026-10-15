@@ -51,7 +51,7 @@ for (const svgFile of svgFiles) {
     const originalSvg = fs.readFileSync(svgPath, 'utf-8');
     const processedSvg = processSVGWithUniqueIds(originalSvg);
 
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
 
     try {
       const originalScreenshot = await renderSvgToBuffer(browser, originalSvg);
@@ -83,7 +83,7 @@ for (const svgFile of svgFiles) {
     const processedOnce = processSVGWithUniqueIds(originalSvg);
     const processedTwice = processSVGWithUniqueIds(processedOnce);
 
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
 
     try {
       const originalScreenshot = await renderSvgToBuffer(browser, originalSvg);

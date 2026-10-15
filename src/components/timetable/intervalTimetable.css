@@ -3,6 +3,7 @@
 .intervalDisplay {
   position: relative;
   color: black;
+
   /* Stretch to fill .root including its horizontal padding */
   margin-left: calc(-1 * var(--border-radius) / 2);
   margin-right: calc(-1 * var(--border-radius) / 2);
@@ -14,13 +15,11 @@
 
 .stripeBackground {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  inset: 0;
   display: flex;
   flex-direction: column;
   pointer-events: none;
+
   /* padding-top/bottom set inline to align stripes with interval rows */
 }
 
