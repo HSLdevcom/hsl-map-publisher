@@ -1,0 +1,9 @@
+# Extends shared HSL defaults; only publisher-specific overrides below.
+EXTENDS:
+  - https://raw.githubusercontent.com/HSLdevcom/transitdata-shared-workflows/71cbe48a811140df7f0e3650f4387167800946a3/megalinter/base.yml
+LINTER_RULES_PATH: https://raw.githubusercontent.com/HSLdevcom/transitdata-shared-workflows/71cbe48a811140df7f0e3650f4387167800946a3/megalinter/linters
+
+# Generated / vendor / data dirs
+FILTER_REGEX_EXCLUDE: '(^|/)(node_modules|dist|build|output|output-v2|fonts|test/results|\.idea|\.husky|lcov\.info|junit\.xml|package-lock\.json)(/|$)'
+
+MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .markdownlint.yml

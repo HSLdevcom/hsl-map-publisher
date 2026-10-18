@@ -1,0 +1,13 @@
+{
+  "extends": "stylelint-config-standard",
+  "rules": {
+    "selector-class-pattern": null,
+    "font-family-no-missing-generic-family-keyword": null,
+    "color-function-notation": null,
+    "alpha-value-notation": null,
+    "color-hex-length": null,
+    "value-keyword-case": null,
+    "no-descending-specificity": null,
+    "property-no-unknown": [true, { "ignoreProperties": ["composes"] }]
+  }
+}
