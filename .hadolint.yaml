@@ -1,0 +1,2 @@
+ignored:
+  - DL3008  # apt pinning: Chrome/fonts packages are intentionally unpinned

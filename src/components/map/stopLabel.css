@@ -3,7 +3,7 @@
   margin: 5px;
   white-space: nowrap;
   color: black;
-  background: hsla(0, 0%, 100%, 0.8);
+  background: hsl(0deg, 0%, 100%, 0.8);
 }
 
 .title {

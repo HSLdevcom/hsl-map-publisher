@@ -3,7 +3,9 @@
   width: 100%;
   border-radius: 30px;
   color: var(--hsl-blue);
+
   --timetable-accent-color: white;
+
   font-size: 16px;
 }
 
@@ -30,13 +32,14 @@
 
 .tableRowsContainer {
   display: flex;
+
   /* flex-direction: row; */
   padding-top: 10px;
   max-width: 1171px;
 }
 
 .tableRowsContainer > *:first-child {
-  padding-left: 0px;
+  padding-left: 0;
 }
 
 .root.standalone {

@@ -11,7 +11,7 @@ th {
 }
 
 table {
-  border-spacing: 0px;
+  border-spacing: 0;
 }
 
 .rowContainer > *:nth-child(odd) {

@@ -4,15 +4,18 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    cooldown:
+      default-days: 7
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
     cooldown:
+      default-days: 30
       semver-major-days: 90
       semver-minor-days: 60
       semver-patch-days: 30
-    groups: 
+    groups:
       major:
         update-types:
           - "major"

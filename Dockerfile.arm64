@@ -6,10 +6,9 @@ RUN apt-get -y update \
         --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-# Install azcopy - auto-detect architecture
-RUN ARCH=$(dpkg --print-architecture) && \
-    AZCOPY_URL="https://github.com/Azure/azure-storage-azcopy/releases/download/v10.24.0/azcopy_linux_arm64_10.24.0.tar.gz" && \
-    wget -O /tmp/azcopy.tar.gz "$AZCOPY_URL" && \
+# Install azcopy (arm64)
+RUN AZCOPY_URL="https://github.com/Azure/azure-storage-azcopy/releases/download/v10.24.0/azcopy_linux_arm64_10.24.0.tar.gz" && \
+    wget -q -O /tmp/azcopy.tar.gz "$AZCOPY_URL" && \
     tar -xzf /tmp/azcopy.tar.gz -C /tmp && \
     find /tmp -name "azcopy" -type f -exec mv {} /usr/local/bin/azcopy \; && \
     chmod +x /usr/local/bin/azcopy && \

@@ -1,14 +1,14 @@
 .header {
   display: flex;
   margin-bottom: 1rem;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
   break-inside: avoid;
   break-after: avoid;
 }
 
 .lineId {
   font-size: 2rem;
-  margin: 2rem 2rem 0 2rem;
+  margin: 2rem 2rem 0;
   font-family: GothamRounded-Medium;
 }
 
