@@ -9,7 +9,7 @@
 }
 
 .emptyColumn {
-  width: 0px;
+  width: 0;
 }
 
 .diagram {
@@ -23,7 +23,7 @@
 }
 
 .a3root {
-  margin: 0px;
+  margin: 0;
   color: black;
   min-width: 389.5px;
   background: white;
