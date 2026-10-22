@@ -59,7 +59,7 @@
 .url {
   position: absolute;
   font-size: 20px;
-  font-family: GothamXNarrow-Medium;
+  font-family: GothamXNarrow-Medium, serif;
   color: black;
   padding: 2px 0;
 }

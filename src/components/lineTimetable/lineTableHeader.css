@@ -19,7 +19,7 @@
 .stop-name-primary {
   font-size: 1rem;
   margin: 0 0 0.2rem 1.2rem;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   letter-spacing: normal;
   break-inside: avoid;
 }
@@ -27,11 +27,11 @@
 .stop-name-secondary {
   font-size: 1rem;
   margin: 0 0 0 1.2rem;
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
   letter-spacing: normal;
 }
 
 .direction-bracket {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   font-size: 1rem;
 }

@@ -34,7 +34,7 @@
 }
 
 .hour {
-  font-family: GothamXNarrow-Medium;
+  font-family: GothamXNarrow-Medium, serif;
   font-size: 15px;
   width: 1.5rem;
   margin-right: 0.5em;
@@ -51,7 +51,7 @@
 .minutes {
   display: flex;
   min-width: 0.9em;
-  font-family: GothamXNarrow-Book;
+  font-family: GothamXNarrow-Book, serif;
   font-size: 12px;
   letter-spacing: -0.02em;
   line-height: 1;

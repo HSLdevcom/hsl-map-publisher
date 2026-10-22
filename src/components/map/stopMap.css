@@ -45,7 +45,7 @@
 .legend-text {
   color: black;
   margin-left: 10px;
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
   font-size: 0.9em;
   white-space: nowrap;
 }
@@ -112,7 +112,7 @@
 }
 
 .primary-legend-text {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
 }
 
 .italics {
@@ -139,7 +139,7 @@
 
 .attribution {
   margin: 8px 0;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   color: black;
 }
 
@@ -147,13 +147,13 @@
 .subtitle {
   margin: 3px 8px 3px 3px;
   font-size: 18px;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   color: black;
 }
 
 .subtitle {
   margin-left: 0;
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
 }
 
 .center {
@@ -163,7 +163,7 @@
 }
 
 .zone-heading {
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
   font-size: 20px;
   vertical-align: middle;
   line-height: 1.1rem;

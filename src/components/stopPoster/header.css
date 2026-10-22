@@ -2,12 +2,12 @@
 .subtitle,
 .stop {
   font-size: 80px;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   white-space: nowrap;
 }
 
 .subtitle {
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
 }
 
 .small {
@@ -57,6 +57,6 @@
   left: 50%;
   text-align: center;
   line-height: 1;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   text-transform: uppercase;
 }

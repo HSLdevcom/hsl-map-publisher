@@ -38,24 +38,24 @@
 }
 
 .component-name > .title {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
 }
 
 .component-name > .subtitle {
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
 }
 
 .subtitle-a3 {
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
   font-size: 0.75em;
 }
 
 .component-name-a3 > .title-a3 {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
 }
 
 .component-name-a3 > .subtitle-a3 {
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
 }
 
 .start {
@@ -75,13 +75,13 @@
 }
 
 .start .title {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   font-size: 18px;
   line-height: 22px;
 }
 
 .start .title-a3 {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   font-size: 0.8em;
   line-height: 22px;
 }

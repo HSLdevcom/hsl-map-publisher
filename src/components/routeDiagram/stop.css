@@ -24,12 +24,12 @@
 }
 
 .title {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   font-size: 11px;
 }
 
 .subtitle {
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
   font-size: 11px;
 }
 
@@ -45,7 +45,7 @@
   justify-content: left;
   font-size: 0.5em;
   padding: 0 0.285em 0 0;
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
 }
 
 .title-container {
@@ -67,7 +67,7 @@
   font-size: 0.5em;
   white-space: initial;
   padding-bottom: 2px;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
 }
 
 .icon {

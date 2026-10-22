@@ -1,19 +1,19 @@
 .timetable-days {
   margin: 0 1rem 1rem 1.2rem;
   font-size: 0.8em;
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
   overflow-wrap: break-word;
 }
 
 .timetable-dates {
   margin: 0 1rem 1rem 2rem;
   font-size: 0.8em;
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
 }
 
 .footnote {
   padding: 0.125em 0.625em;
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
   font-size: 0.813em;
 }
 
@@ -33,7 +33,7 @@
 
 .friday-note {
   margin-left: 1.5rem;
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
   font-size: 12px;
 }
 
@@ -42,7 +42,7 @@
 }
 
 .page-number {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   font-size: 16px;
   color: black;
   position: absolute;

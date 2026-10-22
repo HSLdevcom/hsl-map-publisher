@@ -13,11 +13,11 @@
 }
 
 .component-name > .title {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
 }
 
 .component-name > .subtitle {
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
 }
 
 .diagram {

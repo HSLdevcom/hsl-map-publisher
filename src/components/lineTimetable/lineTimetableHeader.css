@@ -9,7 +9,7 @@
 .line-id {
   font-size: 2rem;
   margin: 2rem 2rem 0;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
 }
 
 .name-container {
@@ -18,10 +18,10 @@
 
 .line-name {
   font-size: 20px;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
 }
 
 .line-name-secondary {
   font-size: 20px;
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
 }

@@ -1,7 +1,7 @@
 .cover-page-container {
   height: 1110px;
   width: 100%;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
 }
 
 .greyscale {
@@ -22,7 +22,7 @@
 }
 
 .stop-row {
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
   font-size: 0.8rem;
   padding: 3px 0;
 }

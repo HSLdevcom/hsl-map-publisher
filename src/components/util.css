@@ -53,7 +53,7 @@
 .ps-text {
   text-anchor: middle;
   dominant-baseline: middle;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   fill: var(--hsl-blue);
 }
 

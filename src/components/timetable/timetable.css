@@ -73,24 +73,24 @@
 }
 
 .title {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   white-space: nowrap;
   font-size: 0.9em;
 }
 
 .subtitle {
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
   font-size: 0.9em;
 }
 
 .footnote {
   padding: 0.125em 0.625em;
-  font-family: GothamXNarrow-Book;
+  font-family: GothamXNarrow-Book, serif;
   font-size: 0.813em;
 }
 
 .validity {
-  font-family: GothamXNarrow-Book;
+  font-family: GothamXNarrow-Book, serif;
   font-size: 0.75em;
   line-height: 1.1;
   letter-spacing: -0.025em;
@@ -103,12 +103,12 @@
 }
 
 .validity .short-id {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   font-size: 1.75em;
 }
 
 .address {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   font-size: 0.6rem;
   color: black;
   position: absolute;
@@ -117,7 +117,7 @@
 }
 
 .validity .title {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
 }
 
 .stop-zone {
@@ -132,14 +132,14 @@
 .zone-subtitle {
   font-size: 0.75em;
   line-height: 1.1;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   white-space: nowrap;
   margin-right: 0.4em;
 }
 
 .zone-subtitle {
   font-size: 0.75em;
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
 }
 
 .zone {
@@ -160,7 +160,7 @@
   left: 50%;
   text-align: center;
   line-height: 1;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   text-transform: uppercase;
 }
 

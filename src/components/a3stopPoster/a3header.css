@@ -28,14 +28,14 @@
 .zone-heading {
   display: flex;
   font-size: 15px;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   color: var(--timetable-text-color);
 }
 
 .zone-letter {
   display: flex;
   font-size: 1.9em;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   width: 60px;
   height: 60px;
   color: rgb(255 255 255);
@@ -63,14 +63,14 @@
 
 .id {
   padding: 0 12px;
-  font-family: GothamXNarrow-Medium;
+  font-family: GothamXNarrow-Medium, serif;
   font-size: 1.2em;
 }
 
 .simple .id {
   font-size: 0.83em;
   padding: 0 0.25em 0 0;
-  font-family: GothamXNarrow-Medium;
+  font-family: GothamXNarrow-Medium, serif;
 }
 
 .stop-title-container {
@@ -80,7 +80,7 @@
 .stop-title {
   font-size: 1em;
   color: var(--timetable-text-color);
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
 }
 
 .stop-id-container {
@@ -94,7 +94,7 @@
 .stop-id-title {
   font-size: 10px;
   color: var(--timetable-text-color);
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
 }
 
 .stop-id {
@@ -105,7 +105,7 @@
   text-align: center;
   border: 5px solid var(--timetable-text-color);
   border-radius: 10px;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
 }
 
 .simplest-routes {
@@ -121,12 +121,12 @@
 .title,
 .subtitle {
   padding-right: 0.893em;
-  font-family: GothamXNarrow-Medium;
+  font-family: GothamXNarrow-Medium, serif;
   font-size: 0.63em;
 }
 
 .subtitle {
-  font-family: GothamXNarrow-Book;
+  font-family: GothamXNarrow-Book, serif;
 }
 
 .simple .title,

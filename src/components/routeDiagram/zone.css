@@ -36,7 +36,7 @@
 }
 
 .zone-heading {
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
   font-size: 11px;
   vertical-align: middle;
   line-height: 1.1rem;
@@ -46,7 +46,7 @@
 }
 
 .zone-heading strong {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
 }
 
 .zone-icon {
@@ -55,7 +55,7 @@
   height: 1.3rem;
   margin-left: 5px;
   padding: 0;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   font-size: 1rem;
   text-align: center;
   line-height: 1.4;

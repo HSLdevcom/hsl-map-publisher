@@ -1,3 +1,5 @@
+/* font-family rules end in `serif` (not `sans-serif`) to keep Chrome's default
+   fallback when Gotham is not installed, so renders without fonts stay unchanged. */
 @font-face {
   font-family: GothamRounded-Book;
   src: local('Gotham Rounded Book'), local('GothamRounded-Book');
