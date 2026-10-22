@@ -1,12 +1,13 @@
-.title {
+.title,
+.subtitle,
+.stop {
   font-size: 80px;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   white-space: nowrap;
 }
 
 .subtitle {
-  composes: title;
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
 }
 
 .small {
@@ -19,7 +20,6 @@
 }
 
 .stop {
-  composes: title;
   margin-top: 10px;
   padding: 0 20px;
   font-size: 55px;
@@ -28,12 +28,12 @@
   border-radius: 10px;
 }
 
-.stopZoneColumn {
+.stop-zone-column {
   display: flex;
   flex-direction: row;
 }
 
-.zoneHeading {
+.zone-heading {
   margin-right: 50px;
 }
 
@@ -51,12 +51,12 @@
 
 /* TODO: Fix each letter. Current is best for C. */
 
-.zoneLetter {
+.zone-letter {
   position: absolute;
   top: 50%;
   left: 50%;
   text-align: center;
   line-height: 1;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   text-transform: uppercase;
 }

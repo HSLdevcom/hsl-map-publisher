@@ -1,3 +1,5 @@
+/* font-family rules end in `serif` (not `sans-serif`) to keep Chrome's default
+   fallback when Gotham is not installed, so renders without fonts stay unchanged. */
 @font-face {
   font-family: GothamRounded-Book;
   src: local('Gotham Rounded Book'), local('GothamRounded-Book');
@@ -33,9 +35,9 @@ body {
 }
 
 :root {
-  --hsl-blue: rgb(0, 122, 201);
-  --timetable-text-color: rgb(0, 122, 201);
-  --hsl-blue-light: rgb(213, 232, 250);
+  --hsl-blue: rgb(0 122 201);
+  --timetable-text-color: rgb(0 122 201);
+  --hsl-blue-light: rgb(213 232 250);
   --background: var(--hsl-blue);
   --light-background: var(--hsl-blue-light);
   --border-radius: 56px;

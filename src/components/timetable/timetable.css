@@ -18,7 +18,7 @@
   height: 20px;
 }
 
-.validFrom {
+.valid-from {
   padding: 0.313em 0.45em;
   color: black;
   font-size: 12.75px;
@@ -63,34 +63,34 @@
   padding: 0 0 0 0.4em;
 }
 
-.headerTitle {
+.header-title {
   font-size: 1.75em;
 }
 
-.componentName {
+.component-name {
   padding: 0 0 0 0.205em;
   font-size: 1.875em;
 }
 
 .title {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   white-space: nowrap;
   font-size: 0.9em;
 }
 
 .subtitle {
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
   font-size: 0.9em;
 }
 
 .footnote {
   padding: 0.125em 0.625em;
-  font-family: GothamXNarrow-Book;
+  font-family: GothamXNarrow-Book, serif;
   font-size: 0.813em;
 }
 
 .validity {
-  font-family: GothamXNarrow-Book;
+  font-family: GothamXNarrow-Book, serif;
   font-size: 0.75em;
   line-height: 1.1;
   letter-spacing: -0.025em;
@@ -102,13 +102,13 @@
   right: var(--border-radius);
 }
 
-.validity .shortId {
-  font-family: GothamRounded-Medium;
+.validity .short-id {
+  font-family: GothamRounded-Medium, serif;
   font-size: 1.75em;
 }
 
 .address {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   font-size: 0.6rem;
   color: black;
   position: absolute;
@@ -117,10 +117,10 @@
 }
 
 .validity .title {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
 }
 
-.stopZone {
+.stop-zone {
   padding-left: 0.5em;
   margin-top: 0.875em;
   display: flex;
@@ -128,18 +128,18 @@
   align-items: center;
 }
 
-.zoneTitle {
+.zone-title,
+.zone-subtitle {
   font-size: 0.75em;
   line-height: 1.1;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   white-space: nowrap;
   margin-right: 0.4em;
 }
 
-.zoneSubtitle {
+.zone-subtitle {
   font-size: 0.75em;
-  composes: zoneTitle;
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
 }
 
 .zone {
@@ -153,18 +153,18 @@
   border-radius: 50%;
 }
 
-.zoneLetter {
+.zone-letter {
   font-size: 1.25em;
   position: absolute;
   top: 50%;
   left: 50%;
   text-align: center;
   line-height: 1;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   text-transform: uppercase;
 }
 
-.printBtn {
+.print-btn {
   margin-left: 2rem;
   background-color: var(--hsl-blue);
   margin-top: 1.5rem;
@@ -177,20 +177,20 @@
   border: none;
 }
 
-.printBtn:hover {
+.print-btn:hover {
   background-color: white;
   cursor: pointer;
   color: var(--hsl-blue);
   border: 1px solid var(--hsl-blue);
 }
 
-.coverPageMargin {
+.cover-page-margin {
   top: 1160px;
 }
 
 @media print {
-  .noPrint,
-  .noPrint * {
+  .no-print,
+  .no-print * {
     display: none !important;
   }
 }

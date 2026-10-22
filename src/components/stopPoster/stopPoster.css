@@ -26,28 +26,28 @@
   justify-content: space-between;
 }
 
-.column {
+.column,
+.left,
+.left-stretched,
+.right {
   display: flex;
   flex-flow: column;
   align-items: stretch;
 }
 
 .left {
-  composes: column;
   width: 639px;
 }
 
-.leftStretched {
-  composes: column;
+.left-stretched {
   width: 780px;
 }
 
 .right {
-  composes: column;
   flex: 1;
 }
 
-.adsContainer {
+.ads-container {
   display: flex;
   flex-direction: column;
   flex: 1 1 100%;
@@ -73,15 +73,15 @@
 /*
  Poster 700 x 1000mm / 1984px x 2835px @ 72 ppi
 */
-.smallTerminalPoster {
+.small-terminal-poster {
   width: calc(1984px + 30px);
   height: calc(2835px + 30px);
 }
 
-.smallTerminalPoster .left {
+.small-terminal-poster .left {
   width: 570px;
 }
 
-.smallTerminalPoster .leftStretched {
+.small-terminal-poster .left-stretched {
   width: 670px;
 }

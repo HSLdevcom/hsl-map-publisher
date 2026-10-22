@@ -82,7 +82,7 @@ const TableRows = props => {
   const getRowAndHeader = (departuresHour, index) => (
     <div>
       {departuresHour.segment && (
-        <div className={styles.a3tableHeaderContainer}>
+        <div className={styles.a3TableHeaderContainer}>
           <TableHeader
             title={departuresHour.segment}
             subtitleSw={SEGMENT_TEXTS[departuresHour.segment].sv}
@@ -101,7 +101,7 @@ const TableRows = props => {
   );
   return (
     <div
-      className={classnames(styles.a3container, {
+      className={classnames(styles.a3Container, {
         [styles.wide]: props.useWide,
         [styles.diagram]: diagramExists.length > 0,
       })}>
@@ -131,7 +131,7 @@ const TableRows = props => {
           return (
             <div
               key={`tableRows_${index}`}
-              className={classnames(styles.a3root, {
+              className={classnames(styles.a3Root, {
                 [styles.summer]: props.isSummerTimetable,
               })}>
               {content}

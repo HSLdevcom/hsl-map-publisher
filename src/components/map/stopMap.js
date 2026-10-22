@@ -200,8 +200,8 @@ const getLegend = (stops, subwayEntrances) => {
       case 'L_RAIL':
         return (
           <div key={mode} className={styles.legendRow}>
-            <div className={classNames(styles.legendLine, styles.l_rail)} />
-            <div className={classNames(styles.legendIcon, styles.l_rail)} />
+            <div className={classNames(styles.legendLine, styles.lRail)} />
+            <div className={classNames(styles.legendIcon, styles.lRail)} />
             <div className={styles.legendText}>
               <span className={styles.primaryLegendText}>Pikaratikka</span>
               {' / '}

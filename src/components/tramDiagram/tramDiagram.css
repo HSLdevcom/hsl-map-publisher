@@ -5,19 +5,19 @@
   position: relative;
 }
 
-.componentName {
+.component-name {
   padding: 42px;
   font-size: 30px;
   color: var(--hsl-blue);
   position: absolute;
 }
 
-.componentName > .title {
-  font-family: GothamRounded-Medium;
+.component-name > .title {
+  font-family: GothamRounded-Medium, serif;
 }
 
-.componentName > .subtitle {
-  font-family: GothamRounded-Book;
+.component-name > .subtitle {
+  font-family: GothamRounded-Book, serif;
 }
 
 .diagram {
