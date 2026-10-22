@@ -27,7 +27,7 @@
   min-width: 4.2em;
 }
 
-.a3Title {
+.a3-title {
   font-size: 0.8em;
 }
 
@@ -39,18 +39,18 @@
   display: inline;
 }
 
-.compactTitle {
+.compact-title {
   font-size: 0.8em;
 }
 
-.compactSubtitle {
+.compact-subtitle {
   font-size: 0.5em;
 }
 
-.compactRoot {
+.compact-root {
   margin: 0.5em 0;
 }
 
-.compactPadding {
+.compact-padding {
   padding-top: 0.15em;
 }

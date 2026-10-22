@@ -1,4 +1,4 @@
-.coverPageContainer {
+.cover-page-container {
   height: 1110px;
   width: 100%;
   font-family: GothamRounded-Medium;
@@ -21,13 +21,13 @@
   margin: 10px 2rem;
 }
 
-.stopRow {
+.stop-row {
   font-family: GothamRounded-Book;
   font-size: 0.8rem;
   padding: 3px 0;
 }
 
-.rowContainer {
+.row-container {
   margin-top: 1rem;
   margin-left: 2rem;
 }

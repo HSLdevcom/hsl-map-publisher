@@ -6,22 +6,22 @@
   break-after: avoid;
 }
 
-.lineId {
+.line-id {
   font-size: 2rem;
   margin: 2rem 2rem 0;
   font-family: GothamRounded-Medium;
 }
 
-.nameContainer {
+.name-container {
   padding-top: 2rem;
 }
 
-.lineName {
+.line-name {
   font-size: 20px;
   font-family: GothamRounded-Medium;
 }
 
-.lineNameSecondary {
+.line-name-secondary {
   font-size: 20px;
   font-family: GothamRounded-Book;
 }

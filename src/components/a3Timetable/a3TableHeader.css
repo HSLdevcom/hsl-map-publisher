@@ -5,11 +5,11 @@
   margin: 0;
 }
 
-.root.largerPaddingTop {
+.root.larger-padding-top {
   padding-top: 0.25em;
 }
 
-.root.noPaddingTop {
+.root.no-padding-top {
   margin: 0;
 }
 
@@ -33,19 +33,19 @@
   align-items: center;
 }
 
-.subtitleContent {
+.subtitle-content {
   padding-left: 5px;
 }
 
-.subtitleContentExtraPadding {
+.subtitle-content-extra-padding {
   padding-left: 10px;
 }
 
-.a3Title {
+.a3-title {
   font-size: 0.8em;
 }
 
-.timeLogo {
+.time-logo {
   height: 30px;
   width: 30px;
 }

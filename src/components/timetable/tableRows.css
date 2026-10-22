@@ -27,7 +27,8 @@
   background-color: var(--timetable-accent-color);
 }
 
-.item {
+.item,
+.hours {
   display: flex;
   min-width: 3.75em;
   padding: 0.25em 0;
@@ -44,11 +45,10 @@
 }
 
 .hours {
-  composes: item;
   padding-left: 0.938em;
   font-family: GothamXNarrow-Medium;
 }
 
-.compactRow {
+.compact-row {
   font-size: 10px;
 }

@@ -12,7 +12,7 @@
   height: 87px;
 }
 
-.infoContainer {
+.info-container {
   display: flex;
 }
 
@@ -25,14 +25,14 @@
   align-items: center;
 }
 
-.zoneHeading {
+.zone-heading {
   display: flex;
   font-size: 15px;
   font-family: GothamRounded-Medium;
   color: var(--timetable-text-color);
 }
 
-.zoneLetter {
+.zone-letter {
   display: flex;
   font-size: 1.9em;
   font-family: GothamRounded-Medium;
@@ -44,7 +44,7 @@
   justify-content: space-evenly;
 }
 
-.routesContainer {
+.routes-container {
   display: flex;
   flex-flow: row wrap;
 }
@@ -73,17 +73,17 @@
   font-family: GothamXNarrow-Medium;
 }
 
-.stopTitleContainer {
+.stop-title-container {
   padding-right: 20px;
 }
 
-.stopTitle {
+.stop-title {
   font-size: 1em;
   color: var(--timetable-text-color);
   font-family: GothamRounded-Book;
 }
 
-.stopIdContainer {
+.stop-id-container {
   display: flex;
   flex-flow: column;
   align-items: center;
@@ -91,13 +91,13 @@
   padding-right: 5px;
 }
 
-.stopIdTitle {
+.stop-id-title {
   font-size: 10px;
   color: var(--timetable-text-color);
   font-family: GothamRounded-Medium;
 }
 
-.stopId {
+.stop-id {
   color: var(--timetable-text-color);
   margin-top: 5px;
   padding: 0 20px;
@@ -108,7 +108,7 @@
   font-family: GothamRounded-Medium;
 }
 
-.simplestRoutes {
+.simplest-routes {
   font-size: 0.73em;
   display: flex;
   flex-wrap: wrap;
@@ -118,17 +118,18 @@
   color: var(--timetable-text-color);
 }
 
-.title {
+.title,
+.subtitle {
   padding-right: 0.893em;
   font-family: GothamXNarrow-Medium;
   font-size: 0.63em;
 }
 
-.simple .title {
-  padding-right: 0.25em;
+.subtitle {
+  font-family: GothamXNarrow-Book;
 }
 
-.subtitle {
-  composes: title;
-  font-family: GothamXNarrow-Book;
+.simple .title,
+.simple .subtitle {
+  padding-right: 0.25em;
 }

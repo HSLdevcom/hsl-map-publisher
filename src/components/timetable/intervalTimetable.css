@@ -1,6 +1,6 @@
 /* ─── Outer container ────────────────────────────────────────────────────── */
 
-.intervalDisplay {
+.interval-display {
   position: relative;
   color: black;
 
@@ -13,7 +13,7 @@
 
 /* ─── Stripe background — absolutely fills the container ─────────────────── */
 
-.stripeBackground {
+.stripe-background {
   position: absolute;
   inset: 0;
   display: flex;
@@ -23,18 +23,18 @@
   /* padding-top/bottom set inline to align stripes with interval rows */
 }
 
-.stripeRow {
+.stripe-row {
   width: 100%;
   flex-shrink: 0;
 }
 
-.stripeRowAlt {
+.stripe-row-alt {
   background-color: var(--timetable-accent-color);
 }
 
 /* ─── Column layout — on top of stripes ──────────────────────────────────── */
 
-.columnLayout {
+.column-layout {
   position: relative;
   z-index: 1;
   display: flex;
@@ -42,7 +42,7 @@
   align-items: stretch;
 }
 
-.routeGroupsContainer {
+.route-groups-container {
   display: flex;
   flex-direction: row;
   align-items: stretch;
@@ -52,7 +52,7 @@
 
 /* ─── Hours column ───────────────────────────────────────────────────────── */
 
-.hoursColumn {
+.hours-column {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -60,20 +60,20 @@
 
 /* ─── Route group wrapper — single border element ────────────────────────── */
 
-.routeGroup {
+.route-group {
   display: flex;
   flex-direction: row;
   border-radius: 8px;
   margin: 0 3px;
 }
 
-.routeGroupBordered {
+.route-group-bordered {
   border: 2px solid;
 }
 
 /* ─── Individual route column ────────────────────────────────────────────── */
 
-.routeColumn {
+.route-column {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -83,14 +83,14 @@
 
 /* ─── Combined headway column — left border separator ────────────────────── */
 
-.combinedColumn {
+.combined-column {
   position: relative;
   width: max-content;
   min-width: max-content;
   flex-shrink: 0;
 }
 
-.combinedColumn::before {
+.combined-column::before {
   content: '';
   position: absolute;
   left: 0;
@@ -102,7 +102,7 @@
 
 /* ─── Heading cell (fixed height set inline) ─────────────────────────────── */
 
-.headingCell {
+.heading-cell {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -112,7 +112,7 @@
 
 /* ─── Departure value cell (fixed height set inline) ─────────────────────── */
 
-.departureCell {
+.departure-cell {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -123,7 +123,7 @@
 
 /* ─── Label cell in hours column (fixed height set inline) ───────────────── */
 
-.labelCell {
+.label-cell {
   display: flex;
   align-items: center;
   box-sizing: border-box;
@@ -131,7 +131,7 @@
 
 /* ─── Individual interval cell (height set inline) ───────────────────────── */
 
-.intervalCell {
+.interval-cell {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -141,7 +141,7 @@
 
 /* ─── Hours interval cell (height set inline) ────────────────────────────── */
 
-.intervalHoursCell {
+.interval-hours-cell {
   display: flex;
   align-items: center;
   box-sizing: border-box;
@@ -149,7 +149,7 @@
 
 /* ─── Route heading ──────────────────────────────────────────────────────── */
 
-.routeHeadings {
+.route-headings {
   display: flex;
   gap: 0.2em;
   font-size: 20px;
@@ -158,7 +158,7 @@
 
 /* ─── Combined headway heading text ─────────────────────────────────────── */
 
-.combinedHeading {
+.combined-heading {
   display: flex;
   flex-direction: column;
   font-size: 11px;
@@ -169,7 +169,7 @@
 
 /* ─── Departure label stacks ─────────────────────────────────────────────── */
 
-.departureTitles {
+.departure-titles {
   display: flex;
   flex-direction: column;
   font-size: 13px;
@@ -178,38 +178,38 @@
 
 /* ─── Two-panel split layout ─────────────────────────────────────────────── */
 
-.flexContainer {
+.flex-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   gap: calc((1 * var(--border-radius)) + 8px);
 }
 
-.leftPanel {
+.left-panel {
   flex: 1 1 auto;
   min-width: 0;
 }
 
-.rightPanel {
+.right-panel {
   flex: 1 1 300px;
   min-width: 300px;
 }
 
 /* ─── Stacked layout (normal timetable has more rows than interval) ────────── */
 
-.stackedLayout {
+.stacked-layout {
   flex-direction: column;
 }
 
-.topPanel {
+.top-panel {
   width: 100%;
 }
 
-.bottomPanel {
+.bottom-panel {
   width: 100%;
 }
 
-.busRoutesContainer {
+.bus-routes-container {
   display: flex;
   gap: 12px;
   padding: 0 0 0.4em 0.938em;
@@ -217,12 +217,12 @@
 
 /* ─── Depot column (H) ───────────────────────────────────────────────────── */
 
-.depotColumn {
+.depot-column {
   position: relative;
   min-width: 0;
 }
 
-.depotColumn::before {
+.depot-column::before {
   content: '';
   position: absolute;
   left: 0;
@@ -232,14 +232,14 @@
   background-color: var(--depot-separator-color);
 }
 
-.depotMinutes {
+.depot-minutes {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
   padding: 0 2px;
 }
 
-.depotMinutes > * {
+.depot-minutes > * {
   min-width: 0;
   padding: 0;
   margin-right: 0.15em;

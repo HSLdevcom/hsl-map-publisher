@@ -3,19 +3,19 @@
   margin: 5px;
 }
 
-.routeId {
+.route-id {
   font-family: GothamXNarrow-Medium;
   font-size: 28px;
   margin-right: 5px;
 }
 
-.title {
+.title,
+.subtitle {
   margin-right: 5px;
   font-family: GothamRounded-Medium;
   font-size: 13px;
 }
 
 .subtitle {
-  composes: title;
   font-family: GothamRounded-Book;
 }

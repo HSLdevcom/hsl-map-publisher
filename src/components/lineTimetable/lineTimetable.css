@@ -1,11 +1,11 @@
-.timetableDays {
+.timetable-days {
   margin: 0 1rem 1rem 1.2rem;
   font-size: 0.8em;
   font-family: GothamRounded-Book;
   overflow-wrap: break-word;
 }
 
-.timetableDates {
+.timetable-dates {
   margin: 0 1rem 1rem 2rem;
   font-size: 0.8em;
   font-family: GothamRounded-Book;
@@ -17,31 +17,31 @@
   font-size: 0.813em;
 }
 
-.pageBreak {
+.page-break {
   break-inside: auto;
 }
 
-.timetableDivider {
+.timetable-divider {
   margin-top: 1rem;
   width: 100%;
   border-bottom: 2px dotted gray;
 }
 
-.timetableContainer {
+.timetable-container {
   display: block;
 }
 
-.fridayNote {
+.friday-note {
   margin-left: 1.5rem;
   font-family: GothamRounded-Book;
   font-size: 12px;
 }
 
-.notesContainer {
+.notes-container {
   margin: 0.5rem 0 1rem 0.5rem;
 }
 
-.pageNumber {
+.page-number {
   font-family: GothamRounded-Medium;
   font-size: 16px;
   color: black;
@@ -52,20 +52,20 @@
   height: fit-content;
 }
 
-.printBtnContainer {
+.print-btn-container {
   position: absolute;
   left: 680px;
   top: 20px;
 }
 
 @media print {
-  .noPrint,
-  .noPrint * {
+  .no-print,
+  .no-print * {
     display: none !important;
   }
 
-  .timetableContainer,
-  .timetableContainer * {
+  .timetable-container,
+  .timetable-container * {
     break-inside: avoid;
   }
 }

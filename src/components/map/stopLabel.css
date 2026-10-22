@@ -3,7 +3,7 @@
   margin: 5px;
   white-space: nowrap;
   color: black;
-  background: hsl(0deg, 0%, 100%, 0.8);
+  background: hsl(0deg 0% 100% / 80%);
 }
 
 .title {
@@ -31,17 +31,17 @@
   font-family: GothamRounded-Medium;
 }
 
-.destinationLight {
+.destination-light {
   font-family: GothamRounded-Book;
 }
 
-.flexContainer {
+.flex-container {
   display: flex;
   flex-direction: row;
   justify-content: left;
 }
 
-.destinationContainer {
+.destination-container {
   align-self: center;
 }
 

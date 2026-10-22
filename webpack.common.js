@@ -55,7 +55,7 @@ module.exports = {
             options: {
               modules: {
                 localIdentName: '[name]_[local]_[hash:base64:5]',
-                exportLocalsConvention: 'as-is',
+                exportLocalsConvention: 'camel-case-only',
               },
               importLoaders: 1,
               esModule: false,

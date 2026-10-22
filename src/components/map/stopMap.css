@@ -2,29 +2,32 @@
   position: relative;
 }
 
-.mapContainer {
+.map-container,
+.map,
+.mini-map,
+.legend {
   border-radius: var(--border-radius);
   overflow: hidden;
 }
 
-.mapContainer img {
+.map-container img,
+.map img,
+.mini-map img,
+.legend img {
   width: 100%;
 }
 
 .map {
-  composes: mapContainer;
   width: 100%;
   height: 100%;
 }
 
-.miniMap {
-  composes: mapContainer;
+.mini-map {
   position: absolute;
   border: 10px solid var(--background);
 }
 
 .legend {
-  composes: mapContainer;
   z-index: 20;
   background-color: white;
   border-radius: 15px;
@@ -33,13 +36,13 @@
   min-height: 30px;
 }
 
-.legendRow {
+.legend-row {
   padding: 5px;
   display: flex;
   align-items: center;
 }
 
-.legendText {
+.legend-text {
   color: black;
   margin-left: 10px;
   font-family: GothamRounded-Book;
@@ -47,35 +50,35 @@
   white-space: nowrap;
 }
 
-.legendLine {
+.legend-line {
   width: 40px;
 }
 
-.legendLine.bus {
-  border: 2px solid rgb(0, 122, 201);
+.legend-line.bus {
+  border: 2px solid rgb(0 122 201);
 }
 
-.legendLine.tram {
-  border: 2px solid rgb(0, 152, 95);
+.legend-line.tram {
+  border: 2px solid rgb(0 152 95);
 }
 
-.legendLine.subway {
-  border: 2px dashed rgb(255, 99, 25);
+.legend-line.subway {
+  border: 2px dashed rgb(255 99 25);
 }
 
-.legendLine.rail {
-  border: 2px dashed rgb(141, 81, 153);
+.legend-line.rail {
+  border: 2px dashed rgb(141 81 153);
 }
 
-.legendLine.trunk {
-  border: 2px solid rgb(255, 99, 25);
+.legend-line.trunk {
+  border: 2px solid rgb(255 99 25);
 }
 
-.legendLine.l_rail {
+.legend-line.l-rail {
   border: 2px solid #0098a1;
 }
 
-.legendIcon {
+.legend-icon {
   width: 10px;
   height: 10px;
   border-radius: 50%;
@@ -84,31 +87,31 @@
   left: 20px;
 }
 
-.legendIcon.bus {
-  border: 2px solid rgb(0, 122, 201);
+.legend-icon.bus {
+  border: 2px solid rgb(0 122 201);
 }
 
-.legendIcon.tram {
-  border: 2px solid rgb(0, 152, 95);
+.legend-icon.tram {
+  border: 2px solid rgb(0 152 95);
 }
 
-.legendIcon.subway {
-  border: 2px solid rgb(255, 99, 25);
+.legend-icon.subway {
+  border: 2px solid rgb(255 99 25);
 }
 
-.legendIcon.rail {
-  border: 2px solid rgb(141, 81, 153);
+.legend-icon.rail {
+  border: 2px solid rgb(141 81 153);
 }
 
-.legendIcon.trunk {
-  border: 2px solid rgb(255, 99, 25);
+.legend-icon.trunk {
+  border: 2px solid rgb(255 99 25);
 }
 
-.legendIcon.l_rail {
+.legend-icon.l-rail {
   border: 2px solid #0098a1;
 }
 
-.primaryLegendText {
+.primary-legend-text {
   font-family: GothamRounded-Medium;
 }
 
@@ -126,20 +129,22 @@
   border-radius: var(--border-radius);
 }
 
-.outline {
-  text-shadow: 0 0 1px rgb(255, 255, 255, 1), 0 0 1px rgb(255, 255, 255, 1),
-    0 0 1px rgb(255, 255, 255, 1);
+.outline,
+.attribution,
+.title,
+.subtitle {
+  text-shadow: 0 0 1px rgb(255 255 255 / 100%), 0 0 1px rgb(255 255 255 / 100%),
+    0 0 1px rgb(255 255 255 / 100%);
 }
 
 .attribution {
-  composes: outline;
   margin: 8px 0;
   font-family: GothamRounded-Medium;
   color: black;
 }
 
-.title {
-  composes: outline;
+.title,
+.subtitle {
   margin: 3px 8px 3px 3px;
   font-size: 18px;
   font-family: GothamRounded-Medium;
@@ -147,7 +152,6 @@
 }
 
 .subtitle {
-  composes: title;
   margin-left: 0;
   font-family: GothamRounded-Book;
 }
@@ -158,7 +162,7 @@
   left: 50%;
 }
 
-.zoneHeading {
+.zone-heading {
   font-family: GothamRounded-Book;
   font-size: 20px;
   vertical-align: middle;
@@ -166,12 +170,12 @@
   display: flex;
   align-items: center;
   width: 100%;
-  color: rgb(0, 122, 201);
+  color: rgb(0 122 201);
   white-space: nowrap;
   flex-wrap: nowrap;
 }
 
-.zoneSymbol {
+.zone-symbol {
   height: 60px;
   width: 60px;
   vertical-align: middle;

@@ -34,7 +34,7 @@
   justify-content: space-between;
 }
 
-.timetablesContainer {
+.timetables-container {
   display: flex;
   flex-direction: column;
   width: 100%;

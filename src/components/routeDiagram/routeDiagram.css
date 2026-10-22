@@ -22,34 +22,39 @@
   min-width: 350px;
 }
 
-.useWide {
+.use-wide {
   min-width: 548px;
 }
 
-.componentName {
+.component-name {
   padding: 0 0 20px;
   font-size: 30px;
   color: var(--hsl-blue);
 }
 
-.componentNameA3 {
+.component-name-a3 {
   font-size: 20px;
   padding: 0 0 10px;
 }
 
-.componentName > .title {
+.component-name > .title {
   font-family: GothamRounded-Medium;
 }
 
-.componentName > .subtitle {
+.component-name > .subtitle {
   font-family: GothamRounded-Book;
 }
 
-.componentNameA3 > .titleA3 {
+.subtitle-a3 {
+  font-family: GothamRounded-Book;
+  font-size: 0.75em;
+}
+
+.component-name-a3 > .title-a3 {
   font-family: GothamRounded-Medium;
 }
 
-.componentNameA3 > .subtitleA3 {
+.component-name-a3 > .subtitle-a3 {
   font-family: GothamRounded-Book;
 }
 
@@ -75,15 +80,10 @@
   line-height: 22px;
 }
 
-.start .titleA3 {
+.start .title-a3 {
   font-family: GothamRounded-Medium;
   font-size: 0.8em;
   line-height: 22px;
-}
-
-.subtitleA3 {
-  font-family: GothamRounded-Book;
-  font-size: 0.75em;
 }
 
 .italics {

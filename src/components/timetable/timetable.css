@@ -18,7 +18,7 @@
   height: 20px;
 }
 
-.validFrom {
+.valid-from {
   padding: 0.313em 0.45em;
   color: black;
   font-size: 12.75px;
@@ -63,11 +63,11 @@
   padding: 0 0 0 0.4em;
 }
 
-.headerTitle {
+.header-title {
   font-size: 1.75em;
 }
 
-.componentName {
+.component-name {
   padding: 0 0 0 0.205em;
   font-size: 1.875em;
 }
@@ -102,7 +102,7 @@
   right: var(--border-radius);
 }
 
-.validity .shortId {
+.validity .short-id {
   font-family: GothamRounded-Medium;
   font-size: 1.75em;
 }
@@ -120,7 +120,7 @@
   font-family: GothamRounded-Medium;
 }
 
-.stopZone {
+.stop-zone {
   padding-left: 0.5em;
   margin-top: 0.875em;
   display: flex;
@@ -128,7 +128,8 @@
   align-items: center;
 }
 
-.zoneTitle {
+.zone-title,
+.zone-subtitle {
   font-size: 0.75em;
   line-height: 1.1;
   font-family: GothamRounded-Medium;
@@ -136,9 +137,8 @@
   margin-right: 0.4em;
 }
 
-.zoneSubtitle {
+.zone-subtitle {
   font-size: 0.75em;
-  composes: zoneTitle;
   font-family: GothamRounded-Book;
 }
 
@@ -153,7 +153,7 @@
   border-radius: 50%;
 }
 
-.zoneLetter {
+.zone-letter {
   font-size: 1.25em;
   position: absolute;
   top: 50%;
@@ -164,7 +164,7 @@
   text-transform: uppercase;
 }
 
-.printBtn {
+.print-btn {
   margin-left: 2rem;
   background-color: var(--hsl-blue);
   margin-top: 1.5rem;
@@ -177,20 +177,20 @@
   border: none;
 }
 
-.printBtn:hover {
+.print-btn:hover {
   background-color: white;
   cursor: pointer;
   color: var(--hsl-blue);
   border: 1px solid var(--hsl-blue);
 }
 
-.coverPageMargin {
+.cover-page-margin {
   top: 1160px;
 }
 
 @media print {
-  .noPrint,
-  .noPrint * {
+  .no-print,
+  .no-print * {
     display: none !important;
   }
 }

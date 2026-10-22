@@ -9,28 +9,28 @@
   font-size: 16px;
 }
 
-.tableContentContainer {
+.table-content-container {
   width: 100%;
   height: fit-content;
   display: flex;
   flex-direction: column;
 }
 
-.tableContentContainer > *:first-child {
+.table-content-container > *:first-child {
   height: 731px;
 }
 
-.tableContentContainer > *:not(:first-child) {
+.table-content-container > *:not(:first-child) {
   height: 841px;
 }
 
-.a3routeDiagram {
+.a3-route-diagram {
   padding-left: 5px;
   height: fit-content;
   width: fit-content;
 }
 
-.tableRowsContainer {
+.table-rows-container {
   display: flex;
 
   /* flex-direction: row; */
@@ -38,7 +38,7 @@
   max-width: 1171px;
 }
 
-.tableRowsContainer > *:first-child {
+.table-rows-container > *:first-child {
   padding-left: 0;
 }
 
@@ -66,11 +66,11 @@
   padding: 0 0 0 0.4em;
 }
 
-.headerTitle {
+.header-title {
   font-size: 1.75em;
 }
 
-.componentName {
+.component-name {
   padding: 0 0 0 0.205em;
   font-size: 1.875em;
 }
@@ -105,7 +105,7 @@
   right: var(--border-radius);
 }
 
-.validity .shortId {
+.validity .short-id {
   font-family: GothamRounded-Medium;
   font-size: 1.75em;
 }
@@ -114,7 +114,7 @@
   font-family: GothamRounded-Medium;
 }
 
-.stopZone {
+.stop-zone {
   padding-left: 0.5em;
   margin-top: 0.875em;
   display: flex;
@@ -122,7 +122,8 @@
   align-items: center;
 }
 
-.zoneTitle {
+.zone-title,
+.zone-subtitle {
   font-size: 0.75em;
   line-height: 1.1;
   font-family: GothamRounded-Medium;
@@ -130,9 +131,8 @@
   margin-right: 0.4em;
 }
 
-.zoneSubtitle {
+.zone-subtitle {
   font-size: 0.75em;
-  composes: zoneTitle;
   font-family: GothamRounded-Book;
 }
 
@@ -147,7 +147,7 @@
   border-radius: 50%;
 }
 
-.zoneLetter {
+.zone-letter {
   font-size: 1.25em;
   position: absolute;
   top: 50%;

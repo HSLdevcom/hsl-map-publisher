@@ -8,7 +8,7 @@
   width: 589.5px;
 }
 
-.emptyColumn {
+.empty-column {
   width: 0;
 }
 
@@ -31,7 +31,7 @@
   width: inherit;
 }
 
-.a3tableHeaderContainer {
+.a3-table-header-container {
   margin-bottom: 3px;
   border-radius: 15px;
 }
@@ -62,7 +62,8 @@
   background-color: var(--timetable-accent-color);
 }
 
-.item {
+.item,
+.hours {
   display: flex;
   min-width: 3.75em;
   padding: 0.25em 0;
@@ -79,7 +80,6 @@
 }
 
 .hours {
-  composes: item;
   padding-left: 0.938em;
   font-family: GothamXNarrow-Medium;
 }
