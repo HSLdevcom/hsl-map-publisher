@@ -63,7 +63,6 @@ function calculateStopsViewport(options) {
     minZoom,
     maxZoom,
     stops,
-    salePoints,
     miniMapStartX,
     miniMapStartY,
     useProjectedSymbols,
@@ -182,15 +181,6 @@ function calculateStopsViewport(options) {
   const projectedStops = bestVisibleStops.map(stop => {
     const [x, y] = bestViewPort.project([stop.lon, stop.lat]);
     return { ...stop, x, y };
-  });
-
-  // Filter sale points that are in the map and calculate pixel coordinates for tem.
-  const visibleSalePoints = salePoints.filter(sp =>
-    viewportContains(bestViewPort, sp, width, height, miniMapStartX, miniMapStartY),
-  );
-  const projectedSalePoints = visibleSalePoints.map(sp => {
-    const [x, y] = bestViewPort.project([sp.lon, sp.lat]);
-    return { ...sp, x, y };
   });
 
   const [minLon, minLat] = bestViewPort.unproject([0, 0]);
@@ -349,7 +339,6 @@ function calculateStopsViewport(options) {
     maxLon,
     maxLat,
     projectedSymbols,
-    projectedSalePoints,
   };
 }
 

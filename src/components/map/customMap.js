@@ -20,7 +20,6 @@ class CustomMap extends Component {
     setMapHeight: PropTypes.func.isRequired,
     mapZoneSymbols: PropTypes.bool,
     mapZones: PropTypes.bool,
-    showSalesPoint: PropTypes.bool,
     minimapZoneSymbols: PropTypes.bool,
     minimapZones: PropTypes.bool,
     legend: PropTypes.bool,
@@ -29,7 +28,6 @@ class CustomMap extends Component {
   static defaultProps = {
     mapZoneSymbols: false,
     mapZones: false,
-    showSalesPoint: false,
     minimapZoneSymbols: false,
     minimapZones: false,
     legend: false,
@@ -86,7 +84,6 @@ class CustomMap extends Component {
       isSummerTimetable,
       mapZoneSymbols,
       mapZones,
-      showSalesPoint,
       minimapZoneSymbols,
       minimapZones,
       legend,
@@ -153,7 +150,6 @@ class CustomMap extends Component {
                 showCitybikes={isSummerTimetable}
                 mapZoneSymbols={mapZoneSymbols}
                 mapZones={mapZones}
-                showSalesPoint={showSalesPoint}
                 minimapZoneSymbols={minimapZoneSymbols}
                 minimapZones={minimapZones}
                 legend={legend}

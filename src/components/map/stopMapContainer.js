@@ -6,10 +6,8 @@ import compose from 'recompose/compose';
 import flatMap from 'lodash/flatMap';
 import get from 'lodash/get';
 import { PerspectiveMercatorViewport } from 'viewport-mercator-project';
-import haversine from 'haversine';
 
 import apolloWrapper from 'util/apolloWrapper';
-import config from 'util/config';
 import promiseWrapper from 'util/promiseWrapper';
 import { trimRouteId, isDropOffOnly, filterRouteSegments } from 'util/domain';
 import { calculateStopsViewport } from 'util/stopPoster';
@@ -28,13 +26,6 @@ const MINI_MAP_ZOOM = 9;
 // Mini map position
 const MINI_MAP_MARGIN_RIGHT = 60;
 const MINI_MAP_MARGIN_BOTTOM = -40;
-
-const SALE_POINT_TYPES = [
-  'Kertalippuautomaatti',
-  'Monilippuautomaatti',
-  'myyntipiste', // yes, there is one in lowercase
-  'Myyntipiste',
-];
 
 const nearbyItemsQuery = gql`
   query nearbyItemsQuery(
@@ -162,7 +153,6 @@ const nearbyItemsMapper = mapProps(props => {
     maxLon,
     maxLat,
     projectedSymbols,
-    projectedSalePoints,
   } = calculateStopsViewport({
     longitude: props.longitude,
     latitude: props.latitude,
@@ -171,7 +161,6 @@ const nearbyItemsMapper = mapProps(props => {
     minZoom: MIN_ZOOM,
     maxZoom: MAX_ZOOM,
     stops,
-    salePoints: props.salePoints,
     currentStopId: props.stopId,
     miniMapStartX: props.width - MINI_MAP_WIDTH - MINI_MAP_MARGIN_RIGHT,
     miniMapStartY: props.height - MINI_MAP_HEIGHT - MINI_MAP_MARGIN_BOTTOM,
@@ -180,33 +169,6 @@ const nearbyItemsMapper = mapProps(props => {
 
   const currentStop = projectedStops.find(({ stopIds }) => stopIds.includes(props.stopId));
   const nearbyStops = projectedStops.filter(({ stopIds }) => !stopIds.includes(props.stopId));
-  // Calculate distances to sale points and get the nearest one
-  const nearestSalePoint = props.showSalesPoint
-    ? projectedSalePoints
-        .map(sp => {
-          // Euclidean distance
-          const distance = haversine(
-            { latitude: sp.lat, longitude: sp.lon },
-            { latitude: projectedCurrentLocation.lat, longitude: projectedCurrentLocation.lon },
-            { unit: 'meter' },
-          );
-          return { ...sp, distance };
-        })
-        .reduce((prev, curr) => (prev && curr.distance > prev.distance ? prev : curr), null)
-    : null;
-
-  const projectedSalesPoints = [];
-  props.salePoints.forEach(salePoint => {
-    if (
-      salePoint.lon > minLon &&
-      salePoint.lon < maxLon &&
-      salePoint.lat < minLat &&
-      salePoint.lat > maxLat
-    ) {
-      projectedSalesPoints.push(salePoint);
-    }
-  });
-
   const mapOptions = {
     center: [viewport.longitude, viewport.latitude],
     width: props.width,
@@ -243,8 +205,6 @@ const nearbyItemsMapper = mapProps(props => {
     maxLon,
     maxLat,
     projectedSymbols,
-    nearestSalePoint,
-    projectedSalesPoints,
   };
 });
 
@@ -297,32 +257,6 @@ const mapInterestsMapper = mapProps(props => {
   };
 });
 
-const getSalePoints = () => {
-  return fetch(config.SALES_POINT_DATA_URL, { method: 'GET' })
-    .then(response => response.json())
-    .then(data => {
-      try {
-        return data.features
-          .filter(sp => SALE_POINT_TYPES.includes(sp.properties.Tyyppi))
-          .map(sp => {
-            const { properties } = sp;
-            const { coordinates } = sp.geometry;
-            const [lon, lat] = coordinates;
-            return {
-              id: properties.ID,
-              type: properties.Tyyppi,
-              title: properties.Nimi,
-              address: properties.Osoite,
-              lat,
-              lon,
-            };
-          });
-      } catch (e) {
-        throw new Error('Error accessing sales point data', e);
-      }
-    });
-};
-
 const fetchOSMObjects = async props => {
   let results;
   try {
@@ -344,21 +278,10 @@ const osmPointsMapper = mapProps(props => {
   };
 });
 
-const salePointsMapper = mapProps(props => {
-  // If sales points are not configured, do not fetch them but return empty array
-  const salePoints = props.showSalesPoint ? getSalePoints() : Promise.resolve([]);
-  return {
-    ...props,
-    salePoints,
-  };
-});
-
 const hoc = compose(
   graphql(mapPositionQuery),
   apolloWrapper(mapInterestsMapper),
   graphql(nearbyItemsQuery),
-  salePointsMapper,
-  promiseWrapper('salePoints'),
   osmPointsMapper,
   promiseWrapper('subwayEntrances'),
   apolloWrapper(nearbyItemsMapper),

@@ -10,8 +10,6 @@ import InlineSVG from 'components/inlineSVG';
 
 import locationIcon from 'icons/marker.svg';
 import subwayStationIcon from 'icons/icon-subway-station.svg';
-import ticketMachineIcon from 'icons/icon-ticket-machine.svg';
-import ticketSalesPointIcon from 'icons/icon-tickets-sales-point.svg';
 
 import aZone from 'icons/icon-Zone-A.svg';
 import bZone from 'icons/icon-Zone-B.svg';
@@ -24,14 +22,12 @@ import MapImage from './mapImageContainer';
 import Scalebar from './scalebar';
 import StopSymbol from './stopSymbol';
 import StopLabel from './stopLabel';
-import SalePointLabel from './salePointLabel';
 
 import styles from './stopMap.css';
 
 import placeLabelCity from './city-layer.json';
 
 // Map symbol size
-const SALES_POINT_RADIUS = 9;
 const STOP_RADIUS = 20;
 const LOCATION_RADIUS = 30;
 const LOCATION_RADIUS_MINI = 10;
@@ -48,12 +44,6 @@ const LocationSymbol = props => (
   <div style={{ width: props.size, height: props.size }}>
     <InlineSVG src={locationIcon} style={{ width: '100%' }} />
   </div>
-);
-
-const getSalesPointIcon = type => (
-  <InlineSVG
-    src={type.toLowerCase() === 'myyntipiste' ? ticketSalesPointIcon : ticketMachineIcon}
-  />
 );
 
 const getZoneIcon = zone => {
@@ -133,7 +123,7 @@ const calculateSymbolDistancesFromStops = (stops, symbols) => {
   return symbolsWithStopDistances;
 };
 
-const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
+const getLegend = (stops, subwayEntrances) => {
   const modes = [];
   stops.forEach(stop => {
     stop.routes.forEach(route => {
@@ -253,41 +243,6 @@ const getLegend = (stops, projectedSalesPoints, subwayEntrances) => {
     }
   }
 
-  if (projectedSalesPoints) {
-    const ticketSalesPoint = find(projectedSalesPoints, ['type', 'Myyntipiste']);
-    const ticketSalesMachine = find(projectedSalesPoints, ['type', 'Monilippuautomaatti']);
-    if (ticketSalesPoint) {
-      legendHeight += 30;
-      legendContent.push(
-        <div key="Myyntipiste" className={styles.legendRow}>
-          <InlineSVG style={svgStyles} src={ticketSalesPointIcon} />
-          <div className={styles.legendText}>
-            <span className={styles.primaryLegendText}>Lipunmyyntipiste</span>
-            {' / '}
-            <span>Biljettförsäljning</span>
-            {' / '}
-            <span className={styles.italics}>Ticket sales</span>
-          </div>
-        </div>,
-      );
-    }
-    if (ticketSalesMachine) {
-      legendHeight += 30;
-      legendContent.push(
-        <div key="Monilippuautomaatti" className={styles.legendRow}>
-          <InlineSVG style={svgStyles} src={ticketMachineIcon} />
-          <div className={styles.legendText}>
-            <span className={styles.primaryLegendText}>Lippuautomaatti</span>
-            {' / '}
-            <span>Biljettautomat</span>
-            {' / '}
-            <span className={styles.italics}>Ticket sales machine</span>
-          </div>
-        </div>,
-      );
-    }
-  }
-
   legendHeight += 100; // Offset, scaleBar and attribution
 
   return {
@@ -346,10 +301,9 @@ const StopMap = props => {
     newPosition.viewport,
   );
 
-  const { nearestSalePoint, isTerminal } = props;
-  const salesPointIcon = nearestSalePoint && getSalesPointIcon(nearestSalePoint.type);
+  const { isTerminal } = props;
 
-  const legend = getLegend(stops, props.projectedSalesPoints, props.subwayEntrances);
+  const legend = getLegend(stops, props.subwayEntrances);
 
   const legendStyle = {
     left: mapStyle.width - props.miniMapOptions.marginRight - props.miniMapOptions.width - 300,
@@ -430,26 +384,6 @@ const StopMap = props => {
             </ItemPositioned>
           ))}
 
-          {nearestSalePoint && (
-            <ItemFixed
-              top={nearestSalePoint.y - SALES_POINT_RADIUS}
-              left={nearestSalePoint.x - SALES_POINT_RADIUS}>
-              <Row>
-                <div style={{ width: SALES_POINT_RADIUS * 2, height: SALES_POINT_RADIUS * 2 }}>
-                  {salesPointIcon}
-                </div>
-              </Row>
-            </ItemFixed>
-          )}
-
-          {nearestSalePoint && (
-            <ItemPositioned x={nearestSalePoint.x} y={nearestSalePoint.y} distance={25} angle={0}>
-              <Row>
-                <SalePointLabel {...nearestSalePoint} icon={salesPointIcon} />
-              </Row>
-            </ItemPositioned>
-          )}
-
           {legend.content.length > 1 && props.legend && (
             <ItemFixed top={legendStyle.top} left={10}>
               <div className={styles.legend}>{legend.content}</div>
@@ -513,23 +447,9 @@ const StopType = PropTypes.shape({
   stops: PropTypes.array,
 });
 
-const nearestSalePointType = PropTypes.shape({
-  id: PropTypes.number.isRequired,
-  type: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  address: PropTypes.string,
-  lat: PropTypes.number.isRequired,
-  lon: PropTypes.number.isRequired,
-  distance: PropTypes.number.isRequired,
-  x: PropTypes.number.isRequired,
-  y: PropTypes.number.isRequired,
-});
-
 StopMap.defaultProps = {
   projectedSymbols: null,
-  nearestSalePoint: null,
   isTerminal: false,
-  projectedSalesPoints: null,
   subwayEntrances: null,
   legend: false,
 };
@@ -543,9 +463,7 @@ StopMap.propTypes = {
   date: PropTypes.string.isRequired,
   showCitybikes: PropTypes.bool.isRequired,
   projectedSymbols: PropTypes.arrayOf(Object),
-  nearestSalePoint: nearestSalePointType,
   isTerminal: PropTypes.bool,
-  projectedSalesPoints: PropTypes.arrayOf(Object),
   subwayEntrances: PropTypes.arrayOf(Object),
   legend: PropTypes.bool,
 };
