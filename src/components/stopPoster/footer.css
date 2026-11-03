@@ -1,55 +1,55 @@
-.footerWrapper {
+.footer-wrapper {
   position: relative;
   height: 418px;
   width: 100%;
 }
 
-.footerPiece {
+.footer-piece {
   position: absolute;
   height: 418px;
   width: auto;
 }
 
-.dynamicSlot {
+.dynamic-slot {
   position: absolute;
   top: 33px;
   overflow: hidden;
 }
 
-.svgContainer {
+.svg-container {
   position: absolute;
   inset: 0;
 }
 
-.svgContainer svg {
+.svg-container svg {
   height: auto;
   width: 100%;
 }
 
-.qrCode {
+.qr-code {
   position: absolute;
 }
 
-.dottedLine {
+.dotted-line {
   position: relative;
   height: auto;
   top: -6px;
   left: 0;
 }
 
-.hslLogo {
+.hsl-logo {
   top: 69px;
   left: 23px;
   height: 385px;
 }
 
-.hslLogo svg {
+.hsl-logo svg {
   height: 100%;
   width: auto;
   fill: red;
 }
 
-.customerService {
+.customer-service {
   top: 40px;
   right: 11px;
   height: auto;
@@ -59,7 +59,7 @@
 .url {
   position: absolute;
   font-size: 20px;
-  font-family: GothamXNarrow-Medium;
+  font-family: GothamXNarrow-Medium, serif;
   color: black;
   padding: 2px 0;
 }

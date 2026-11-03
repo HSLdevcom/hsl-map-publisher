@@ -6,10 +6,10 @@
 
 .root > *:first-child {
   margin: 5px 0;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   color: black;
-  text-shadow: 0 0 1px rgb(255, 255, 255, 1), 0 0 1px rgb(255, 255, 255, 1),
-    0 0 1px rgb(255, 255, 255, 1);
+  text-shadow: 0 0 1px rgb(255 255 255 / 100%), 0 0 1px rgb(255 255 255 / 100%),
+    0 0 1px rgb(255 255 255 / 100%);
 }
 
 .root > *:last-child {

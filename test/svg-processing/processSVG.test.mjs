@@ -41,8 +41,8 @@ async function renderSvgToBuffer(browser, svgContent) {
 }
 
 function buffersAreEqual(buf1, buf2) {
-  if (buf1.length !== buf2.length) return false;
-  return buf1.equals(buf2);
+  // page.screenshot() returns a Uint8Array on newer Node/Puppeteer, which has no .equals()
+  return Buffer.from(buf1).equals(Buffer.from(buf2));
 }
 
 for (const svgFile of svgFiles) {

@@ -55,20 +55,20 @@
   height: 84px;
 }
 
-.groupA4 {
+.group-a4 {
   display: flex;
   flex-direction: column;
   justify-content: left;
   height: 84px;
 }
 
-.routeIdsContainer {
+.route-ids-container {
   display: flex;
   justify-content: left;
   flex-wrap: wrap;
 }
 
-.simple .groupA4 {
+.simple .group-a4 {
   height: auto;
   margin-top: 0.25rem;
   flex-flow: row nowrap;
@@ -76,7 +76,7 @@
   justify-content: flex-start;
 }
 
-.groupRow {
+.group-row {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -85,43 +85,44 @@
 
 .id {
   padding: 0 12px;
-  font-family: GothamXNarrow-Medium;
+  font-family: GothamXNarrow-Medium, serif;
   font-size: 2.5em;
 }
 
 .simple .id {
   font-size: 0.83em;
   padding: 0 0.25em 0 0;
-  font-family: GothamXNarrow-Medium;
+  font-family: GothamXNarrow-Medium, serif;
 }
 
-.simple .singleId {
+.simple .single-id {
   font-size: 0.83em;
   padding: 0 0.25em 0 0;
   min-width: 1.875em;
-  font-family: GothamXNarrow-Medium;
+  font-family: GothamXNarrow-Medium, serif;
 }
 
-.routeTitles {
+.route-titles {
   display: flex;
   flex-flow: row wrap;
 }
 
-.title {
+.title,
+.subtitle {
   /* padding-right: 0.893em; */
 
   /* Removed to allow more space for overflow */
-  font-family: GothamXNarrow-Medium;
+  font-family: GothamXNarrow-Medium, serif;
   font-size: 0.83em;
 }
 
-.simple .title {
-  padding-right: 0.25em;
+.subtitle {
+  font-family: GothamXNarrow-Book, serif;
 }
 
-.subtitle {
-  composes: title;
-  font-family: GothamXNarrow-Book;
+.simple .title,
+.simple .subtitle {
+  padding-right: 0.25em;
 }
 
 .icon {

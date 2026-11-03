@@ -22,35 +22,40 @@
   min-width: 350px;
 }
 
-.useWide {
+.use-wide {
   min-width: 548px;
 }
 
-.componentName {
+.component-name {
   padding: 0 0 20px;
   font-size: 30px;
   color: var(--hsl-blue);
 }
 
-.componentNameA3 {
+.component-name-a3 {
   font-size: 20px;
   padding: 0 0 10px;
 }
 
-.componentName > .title {
-  font-family: GothamRounded-Medium;
+.component-name > .title {
+  font-family: GothamRounded-Medium, serif;
 }
 
-.componentName > .subtitle {
-  font-family: GothamRounded-Book;
+.component-name > .subtitle {
+  font-family: GothamRounded-Book, serif;
 }
 
-.componentNameA3 > .titleA3 {
-  font-family: GothamRounded-Medium;
+.subtitle-a3 {
+  font-family: GothamRounded-Book, serif;
+  font-size: 0.75em;
 }
 
-.componentNameA3 > .subtitleA3 {
-  font-family: GothamRounded-Book;
+.component-name-a3 > .title-a3 {
+  font-family: GothamRounded-Medium, serif;
+}
+
+.component-name-a3 > .subtitle-a3 {
+  font-family: GothamRounded-Book, serif;
 }
 
 .start {
@@ -70,20 +75,15 @@
 }
 
 .start .title {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   font-size: 18px;
   line-height: 22px;
 }
 
-.start .titleA3 {
-  font-family: GothamRounded-Medium;
+.start .title-a3 {
+  font-family: GothamRounded-Medium, serif;
   font-size: 0.8em;
   line-height: 22px;
-}
-
-.subtitleA3 {
-  font-family: GothamRounded-Book;
-  font-size: 0.75em;
 }
 
 .italics {

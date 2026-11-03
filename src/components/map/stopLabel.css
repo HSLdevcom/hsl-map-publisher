@@ -3,18 +3,18 @@
   margin: 5px;
   white-space: nowrap;
   color: black;
-  background: hsl(0deg, 0%, 100%, 0.8);
+  background: hsl(0deg 0% 100% / 80%);
 }
 
 .title {
   font-size: 16px;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   line-height: 16px;
 }
 
 .subtitle {
   font-size: 16px;
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
 }
 
 .content {
@@ -24,24 +24,24 @@
 }
 
 .route {
-  font-family: GothamXNarrow-Medium;
+  font-family: GothamXNarrow-Medium, serif;
 }
 
 .destination {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
 }
 
-.destinationLight {
-  font-family: GothamRounded-Book;
+.destination-light {
+  font-family: GothamRounded-Book, serif;
 }
 
-.flexContainer {
+.flex-container {
   display: flex;
   flex-direction: row;
   justify-content: left;
 }
 
-.destinationContainer {
+.destination-container {
   align-self: center;
 }
 

@@ -134,16 +134,16 @@ PrintButton.propTypes = {
 };
 
 const PlatformSymbol = ({ platform, size, color }) => (
-  <svg className={styles.PScontainer} width={size} height={size}>
+  <svg className={styles.psContainer} width={size} height={size}>
     <circle
-      className={styles.PScircle}
+      className={styles.psCircle}
       style={{ stroke: color }}
       cx={size / 2}
       cy={size / 2}
       r={size / 2 - 2}
     />
     <text
-      className={styles.PStext}
+      className={styles.psText}
       style={{ fill: color }}
       x={size / 2}
       y={size / 2}

@@ -16,7 +16,7 @@
   width: var(--right-width);
 }
 
-.rightWide {
+.right-wide {
   display: flex;
   padding-left: 10px;
   box-sizing: border-box;
@@ -24,50 +24,50 @@
 }
 
 .title {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   font-size: 11px;
 }
 
 .subtitle {
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
   font-size: 11px;
 }
 
-.iconContainer {
+.icon-container {
   display: flex;
   align-items: center;
   margin-left: 6px;
   margin-right: 6px;
 }
 
-.routeContainer {
+.route-container {
   display: flex;
   justify-content: left;
   font-size: 0.5em;
   padding: 0 0.285em 0 0;
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
 }
 
-.titleContainer {
+.title-container {
   display: flex;
   align-items: center;
 }
 
-.terminalAreaRoutesContainer {
+.terminal-area-routes-container {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
 }
 
-.compactRoutes {
+.compact-routes {
   max-width: 60px;
 }
 
-.terminalAreaRoutesTitle {
+.terminal-area-routes-title {
   font-size: 0.5em;
   white-space: initial;
   padding-bottom: 2px;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
 }
 
 .icon {
@@ -82,17 +82,18 @@
   align-items: flex-start;
 }
 
-.separatorTop {
+.separator-top {
   height: 12px;
   border-left: var(--line-border);
 }
 
-.separatorBottom {
+.separator-bottom {
   height: 12px;
   border-left: var(--line-border);
 }
 
-.separatorStop {
+.separator-stop,
+.separator-last-stop {
   width: calc(4 * var(--line-width));
   height: calc(4 * var(--line-width));
   border: var(--line-border);
@@ -102,8 +103,7 @@
   margin-left: calc(-2.5 * var(--line-width));
 }
 
-.separatorLastStop {
-  composes: separatorStop;
+.separator-last-stop {
   background: var(--line-color);
   border-radius: 0;
 }

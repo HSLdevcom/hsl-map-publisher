@@ -8,7 +8,7 @@
   width: 589.5px;
 }
 
-.emptyColumn {
+.empty-column {
   width: 0;
 }
 
@@ -31,7 +31,7 @@
   width: inherit;
 }
 
-.a3tableHeaderContainer {
+.a3-table-header-container {
   margin-bottom: 3px;
   border-radius: 15px;
 }
@@ -62,11 +62,12 @@
   background-color: var(--timetable-accent-color);
 }
 
-.item {
+.item,
+.hours {
   display: flex;
   min-width: 3.75em;
   padding: 0.25em 0;
-  font-family: GothamXNarrow-Book;
+  font-family: GothamXNarrow-Book, serif;
   font-size: 0.75em;
   letter-spacing: -0.025em;
   line-height: 1;
@@ -75,11 +76,10 @@
 
 .minutes {
   min-width: 0.75em;
-  font-family: GothamXNarrow-Medium;
+  font-family: GothamXNarrow-Medium, serif;
 }
 
 .hours {
-  composes: item;
   padding-left: 0.938em;
-  font-family: GothamXNarrow-Medium;
+  font-family: GothamXNarrow-Medium, serif;
 }
