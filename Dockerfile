@@ -17,13 +17,14 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
 ENV WORK=/opt/publisher
 
-RUN mkdir -p ${WORK}
+RUN mkdir -p ${WORK} && chown node:node ${WORK}
 WORKDIR ${WORK}
+USER node
 
-COPY package.json package-lock.json .npmrc ${WORK}/
+COPY --chown=node:node package.json package-lock.json .npmrc ${WORK}/
 RUN npm ci && npm cache clean --force
 
-COPY . ${WORK}
+COPY --chown=node:node . ${WORK}
 
 RUN npm run build
 
