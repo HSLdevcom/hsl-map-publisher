@@ -1,4 +1,4 @@
-FROM node:22-bookworm-slim AS production
+FROM node:25-bookworm-slim AS production
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
