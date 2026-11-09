@@ -101,7 +101,7 @@
     "apollo-link-http": "^1.2.0",
     "assert": "^2.1.0",
     "babel-polyfill": "^6.26.0",
-    "bullmq": "^1.86.2",
+    "bullmq": "^6.0.11",
     "cheerio": "^1.0.0",
     "classnames": "^2.2.5",
     "clean-webpack-plugin": "^4.0.0",
