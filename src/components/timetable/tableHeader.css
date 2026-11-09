@@ -1,18 +1,18 @@
 .root {
   margin-top: 0.4em;
   margin-bottom: 0.938em;
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
   color: var(--timetable-text-color);
   break-after: avoid;
 }
 
 .strong {
-  font-family: GothamXNarrow-Medium;
+  font-family: GothamXNarrow-Medium, serif;
 }
 
 .title {
   padding: 0.313em 0.45em;
-  font-family: GothamXNarrow-Book;
+  font-family: GothamXNarrow-Book, serif;
 }
 
 .subtitle {
@@ -27,7 +27,7 @@
   min-width: 4.2em;
 }
 
-.a3Title {
+.a3-title {
   font-size: 0.8em;
 }
 
@@ -39,18 +39,18 @@
   display: inline;
 }
 
-.compactTitle {
+.compact-title {
   font-size: 0.8em;
 }
 
-.compactSubtitle {
+.compact-subtitle {
   font-size: 0.5em;
 }
 
-.compactRoot {
+.compact-root {
   margin: 0.5em 0;
 }
 
-.compactPadding {
+.compact-padding {
   padding-top: 0.15em;
 }

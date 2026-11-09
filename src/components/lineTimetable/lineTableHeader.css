@@ -1,11 +1,11 @@
-.headerContainer {
+.header-container {
   display: block;
   break-inside: avoid;
   break-before: avoid-page;
   margin-bottom: 1.3rem;
 }
 
-.flexHeader {
+.flex-header {
   display: flex;
 }
 
@@ -16,22 +16,22 @@
   margin-bottom: 1rem;
 }
 
-.stopNamePrimary {
+.stop-name-primary {
   font-size: 1rem;
   margin: 0 0 0.2rem 1.2rem;
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   letter-spacing: normal;
   break-inside: avoid;
 }
 
-.stopNameSecondary {
+.stop-name-secondary {
   font-size: 1rem;
   margin: 0 0 0 1.2rem;
-  font-family: GothamRounded-Book;
+  font-family: GothamRounded-Book, serif;
   letter-spacing: normal;
 }
 
-.directionBracket {
-  font-family: GothamRounded-Medium;
+.direction-bracket {
+  font-family: GothamRounded-Medium, serif;
   font-size: 1rem;
 }

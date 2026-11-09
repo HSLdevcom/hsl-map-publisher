@@ -1,23 +1,25 @@
----
 name: "CI/CD: Continuous integration and continuous deployment"
 
 "on":
   push:
     branches:
-      - master
-      - development
+      - '**'
     tags:
       - "v*"
   pull_request:
 
+permissions: {}
+
 jobs:
   build-check-test-push:
-    uses: HSLdevcom/transitdata-shared-workflows/.github/workflows/ci-cd-typescript.yml@publisher-wip
-    secrets:
-      DOCKER_USERNAME: ${{ secrets.KARTAT_DOCKERHUB_USER }}
-      DOCKER_PASSWORD: ${{ secrets.KARTAT_DOCKERHUB_TOKEN }}
+    permissions:
+      contents: read
+      packages: read
+    # ponytail: SHA of feature/megalinter head; repin to a release tag/SHA on main after merge
+    uses: HSLdevcom/transitdata-shared-workflows/.github/workflows/ci-cd-typescript.yml@234db0afad207e5af97e17e597b9f0933d22b4c0  # 1.1.0
+    secrets: inherit  # zizmor: ignore[secrets-inherit] shared workflow declares no secrets: block
     with:
       checkAndTestOutsideDocker: true
-      codeCoverageEnabled: true
-      performRelease: true
+      performRelease: false
       checkAndTestInsideDocker: false
+      lintBlocking: true
