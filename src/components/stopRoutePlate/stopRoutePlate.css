@@ -1,5 +1,5 @@
 body {
-  font-family: GothamRounded-Medium;
+  font-family: GothamRounded-Medium, serif;
   font-size: 16px;
 }
 
@@ -11,9 +11,9 @@ th {
 }
 
 table {
-  border-spacing: 0px;
+  border-spacing: 0;
 }
 
-.rowContainer > *:nth-child(odd) {
+.row-container > *:nth-child(odd) {
   background-color: #eaeaea;
 }

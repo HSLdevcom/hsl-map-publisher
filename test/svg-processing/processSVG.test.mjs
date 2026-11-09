@@ -41,8 +41,8 @@ async function renderSvgToBuffer(browser, svgContent) {
 }
 
 function buffersAreEqual(buf1, buf2) {
-  if (buf1.length !== buf2.length) return false;
-  return buf1.equals(buf2);
+  // page.screenshot() returns a Uint8Array on newer Node/Puppeteer, which has no .equals()
+  return Buffer.from(buf1).equals(Buffer.from(buf2));
 }
 
 for (const svgFile of svgFiles) {
@@ -51,7 +51,7 @@ for (const svgFile of svgFiles) {
     const originalSvg = fs.readFileSync(svgPath, 'utf-8');
     const processedSvg = processSVGWithUniqueIds(originalSvg);
 
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
 
     try {
       const originalScreenshot = await renderSvgToBuffer(browser, originalSvg);
@@ -83,7 +83,7 @@ for (const svgFile of svgFiles) {
     const processedOnce = processSVGWithUniqueIds(originalSvg);
     const processedTwice = processSVGWithUniqueIds(processedOnce);
 
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
 
     try {
       const originalScreenshot = await renderSvgToBuffer(browser, originalSvg);
