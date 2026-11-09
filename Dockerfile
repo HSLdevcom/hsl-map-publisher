@@ -1,4 +1,4 @@
-FROM node:22-bookworm-slim AS production
+FROM hsldevcom/infodevops-docker-base-images:1.1.0-24-node AS production
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
