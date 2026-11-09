@@ -1,4 +1,4 @@
-FROM node:22-bullseye-slim AS production
+FROM hsldevcom/infodevops-docker-base-images:1.1.0-24-node AS production
 
 RUN apt-get -y update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -yq \
