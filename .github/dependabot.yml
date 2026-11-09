@@ -1,17 +1,4 @@
 version: 2
-multi-ecosystem-groups:
-  hsldevcom-infra:
-    schedule:
-      interval: "daily"
-    updates:
-      - package-ecosystem: "docker"
-        directory: "/"
-        patterns: ["hsldevcom/*"]
-        multi-ecosystem-group: "hsldevcom-infra"
-      - package-ecosystem: "github-actions"
-        directory: "/"
-        patterns: ["HSLdevcom/*"]
-        multi-ecosystem-group: "hsldevcom-infra"
 updates:
   - package-ecosystem: "maven"
     directory: "/"
